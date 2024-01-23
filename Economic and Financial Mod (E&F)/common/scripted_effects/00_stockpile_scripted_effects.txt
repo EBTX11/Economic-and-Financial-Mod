@@ -1,0 +1,3954 @@
+﻿#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+# ███████╗████████╗ ██████╗  ██████╗██╗  ██╗██████╗ ██╗██╗     ██╗███╗   ██╗ ██████╗      ██████╗  ██████╗  ██████╗ ██████╗ ███████╗
+# ██╔════╝╚══██╔══╝██╔═══██╗██╔════╝██║ ██╔╝██╔══██╗██║██║     ██║████╗  ██║██╔════╝     ██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔════╝
+# ███████╗   ██║   ██║   ██║██║     █████╔╝ ██████╔╝██║██║     ██║██╔██╗ ██║██║  ███╗    ██║  ███╗██║   ██║██║   ██║██║  ██║███████╗
+# ╚════██║   ██║   ██║   ██║██║     ██╔═██╗ ██╔═══╝ ██║██║     ██║██║╚██╗██║██║   ██║    ██║   ██║██║   ██║██║   ██║██║  ██║╚════██║
+# ███████║   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║███████╗██║██║ ╚████║╚██████╔╝    ╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝███████║
+# ╚══════╝   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝      ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_grain = {
+	set_variable = {
+		name = stockpiling_grain_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			grain_market_goods_delta > 0
+			stockpiling_grain_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_grain_var_2
+			add = grain_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_grain_state_1
+						add = root.var:stockpiling_grain_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_grain_1 = {
+	change_variable = {
+		name = store_grain_time
+		add = 1
+	}	
+	change_variable = {
+		name = grain_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_grain_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_grain_var_2
+			add = grain_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_grain_var_2
+			#add = grain_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_grain_state_1
+						add = root.var:stockpiling_grain_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_grain_time = var:grain_store_month_fixe
+		}
+		set_variable = {
+			name = store_grain_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_grain_state_1
+						subtract = root.var:grain_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_grain_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_grain_1
+			}
+		}
+		set_variable = {
+			name = grain_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_grain_time
+			value = 0
+		}
+		set_variable = {
+			name = grain_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_grain_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = grain_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = grain_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_grain_1 = {
+	change_variable = {
+		name = release_grain_time
+		add = 1
+	}	
+	change_variable = {
+		name = grain_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_grain_time = var:grain_release_month_fixe
+		}
+		set_variable = {
+			name = release_grain_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_grain_state_1
+						subtract = root.var:grain_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_grain_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_grain_1
+				remove_modifier = release_grain_1
+			}
+		}
+		set_variable = {
+			name = grain_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_grain_time
+			value = 0
+		}
+		set_variable = {
+			name = grain_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_grain_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = grain_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = grain_release_month
+			value = 12
+		}
+	}
+}
+
+set_grain_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_grain_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_wood = {
+	set_variable = {
+		name = stockpiling_wood_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			wood_market_goods_delta > 0
+			stockpiling_wood_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_wood_var_2
+			add = wood_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_wood_state_1
+						add = root.var:stockpiling_wood_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_wood_1 = {
+	change_variable = {
+		name = store_wood_time
+		add = 1
+	}	
+	change_variable = {
+		name = wood_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_wood_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_wood_var_2
+			add = wood_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_wood_var_2
+			#add = wood_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_wood_state_1
+						add = root.var:stockpiling_wood_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_wood_time = var:wood_store_month_fixe
+		}
+		set_variable = {
+			name = store_wood_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_wood_state_1
+						subtract = root.var:wood_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_wood_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_wood_1
+			}
+		}
+		set_variable = {
+			name = wood_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_wood_time
+			value = 0
+		}
+		set_variable = {
+			name = wood_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_wood_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = wood_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = wood_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_wood_1 = {
+	change_variable = {
+		name = release_wood_time
+		add = 1
+	}	
+	change_variable = {
+		name = wood_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_wood_time = var:wood_release_month_fixe
+		}
+		set_variable = {
+			name = release_wood_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_wood_state_1
+						subtract = root.var:wood_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_wood_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_wood_1
+				remove_modifier = release_wood_1
+			}
+		}
+		set_variable = {
+			name = wood_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_wood_time
+			value = 0
+		}
+		set_variable = {
+			name = wood_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_wood_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = wood_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = wood_release_month
+			value = 12
+		}
+	}
+}
+
+set_wood_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_wood_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_coal = {
+	set_variable = {
+		name = stockpiling_coal_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			coal_market_goods_delta > 0
+			stockpiling_coal_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_coal_var_2
+			add = coal_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_coal_state_1
+						add = root.var:stockpiling_coal_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_coal_1 = {
+	change_variable = {
+		name = store_coal_time
+		add = 1
+	}	
+	change_variable = {
+		name = coal_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_coal_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_coal_var_2
+			add = coal_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_coal_var_2
+			#add = coal_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_coal_state_1
+						add = root.var:stockpiling_coal_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_coal_time = var:coal_store_month_fixe
+		}
+		set_variable = {
+			name = store_coal_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_coal_state_1
+						subtract = root.var:coal_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_coal_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_coal_1
+			}
+		}
+		set_variable = {
+			name = coal_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_coal_time
+			value = 0
+		}
+		set_variable = {
+			name = coal_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_coal_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = coal_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = coal_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_coal_1 = {
+	change_variable = {
+		name = release_coal_time
+		add = 1
+	}	
+	change_variable = {
+		name = coal_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_coal_time = var:coal_release_month_fixe
+		}
+		set_variable = {
+			name = release_coal_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_coal_state_1
+						subtract = root.var:coal_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_coal_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_coal_1
+				remove_modifier = release_coal_1
+			}
+		}
+		set_variable = {
+			name = coal_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_coal_time
+			value = 0
+		}
+		set_variable = {
+			name = coal_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_coal_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = coal_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = coal_release_month
+			value = 12
+		}
+	}
+}
+
+set_coal_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_coal_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_iron = {
+	set_variable = {
+		name = stockpiling_iron_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			iron_market_goods_delta > 0
+			stockpiling_iron_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_iron_var_2
+			add = iron_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_iron_state_1
+						add = root.var:stockpiling_iron_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_iron_1 = {
+	change_variable = {
+		name = store_iron_time
+		add = 1
+	}	
+	change_variable = {
+		name = iron_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_iron_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_iron_var_2
+			add = iron_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_iron_var_2
+			#add = iron_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_iron_state_1
+						add = root.var:stockpiling_iron_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_iron_time = var:iron_store_month_fixe
+		}
+		set_variable = {
+			name = store_iron_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_iron_state_1
+						subtract = root.var:iron_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_iron_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_iron_1
+			}
+		}
+		set_variable = {
+			name = iron_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_iron_time
+			value = 0
+		}
+		set_variable = {
+			name = iron_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_iron_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = iron_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = iron_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_iron_1 = {
+	change_variable = {
+		name = release_iron_time
+		add = 1
+	}	
+	change_variable = {
+		name = iron_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_iron_time = var:iron_release_month_fixe
+		}
+		set_variable = {
+			name = release_iron_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_iron_state_1
+						subtract = root.var:iron_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_iron_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_iron_1
+				remove_modifier = release_iron_1
+			}
+		}
+		set_variable = {
+			name = iron_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_iron_time
+			value = 0
+		}
+		set_variable = {
+			name = iron_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_iron_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = iron_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = iron_release_month
+			value = 12
+		}
+	}
+}
+
+set_iron_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_iron_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_sulfur = {
+	set_variable = {
+		name = stockpiling_sulfur_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			sulfur_market_goods_delta > 0
+			stockpiling_sulfur_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_sulfur_var_2
+			add = sulfur_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_sulfur_state_1
+						add = root.var:stockpiling_sulfur_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_sulfur_1 = {
+	change_variable = {
+		name = store_sulfur_time
+		add = 1
+	}	
+	change_variable = {
+		name = sulfur_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_sulfur_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_sulfur_var_2
+			add = sulfur_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_sulfur_var_2
+			#add = sulfur_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_sulfur_state_1
+						add = root.var:stockpiling_sulfur_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_sulfur_time = var:sulfur_store_month_fixe
+		}
+		set_variable = {
+			name = store_sulfur_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_sulfur_state_1
+						subtract = root.var:sulfur_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_sulfur_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_sulfur_1
+			}
+		}
+		set_variable = {
+			name = sulfur_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_sulfur_time
+			value = 0
+		}
+		set_variable = {
+			name = sulfur_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_sulfur_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = sulfur_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = sulfur_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_sulfur_1 = {
+	change_variable = {
+		name = release_sulfur_time
+		add = 1
+	}	
+	change_variable = {
+		name = sulfur_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_sulfur_time = var:sulfur_release_month_fixe
+		}
+		set_variable = {
+			name = release_sulfur_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_sulfur_state_1
+						subtract = root.var:sulfur_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_sulfur_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_sulfur_1
+				remove_modifier = release_sulfur_1
+			}
+		}
+		set_variable = {
+			name = sulfur_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_sulfur_time
+			value = 0
+		}
+		set_variable = {
+			name = sulfur_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_sulfur_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = sulfur_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = sulfur_release_month
+			value = 12
+		}
+	}
+}
+
+set_sulfur_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_sulfur_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_lead = {
+	set_variable = {
+		name = stockpiling_lead_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			lead_market_goods_delta > 0
+			stockpiling_lead_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_lead_var_2
+			add = lead_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_lead_state_1
+						add = root.var:stockpiling_lead_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_lead_1 = {
+	change_variable = {
+		name = store_lead_time
+		add = 1
+	}	
+	change_variable = {
+		name = lead_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_lead_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_lead_var_2
+			add = lead_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_lead_var_2
+			#add = lead_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_lead_state_1
+						add = root.var:stockpiling_lead_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_lead_time = var:lead_store_month_fixe
+		}
+		set_variable = {
+			name = store_lead_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_lead_state_1
+						subtract = root.var:lead_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_lead_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_lead_1
+			}
+		}
+		set_variable = {
+			name = lead_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_lead_time
+			value = 0
+		}
+		set_variable = {
+			name = lead_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_lead_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = lead_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = lead_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_lead_1 = {
+	change_variable = {
+		name = release_lead_time
+		add = 1
+	}	
+	change_variable = {
+		name = lead_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_lead_time = var:lead_release_month_fixe
+		}
+		set_variable = {
+			name = release_lead_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_lead_state_1
+						subtract = root.var:lead_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_lead_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_lead_1
+				remove_modifier = release_lead_1
+			}
+		}
+		set_variable = {
+			name = lead_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_lead_time
+			value = 0
+		}
+		set_variable = {
+			name = lead_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_lead_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = lead_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = lead_release_month
+			value = 12
+		}
+	}
+}
+
+set_lead_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_lead_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_oil = {
+	set_variable = {
+		name = stockpiling_oil_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			oil_market_goods_delta > 0
+			stockpiling_oil_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_oil_var_2
+			add = oil_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_oil_state_1
+						add = root.var:stockpiling_oil_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_oil_1 = {
+	change_variable = {
+		name = store_oil_time
+		add = 1
+	}	
+	change_variable = {
+		name = oil_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_oil_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_oil_var_2
+			add = oil_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_oil_var_2
+			#add = oil_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_oil_state_1
+						add = root.var:stockpiling_oil_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_oil_time = var:oil_store_month_fixe
+		}
+		set_variable = {
+			name = store_oil_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_oil_state_1
+						subtract = root.var:oil_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_oil_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_oil_1
+			}
+		}
+		set_variable = {
+			name = oil_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_oil_time
+			value = 0
+		}
+		set_variable = {
+			name = oil_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_oil_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = oil_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = oil_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_oil_1 = {
+	change_variable = {
+		name = release_oil_time
+		add = 1
+	}	
+	change_variable = {
+		name = oil_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_oil_time = var:oil_release_month_fixe
+		}
+		set_variable = {
+			name = release_oil_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_oil_state_1
+						subtract = root.var:oil_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_oil_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_oil_1
+				remove_modifier = release_oil_1
+			}
+		}
+		set_variable = {
+			name = oil_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_oil_time
+			value = 0
+		}
+		set_variable = {
+			name = oil_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_oil_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = oil_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = oil_release_month
+			value = 12
+		}
+	}
+}
+
+set_oil_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_oil_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_dye = {
+	set_variable = {
+		name = stockpiling_dye_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			dye_market_goods_delta > 0
+			stockpiling_dye_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_dye_var_2
+			add = dye_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_dye_state_1
+						add = root.var:stockpiling_dye_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_dye_1 = {
+	change_variable = {
+		name = store_dye_time
+		add = 1
+	}	
+	change_variable = {
+		name = dye_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_dye_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_dye_var_2
+			add = dye_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_dye_var_2
+			#add = dye_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_dye_state_1
+						add = root.var:stockpiling_dye_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_dye_time = var:dye_store_month_fixe
+		}
+		set_variable = {
+			name = store_dye_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_dye_state_1
+						subtract = root.var:dye_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_dye_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_dye_1
+			}
+		}
+		set_variable = {
+			name = dye_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_dye_time
+			value = 0
+		}
+		set_variable = {
+			name = dye_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_dye_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = dye_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = dye_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_dye_1 = {
+	change_variable = {
+		name = release_dye_time
+		add = 1
+	}	
+	change_variable = {
+		name = dye_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_dye_time = var:dye_release_month_fixe
+		}
+		set_variable = {
+			name = release_dye_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_dye_state_1
+						subtract = root.var:dye_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_dye_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_dye_1
+				remove_modifier = release_dye_1
+			}
+		}
+		set_variable = {
+			name = dye_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_dye_time
+			value = 0
+		}
+		set_variable = {
+			name = dye_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_dye_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = dye_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = dye_release_month
+			value = 12
+		}
+	}
+}
+
+set_dye_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_dye_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_silk = {
+	set_variable = {
+		name = stockpiling_silk_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			silk_market_goods_delta > 0
+			stockpiling_silk_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_silk_var_2
+			add = silk_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_silk_state_1
+						add = root.var:stockpiling_silk_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_silk_1 = {
+	change_variable = {
+		name = store_silk_time
+		add = 1
+	}	
+	change_variable = {
+		name = silk_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_silk_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_silk_var_2
+			add = silk_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_silk_var_2
+			#add = silk_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_silk_state_1
+						add = root.var:stockpiling_silk_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_silk_time = var:silk_store_month_fixe
+		}
+		set_variable = {
+			name = store_silk_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_silk_state_1
+						subtract = root.var:silk_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_silk_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_silk_1
+			}
+		}
+		set_variable = {
+			name = silk_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_silk_time
+			value = 0
+		}
+		set_variable = {
+			name = silk_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_silk_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = silk_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = silk_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_silk_1 = {
+	change_variable = {
+		name = release_silk_time
+		add = 1
+	}	
+	change_variable = {
+		name = silk_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_silk_time = var:silk_release_month_fixe
+		}
+		set_variable = {
+			name = release_silk_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_silk_state_1
+						subtract = root.var:silk_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_silk_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_silk_1
+				remove_modifier = release_silk_1
+			}
+		}
+		set_variable = {
+			name = silk_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_silk_time
+			value = 0
+		}
+		set_variable = {
+			name = silk_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_silk_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = silk_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = silk_release_month
+			value = 12
+		}
+	}
+}
+
+set_silk_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_silk_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_rubber = {
+	set_variable = {
+		name = stockpiling_rubber_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			rubber_market_goods_delta > 0
+			stockpiling_rubber_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_rubber_var_2
+			add = rubber_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_rubber_state_1
+						add = root.var:stockpiling_rubber_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_rubber_1 = {
+	change_variable = {
+		name = store_rubber_time
+		add = 1
+	}	
+	change_variable = {
+		name = rubber_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_rubber_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_rubber_var_2
+			add = rubber_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_rubber_var_2
+			#add = rubber_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_rubber_state_1
+						add = root.var:stockpiling_rubber_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_rubber_time = var:rubber_store_month_fixe
+		}
+		set_variable = {
+			name = store_rubber_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_rubber_state_1
+						subtract = root.var:rubber_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_rubber_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_rubber_1
+			}
+		}
+		set_variable = {
+			name = rubber_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_rubber_time
+			value = 0
+		}
+		set_variable = {
+			name = rubber_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_rubber_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = rubber_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = rubber_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_rubber_1 = {
+	change_variable = {
+		name = release_rubber_time
+		add = 1
+	}	
+	change_variable = {
+		name = rubber_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_rubber_time = var:rubber_release_month_fixe
+		}
+		set_variable = {
+			name = release_rubber_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_rubber_state_1
+						subtract = root.var:rubber_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_rubber_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_rubber_1
+				remove_modifier = release_rubber_1
+			}
+		}
+		set_variable = {
+			name = rubber_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_rubber_time
+			value = 0
+		}
+		set_variable = {
+			name = rubber_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_rubber_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = rubber_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = rubber_release_month
+			value = 12
+		}
+	}
+}
+
+set_rubber_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_rubber_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_ammunition = {
+	set_variable = {
+		name = stockpiling_ammunition_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			ammunition_market_goods_delta > 0
+			stockpiling_ammunition_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_ammunition_var_2
+			add = ammunition_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_ammunition_state_1
+						add = root.var:stockpiling_ammunition_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_ammunition_1 = {
+	change_variable = {
+		name = store_ammunition_time
+		add = 1
+	}	
+	change_variable = {
+		name = ammunition_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_ammunition_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_ammunition_var_2
+			add = ammunition_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_ammunition_var_2
+			#add = ammunition_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_ammunition_state_1
+						add = root.var:stockpiling_ammunition_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_ammunition_time = var:ammunition_store_month_fixe
+		}
+		set_variable = {
+			name = store_ammunition_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_ammunition_state_1
+						subtract = root.var:ammunition_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_ammunition_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_ammunition_1
+			}
+		}
+		set_variable = {
+			name = ammunition_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_ammunition_time
+			value = 0
+		}
+		set_variable = {
+			name = ammunition_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_ammunition_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = ammunition_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = ammunition_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_ammunition_1 = {
+	change_variable = {
+		name = release_ammunition_time
+		add = 1
+	}	
+	change_variable = {
+		name = ammunition_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_ammunition_time = var:ammunition_release_month_fixe
+		}
+		set_variable = {
+			name = release_ammunition_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_ammunition_state_1
+						subtract = root.var:ammunition_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_ammunition_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_ammunition_1
+				remove_modifier = release_ammunition_1
+			}
+		}
+		set_variable = {
+			name = ammunition_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_ammunition_time
+			value = 0
+		}
+		set_variable = {
+			name = ammunition_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_ammunition_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = ammunition_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = ammunition_release_month
+			value = 12
+		}
+	}
+}
+
+set_ammunition_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_ammunition_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_small_arms = {
+	set_variable = {
+		name = stockpiling_small_arms_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			small_arms_market_goods_delta > 0
+			stockpiling_small_arms_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_small_arms_var_2
+			add = small_arms_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_small_arms_state_1
+						add = root.var:stockpiling_small_arms_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_small_arms_1 = {
+	change_variable = {
+		name = store_small_arms_time
+		add = 1
+	}	
+	change_variable = {
+		name = small_arms_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_small_arms_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_small_arms_var_2
+			add = small_arms_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_small_arms_var_2
+			#add = small_arms_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_small_arms_state_1
+						add = root.var:stockpiling_small_arms_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_small_arms_time = var:small_arms_store_month_fixe
+		}
+		set_variable = {
+			name = store_small_arms_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_small_arms_state_1
+						subtract = root.var:small_arms_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_small_arms_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_small_arms_1
+			}
+		}
+		set_variable = {
+			name = small_arms_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_small_arms_time
+			value = 0
+		}
+		set_variable = {
+			name = small_arms_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_small_arms_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = small_arms_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = small_arms_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_small_arms_1 = {
+	change_variable = {
+		name = release_small_arms_time
+		add = 1
+	}	
+	change_variable = {
+		name = small_arms_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_small_arms_time = var:small_arms_release_month_fixe
+		}
+		set_variable = {
+			name = release_small_arms_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_small_arms_state_1
+						subtract = root.var:small_arms_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_small_arms_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_small_arms_1
+				remove_modifier = release_small_arms_1
+			}
+		}
+		set_variable = {
+			name = small_arms_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_small_arms_time
+			value = 0
+		}
+		set_variable = {
+			name = small_arms_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_small_arms_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = small_arms_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = small_arms_release_month
+			value = 12
+		}
+	}
+}
+
+set_small_arms_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_small_arms_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_artillery = {
+	set_variable = {
+		name = stockpiling_artillery_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			artillery_market_goods_delta > 0
+			stockpiling_artillery_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_artillery_var_2
+			add = artillery_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_artillery_state_1
+						add = root.var:stockpiling_artillery_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_artillery_1 = {
+	change_variable = {
+		name = store_artillery_time
+		add = 1
+	}	
+	change_variable = {
+		name = artillery_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_artillery_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_artillery_var_2
+			add = artillery_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_artillery_var_2
+			#add = artillery_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_artillery_state_1
+						add = root.var:stockpiling_artillery_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_artillery_time = var:artillery_store_month_fixe
+		}
+		set_variable = {
+			name = store_artillery_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_artillery_state_1
+						subtract = root.var:artillery_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_artillery_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_artillery_1
+			}
+		}
+		set_variable = {
+			name = artillery_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_artillery_time
+			value = 0
+		}
+		set_variable = {
+			name = artillery_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_artillery_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = artillery_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = artillery_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_artillery_1 = {
+	change_variable = {
+		name = release_artillery_time
+		add = 1
+	}	
+	change_variable = {
+		name = artillery_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_artillery_time = var:artillery_release_month_fixe
+		}
+		set_variable = {
+			name = release_artillery_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_artillery_state_1
+						subtract = root.var:artillery_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_artillery_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_artillery_1
+				remove_modifier = release_artillery_1
+			}
+		}
+		set_variable = {
+			name = artillery_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_artillery_time
+			value = 0
+		}
+		set_variable = {
+			name = artillery_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_artillery_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = artillery_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = artillery_release_month
+			value = 12
+		}
+	}
+}
+
+set_artillery_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_artillery_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_tanks = {
+	set_variable = {
+		name = stockpiling_tanks_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			tanks_market_goods_delta > 0
+			stockpiling_tanks_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_tanks_var_2
+			add = tanks_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_tanks_state_1
+						add = root.var:stockpiling_tanks_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_tanks_1 = {
+	change_variable = {
+		name = store_tanks_time
+		add = 1
+	}	
+	change_variable = {
+		name = tanks_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_tanks_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_tanks_var_2
+			add = tanks_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_tanks_var_2
+			#add = tanks_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_tanks_state_1
+						add = root.var:stockpiling_tanks_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_tanks_time = var:tanks_store_month_fixe
+		}
+		set_variable = {
+			name = store_tanks_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_tanks_state_1
+						subtract = root.var:tanks_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_tanks_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_tanks_1
+			}
+		}
+		set_variable = {
+			name = tanks_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_tanks_time
+			value = 0
+		}
+		set_variable = {
+			name = tanks_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_tanks_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = tanks_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = tanks_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_tanks_1 = {
+	change_variable = {
+		name = release_tanks_time
+		add = 1
+	}	
+	change_variable = {
+		name = tanks_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_tanks_time = var:tanks_release_month_fixe
+		}
+		set_variable = {
+			name = release_tanks_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_tanks_state_1
+						subtract = root.var:tanks_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_tanks_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_tanks_1
+				remove_modifier = release_tanks_1
+			}
+		}
+		set_variable = {
+			name = tanks_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_tanks_time
+			value = 0
+		}
+		set_variable = {
+			name = tanks_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_tanks_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = tanks_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = tanks_release_month
+			value = 12
+		}
+	}
+}
+
+set_tanks_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_tanks_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_aeroplanes = {
+	set_variable = {
+		name = stockpiling_aeroplanes_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			aeroplanes_market_goods_delta > 0
+			stockpiling_aeroplanes_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_aeroplanes_var_2
+			add = aeroplanes_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_aeroplanes_state_1
+						add = root.var:stockpiling_aeroplanes_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_aeroplanes_1 = {
+	change_variable = {
+		name = store_aeroplanes_time
+		add = 1
+	}	
+	change_variable = {
+		name = aeroplanes_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_aeroplanes_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_aeroplanes_var_2
+			add = aeroplanes_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_aeroplanes_var_2
+			#add = aeroplanes_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_aeroplanes_state_1
+						add = root.var:stockpiling_aeroplanes_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_aeroplanes_time = var:aeroplanes_store_month_fixe
+		}
+		set_variable = {
+			name = store_aeroplanes_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_aeroplanes_state_1
+						subtract = root.var:aeroplanes_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_aeroplanes_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_aeroplanes_1
+			}
+		}
+		set_variable = {
+			name = aeroplanes_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_aeroplanes_time
+			value = 0
+		}
+		set_variable = {
+			name = aeroplanes_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_aeroplanes_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = aeroplanes_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = aeroplanes_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_aeroplanes_1 = {
+	change_variable = {
+		name = release_aeroplanes_time
+		add = 1
+	}	
+	change_variable = {
+		name = aeroplanes_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_aeroplanes_time = var:aeroplanes_release_month_fixe
+		}
+		set_variable = {
+			name = release_aeroplanes_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_aeroplanes_state_1
+						subtract = root.var:aeroplanes_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_aeroplanes_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_aeroplanes_1
+				remove_modifier = release_aeroplanes_1
+			}
+		}
+		set_variable = {
+			name = aeroplanes_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_aeroplanes_time
+			value = 0
+		}
+		set_variable = {
+			name = aeroplanes_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_aeroplanes_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = aeroplanes_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = aeroplanes_release_month
+			value = 12
+		}
+	}
+}
+
+set_aeroplanes_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_aeroplanes_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_manowars = {
+	set_variable = {
+		name = stockpiling_manowars_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			manowars_market_goods_delta > 0
+			stockpiling_manowars_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_manowars_var_2
+			add = manowars_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_manowars_state_1
+						add = root.var:stockpiling_manowars_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_manowars_1 = {
+	change_variable = {
+		name = store_manowars_time
+		add = 1
+	}	
+	change_variable = {
+		name = manowars_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_manowars_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_manowars_var_2
+			add = manowars_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_manowars_var_2
+			#add = manowars_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_manowars_state_1
+						add = root.var:stockpiling_manowars_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_manowars_time = var:manowars_store_month_fixe
+		}
+		set_variable = {
+			name = store_manowars_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_manowars_state_1
+						subtract = root.var:manowars_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_manowars_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_manowars_1
+			}
+		}
+		set_variable = {
+			name = manowars_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_manowars_time
+			value = 0
+		}
+		set_variable = {
+			name = manowars_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_manowars_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = manowars_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = manowars_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_manowars_1 = {
+	change_variable = {
+		name = release_manowars_time
+		add = 1
+	}	
+	change_variable = {
+		name = manowars_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_manowars_time = var:manowars_release_month_fixe
+		}
+		set_variable = {
+			name = release_manowars_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_manowars_state_1
+						subtract = root.var:manowars_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_manowars_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_manowars_1
+				remove_modifier = release_manowars_1
+			}
+		}
+		set_variable = {
+			name = manowars_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_manowars_time
+			value = 0
+		}
+		set_variable = {
+			name = manowars_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_manowars_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = manowars_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = manowars_release_month
+			value = 12
+		}
+	}
+}
+
+set_manowars_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_manowars_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+flow_storing_ironclads = {
+	set_variable = {
+		name = stockpiling_ironclads_var_2
+		value = 0
+	}
+    if = {
+        limit = {
+			ironclads_market_goods_delta > 0
+			stockpiling_ironclads_var_1 < 10000000
+        }
+		change_variable = {
+			name = stockpiling_ironclads_var_2
+			add = ironclads_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_ironclads_state_1
+						add = root.var:stockpiling_ironclads_var_2
+					}
+				}            
+			}
+		}    
+	}
+}
+
+storing_ironclads_1 = {
+	change_variable = {
+		name = store_ironclads_time
+		add = 1
+	}	
+	change_variable = {
+		name = ironclads_store_month
+		subtract = 1
+	}
+	set_variable = {
+		name = stockpiling_ironclads_var_2
+		value = 0
+	}
+	if = {
+		change_variable = {
+			name = stockpiling_ironclads_var_2
+			add = ironclads_store_quantity_1_mounth
+		}
+		change_variable = {
+			name = stockpiling_ironclads_var_2
+			#add = ironclads_market_goods_delta_month
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				save_scope_as = bank_central_historic_place
+				scope:bank_central_historic_place = {
+					change_variable = {
+						name = stockpiling_ironclads_state_1
+						add = root.var:stockpiling_ironclads_var_2
+					}
+				}            
+			}
+		}    
+	}
+
+	############
+	if = {
+		limit = {
+			var:store_ironclads_time = var:ironclads_store_month_fixe
+		}
+		set_variable = {
+			name = store_ironclads_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_ironclads_state_1
+						subtract = root.var:ironclads_store_quantity_1_year
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_ironclads_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = store_ironclads_1
+			}
+		}
+		set_variable = {
+			name = ironclads_store_status
+			value = 0
+		}
+		set_variable = {
+			name = store_ironclads_time
+			value = 0
+		}
+		set_variable = {
+			name = ironclads_store_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_ironclads_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = ironclads_store_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = ironclads_store_month
+			value = 12
+		}
+	}
+}
+
+releasing_ironclads_1 = {
+	change_variable = {
+		name = release_ironclads_time
+		add = 1
+	}	
+	change_variable = {
+		name = ironclads_release_month
+		subtract = 1
+	}
+
+	############
+	if = {
+		limit = {
+			var:release_ironclads_time = var:ironclads_release_month_fixe
+		}
+		set_variable = {
+			name = release_ironclads_time
+			value = 0
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = national_stockpile_historic_place
+					is_capital = yes
+				}
+				save_scope_as = national_stockpile_historic_place
+				scope:national_stockpile_historic_place = {
+					change_variable = {
+						name = stockpiling_ironclads_state_1
+						subtract = root.var:ironclads_release_quantity_1_year
+
+					}
+					activate_production_method = {
+						building_type = building_national_stockpile
+						production_method = pm_ironclads_0
+					}
+				}            
+			}
+		}		
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				#remove_modifier = store_ironclads_1
+				remove_modifier = release_ironclads_1
+			}
+		}
+		set_variable = {
+			name = ironclads_release_status
+			value = 0
+		}
+		set_variable = {
+			name = release_ironclads_time
+			value = 0
+		}
+		set_variable = {
+			name = ironclads_release_quantity_1_year
+			value = 0
+		}
+		set_variable = {
+			name = release_ironclads_var_1
+			value = 0
+		}
+		#set_variable = {
+		#	name = ironclads_release_quantity
+		#	value = 500
+		#}
+		set_variable = {
+			name = ironclads_release_month
+			value = 12
+		}
+	}
+}
+
+set_ironclads_idle = {
+	every_scope_state = {
+		limit = {
+			has_building = building_trade_center
+		}
+		activate_production_method = {
+			building_type = building_trade_center
+			production_method = pm_releasing_ironclads_0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################

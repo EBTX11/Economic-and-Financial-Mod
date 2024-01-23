@@ -1,0 +1,3503 @@
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+# ███████╗████████╗ ██████╗  ██████╗██╗  ██╗██████╗ ██╗██╗     ██╗███╗   ██╗ ██████╗ 
+# ██╔════╝╚══██╔══╝██╔═══██╗██╔════╝██║ ██╔╝██╔══██╗██║██║     ██║████╗  ██║██╔════╝ 
+# ███████╗   ██║   ██║   ██║██║     █████╔╝ ██████╔╝██║██║     ██║██╔██╗ ██║██║  ███╗
+# ╚════██║   ██║   ██║   ██║██║     ██╔═██╗ ██╔═══╝ ██║██║     ██║██║╚██╗██║██║   ██║
+# ███████║   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║███████╗██║██║ ╚████║╚██████╔╝
+# ╚══════╝   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+#                                                                                    
+#  ██████╗  ██████╗  ██████╗ ██████╗ ███████╗                                        
+# ██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔════╝                                        
+# ██║  ███╗██║   ██║██║   ██║██║  ██║███████╗                                        
+# ██║   ██║██║   ██║██║   ██║██║  ██║╚════██║                                        
+# ╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝███████║                                        
+#  ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝                                                 
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#grain
+
+#####flow
+grain_market_goods_sell_orders = {
+	value = {
+		add = market.mg:grain.market_goods_sell_orders
+	}
+}
+grain_market_goods_buy_orders = {
+	value = {
+		add = market.mg:grain.market_goods_buy_orders
+	}
+}
+grain_market_goods_delta = {
+	value = grain_market_goods_sell_orders
+	subtract = grain_market_goods_buy_orders
+}
+grain_market_goods_delta_month = {
+	value = grain_market_goods_delta
+	multiply = 4
+}
+grain_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:grain_store_status = 0
+			grain_market_goods_delta > 0
+		}
+		add = grain_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:grain_store_status = 1
+		}
+		value = grain_store_quantity_1_week
+		if = {
+			limit = {
+				grain_market_goods_delta > 0
+			}
+			add = grain_market_goods_delta
+		}
+	}
+}
+
+#####store
+grain_store_predicted = { #1year
+	if = {
+		limit = {
+			var:grain_store_status = 1
+		}
+		add = 1
+		multiply = var:grain_store_quantity
+		multiply = var:grain_store_month
+	}
+}
+grain_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:grain_store_status = 1
+		}
+		add = 1
+		multiply = var:grain_store_quantity
+		multiply = var:grain_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:grain_store_status = 0
+		}	
+		add = 1
+		multiply = var:grain_store_quantity
+		multiply = var:grain_store_month
+	}
+}
+grain_store_for_modifier = {
+	add = var:grain_store_quantity
+	multiply = 25
+}
+grain_store_quantity_1_mounth = {
+	add = var:grain_store_quantity
+}
+grain_store_quantity_1_week = {
+	add = var:grain_store_quantity
+	divide = 4
+}
+store_grain_time_reverse = {
+	value = var:grain_store_month_fixe # #12
+	subtract = var:store_grain_time
+}
+
+#####release
+grain_mounth_choise = { #1year
+	value = var:grain_mounth_choise
+}
+grain_release_predicted = { #1year
+	if = {
+		limit = {
+			var:grain_release_status = 1
+		}
+		add = 1
+		multiply = var:grain_release_quantity
+		multiply = var:grain_release_month
+	}
+}
+grain_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:grain_release_status = 1
+		}
+		add = 1
+		multiply = var:grain_release_quantity
+		multiply = var:grain_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:grain_release_status = 0
+		}	
+		add = 1
+		multiply = var:grain_release_quantity
+		multiply = var:grain_release_month
+	}
+}
+grain_release_for_modifier = {
+	add = var:grain_release_quantity
+	multiply = 25
+}
+grain_release_quantity_1_mounth = {
+	add = var:grain_release_quantity
+}
+grain_release_quantity_1_week = {
+	add = var:grain_release_quantity
+	divide = 4
+}
+release_grain_time_reverse = {
+	value = var:grain_release_month_fixe # #12
+	subtract = var:release_grain_time
+}
+
+
+#country_grain
+stockpiling_grain_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_grain_state_1
+			}
+		}
+	}
+}
+
+#global_grain
+grain_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:grain.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+grain_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:grain.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+grain_global_market_goods_delta = {
+	value = grain_global_market_goods_sell_orders
+	subtract = grain_global_market_goods_buy_orders
+}
+grain_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = grain_global_market_goods_delta
+		divide = grain_global_market_goods_sell_orders
+	}
+}
+grain_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = grain_global_market_goods_rapport_price
+	multiply = -1
+}
+grain_global_market_goods_price = {
+	value = 20
+	multiply = grain_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#wood
+
+#####flow
+wood_market_goods_sell_orders = {
+	value = {
+		add = market.mg:wood.market_goods_sell_orders
+	}
+}
+wood_market_goods_buy_orders = {
+	value = {
+		add = market.mg:wood.market_goods_buy_orders
+	}
+}
+wood_market_goods_delta = {
+	value = wood_market_goods_sell_orders
+	subtract = wood_market_goods_buy_orders
+}
+wood_market_goods_delta_month = {
+	value = wood_market_goods_delta
+	multiply = 4
+}
+wood_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:wood_store_status = 0
+			wood_market_goods_delta > 0
+		}
+		add = wood_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:wood_store_status = 1
+		}
+		value = wood_store_quantity_1_week
+		if = {
+			limit = {
+				wood_market_goods_delta > 0
+			}
+			add = wood_market_goods_delta
+		}
+	}
+}
+
+#####store
+wood_store_predicted = { #1year
+	if = {
+		limit = {
+			var:wood_store_status = 1
+		}
+		add = 1
+		multiply = var:wood_store_quantity
+		multiply = var:wood_store_month
+	}
+}
+wood_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:wood_store_status = 1
+		}
+		add = 1
+		multiply = var:wood_store_quantity
+		multiply = var:wood_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:wood_store_status = 0
+		}	
+		add = 1
+		multiply = var:wood_store_quantity
+		multiply = var:wood_store_month
+	}
+}
+wood_store_for_modifier = {
+	add = var:wood_store_quantity
+	multiply = 25
+}
+wood_store_quantity_1_mounth = {
+	add = var:wood_store_quantity
+}
+wood_store_quantity_1_week = {
+	add = var:wood_store_quantity
+	divide = 4
+}
+store_wood_time_reverse = {
+	value = var:wood_store_month_fixe # #12
+	subtract = var:store_wood_time
+}
+
+#####release
+wood_mounth_choise = { #1year
+	value = var:wood_mounth_choise
+}
+wood_release_predicted = { #1year
+	if = {
+		limit = {
+			var:wood_release_status = 1
+		}
+		add = 1
+		multiply = var:wood_release_quantity
+		multiply = var:wood_release_month
+	}
+}
+wood_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:wood_release_status = 1
+		}
+		add = 1
+		multiply = var:wood_release_quantity
+		multiply = var:wood_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:wood_release_status = 0
+		}	
+		add = 1
+		multiply = var:wood_release_quantity
+		multiply = var:wood_release_month
+	}
+}
+wood_release_for_modifier = {
+	add = var:wood_release_quantity
+	multiply = 25
+}
+wood_release_quantity_1_mounth = {
+	add = var:wood_release_quantity
+}
+wood_release_quantity_1_week = {
+	add = var:wood_release_quantity
+	divide = 4
+}
+release_wood_time_reverse = {
+	value = var:wood_release_month_fixe # #12
+	subtract = var:release_wood_time
+}
+
+
+#country_wood
+stockpiling_wood_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_wood_state_1
+			}
+		}
+	}
+}
+
+#global_wood
+wood_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:wood.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+wood_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:wood.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+wood_global_market_goods_delta = {
+	value = wood_global_market_goods_sell_orders
+	subtract = wood_global_market_goods_buy_orders
+}
+wood_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = wood_global_market_goods_delta
+		divide = wood_global_market_goods_sell_orders
+	}
+}
+wood_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = wood_global_market_goods_rapport_price
+	multiply = -1
+}
+wood_global_market_goods_price = {
+	value = 20
+	multiply = wood_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#coal
+
+#####flow
+coal_market_goods_sell_orders = {
+	value = {
+		add = market.mg:coal.market_goods_sell_orders
+	}
+}
+coal_market_goods_buy_orders = {
+	value = {
+		add = market.mg:coal.market_goods_buy_orders
+	}
+}
+coal_market_goods_delta = {
+	value = coal_market_goods_sell_orders
+	subtract = coal_market_goods_buy_orders
+}
+coal_market_goods_delta_month = {
+	value = coal_market_goods_delta
+	multiply = 4
+}
+coal_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:coal_store_status = 0
+			coal_market_goods_delta > 0
+		}
+		add = coal_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:coal_store_status = 1
+		}
+		value = coal_store_quantity_1_week
+		if = {
+			limit = {
+				coal_market_goods_delta > 0
+			}
+			add = coal_market_goods_delta
+		}
+	}
+}
+
+#####store
+coal_store_predicted = { #1year
+	if = {
+		limit = {
+			var:coal_store_status = 1
+		}
+		add = 1
+		multiply = var:coal_store_quantity
+		multiply = var:coal_store_month
+	}
+}
+coal_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:coal_store_status = 1
+		}
+		add = 1
+		multiply = var:coal_store_quantity
+		multiply = var:coal_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:coal_store_status = 0
+		}	
+		add = 1
+		multiply = var:coal_store_quantity
+		multiply = var:coal_store_month
+	}
+}
+coal_store_for_modifier = {
+	add = var:coal_store_quantity
+	multiply = 25
+}
+coal_store_quantity_1_mounth = {
+	add = var:coal_store_quantity
+}
+coal_store_quantity_1_week = {
+	add = var:coal_store_quantity
+	divide = 4
+}
+store_coal_time_reverse = {
+	value = var:coal_store_month_fixe # #12
+	subtract = var:store_coal_time
+}
+
+#####release
+coal_mounth_choise = { #1year
+	value = var:coal_mounth_choise
+}
+coal_release_predicted = { #1year
+	if = {
+		limit = {
+			var:coal_release_status = 1
+		}
+		add = 1
+		multiply = var:coal_release_quantity
+		multiply = var:coal_release_month
+	}
+}
+coal_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:coal_release_status = 1
+		}
+		add = 1
+		multiply = var:coal_release_quantity
+		multiply = var:coal_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:coal_release_status = 0
+		}	
+		add = 1
+		multiply = var:coal_release_quantity
+		multiply = var:coal_release_month
+	}
+}
+coal_release_for_modifier = {
+	add = var:coal_release_quantity
+	multiply = 25
+}
+coal_release_quantity_1_mounth = {
+	add = var:coal_release_quantity
+}
+coal_release_quantity_1_week = {
+	add = var:coal_release_quantity
+	divide = 4
+}
+release_coal_time_reverse = {
+	value = var:coal_release_month_fixe # #12
+	subtract = var:release_coal_time
+}
+
+
+#country_coal
+stockpiling_coal_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_coal_state_1
+			}
+		}
+	}
+}
+
+#global_coal
+coal_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:coal.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+coal_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:coal.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+coal_global_market_goods_delta = {
+	value = coal_global_market_goods_sell_orders
+	subtract = coal_global_market_goods_buy_orders
+}
+coal_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = coal_global_market_goods_delta
+		divide = coal_global_market_goods_sell_orders
+	}
+}
+coal_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = coal_global_market_goods_rapport_price
+	multiply = -1
+}
+coal_global_market_goods_price = {
+	value = 20
+	multiply = coal_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#iron
+
+#####flow
+iron_market_goods_sell_orders = {
+	value = {
+		add = market.mg:iron.market_goods_sell_orders
+	}
+}
+iron_market_goods_buy_orders = {
+	value = {
+		add = market.mg:iron.market_goods_buy_orders
+	}
+}
+iron_market_goods_delta = {
+	value = iron_market_goods_sell_orders
+	subtract = iron_market_goods_buy_orders
+}
+iron_market_goods_delta_month = {
+	value = iron_market_goods_delta
+	multiply = 4
+}
+iron_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:iron_store_status = 0
+			iron_market_goods_delta > 0
+		}
+		add = iron_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:iron_store_status = 1
+		}
+		value = iron_store_quantity_1_week
+		if = {
+			limit = {
+				iron_market_goods_delta > 0
+			}
+			add = iron_market_goods_delta
+		}
+	}
+}
+
+#####store
+iron_store_predicted = { #1year
+	if = {
+		limit = {
+			var:iron_store_status = 1
+		}
+		add = 1
+		multiply = var:iron_store_quantity
+		multiply = var:iron_store_month
+	}
+}
+iron_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:iron_store_status = 1
+		}
+		add = 1
+		multiply = var:iron_store_quantity
+		multiply = var:iron_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:iron_store_status = 0
+		}	
+		add = 1
+		multiply = var:iron_store_quantity
+		multiply = var:iron_store_month
+	}
+}
+iron_store_for_modifier = {
+	add = var:iron_store_quantity
+	multiply = 25
+}
+iron_store_quantity_1_mounth = {
+	add = var:iron_store_quantity
+}
+iron_store_quantity_1_week = {
+	add = var:iron_store_quantity
+	divide = 4
+}
+store_iron_time_reverse = {
+	value = var:iron_store_month_fixe # #12
+	subtract = var:store_iron_time
+}
+
+#####release
+iron_mounth_choise = { #1year
+	value = var:iron_mounth_choise
+}
+iron_release_predicted = { #1year
+	if = {
+		limit = {
+			var:iron_release_status = 1
+		}
+		add = 1
+		multiply = var:iron_release_quantity
+		multiply = var:iron_release_month
+	}
+}
+iron_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:iron_release_status = 1
+		}
+		add = 1
+		multiply = var:iron_release_quantity
+		multiply = var:iron_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:iron_release_status = 0
+		}	
+		add = 1
+		multiply = var:iron_release_quantity
+		multiply = var:iron_release_month
+	}
+}
+iron_release_for_modifier = {
+	add = var:iron_release_quantity
+	multiply = 25
+}
+iron_release_quantity_1_mounth = {
+	add = var:iron_release_quantity
+}
+iron_release_quantity_1_week = {
+	add = var:iron_release_quantity
+	divide = 4
+}
+release_iron_time_reverse = {
+	value = var:iron_release_month_fixe # #12
+	subtract = var:release_iron_time
+}
+
+
+#country_iron
+stockpiling_iron_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_iron_state_1
+			}
+		}
+	}
+}
+
+#global_iron
+iron_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:iron.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+iron_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:iron.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+iron_global_market_goods_delta = {
+	value = iron_global_market_goods_sell_orders
+	subtract = iron_global_market_goods_buy_orders
+}
+iron_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = iron_global_market_goods_delta
+		divide = iron_global_market_goods_sell_orders
+	}
+}
+iron_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = iron_global_market_goods_rapport_price
+	multiply = -1
+}
+iron_global_market_goods_price = {
+	value = 20
+	multiply = iron_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#sulfur
+
+#####flow
+sulfur_market_goods_sell_orders = {
+	value = {
+		add = market.mg:sulfur.market_goods_sell_orders
+	}
+}
+sulfur_market_goods_buy_orders = {
+	value = {
+		add = market.mg:sulfur.market_goods_buy_orders
+	}
+}
+sulfur_market_goods_delta = {
+	value = sulfur_market_goods_sell_orders
+	subtract = sulfur_market_goods_buy_orders
+}
+sulfur_market_goods_delta_month = {
+	value = sulfur_market_goods_delta
+	multiply = 4
+}
+sulfur_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:sulfur_store_status = 0
+			sulfur_market_goods_delta > 0
+		}
+		add = sulfur_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:sulfur_store_status = 1
+		}
+		value = sulfur_store_quantity_1_week
+		if = {
+			limit = {
+				sulfur_market_goods_delta > 0
+			}
+			add = sulfur_market_goods_delta
+		}
+	}
+}
+
+#####store
+sulfur_store_predicted = { #1year
+	if = {
+		limit = {
+			var:sulfur_store_status = 1
+		}
+		add = 1
+		multiply = var:sulfur_store_quantity
+		multiply = var:sulfur_store_month
+	}
+}
+sulfur_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:sulfur_store_status = 1
+		}
+		add = 1
+		multiply = var:sulfur_store_quantity
+		multiply = var:sulfur_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:sulfur_store_status = 0
+		}	
+		add = 1
+		multiply = var:sulfur_store_quantity
+		multiply = var:sulfur_store_month
+	}
+}
+sulfur_store_for_modifier = {
+	add = var:sulfur_store_quantity
+	multiply = 25
+}
+sulfur_store_quantity_1_mounth = {
+	add = var:sulfur_store_quantity
+}
+sulfur_store_quantity_1_week = {
+	add = var:sulfur_store_quantity
+	divide = 4
+}
+store_sulfur_time_reverse = {
+	value = var:sulfur_store_month_fixe # #12
+	subtract = var:store_sulfur_time
+}
+
+#####release
+sulfur_mounth_choise = { #1year
+	value = var:sulfur_mounth_choise
+}
+sulfur_release_predicted = { #1year
+	if = {
+		limit = {
+			var:sulfur_release_status = 1
+		}
+		add = 1
+		multiply = var:sulfur_release_quantity
+		multiply = var:sulfur_release_month
+	}
+}
+sulfur_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:sulfur_release_status = 1
+		}
+		add = 1
+		multiply = var:sulfur_release_quantity
+		multiply = var:sulfur_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:sulfur_release_status = 0
+		}	
+		add = 1
+		multiply = var:sulfur_release_quantity
+		multiply = var:sulfur_release_month
+	}
+}
+sulfur_release_for_modifier = {
+	add = var:sulfur_release_quantity
+	multiply = 25
+}
+sulfur_release_quantity_1_mounth = {
+	add = var:sulfur_release_quantity
+}
+sulfur_release_quantity_1_week = {
+	add = var:sulfur_release_quantity
+	divide = 4
+}
+release_sulfur_time_reverse = {
+	value = var:sulfur_release_month_fixe # #12
+	subtract = var:release_sulfur_time
+}
+
+
+#country_sulfur
+stockpiling_sulfur_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_sulfur_state_1
+			}
+		}
+	}
+}
+
+#global_sulfur
+sulfur_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:sulfur.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+sulfur_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:sulfur.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+sulfur_global_market_goods_delta = {
+	value = sulfur_global_market_goods_sell_orders
+	subtract = sulfur_global_market_goods_buy_orders
+}
+sulfur_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = sulfur_global_market_goods_delta
+		divide = sulfur_global_market_goods_sell_orders
+	}
+}
+sulfur_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = sulfur_global_market_goods_rapport_price
+	multiply = -1
+}
+sulfur_global_market_goods_price = {
+	value = 20
+	multiply = sulfur_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#lead
+
+#####flow
+lead_market_goods_sell_orders = {
+	value = {
+		add = market.mg:lead.market_goods_sell_orders
+	}
+}
+lead_market_goods_buy_orders = {
+	value = {
+		add = market.mg:lead.market_goods_buy_orders
+	}
+}
+lead_market_goods_delta = {
+	value = lead_market_goods_sell_orders
+	subtract = lead_market_goods_buy_orders
+}
+lead_market_goods_delta_month = {
+	value = lead_market_goods_delta
+	multiply = 4
+}
+lead_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:lead_store_status = 0
+			lead_market_goods_delta > 0
+		}
+		add = lead_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:lead_store_status = 1
+		}
+		value = lead_store_quantity_1_week
+		if = {
+			limit = {
+				lead_market_goods_delta > 0
+			}
+			add = lead_market_goods_delta
+		}
+	}
+}
+
+#####store
+lead_store_predicted = { #1year
+	if = {
+		limit = {
+			var:lead_store_status = 1
+		}
+		add = 1
+		multiply = var:lead_store_quantity
+		multiply = var:lead_store_month
+	}
+}
+lead_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:lead_store_status = 1
+		}
+		add = 1
+		multiply = var:lead_store_quantity
+		multiply = var:lead_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:lead_store_status = 0
+		}	
+		add = 1
+		multiply = var:lead_store_quantity
+		multiply = var:lead_store_month
+	}
+}
+lead_store_for_modifier = {
+	add = var:lead_store_quantity
+	multiply = 25
+}
+lead_store_quantity_1_mounth = {
+	add = var:lead_store_quantity
+}
+lead_store_quantity_1_week = {
+	add = var:lead_store_quantity
+	divide = 4
+}
+store_lead_time_reverse = {
+	value = var:lead_store_month_fixe # #12
+	subtract = var:store_lead_time
+}
+
+#####release
+lead_mounth_choise = { #1year
+	value = var:lead_mounth_choise
+}
+lead_release_predicted = { #1year
+	if = {
+		limit = {
+			var:lead_release_status = 1
+		}
+		add = 1
+		multiply = var:lead_release_quantity
+		multiply = var:lead_release_month
+	}
+}
+lead_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:lead_release_status = 1
+		}
+		add = 1
+		multiply = var:lead_release_quantity
+		multiply = var:lead_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:lead_release_status = 0
+		}	
+		add = 1
+		multiply = var:lead_release_quantity
+		multiply = var:lead_release_month
+	}
+}
+lead_release_for_modifier = {
+	add = var:lead_release_quantity
+	multiply = 25
+}
+lead_release_quantity_1_mounth = {
+	add = var:lead_release_quantity
+}
+lead_release_quantity_1_week = {
+	add = var:lead_release_quantity
+	divide = 4
+}
+release_lead_time_reverse = {
+	value = var:lead_release_month_fixe # #12
+	subtract = var:release_lead_time
+}
+
+
+#country_lead
+stockpiling_lead_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_lead_state_1
+			}
+		}
+	}
+}
+
+#global_lead
+lead_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:lead.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+lead_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:lead.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+lead_global_market_goods_delta = {
+	value = lead_global_market_goods_sell_orders
+	subtract = lead_global_market_goods_buy_orders
+}
+lead_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = lead_global_market_goods_delta
+		divide = lead_global_market_goods_sell_orders
+	}
+}
+lead_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = lead_global_market_goods_rapport_price
+	multiply = -1
+}
+lead_global_market_goods_price = {
+	value = 20
+	multiply = lead_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#oil
+
+#####flow
+oil_market_goods_sell_orders = {
+	value = {
+		add = market.mg:oil.market_goods_sell_orders
+	}
+}
+oil_market_goods_buy_orders = {
+	value = {
+		add = market.mg:oil.market_goods_buy_orders
+	}
+}
+oil_market_goods_delta = {
+	value = oil_market_goods_sell_orders
+	subtract = oil_market_goods_buy_orders
+}
+oil_market_goods_delta_month = {
+	value = oil_market_goods_delta
+	multiply = 4
+}
+oil_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:oil_store_status = 0
+			oil_market_goods_delta > 0
+		}
+		add = oil_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:oil_store_status = 1
+		}
+		value = oil_store_quantity_1_week
+		if = {
+			limit = {
+				oil_market_goods_delta > 0
+			}
+			add = oil_market_goods_delta
+		}
+	}
+}
+
+#####store
+oil_store_predicted = { #1year
+	if = {
+		limit = {
+			var:oil_store_status = 1
+		}
+		add = 1
+		multiply = var:oil_store_quantity
+		multiply = var:oil_store_month
+	}
+}
+oil_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:oil_store_status = 1
+		}
+		add = 1
+		multiply = var:oil_store_quantity
+		multiply = var:oil_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:oil_store_status = 0
+		}	
+		add = 1
+		multiply = var:oil_store_quantity
+		multiply = var:oil_store_month
+	}
+}
+oil_store_for_modifier = {
+	add = var:oil_store_quantity
+	multiply = 25
+}
+oil_store_quantity_1_mounth = {
+	add = var:oil_store_quantity
+}
+oil_store_quantity_1_week = {
+	add = var:oil_store_quantity
+	divide = 4
+}
+store_oil_time_reverse = {
+	value = var:oil_store_month_fixe # #12
+	subtract = var:store_oil_time
+}
+
+#####release
+oil_mounth_choise = { #1year
+	value = var:oil_mounth_choise
+}
+oil_release_predicted = { #1year
+	if = {
+		limit = {
+			var:oil_release_status = 1
+		}
+		add = 1
+		multiply = var:oil_release_quantity
+		multiply = var:oil_release_month
+	}
+}
+oil_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:oil_release_status = 1
+		}
+		add = 1
+		multiply = var:oil_release_quantity
+		multiply = var:oil_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:oil_release_status = 0
+		}	
+		add = 1
+		multiply = var:oil_release_quantity
+		multiply = var:oil_release_month
+	}
+}
+oil_release_for_modifier = {
+	add = var:oil_release_quantity
+	multiply = 25
+}
+oil_release_quantity_1_mounth = {
+	add = var:oil_release_quantity
+}
+oil_release_quantity_1_week = {
+	add = var:oil_release_quantity
+	divide = 4
+}
+release_oil_time_reverse = {
+	value = var:oil_release_month_fixe # #12
+	subtract = var:release_oil_time
+}
+
+
+#country_oil
+stockpiling_oil_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_oil_state_1
+			}
+		}
+	}
+}
+
+#global_oil
+oil_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:oil.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+oil_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:oil.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+oil_global_market_goods_delta = {
+	value = oil_global_market_goods_sell_orders
+	subtract = oil_global_market_goods_buy_orders
+}
+oil_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = oil_global_market_goods_delta
+		divide = oil_global_market_goods_sell_orders
+	}
+}
+oil_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = oil_global_market_goods_rapport_price
+	multiply = -1
+}
+oil_global_market_goods_price = {
+	value = 20
+	multiply = oil_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#dye
+
+#####flow
+dye_market_goods_sell_orders = {
+	value = {
+		add = market.mg:dye.market_goods_sell_orders
+	}
+}
+dye_market_goods_buy_orders = {
+	value = {
+		add = market.mg:dye.market_goods_buy_orders
+	}
+}
+dye_market_goods_delta = {
+	value = dye_market_goods_sell_orders
+	subtract = dye_market_goods_buy_orders
+}
+dye_market_goods_delta_month = {
+	value = dye_market_goods_delta
+	multiply = 4
+}
+dye_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:dye_store_status = 0
+			dye_market_goods_delta > 0
+		}
+		add = dye_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:dye_store_status = 1
+		}
+		value = dye_store_quantity_1_week
+		if = {
+			limit = {
+				dye_market_goods_delta > 0
+			}
+			add = dye_market_goods_delta
+		}
+	}
+}
+
+#####store
+dye_store_predicted = { #1year
+	if = {
+		limit = {
+			var:dye_store_status = 1
+		}
+		add = 1
+		multiply = var:dye_store_quantity
+		multiply = var:dye_store_month
+	}
+}
+dye_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:dye_store_status = 1
+		}
+		add = 1
+		multiply = var:dye_store_quantity
+		multiply = var:dye_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:dye_store_status = 0
+		}	
+		add = 1
+		multiply = var:dye_store_quantity
+		multiply = var:dye_store_month
+	}
+}
+dye_store_for_modifier = {
+	add = var:dye_store_quantity
+	multiply = 25
+}
+dye_store_quantity_1_mounth = {
+	add = var:dye_store_quantity
+}
+dye_store_quantity_1_week = {
+	add = var:dye_store_quantity
+	divide = 4
+}
+store_dye_time_reverse = {
+	value = var:dye_store_month_fixe # #12
+	subtract = var:store_dye_time
+}
+
+#####release
+dye_mounth_choise = { #1year
+	value = var:dye_mounth_choise
+}
+dye_release_predicted = { #1year
+	if = {
+		limit = {
+			var:dye_release_status = 1
+		}
+		add = 1
+		multiply = var:dye_release_quantity
+		multiply = var:dye_release_month
+	}
+}
+dye_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:dye_release_status = 1
+		}
+		add = 1
+		multiply = var:dye_release_quantity
+		multiply = var:dye_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:dye_release_status = 0
+		}	
+		add = 1
+		multiply = var:dye_release_quantity
+		multiply = var:dye_release_month
+	}
+}
+dye_release_for_modifier = {
+	add = var:dye_release_quantity
+	multiply = 25
+}
+dye_release_quantity_1_mounth = {
+	add = var:dye_release_quantity
+}
+dye_release_quantity_1_week = {
+	add = var:dye_release_quantity
+	divide = 4
+}
+release_dye_time_reverse = {
+	value = var:dye_release_month_fixe # #12
+	subtract = var:release_dye_time
+}
+
+
+#country_dye
+stockpiling_dye_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_dye_state_1
+			}
+		}
+	}
+}
+
+#global_dye
+dye_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:dye.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+dye_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:dye.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+dye_global_market_goods_delta = {
+	value = dye_global_market_goods_sell_orders
+	subtract = dye_global_market_goods_buy_orders
+}
+dye_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = dye_global_market_goods_delta
+		divide = dye_global_market_goods_sell_orders
+	}
+}
+dye_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = dye_global_market_goods_rapport_price
+	multiply = -1
+}
+dye_global_market_goods_price = {
+	value = 20
+	multiply = dye_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#silk
+
+#####flow
+silk_market_goods_sell_orders = {
+	value = {
+		add = market.mg:silk.market_goods_sell_orders
+	}
+}
+silk_market_goods_buy_orders = {
+	value = {
+		add = market.mg:silk.market_goods_buy_orders
+	}
+}
+silk_market_goods_delta = {
+	value = silk_market_goods_sell_orders
+	subtract = silk_market_goods_buy_orders
+}
+silk_market_goods_delta_month = {
+	value = silk_market_goods_delta
+	multiply = 4
+}
+silk_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:silk_store_status = 0
+			silk_market_goods_delta > 0
+		}
+		add = silk_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:silk_store_status = 1
+		}
+		value = silk_store_quantity_1_week
+		if = {
+			limit = {
+				silk_market_goods_delta > 0
+			}
+			add = silk_market_goods_delta
+		}
+	}
+}
+
+#####store
+silk_store_predicted = { #1year
+	if = {
+		limit = {
+			var:silk_store_status = 1
+		}
+		add = 1
+		multiply = var:silk_store_quantity
+		multiply = var:silk_store_month
+	}
+}
+silk_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:silk_store_status = 1
+		}
+		add = 1
+		multiply = var:silk_store_quantity
+		multiply = var:silk_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:silk_store_status = 0
+		}	
+		add = 1
+		multiply = var:silk_store_quantity
+		multiply = var:silk_store_month
+	}
+}
+silk_store_for_modifier = {
+	add = var:silk_store_quantity
+	multiply = 25
+}
+silk_store_quantity_1_mounth = {
+	add = var:silk_store_quantity
+}
+silk_store_quantity_1_week = {
+	add = var:silk_store_quantity
+	divide = 4
+}
+store_silk_time_reverse = {
+	value = var:silk_store_month_fixe # #12
+	subtract = var:store_silk_time
+}
+
+#####release
+silk_mounth_choise = { #1year
+	value = var:silk_mounth_choise
+}
+silk_release_predicted = { #1year
+	if = {
+		limit = {
+			var:silk_release_status = 1
+		}
+		add = 1
+		multiply = var:silk_release_quantity
+		multiply = var:silk_release_month
+	}
+}
+silk_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:silk_release_status = 1
+		}
+		add = 1
+		multiply = var:silk_release_quantity
+		multiply = var:silk_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:silk_release_status = 0
+		}	
+		add = 1
+		multiply = var:silk_release_quantity
+		multiply = var:silk_release_month
+	}
+}
+silk_release_for_modifier = {
+	add = var:silk_release_quantity
+	multiply = 25
+}
+silk_release_quantity_1_mounth = {
+	add = var:silk_release_quantity
+}
+silk_release_quantity_1_week = {
+	add = var:silk_release_quantity
+	divide = 4
+}
+release_silk_time_reverse = {
+	value = var:silk_release_month_fixe # #12
+	subtract = var:release_silk_time
+}
+
+
+#country_silk
+stockpiling_silk_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_silk_state_1
+			}
+		}
+	}
+}
+
+#global_silk
+silk_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:silk.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+silk_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:silk.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+silk_global_market_goods_delta = {
+	value = silk_global_market_goods_sell_orders
+	subtract = silk_global_market_goods_buy_orders
+}
+silk_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = silk_global_market_goods_delta
+		divide = silk_global_market_goods_sell_orders
+	}
+}
+silk_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = silk_global_market_goods_rapport_price
+	multiply = -1
+}
+silk_global_market_goods_price = {
+	value = 20
+	multiply = silk_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#rubber
+
+#####flow
+rubber_market_goods_sell_orders = {
+	value = {
+		add = market.mg:rubber.market_goods_sell_orders
+	}
+}
+rubber_market_goods_buy_orders = {
+	value = {
+		add = market.mg:rubber.market_goods_buy_orders
+	}
+}
+rubber_market_goods_delta = {
+	value = rubber_market_goods_sell_orders
+	subtract = rubber_market_goods_buy_orders
+}
+rubber_market_goods_delta_month = {
+	value = rubber_market_goods_delta
+	multiply = 4
+}
+rubber_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:rubber_store_status = 0
+			rubber_market_goods_delta > 0
+		}
+		add = rubber_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:rubber_store_status = 1
+		}
+		value = rubber_store_quantity_1_week
+		if = {
+			limit = {
+				rubber_market_goods_delta > 0
+			}
+			add = rubber_market_goods_delta
+		}
+	}
+}
+
+#####store
+rubber_store_predicted = { #1year
+	if = {
+		limit = {
+			var:rubber_store_status = 1
+		}
+		add = 1
+		multiply = var:rubber_store_quantity
+		multiply = var:rubber_store_month
+	}
+}
+rubber_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:rubber_store_status = 1
+		}
+		add = 1
+		multiply = var:rubber_store_quantity
+		multiply = var:rubber_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:rubber_store_status = 0
+		}	
+		add = 1
+		multiply = var:rubber_store_quantity
+		multiply = var:rubber_store_month
+	}
+}
+rubber_store_for_modifier = {
+	add = var:rubber_store_quantity
+	multiply = 25
+}
+rubber_store_quantity_1_mounth = {
+	add = var:rubber_store_quantity
+}
+rubber_store_quantity_1_week = {
+	add = var:rubber_store_quantity
+	divide = 4
+}
+store_rubber_time_reverse = {
+	value = var:rubber_store_month_fixe # #12
+	subtract = var:store_rubber_time
+}
+
+#####release
+rubber_mounth_choise = { #1year
+	value = var:rubber_mounth_choise
+}
+rubber_release_predicted = { #1year
+	if = {
+		limit = {
+			var:rubber_release_status = 1
+		}
+		add = 1
+		multiply = var:rubber_release_quantity
+		multiply = var:rubber_release_month
+	}
+}
+rubber_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:rubber_release_status = 1
+		}
+		add = 1
+		multiply = var:rubber_release_quantity
+		multiply = var:rubber_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:rubber_release_status = 0
+		}	
+		add = 1
+		multiply = var:rubber_release_quantity
+		multiply = var:rubber_release_month
+	}
+}
+rubber_release_for_modifier = {
+	add = var:rubber_release_quantity
+	multiply = 25
+}
+rubber_release_quantity_1_mounth = {
+	add = var:rubber_release_quantity
+}
+rubber_release_quantity_1_week = {
+	add = var:rubber_release_quantity
+	divide = 4
+}
+release_rubber_time_reverse = {
+	value = var:rubber_release_month_fixe # #12
+	subtract = var:release_rubber_time
+}
+
+
+#country_rubber
+stockpiling_rubber_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_rubber_state_1
+			}
+		}
+	}
+}
+
+#global_rubber
+rubber_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:rubber.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+rubber_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:rubber.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+rubber_global_market_goods_delta = {
+	value = rubber_global_market_goods_sell_orders
+	subtract = rubber_global_market_goods_buy_orders
+}
+rubber_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = rubber_global_market_goods_delta
+		divide = rubber_global_market_goods_sell_orders
+	}
+}
+rubber_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = rubber_global_market_goods_rapport_price
+	multiply = -1
+}
+rubber_global_market_goods_price = {
+	value = 20
+	multiply = rubber_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#ammunition
+
+#####flow
+ammunition_market_goods_sell_orders = {
+	value = {
+		add = market.mg:ammunition.market_goods_sell_orders
+	}
+}
+ammunition_market_goods_buy_orders = {
+	value = {
+		add = market.mg:ammunition.market_goods_buy_orders
+	}
+}
+ammunition_market_goods_delta = {
+	value = ammunition_market_goods_sell_orders
+	subtract = ammunition_market_goods_buy_orders
+}
+ammunition_market_goods_delta_month = {
+	value = ammunition_market_goods_delta
+	multiply = 4
+}
+ammunition_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:ammunition_store_status = 0
+			ammunition_market_goods_delta > 0
+		}
+		add = ammunition_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:ammunition_store_status = 1
+		}
+		value = ammunition_store_quantity_1_week
+		if = {
+			limit = {
+				ammunition_market_goods_delta > 0
+			}
+			add = ammunition_market_goods_delta
+		}
+	}
+}
+
+#####store
+ammunition_store_predicted = { #1year
+	if = {
+		limit = {
+			var:ammunition_store_status = 1
+		}
+		add = 1
+		multiply = var:ammunition_store_quantity
+		multiply = var:ammunition_store_month
+	}
+}
+ammunition_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:ammunition_store_status = 1
+		}
+		add = 1
+		multiply = var:ammunition_store_quantity
+		multiply = var:ammunition_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:ammunition_store_status = 0
+		}	
+		add = 1
+		multiply = var:ammunition_store_quantity
+		multiply = var:ammunition_store_month
+	}
+}
+ammunition_store_for_modifier = {
+	add = var:ammunition_store_quantity
+	multiply = 25
+}
+ammunition_store_quantity_1_mounth = {
+	add = var:ammunition_store_quantity
+}
+ammunition_store_quantity_1_week = {
+	add = var:ammunition_store_quantity
+	divide = 4
+}
+store_ammunition_time_reverse = {
+	value = var:ammunition_store_month_fixe # #12
+	subtract = var:store_ammunition_time
+}
+
+#####release
+ammunition_mounth_choise = { #1year
+	value = var:ammunition_mounth_choise
+}
+ammunition_release_predicted = { #1year
+	if = {
+		limit = {
+			var:ammunition_release_status = 1
+		}
+		add = 1
+		multiply = var:ammunition_release_quantity
+		multiply = var:ammunition_release_month
+	}
+}
+ammunition_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:ammunition_release_status = 1
+		}
+		add = 1
+		multiply = var:ammunition_release_quantity
+		multiply = var:ammunition_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:ammunition_release_status = 0
+		}	
+		add = 1
+		multiply = var:ammunition_release_quantity
+		multiply = var:ammunition_release_month
+	}
+}
+ammunition_release_for_modifier = {
+	add = var:ammunition_release_quantity
+	multiply = 25
+}
+ammunition_release_quantity_1_mounth = {
+	add = var:ammunition_release_quantity
+}
+ammunition_release_quantity_1_week = {
+	add = var:ammunition_release_quantity
+	divide = 4
+}
+release_ammunition_time_reverse = {
+	value = var:ammunition_release_month_fixe # #12
+	subtract = var:release_ammunition_time
+}
+
+
+#country_ammunition
+stockpiling_ammunition_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_ammunition_state_1
+			}
+		}
+	}
+}
+
+#global_ammunition
+ammunition_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:ammunition.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+ammunition_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:ammunition.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+ammunition_global_market_goods_delta = {
+	value = ammunition_global_market_goods_sell_orders
+	subtract = ammunition_global_market_goods_buy_orders
+}
+ammunition_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = ammunition_global_market_goods_delta
+		divide = ammunition_global_market_goods_sell_orders
+	}
+}
+ammunition_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = ammunition_global_market_goods_rapport_price
+	multiply = -1
+}
+ammunition_global_market_goods_price = {
+	value = 20
+	multiply = ammunition_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#small_arms
+
+#####flow
+small_arms_market_goods_sell_orders = {
+	value = {
+		add = market.mg:small_arms.market_goods_sell_orders
+	}
+}
+small_arms_market_goods_buy_orders = {
+	value = {
+		add = market.mg:small_arms.market_goods_buy_orders
+	}
+}
+small_arms_market_goods_delta = {
+	value = small_arms_market_goods_sell_orders
+	subtract = small_arms_market_goods_buy_orders
+}
+small_arms_market_goods_delta_month = {
+	value = small_arms_market_goods_delta
+	multiply = 4
+}
+small_arms_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:small_arms_store_status = 0
+			small_arms_market_goods_delta > 0
+		}
+		add = small_arms_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:small_arms_store_status = 1
+		}
+		value = small_arms_store_quantity_1_week
+		if = {
+			limit = {
+				small_arms_market_goods_delta > 0
+			}
+			add = small_arms_market_goods_delta
+		}
+	}
+}
+
+#####store
+small_arms_store_predicted = { #1year
+	if = {
+		limit = {
+			var:small_arms_store_status = 1
+		}
+		add = 1
+		multiply = var:small_arms_store_quantity
+		multiply = var:small_arms_store_month
+	}
+}
+small_arms_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:small_arms_store_status = 1
+		}
+		add = 1
+		multiply = var:small_arms_store_quantity
+		multiply = var:small_arms_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:small_arms_store_status = 0
+		}	
+		add = 1
+		multiply = var:small_arms_store_quantity
+		multiply = var:small_arms_store_month
+	}
+}
+small_arms_store_for_modifier = {
+	add = var:small_arms_store_quantity
+	multiply = 25
+}
+small_arms_store_quantity_1_mounth = {
+	add = var:small_arms_store_quantity
+}
+small_arms_store_quantity_1_week = {
+	add = var:small_arms_store_quantity
+	divide = 4
+}
+store_small_arms_time_reverse = {
+	value = var:small_arms_store_month_fixe # #12
+	subtract = var:store_small_arms_time
+}
+
+#####release
+small_arms_mounth_choise = { #1year
+	value = var:small_arms_mounth_choise
+}
+small_arms_release_predicted = { #1year
+	if = {
+		limit = {
+			var:small_arms_release_status = 1
+		}
+		add = 1
+		multiply = var:small_arms_release_quantity
+		multiply = var:small_arms_release_month
+	}
+}
+small_arms_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:small_arms_release_status = 1
+		}
+		add = 1
+		multiply = var:small_arms_release_quantity
+		multiply = var:small_arms_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:small_arms_release_status = 0
+		}	
+		add = 1
+		multiply = var:small_arms_release_quantity
+		multiply = var:small_arms_release_month
+	}
+}
+small_arms_release_for_modifier = {
+	add = var:small_arms_release_quantity
+	multiply = 25
+}
+small_arms_release_quantity_1_mounth = {
+	add = var:small_arms_release_quantity
+}
+small_arms_release_quantity_1_week = {
+	add = var:small_arms_release_quantity
+	divide = 4
+}
+release_small_arms_time_reverse = {
+	value = var:small_arms_release_month_fixe # #12
+	subtract = var:release_small_arms_time
+}
+
+
+#country_small_arms
+stockpiling_small_arms_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_small_arms_state_1
+			}
+		}
+	}
+}
+
+#global_small_arms
+small_arms_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:small_arms.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+small_arms_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:small_arms.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+small_arms_global_market_goods_delta = {
+	value = small_arms_global_market_goods_sell_orders
+	subtract = small_arms_global_market_goods_buy_orders
+}
+small_arms_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = small_arms_global_market_goods_delta
+		divide = small_arms_global_market_goods_sell_orders
+	}
+}
+small_arms_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = small_arms_global_market_goods_rapport_price
+	multiply = -1
+}
+small_arms_global_market_goods_price = {
+	value = 20
+	multiply = small_arms_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#artillery
+
+#####flow
+artillery_market_goods_sell_orders = {
+	value = {
+		add = market.mg:artillery.market_goods_sell_orders
+	}
+}
+artillery_market_goods_buy_orders = {
+	value = {
+		add = market.mg:artillery.market_goods_buy_orders
+	}
+}
+artillery_market_goods_delta = {
+	value = artillery_market_goods_sell_orders
+	subtract = artillery_market_goods_buy_orders
+}
+artillery_market_goods_delta_month = {
+	value = artillery_market_goods_delta
+	multiply = 4
+}
+artillery_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:artillery_store_status = 0
+			artillery_market_goods_delta > 0
+		}
+		add = artillery_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:artillery_store_status = 1
+		}
+		value = artillery_store_quantity_1_week
+		if = {
+			limit = {
+				artillery_market_goods_delta > 0
+			}
+			add = artillery_market_goods_delta
+		}
+	}
+}
+
+#####store
+artillery_store_predicted = { #1year
+	if = {
+		limit = {
+			var:artillery_store_status = 1
+		}
+		add = 1
+		multiply = var:artillery_store_quantity
+		multiply = var:artillery_store_month
+	}
+}
+artillery_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:artillery_store_status = 1
+		}
+		add = 1
+		multiply = var:artillery_store_quantity
+		multiply = var:artillery_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:artillery_store_status = 0
+		}	
+		add = 1
+		multiply = var:artillery_store_quantity
+		multiply = var:artillery_store_month
+	}
+}
+artillery_store_for_modifier = {
+	add = var:artillery_store_quantity
+	multiply = 25
+}
+artillery_store_quantity_1_mounth = {
+	add = var:artillery_store_quantity
+}
+artillery_store_quantity_1_week = {
+	add = var:artillery_store_quantity
+	divide = 4
+}
+store_artillery_time_reverse = {
+	value = var:artillery_store_month_fixe # #12
+	subtract = var:store_artillery_time
+}
+
+#####release
+artillery_mounth_choise = { #1year
+	value = var:artillery_mounth_choise
+}
+artillery_release_predicted = { #1year
+	if = {
+		limit = {
+			var:artillery_release_status = 1
+		}
+		add = 1
+		multiply = var:artillery_release_quantity
+		multiply = var:artillery_release_month
+	}
+}
+artillery_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:artillery_release_status = 1
+		}
+		add = 1
+		multiply = var:artillery_release_quantity
+		multiply = var:artillery_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:artillery_release_status = 0
+		}	
+		add = 1
+		multiply = var:artillery_release_quantity
+		multiply = var:artillery_release_month
+	}
+}
+artillery_release_for_modifier = {
+	add = var:artillery_release_quantity
+	multiply = 25
+}
+artillery_release_quantity_1_mounth = {
+	add = var:artillery_release_quantity
+}
+artillery_release_quantity_1_week = {
+	add = var:artillery_release_quantity
+	divide = 4
+}
+release_artillery_time_reverse = {
+	value = var:artillery_release_month_fixe # #12
+	subtract = var:release_artillery_time
+}
+
+
+#country_artillery
+stockpiling_artillery_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_artillery_state_1
+			}
+		}
+	}
+}
+
+#global_artillery
+artillery_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:artillery.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+artillery_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:artillery.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+artillery_global_market_goods_delta = {
+	value = artillery_global_market_goods_sell_orders
+	subtract = artillery_global_market_goods_buy_orders
+}
+artillery_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = artillery_global_market_goods_delta
+		divide = artillery_global_market_goods_sell_orders
+	}
+}
+artillery_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = artillery_global_market_goods_rapport_price
+	multiply = -1
+}
+artillery_global_market_goods_price = {
+	value = 20
+	multiply = artillery_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#tanks
+
+#####flow
+tanks_market_goods_sell_orders = {
+	value = {
+		add = market.mg:tanks.market_goods_sell_orders
+	}
+}
+tanks_market_goods_buy_orders = {
+	value = {
+		add = market.mg:tanks.market_goods_buy_orders
+	}
+}
+tanks_market_goods_delta = {
+	value = tanks_market_goods_sell_orders
+	subtract = tanks_market_goods_buy_orders
+}
+tanks_market_goods_delta_month = {
+	value = tanks_market_goods_delta
+	multiply = 4
+}
+tanks_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:tanks_store_status = 0
+			tanks_market_goods_delta > 0
+		}
+		add = tanks_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:tanks_store_status = 1
+		}
+		value = tanks_store_quantity_1_week
+		if = {
+			limit = {
+				tanks_market_goods_delta > 0
+			}
+			add = tanks_market_goods_delta
+		}
+	}
+}
+
+#####store
+tanks_store_predicted = { #1year
+	if = {
+		limit = {
+			var:tanks_store_status = 1
+		}
+		add = 1
+		multiply = var:tanks_store_quantity
+		multiply = var:tanks_store_month
+	}
+}
+tanks_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:tanks_store_status = 1
+		}
+		add = 1
+		multiply = var:tanks_store_quantity
+		multiply = var:tanks_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:tanks_store_status = 0
+		}	
+		add = 1
+		multiply = var:tanks_store_quantity
+		multiply = var:tanks_store_month
+	}
+}
+tanks_store_for_modifier = {
+	add = var:tanks_store_quantity
+	multiply = 25
+}
+tanks_store_quantity_1_mounth = {
+	add = var:tanks_store_quantity
+}
+tanks_store_quantity_1_week = {
+	add = var:tanks_store_quantity
+	divide = 4
+}
+store_tanks_time_reverse = {
+	value = var:tanks_store_month_fixe # #12
+	subtract = var:store_tanks_time
+}
+
+#####release
+tanks_mounth_choise = { #1year
+	value = var:tanks_mounth_choise
+}
+tanks_release_predicted = { #1year
+	if = {
+		limit = {
+			var:tanks_release_status = 1
+		}
+		add = 1
+		multiply = var:tanks_release_quantity
+		multiply = var:tanks_release_month
+	}
+}
+tanks_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:tanks_release_status = 1
+		}
+		add = 1
+		multiply = var:tanks_release_quantity
+		multiply = var:tanks_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:tanks_release_status = 0
+		}	
+		add = 1
+		multiply = var:tanks_release_quantity
+		multiply = var:tanks_release_month
+	}
+}
+tanks_release_for_modifier = {
+	add = var:tanks_release_quantity
+	multiply = 25
+}
+tanks_release_quantity_1_mounth = {
+	add = var:tanks_release_quantity
+}
+tanks_release_quantity_1_week = {
+	add = var:tanks_release_quantity
+	divide = 4
+}
+release_tanks_time_reverse = {
+	value = var:tanks_release_month_fixe # #12
+	subtract = var:release_tanks_time
+}
+
+
+#country_tanks
+stockpiling_tanks_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_tanks_state_1
+			}
+		}
+	}
+}
+
+#global_tanks
+tanks_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:tanks.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+tanks_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:tanks.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+tanks_global_market_goods_delta = {
+	value = tanks_global_market_goods_sell_orders
+	subtract = tanks_global_market_goods_buy_orders
+}
+tanks_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = tanks_global_market_goods_delta
+		divide = tanks_global_market_goods_sell_orders
+	}
+}
+tanks_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = tanks_global_market_goods_rapport_price
+	multiply = -1
+}
+tanks_global_market_goods_price = {
+	value = 20
+	multiply = tanks_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#aeroplanes
+
+#####flow
+aeroplanes_market_goods_sell_orders = {
+	value = {
+		add = market.mg:aeroplanes.market_goods_sell_orders
+	}
+}
+aeroplanes_market_goods_buy_orders = {
+	value = {
+		add = market.mg:aeroplanes.market_goods_buy_orders
+	}
+}
+aeroplanes_market_goods_delta = {
+	value = aeroplanes_market_goods_sell_orders
+	subtract = aeroplanes_market_goods_buy_orders
+}
+aeroplanes_market_goods_delta_month = {
+	value = aeroplanes_market_goods_delta
+	multiply = 4
+}
+aeroplanes_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:aeroplanes_store_status = 0
+			aeroplanes_market_goods_delta > 0
+		}
+		add = aeroplanes_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:aeroplanes_store_status = 1
+		}
+		value = aeroplanes_store_quantity_1_week
+		if = {
+			limit = {
+				aeroplanes_market_goods_delta > 0
+			}
+			add = aeroplanes_market_goods_delta
+		}
+	}
+}
+
+#####store
+aeroplanes_store_predicted = { #1year
+	if = {
+		limit = {
+			var:aeroplanes_store_status = 1
+		}
+		add = 1
+		multiply = var:aeroplanes_store_quantity
+		multiply = var:aeroplanes_store_month
+	}
+}
+aeroplanes_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:aeroplanes_store_status = 1
+		}
+		add = 1
+		multiply = var:aeroplanes_store_quantity
+		multiply = var:aeroplanes_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:aeroplanes_store_status = 0
+		}	
+		add = 1
+		multiply = var:aeroplanes_store_quantity
+		multiply = var:aeroplanes_store_month
+	}
+}
+aeroplanes_store_for_modifier = {
+	add = var:aeroplanes_store_quantity
+	multiply = 25
+}
+aeroplanes_store_quantity_1_mounth = {
+	add = var:aeroplanes_store_quantity
+}
+aeroplanes_store_quantity_1_week = {
+	add = var:aeroplanes_store_quantity
+	divide = 4
+}
+store_aeroplanes_time_reverse = {
+	value = var:aeroplanes_store_month_fixe # #12
+	subtract = var:store_aeroplanes_time
+}
+
+#####release
+aeroplanes_mounth_choise = { #1year
+	value = var:aeroplanes_mounth_choise
+}
+aeroplanes_release_predicted = { #1year
+	if = {
+		limit = {
+			var:aeroplanes_release_status = 1
+		}
+		add = 1
+		multiply = var:aeroplanes_release_quantity
+		multiply = var:aeroplanes_release_month
+	}
+}
+aeroplanes_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:aeroplanes_release_status = 1
+		}
+		add = 1
+		multiply = var:aeroplanes_release_quantity
+		multiply = var:aeroplanes_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:aeroplanes_release_status = 0
+		}	
+		add = 1
+		multiply = var:aeroplanes_release_quantity
+		multiply = var:aeroplanes_release_month
+	}
+}
+aeroplanes_release_for_modifier = {
+	add = var:aeroplanes_release_quantity
+	multiply = 25
+}
+aeroplanes_release_quantity_1_mounth = {
+	add = var:aeroplanes_release_quantity
+}
+aeroplanes_release_quantity_1_week = {
+	add = var:aeroplanes_release_quantity
+	divide = 4
+}
+release_aeroplanes_time_reverse = {
+	value = var:aeroplanes_release_month_fixe # #12
+	subtract = var:release_aeroplanes_time
+}
+
+
+#country_aeroplanes
+stockpiling_aeroplanes_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_aeroplanes_state_1
+			}
+		}
+	}
+}
+
+#global_aeroplanes
+aeroplanes_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:aeroplanes.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+aeroplanes_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:aeroplanes.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+aeroplanes_global_market_goods_delta = {
+	value = aeroplanes_global_market_goods_sell_orders
+	subtract = aeroplanes_global_market_goods_buy_orders
+}
+aeroplanes_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = aeroplanes_global_market_goods_delta
+		divide = aeroplanes_global_market_goods_sell_orders
+	}
+}
+aeroplanes_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = aeroplanes_global_market_goods_rapport_price
+	multiply = -1
+}
+aeroplanes_global_market_goods_price = {
+	value = 20
+	multiply = aeroplanes_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#manowars
+
+#####flow
+manowars_market_goods_sell_orders = {
+	value = {
+		add = market.mg:manowars.market_goods_sell_orders
+	}
+}
+manowars_market_goods_buy_orders = {
+	value = {
+		add = market.mg:manowars.market_goods_buy_orders
+	}
+}
+manowars_market_goods_delta = {
+	value = manowars_market_goods_sell_orders
+	subtract = manowars_market_goods_buy_orders
+}
+manowars_market_goods_delta_month = {
+	value = manowars_market_goods_delta
+	multiply = 4
+}
+manowars_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:manowars_store_status = 0
+			manowars_market_goods_delta > 0
+		}
+		add = manowars_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:manowars_store_status = 1
+		}
+		value = manowars_store_quantity_1_week
+		if = {
+			limit = {
+				manowars_market_goods_delta > 0
+			}
+			add = manowars_market_goods_delta
+		}
+	}
+}
+
+#####store
+manowars_store_predicted = { #1year
+	if = {
+		limit = {
+			var:manowars_store_status = 1
+		}
+		add = 1
+		multiply = var:manowars_store_quantity
+		multiply = var:manowars_store_month
+	}
+}
+manowars_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:manowars_store_status = 1
+		}
+		add = 1
+		multiply = var:manowars_store_quantity
+		multiply = var:manowars_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:manowars_store_status = 0
+		}	
+		add = 1
+		multiply = var:manowars_store_quantity
+		multiply = var:manowars_store_month
+	}
+}
+manowars_store_for_modifier = {
+	add = var:manowars_store_quantity
+	multiply = 25
+}
+manowars_store_quantity_1_mounth = {
+	add = var:manowars_store_quantity
+}
+manowars_store_quantity_1_week = {
+	add = var:manowars_store_quantity
+	divide = 4
+}
+store_manowars_time_reverse = {
+	value = var:manowars_store_month_fixe # #12
+	subtract = var:store_manowars_time
+}
+
+#####release
+manowars_mounth_choise = { #1year
+	value = var:manowars_mounth_choise
+}
+manowars_release_predicted = { #1year
+	if = {
+		limit = {
+			var:manowars_release_status = 1
+		}
+		add = 1
+		multiply = var:manowars_release_quantity
+		multiply = var:manowars_release_month
+	}
+}
+manowars_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:manowars_release_status = 1
+		}
+		add = 1
+		multiply = var:manowars_release_quantity
+		multiply = var:manowars_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:manowars_release_status = 0
+		}	
+		add = 1
+		multiply = var:manowars_release_quantity
+		multiply = var:manowars_release_month
+	}
+}
+manowars_release_for_modifier = {
+	add = var:manowars_release_quantity
+	multiply = 25
+}
+manowars_release_quantity_1_mounth = {
+	add = var:manowars_release_quantity
+}
+manowars_release_quantity_1_week = {
+	add = var:manowars_release_quantity
+	divide = 4
+}
+release_manowars_time_reverse = {
+	value = var:manowars_release_month_fixe # #12
+	subtract = var:release_manowars_time
+}
+
+
+#country_manowars
+stockpiling_manowars_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_manowars_state_1
+			}
+		}
+	}
+}
+
+#global_manowars
+manowars_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:manowars.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+manowars_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:manowars.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+manowars_global_market_goods_delta = {
+	value = manowars_global_market_goods_sell_orders
+	subtract = manowars_global_market_goods_buy_orders
+}
+manowars_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = manowars_global_market_goods_delta
+		divide = manowars_global_market_goods_sell_orders
+	}
+}
+manowars_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = manowars_global_market_goods_rapport_price
+	multiply = -1
+}
+manowars_global_market_goods_price = {
+	value = 20
+	multiply = manowars_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+#ironclads
+
+#####flow
+ironclads_market_goods_sell_orders = {
+	value = {
+		add = market.mg:ironclads.market_goods_sell_orders
+	}
+}
+ironclads_market_goods_buy_orders = {
+	value = {
+		add = market.mg:ironclads.market_goods_buy_orders
+	}
+}
+ironclads_market_goods_delta = {
+	value = ironclads_market_goods_sell_orders
+	subtract = ironclads_market_goods_buy_orders
+}
+ironclads_market_goods_delta_month = {
+	value = ironclads_market_goods_delta
+	multiply = 4
+}
+ironclads_market_goods_delta_month_view = {
+	value = 0
+	if = {
+		limit = {
+			var:ironclads_store_status = 0
+			ironclads_market_goods_delta > 0
+		}
+		add = ironclads_market_goods_delta
+	}
+	if = {
+		limit = {
+			var:ironclads_store_status = 1
+		}
+		value = ironclads_store_quantity_1_week
+		if = {
+			limit = {
+				ironclads_market_goods_delta > 0
+			}
+			add = ironclads_market_goods_delta
+		}
+	}
+}
+
+#####store
+ironclads_store_predicted = { #1year
+	if = {
+		limit = {
+			var:ironclads_store_status = 1
+		}
+		add = 1
+		multiply = var:ironclads_store_quantity
+		multiply = var:ironclads_store_month
+	}
+}
+ironclads_store_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:ironclads_store_status = 1
+		}
+		add = 1
+		multiply = var:ironclads_store_quantity
+		multiply = var:ironclads_store_month_fixe
+	}
+	if = {
+		limit = {
+			var:ironclads_store_status = 0
+		}	
+		add = 1
+		multiply = var:ironclads_store_quantity
+		multiply = var:ironclads_store_month
+	}
+}
+ironclads_store_for_modifier = {
+	add = var:ironclads_store_quantity
+	multiply = 25
+}
+ironclads_store_quantity_1_mounth = {
+	add = var:ironclads_store_quantity
+}
+ironclads_store_quantity_1_week = {
+	add = var:ironclads_store_quantity
+	divide = 4
+}
+store_ironclads_time_reverse = {
+	value = var:ironclads_store_month_fixe # #12
+	subtract = var:store_ironclads_time
+}
+
+#####release
+ironclads_mounth_choise = { #1year
+	value = var:ironclads_mounth_choise
+}
+ironclads_release_predicted = { #1year
+	if = {
+		limit = {
+			var:ironclads_release_status = 1
+		}
+		add = 1
+		multiply = var:ironclads_release_quantity
+		multiply = var:ironclads_release_month
+	}
+}
+ironclads_release_predicted_no_limit = {  #1year_fixe ui
+	if = {
+		limit = {
+			var:ironclads_release_status = 1
+		}
+		add = 1
+		multiply = var:ironclads_release_quantity
+		multiply = var:ironclads_release_month_fixe
+	}
+	if = {
+		limit = {
+			var:ironclads_release_status = 0
+		}	
+		add = 1
+		multiply = var:ironclads_release_quantity
+		multiply = var:ironclads_release_month
+	}
+}
+ironclads_release_for_modifier = {
+	add = var:ironclads_release_quantity
+	multiply = 25
+}
+ironclads_release_quantity_1_mounth = {
+	add = var:ironclads_release_quantity
+}
+ironclads_release_quantity_1_week = {
+	add = var:ironclads_release_quantity
+	divide = 4
+}
+release_ironclads_time_reverse = {
+	value = var:ironclads_release_month_fixe # #12
+	subtract = var:release_ironclads_time
+}
+
+
+#country_ironclads
+stockpiling_ironclads_var_state = {
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+				}
+				add = var:stockpiling_ironclads_state_1
+			}
+		}
+	}
+}
+
+#global_ironclads
+ironclads_global_market_goods_sell_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:ironclads.market_goods_sell_orders
+            }
+        }
+	}
+	add = 1   
+}
+ironclads_global_market_goods_buy_orders = {
+	value = {
+        add = {
+            every_country = {
+				add = market.mg:ironclads.market_goods_buy_orders
+            }
+        }
+	}
+	add = 1
+}
+ironclads_global_market_goods_delta = {
+	value = ironclads_global_market_goods_sell_orders
+	subtract = ironclads_global_market_goods_buy_orders
+}
+ironclads_global_market_goods_rapport_price = {
+	value = 1
+	subtract = {
+		value = ironclads_global_market_goods_delta
+		divide = ironclads_global_market_goods_sell_orders
+	}
+}
+ironclads_global_market_goods_rapport_price_reverse_panel = {
+	value = 1
+	subtract = ironclads_global_market_goods_rapport_price
+	multiply = -1
+}
+ironclads_global_market_goods_price = {
+	value = 20
+	multiply = ironclads_global_market_goods_rapport_price
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################

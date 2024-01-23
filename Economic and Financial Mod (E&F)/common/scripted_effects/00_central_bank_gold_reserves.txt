@@ -1,0 +1,53 @@
+country_gold_reserve_unlimited = {
+    if = {
+        limit = {
+            has_modifier = country_gold_reserve_unlimited
+        }
+        remove_modifier = country_gold_reserve_unlimited
+    }
+    add_modifier = {
+        name = country_gold_reserve_unlimited
+    }
+}
+
+stockpiling_central_bank_gold_reserves_1 = {
+    set_variable = {
+        name = stockpiling_central_bank_gold_reserves_var_2
+        value = 0
+    }
+    if = {
+        limit = {
+            central_bank_gold_reserves_market_goods_sell_orders > 0
+        }
+        change_variable = {
+            name = stockpiling_central_bank_gold_reserves_var_2
+            add = central_bank_gold_reserves_market_goods_sell_orders
+        }
+        change_variable = {
+            name = stockpiling_central_bank_gold_reserves_var_2
+            multiply = 1000
+        }
+        change_variable = {
+            name = stockpiling_central_bank_gold_reserves_var_2
+            multiply = 4
+        }
+    }
+}
+stockpiling_central_bank_gold_reserves_state = {
+    every_scope_state = {
+        if = {
+            limit = {
+                has_modifier = bank_central_historic_place
+				is_capital = yes
+                #is_homeland_of_country_cultures = ROOT
+            }
+            save_scope_as = central_bank_site
+            scope:central_bank_site = {
+                change_variable = {
+                    name = central_bank_gold_reserves_state_1
+                    add = root.var:stockpiling_central_bank_gold_reserves_var_2
+                }
+            }
+        }
+    }
+}
