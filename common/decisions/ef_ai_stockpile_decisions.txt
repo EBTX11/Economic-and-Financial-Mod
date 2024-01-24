@@ -1,7 +1,4 @@
-﻿#market_goods_shortage_ratio > 0.33
-#mg:grain = { market_goods_delta >= 10 } 
-
-#####################################################################################################################################################
+﻿#####################################################################################################################################################
 #####################################################################################################################################################
 #####################################################################################################################################################
 #####################################################################################################################################################
@@ -31,6 +28,7 @@ ef_ai_grain_release_decisions_1 = {
 			}
 		}
 		var:grain_release_status = 0
+		var:grain_store_status = 0
 		has_building = building_national_stockpile
 		stockpiling_grain_var_state > ai_grain_release_quantity_1Y
 	}          
@@ -51,10 +49,6 @@ ef_ai_grain_release_decisions_1 = {
 		set_variable = {
 			name = release_grain_var_1
 			value = grain_release_quantity_1_week #grain_release_quantity  
-		}
-		set_variable = {
-			name = grain_store_quantity
-			value = 0
 		}
 		set_variable = {
 			name = grain_release_status
@@ -103,12 +97,6 @@ ef_ai_grain_release_decisions_1 = {
 		set_variable = {
 			name = grain_store_quantity
 			value = 1000
-		}
-
-		#test
-		set_variable = {
-			name = release_grain_time
-			value = 0
 		}
 	}
 
@@ -548,10 +536,6 @@ ef_ai_lead_release_decisions_1 = {
 			value = lead_release_quantity_1_week #lead_release_quantity  
 		}
 		set_variable = {
-			name = lead_store_quantity
-			value = 0
-		}
-		set_variable = {
 			name = lead_release_status
 			value = 1
 		}
@@ -598,12 +582,6 @@ ef_ai_lead_release_decisions_1 = {
 		set_variable = {
 			name = lead_store_quantity
 			value = 1000
-		}
-
-		#test
-		set_variable = {
-			name = release_lead_time
-			value = 0
 		}
 	}
 
@@ -1725,3 +1703,102 @@ ef_ai_ironclads_release_decisions_1 = {
 #####################################################################################################################################################
 #####################################################################################################################################################
 
+#grain
+ef_ai_grain_store_decisions_1 = {
+	is_shown = {
+		is_ai = no
+	}
+
+	possible = {
+		var:grain_release_status = 0
+		var:grain_store_status = 0
+
+		market = { 
+			mg:grain = { grain_market_goods_delta_month >= 4000 } 
+		}
+		has_building = building_national_stockpile
+		stockpiling_grain_var_state > ai_grain_release_quantity_1Y
+	}          
+         
+	when_taken = {
+
+		#Scripted GUI transformed
+		set_variable = {
+			name = grain_store_quantity
+			value = ai_grain_store_quantity_1Y
+		}
+		set_variable = {
+			name = grain_store_month
+			value = 24
+		}
+		##################################
+
+		set_variable = {
+			name = grain_store_status
+			value = 1
+		}
+		set_variable = {
+			name = store_grain_var_1
+			value = grain_store_quantity_1_week
+		}
+		set_variable = {
+			name = grain_store_month_fixe
+			value = var:grain_store_month
+		}
+
+		#reset release
+		set_variable = {
+			name = grain_release_status
+			value = 0
+		}
+		set_variable = {
+			name = grain_release_quantity
+			value = 1000
+		}
+		every_scope_state = {
+			limit = {
+				has_building = building_national_stockpile
+			}
+
+			activate_production_method = {
+				building_type = building_national_stockpile
+				production_method = pm_grain_0
+			}
+			activate_production_method = {
+				building_type = building_national_stockpile
+				production_method = pm_store_grain_1
+			}
+		}
+		every_scope_building = {
+			if  = {
+				limit = {
+					is_building_type = building_national_stockpile
+				}
+				remove_modifier = release_grain_1
+				remove_modifier = store_grain_1
+				add_modifier = {
+					name = store_grain_1
+					multiplier = grain_store_for_modifier
+				}
+			}
+		}
+		
+		set_variable = {
+			name = grain_income_for_compensation
+			value = ai_grain_store_quantity_1Y
+		}
+		change_variable = {
+			name = grain_income_for_compensation
+			multiplier = root.grain_price
+		}
+		add_modifier = {
+			name = grain_income_for_compensation
+			months = 24
+			multiplier = var:grain_income_for_compensation
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
