@@ -3,12 +3,12 @@
 ############################################################################################################################################################
 ############################################################################################################################################################
 
-# ██████╗ ██╗██╗   ██╗███████╗██████╗ 
-# ██╔══██╗██║██║   ██║██╔════╝██╔══██╗
-# ██║  ██║██║██║   ██║█████╗  ██████╔╝
-# ██║  ██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗
-# ██████╔╝██║ ╚████╔╝ ███████╗██║  ██║
-# ╚═════╝ ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝  
+#  ██████╗ ██████╗ ███╗   ██╗ ██████╗███████╗██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗     ██████╗ ███████╗███████╗███████╗██████╗ ██╗   ██╗███████╗     ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗
+# ██╔════╝██╔═══██╗████╗  ██║██╔════╝██╔════╝██╔══██╗████╗  ██║██║████╗  ██║██╔════╝     ██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝    ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝
+# ██║     ██║   ██║██╔██╗ ██║██║     █████╗  ██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗    ██████╔╝█████╗  ███████╗█████╗  ██████╔╝██║   ██║█████╗      ██║     ██║   ██║██████╔╝██████╔╝█████╗  ██╔██╗ ██║██║      ╚████╔╝ 
+# ██║     ██║   ██║██║╚██╗██║██║     ██╔══╝  ██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║    ██╔══██╗██╔══╝  ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝      ██║     ██║   ██║██╔══██╗██╔══██╗██╔══╝  ██║╚██╗██║██║       ╚██╔╝  
+# ╚██████╗╚██████╔╝██║ ╚████║╚██████╗███████╗██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝    ██║  ██║███████╗███████║███████╗██║  ██║ ╚████╔╝ ███████╗    ╚██████╗╚██████╔╝██║  ██║██║  ██║███████╗██║ ╚████║╚██████╗   ██║   
+#  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -60,8 +60,6 @@ money_supply_stockpile_by_other_country_reference_currency = {
 	}
 }
 
-
-
 relation_with_reference_currency = {
 	value = 0
 	every_country = {
@@ -98,7 +96,7 @@ relation_with_reference_currency = {
 		if  = {
 			limit = {
 				relations:root <= -20
-				relations:root >= -50
+				relations:root >= -49
 			}
 			add = -1
 		}
@@ -115,6 +113,809 @@ relation_with_reference_currency = {
 			}	
 			add = -3
 		}
+	}
+}
+
+infamy_of_reference_currency = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+		}
+		if  = {
+			limit = {
+				#infamy < 24.9
+				infamy = infamy_threshold:Reputable
+			}	
+			add = 0
+		}
+		if  = {
+			limit = {
+				#infamy >= 25
+				#infamy < 49.9
+				infamy = infamy_threshold:infamous
+			}	
+			add = -1
+		}
+		if  = {
+			limit = {
+				#infamy >= 50
+				#infamy < 99.9
+				infamy = infamy_threshold:notorious
+
+			}	
+			add = -2
+		}
+		if  = {
+			limit = {
+				#infamy > 100
+				infamy = infamy_threshold:pariah
+			}	
+			add = -3
+		}
+	}
+}
+
+score_of_trust_with_reference_currency = {
+	add = relation_with_reference_currency
+	add = infamy_of_reference_currency
+}
+
+#what is the reserve currency
+
+#shares
+reference_currency_is_shares = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_shares_currency
+		}
+		add = 1
+	}
+}
+
+#franc
+reference_currency_is_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_franc_currency
+		}
+		add = 1
+	}
+}
+
+#dollar
+reference_currency_is_dollar = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_dollar_currency
+		}
+		add = 1
+	}
+}
+
+#mark
+reference_currency_is_mark = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_mark_currency
+		}
+		add = 1
+	}
+}
+
+#sterling
+reference_currency_is_sterling = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_sterling_currency
+		}
+		add = 1
+	}
+}
+
+#real
+reference_currency_is_real = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_real_currency
+		}
+		add = 1
+	}
+}
+
+#gulden
+reference_currency_is_gulden = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_gulden_currency
+		}
+		add = 1
+	}
+}
+
+#yuan
+reference_currency_is_yuan = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_yuan_currency
+		}
+		add = 1
+	}
+}
+
+#rupee
+reference_currency_is_rupee = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_rupee_currency
+		}
+		add = 1
+	}
+}
+
+#yen
+reference_currency_is_yen = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_yen_currency
+		}
+		add = 1
+	}
+}
+
+#peseta
+reference_currency_is_peseta = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_peseta_currency
+		}
+		add = 1
+	}
+}
+
+#ottoman_lira
+reference_currency_is_ottoman_lira = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_ottoman_lira_currency
+		}
+		add = 1
+	}
+}
+
+#lira
+reference_currency_is_lira = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_lira_currency
+		}
+		add = 1
+	}
+}
+
+#peso
+reference_currency_is_peso = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_peso_currency
+		}
+		add = 1
+	}
+}
+
+#rouble
+reference_currency_is_rouble = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_rouble_currency
+		}
+		add = 1
+	}
+}
+
+#swiss_franc
+reference_currency_is_swiss_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_swiss_franc_currency
+		}
+		add = 1
+	}
+}
+
+#belgian_franc
+reference_currency_is_belgian_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_belgian_franc_currency
+		}
+		add = 1
+	}
+}
+
+#florin
+reference_currency_is_florin = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_florin_currency
+		}
+		add = 1
+	}
+}
+
+#brazilian_real
+reference_currency_is_brazilian_real = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_brazilian_real_currency
+		}
+		add = 1
+	}
+}
+
+#dinar
+reference_currency_is_dinar = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_dinar_currency
+		}
+		add = 1
+	}
+}
+
+#krone
+reference_currency_is_krone = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_krone_currency
+		}
+		add = 1
+	}
+}
+
+#leu
+reference_currency_is_leu = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_leu_currency
+		}
+		add = 1
+	}
+}
+
+#drachma
+reference_currency_is_drachma = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_drachma_currency
+		}
+		add = 1
+	}
+}
+
+#bath
+reference_currency_is_bath = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_bath_currency
+		}
+		add = 1
+	}
+}
+
+#qiran
+reference_currency_is_qiran = {
+	value = 0
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+			has_law = law_type:law_qiran_currency
+		}
+		add = 1
+	}
+}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+#  ██████╗ ██████╗ ███╗   ██╗ ██████╗███████╗██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗     ██████╗ ██╗      █████╗ ██╗   ██╗███████╗██████╗ 
+# ██╔════╝██╔═══██╗████╗  ██║██╔════╝██╔════╝██╔══██╗████╗  ██║██║████╗  ██║██╔════╝     ██╔══██╗██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗
+# ██║     ██║   ██║██╔██╗ ██║██║     █████╗  ██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗    ██████╔╝██║     ███████║ ╚████╔╝ █████╗  ██████╔╝
+# ██║     ██║   ██║██║╚██╗██║██║     ██╔══╝  ██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║    ██╔═══╝ ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗
+# ╚██████╗╚██████╔╝██║ ╚████║╚██████╗███████╗██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝    ██║     ███████╗██║  ██║   ██║   ███████╗██║  ██║
+#  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+money_value_of_player = {
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		value = money_value
+	}
+}
+
+money_value_rapported_inflation_of_player = {
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		value = money_value_rapported_inflation
+	}
+}
+
+money_supply_of_player = {
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		value = money_supply
+	}
+}
+
+money_supply_stockpile_by_other_country_of_player = {
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		value = money_supply_stockpile_by_other_country
+	}
+}
+
+relation_with_player = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		if  = {
+			limit = {
+				relations:root >= 80
+			}	
+			add = 3
+		}
+		if  = {
+			limit = {
+				relations:root <= 79
+				relations:root >= 50
+			}	
+			add = 2
+		}
+		if  = {
+			limit = {
+				relations:root <= 49
+				relations:root >= 20
+			}	
+			add = 1
+		}
+		if  = {
+			limit = {
+				relations:root >= -19
+				relations:root <= 19
+			}	
+			add = 0
+		}
+		if  = {
+			limit = {
+				relations:root <= -20
+				relations:root >= -49
+			}
+			add = -1
+		}
+		if  = {
+			limit = {
+				relations:root <= -50
+				relations:root >= -80
+			}	
+			add = -2
+		}
+		if  = {
+			limit = {
+				relations:root < -80
+			}	
+			add = -3
+		}
+	}
+}
+
+infamy_of_player = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+		}
+		if  = {
+			limit = {
+				#infamy < 24.9
+				infamy = infamy_threshold:Reputable
+			}	
+			add = 0
+		}
+		if  = {
+			limit = {
+				#infamy >= 25
+				#infamy < 49.9
+				infamy = infamy_threshold:infamous
+			}	
+			add = -1
+		}
+		if  = {
+			limit = {
+				#infamy >= 50
+				#infamy < 99.9
+				infamy = infamy_threshold:notorious
+
+			}	
+			add = -2
+		}
+		if  = {
+			limit = {
+				#infamy > 100
+				infamy = infamy_threshold:pariah
+			}	
+			add = -3
+		}
+	}
+}
+
+score_of_trust_with_player = {
+	add = relation_with_player
+	add = infamy_of_player
+}
+
+#what is the reserve currency
+
+#shares
+currency_currency_of_player_is_shares = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_shares_currency
+		}
+		add = 1
+	}
+}
+
+#franc
+currency_of_player_is_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_franc_currency
+		}
+		add = 1
+	}
+}
+
+#dollar
+currency_of_player_is_dollar = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_dollar_currency
+		}
+		add = 1
+	}
+}
+
+#mark
+currency_of_player_is_mark = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_mark_currency
+		}
+		add = 1
+	}
+}
+
+#sterling
+currency_of_player_is_sterling = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_sterling_currency
+		}
+		add = 1
+	}
+}
+
+#real
+currency_of_player_is_real = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_real_currency
+		}
+		add = 1
+	}
+}
+
+#gulden
+currency_of_player_is_gulden = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_gulden_currency
+		}
+		add = 1
+	}
+}
+
+#yuan
+currency_of_player_is_yuan = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_yuan_currency
+		}
+		add = 1
+	}
+}
+
+#rupee
+currency_of_player_is_rupee = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_rupee_currency
+		}
+		add = 1
+	}
+}
+
+#yen
+currency_of_player_is_yen = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_yen_currency
+		}
+		add = 1
+	}
+}
+
+#peseta
+currency_of_player_is_peseta = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_peseta_currency
+		}
+		add = 1
+	}
+}
+
+#ottoman_lira
+currency_of_player_is_ottoman_lira = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_ottoman_lira_currency
+		}
+		add = 1
+	}
+}
+
+#lira
+currency_of_player_is_lira = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_lira_currency
+		}
+		add = 1
+	}
+}
+
+#peso
+currency_of_player_is_peso = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_peso_currency
+		}
+		add = 1
+	}
+}
+
+#rouble
+currency_of_player_is_rouble = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_rouble_currency
+		}
+		add = 1
+	}
+}
+
+#swiss_franc
+currency_of_player_is_swiss_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_swiss_franc_currency
+		}
+		add = 1
+	}
+}
+
+#belgian_franc
+currency_of_player_is_belgian_franc = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_belgian_franc_currency
+		}
+		add = 1
+	}
+}
+
+#florin
+currency_of_player_is_florin = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_florin_currency
+		}
+		add = 1
+	}
+}
+
+#brazilian_real
+currency_of_player_is_brazilian_real = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_brazilian_real_currency
+		}
+		add = 1
+	}
+}
+
+#dinar
+currency_of_player_is_dinar = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_dinar_currency
+		}
+		add = 1
+	}
+}
+
+#krone
+currency_of_player_is_krone = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_krone_currency
+		}
+		add = 1
+	}
+}
+
+#leu
+currency_of_player_is_leu = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_leu_currency
+		}
+		add = 1
+	}
+}
+
+#drachma
+currency_of_player_is_drachma = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_drachma_currency
+		}
+		add = 1
+	}
+}
+
+#bath
+currency_of_player_is_bath = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_bath_currency
+		}
+		add = 1
+	}
+}
+
+#qiran
+currency_of_player_is_qiran = {
+	value = 0
+	every_country = {
+		limit = {
+			is_player = yes
+			has_law = law_type:law_qiran_currency
+		}
+		add = 1
 	}
 }
 
@@ -247,6 +1048,7 @@ money_value = {
 }
 
 money_supply = {
+	value = 1 #à voir
 	if  = {
 		if = {
 			limit = {
