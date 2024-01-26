@@ -1,0 +1,915 @@
+﻿#notification_example = {													#notification key
+#	type = country 															#include notification type
+#   group = "some_group"                                                    # group for "Current Situation". Also adds this notification to the Message Settings list.
+#	texture = "gfx/interface/icons/notification_icons/technology.dds" 		#texture icon. Mandatory if notification has a group. Otherwise, you'll get a pink face placeholder in feed notifications.
+#
+#	notification_type = feed/toast/popup									#how the notification will be presented
+#	popup_name = acquired_technology_popup 									#gui specification for popups, must be in gui/popups.gui
+#
+#	on_created_soundeffect = "event:/SFX/UI/Notifications/notification" 	#notification on creationg sound
+#}
+
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+#  █████╗ ██╗        ██████╗ ██╗   ██╗██╗   ██╗     ███████╗███████╗██╗     ██╗             ██████╗ ██╗      █████╗ ██╗   ██╗███████╗██████╗          ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗
+# ██╔══██╗██║        ██╔══██╗██║   ██║╚██╗ ██╔╝     ██╔════╝██╔════╝██║     ██║             ██╔══██╗██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗        ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝
+# ███████║██║        ██████╔╝██║   ██║ ╚████╔╝      ███████╗█████╗  ██║     ██║             ██████╔╝██║     ███████║ ╚████╔╝ █████╗  ██████╔╝        ██║     ██║   ██║██████╔╝██████╔╝█████╗  ██╔██╗ ██║██║      ╚████╔╝ 
+# ██╔══██║██║        ██╔══██╗██║   ██║  ╚██╔╝       ╚════██║██╔══╝  ██║     ██║             ██╔═══╝ ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗        ██║     ██║   ██║██╔══██╗██╔══██╗██╔══╝  ██║╚██╗██║██║       ╚██╔╝  
+# ██║  ██║██║███████╗██████╔╝╚██████╔╝   ██║███████╗███████║███████╗███████╗███████╗███████╗██║     ███████╗██║  ██║   ██║   ███████╗██║  ██║███████╗╚██████╗╚██████╔╝██║  ██║██║  ██║███████╗██║ ╚████║╚██████╗   ██║   
+# ╚═╝  ╚═╝╚═╝╚══════╝╚═════╝  ╚═════╝    ╚═╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+
+global_monetary_reference_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+global_monetary_reference_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+#  █████╗ ██╗        ██████╗ ██╗   ██╗██╗   ██╗     ███████╗███████╗██╗     ██╗             ██████╗ ██╗      █████╗ ██╗   ██╗███████╗██████╗          ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗
+# ██╔══██╗██║        ██╔══██╗██║   ██║╚██╗ ██╔╝     ██╔════╝██╔════╝██║     ██║             ██╔══██╗██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗        ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝
+# ███████║██║        ██████╔╝██║   ██║ ╚████╔╝      ███████╗█████╗  ██║     ██║             ██████╔╝██║     ███████║ ╚████╔╝ █████╗  ██████╔╝        ██║     ██║   ██║██████╔╝██████╔╝█████╗  ██╔██╗ ██║██║      ╚████╔╝ 
+# ██╔══██║██║        ██╔══██╗██║   ██║  ╚██╔╝       ╚════██║██╔══╝  ██║     ██║             ██╔═══╝ ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗        ██║     ██║   ██║██╔══██╗██╔══██╗██╔══╝  ██║╚██╗██║██║       ╚██╔╝  
+# ██║  ██║██║███████╗██████╔╝╚██████╔╝   ██║███████╗███████║███████╗███████╗███████╗███████╗██║     ███████╗██║  ██║   ██║   ███████╗██║  ██║███████╗╚██████╗╚██████╔╝██║  ██║██║  ██║███████╗██║ ╚████║╚██████╗   ██║   
+# ╚═╝  ╚═╝╚═╝╚══════╝╚═════╝  ╚═════╝    ╚═╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+#shares
+your_currency_shares_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_shares_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_shares_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_shares_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#franc
+your_currency_franc_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_franc_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_franc_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_franc_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#dollar
+your_currency_dollar_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_dollar_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_dollar_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_dollar_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#mark
+your_currency_mark_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_mark_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_mark_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_mark_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#sterling
+your_currency_sterling_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_sterling_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_sterling_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_sterling_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#real
+your_currency_real_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_real_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_real_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_real_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#gulden
+your_currency_gulden_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_gulden_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_gulden_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_gulden_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#yuan
+your_currency_yuan_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_yuan_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_yuan_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_yuan_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#rupee
+your_currency_rupee_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_rupee_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_rupee_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_rupee_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#yen
+your_currency_yen_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_yen_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_yen_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_yen_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#peseta
+your_currency_peseta_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_peseta_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_peseta_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_peseta_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#ottoman_lira
+your_currency_ottoman_lira_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_ottoman_lira_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_ottoman_lira_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_ottoman_lira_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#lira
+your_currency_lira_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_lira_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_lira_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_lira_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#peso
+your_currency_peso_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_peso_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_peso_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_peso_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#rouble
+your_currency_rouble_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_rouble_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_rouble_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_rouble_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#swiss_franc
+your_currency_swiss_franc_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_swiss_franc_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_swiss_franc_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_swiss_franc_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#belgian_franc
+your_currency_belgian_franc_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_belgian_franc_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_belgian_franc_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_belgian_franc_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#florin
+your_currency_florin_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_florin_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_florin_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_florin_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#brazilian_real
+your_currency_brazilian_real_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_brazilian_real_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_brazilian_real_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_brazilian_real_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#dinar
+your_currency_dinar_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_dinar_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_dinar_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_dinar_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#krone
+your_currency_krone_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_krone_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_krone_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_krone_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#leu
+your_currency_leu_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_leu_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_leu_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_leu_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#drachma
+your_currency_drachma_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_drachma_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_drachma_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_drachma_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#bath
+your_currency_bath_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_bath_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_bath_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_bath_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+#qiran
+your_currency_qiran_are_buy_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_qiran_are_sell_toast = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/authority.dds"
+
+
+	notification_type = toast
+
+	on_created_soundeffect = "event:/SFX/UI/Alerts/Toasts/peace_agreement"
+}
+
+your_currency_qiran_are_buy_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+your_currency_qiran_are_sell_message = {
+	type = country
+	texture = "gfx/interface/icons/notification_icons/news.dds"
+
+	notification_type = feed
+}
+
+
+
+
