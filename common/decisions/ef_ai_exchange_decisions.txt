@@ -1,0 +1,6725 @@
+﻿#shares
+ai_exchange_undervalued_shares_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_shares_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_shares_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_shares_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_shares_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_shares_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_shares_seller
+		}
+
+		set_variable = {
+			name = shares_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_shares_state_1_buy_in_gold
+			value = var:shares_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_shares_state_1_buy_in_gold
+			multiplier = scope:undervalued_shares_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_shares_state_buy_vriablity
+			value = var:shares_quantity_var
+		}
+
+		scope:gold_to_shares_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_shares_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_shares_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_shares_state_1
+							add = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_shares_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_shares_state_1
+								subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_shares_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_shares_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_shares_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_shares_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_shares_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_shares_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_shares_seller
+		}
+
+		set_variable = {
+			name = shares_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_shares_state_1_buy_in_gold
+			value = var:shares_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_shares_state_1_buy_in_gold
+			multiplier = scope:undervalued_shares_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_shares_state_buy_vriablity
+			value = var:shares_quantity_var
+		}
+
+		scope:gold_to_shares_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_shares_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_shares_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_shares_state_1
+							subtract = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_shares_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+
+								#add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_shares_state_1
+								add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+
+								#subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#franc
+ai_exchange_undervalued_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_franc_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_franc_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_franc_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_franc_seller
+		}
+
+		set_variable = {
+			name = franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_franc_state_1_buy_in_gold
+			value = var:franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_franc_state_buy_vriablity
+			value = var:franc_quantity_var
+		}
+
+		scope:gold_to_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_franc_state_1
+							add = owner.var:stockpiling_undervalued_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_franc_state_1
+								subtract = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_franc_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_franc_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_franc_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_franc_seller
+		}
+
+		set_variable = {
+			name = franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_franc_state_1_buy_in_gold
+			value = var:franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_franc_state_buy_vriablity
+			value = var:franc_quantity_var
+		}
+
+		scope:gold_to_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_franc_state_1
+							subtract = owner.var:stockpiling_undervalued_franc_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+
+								#add = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_franc_state_1
+								add = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_buy_vriablity
+
+								#subtract = scope:gold_to_franc_seller.var:stockpiling_undervalued_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#dollar
+ai_exchange_undervalued_dollar_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_dollar_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_dollar_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_dollar_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_dollar_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_dollar_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_dollar_seller
+		}
+
+		set_variable = {
+			name = dollar_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
+			value = var:dollar_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
+			multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dollar_state_buy_vriablity
+			value = var:dollar_quantity_var
+		}
+
+		scope:gold_to_dollar_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_dollar_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_dollar_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_dollar_state_1
+							add = owner.var:stockpiling_undervalued_dollar_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_dollar_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_dollar_state_1
+								subtract = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_dollar_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_dollar_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_dollar_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_dollar_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_dollar_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_dollar_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_dollar_seller
+		}
+
+		set_variable = {
+			name = dollar_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
+			value = var:dollar_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
+			multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dollar_state_buy_vriablity
+			value = var:dollar_quantity_var
+		}
+
+		scope:gold_to_dollar_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_dollar_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_dollar_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_dollar_state_1
+							subtract = owner.var:stockpiling_undervalued_dollar_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_dollar_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_dollar_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+
+								#add = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_dollar_state_1
+								add = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_buy_vriablity
+
+								#subtract = scope:gold_to_dollar_seller.var:stockpiling_undervalued_dollar_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#mark
+ai_exchange_undervalued_mark_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_mark_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_mark_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_mark_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_mark_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_mark_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_mark_seller
+		}
+
+		set_variable = {
+			name = mark_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_mark_state_1_buy_in_gold
+			value = var:mark_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_mark_state_1_buy_in_gold
+			multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_mark_state_buy_vriablity
+			value = var:mark_quantity_var
+		}
+
+		scope:gold_to_mark_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_mark_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_mark_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_mark_state_1
+							add = owner.var:stockpiling_undervalued_mark_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_mark_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_mark_state_1
+								subtract = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_mark_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_mark_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_mark_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_mark_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_mark_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_mark_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_mark_seller
+		}
+
+		set_variable = {
+			name = mark_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_mark_state_1_buy_in_gold
+			value = var:mark_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_mark_state_1_buy_in_gold
+			multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_mark_state_buy_vriablity
+			value = var:mark_quantity_var
+		}
+
+		scope:gold_to_mark_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_mark_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_mark_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_mark_state_1
+							subtract = owner.var:stockpiling_undervalued_mark_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_mark_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_mark_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+
+								#add = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_mark_state_1
+								add = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_buy_vriablity
+
+								#subtract = scope:gold_to_mark_seller.var:stockpiling_undervalued_mark_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#sterling
+ai_exchange_undervalued_sterling_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_sterling_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_sterling_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_sterling_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_sterling_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_sterling_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_sterling_seller
+		}
+
+		set_variable = {
+			name = sterling_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
+			value = var:sterling_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
+			multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_sterling_state_buy_vriablity
+			value = var:sterling_quantity_var
+		}
+
+		scope:gold_to_sterling_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_sterling_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_sterling_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_sterling_state_1
+							add = owner.var:stockpiling_undervalued_sterling_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_sterling_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_sterling_state_1
+								subtract = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_sterling_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_sterling_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_sterling_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_sterling_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_sterling_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_sterling_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_sterling_seller
+		}
+
+		set_variable = {
+			name = sterling_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
+			value = var:sterling_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
+			multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_sterling_state_buy_vriablity
+			value = var:sterling_quantity_var
+		}
+
+		scope:gold_to_sterling_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_sterling_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_sterling_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_sterling_state_1
+							subtract = owner.var:stockpiling_undervalued_sterling_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_sterling_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_sterling_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+
+								#add = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_sterling_state_1
+								add = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_buy_vriablity
+
+								#subtract = scope:gold_to_sterling_seller.var:stockpiling_undervalued_sterling_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#real
+ai_exchange_undervalued_real_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_real_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_real_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_real_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_real_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_real_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_real_seller
+		}
+
+		set_variable = {
+			name = real_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_real_state_1_buy_in_gold
+			value = var:real_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_real_state_1_buy_in_gold
+			multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_real_state_buy_vriablity
+			value = var:real_quantity_var
+		}
+
+		scope:gold_to_real_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_real_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_real_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_real_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_real_state_1
+							add = owner.var:stockpiling_undervalued_real_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_real_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_real_state_1
+								subtract = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_real_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_real_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_real_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_real_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_real_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_real_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_real_seller
+		}
+
+		set_variable = {
+			name = real_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_real_state_1_buy_in_gold
+			value = var:real_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_real_state_1_buy_in_gold
+			multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_real_state_buy_vriablity
+			value = var:real_quantity_var
+		}
+
+		scope:gold_to_real_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_real_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_real_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_real_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_real_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_real_state_1
+							subtract = owner.var:stockpiling_undervalued_real_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_real_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_real_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_1_buy_in_gold
+
+								#add = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_real_state_1
+								add = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_buy_vriablity
+
+								#subtract = scope:gold_to_real_seller.var:stockpiling_undervalued_real_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#gulden
+ai_exchange_undervalued_gulden_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_gulden_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_gulden_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_gulden_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_gulden_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_gulden_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_gulden_seller
+		}
+
+		set_variable = {
+			name = gulden_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
+			value = var:gulden_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
+			multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_gulden_state_buy_vriablity
+			value = var:gulden_quantity_var
+		}
+
+		scope:gold_to_gulden_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_gulden_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_gulden_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_gulden_state_1
+							add = owner.var:stockpiling_undervalued_gulden_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_gulden_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_gulden_state_1
+								subtract = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_gulden_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_gulden_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_gulden_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_gulden_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_gulden_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_gulden_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_gulden_seller
+		}
+
+		set_variable = {
+			name = gulden_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
+			value = var:gulden_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
+			multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_gulden_state_buy_vriablity
+			value = var:gulden_quantity_var
+		}
+
+		scope:gold_to_gulden_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_gulden_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_gulden_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_gulden_state_1
+							subtract = owner.var:stockpiling_undervalued_gulden_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_gulden_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_gulden_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+
+								#add = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_gulden_state_1
+								add = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_buy_vriablity
+
+								#subtract = scope:gold_to_gulden_seller.var:stockpiling_undervalued_gulden_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#yuan
+ai_exchange_undervalued_yuan_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_yuan_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_yuan_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_yuan_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_yuan_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_yuan_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_yuan_seller
+		}
+
+		set_variable = {
+			name = yuan_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
+			value = var:yuan_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
+			multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yuan_state_buy_vriablity
+			value = var:yuan_quantity_var
+		}
+
+		scope:gold_to_yuan_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_yuan_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_yuan_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_yuan_state_1
+							add = owner.var:stockpiling_undervalued_yuan_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_yuan_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_yuan_state_1
+								subtract = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_yuan_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_yuan_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_yuan_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_yuan_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_yuan_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_yuan_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_yuan_seller
+		}
+
+		set_variable = {
+			name = yuan_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
+			value = var:yuan_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
+			multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yuan_state_buy_vriablity
+			value = var:yuan_quantity_var
+		}
+
+		scope:gold_to_yuan_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_yuan_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_yuan_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_yuan_state_1
+							subtract = owner.var:stockpiling_undervalued_yuan_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_yuan_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_yuan_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+
+								#add = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_yuan_state_1
+								add = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_buy_vriablity
+
+								#subtract = scope:gold_to_yuan_seller.var:stockpiling_undervalued_yuan_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#rupee
+ai_exchange_undervalued_rupee_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_rupee_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_rupee_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_rupee_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_rupee_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_rupee_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_rupee_seller
+		}
+
+		set_variable = {
+			name = rupee_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
+			value = var:rupee_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
+			multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rupee_state_buy_vriablity
+			value = var:rupee_quantity_var
+		}
+
+		scope:gold_to_rupee_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_rupee_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_rupee_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_rupee_state_1
+							add = owner.var:stockpiling_undervalued_rupee_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_rupee_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_rupee_state_1
+								subtract = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_rupee_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_rupee_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_rupee_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_rupee_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_rupee_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_rupee_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_rupee_seller
+		}
+
+		set_variable = {
+			name = rupee_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
+			value = var:rupee_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
+			multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rupee_state_buy_vriablity
+			value = var:rupee_quantity_var
+		}
+
+		scope:gold_to_rupee_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_rupee_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_rupee_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_rupee_state_1
+							subtract = owner.var:stockpiling_undervalued_rupee_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_rupee_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_rupee_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+
+								#add = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_rupee_state_1
+								add = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_buy_vriablity
+
+								#subtract = scope:gold_to_rupee_seller.var:stockpiling_undervalued_rupee_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#yen
+ai_exchange_undervalued_yen_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_yen_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_yen_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_yen_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_yen_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_yen_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_yen_seller
+		}
+
+		set_variable = {
+			name = yen_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yen_state_1_buy_in_gold
+			value = var:yen_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_yen_state_1_buy_in_gold
+			multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yen_state_buy_vriablity
+			value = var:yen_quantity_var
+		}
+
+		scope:gold_to_yen_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_yen_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_yen_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_yen_state_1
+							add = owner.var:stockpiling_undervalued_yen_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_yen_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_yen_state_1
+								subtract = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_yen_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_yen_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_yen_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_yen_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_yen_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_yen_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_yen_seller
+		}
+
+		set_variable = {
+			name = yen_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yen_state_1_buy_in_gold
+			value = var:yen_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_yen_state_1_buy_in_gold
+			multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_yen_state_buy_vriablity
+			value = var:yen_quantity_var
+		}
+
+		scope:gold_to_yen_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_yen_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_yen_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_yen_state_1
+							subtract = owner.var:stockpiling_undervalued_yen_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_yen_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_yen_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+
+								#add = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_yen_state_1
+								add = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_buy_vriablity
+
+								#subtract = scope:gold_to_yen_seller.var:stockpiling_undervalued_yen_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#peseta
+ai_exchange_undervalued_peseta_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_peseta_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_peseta_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_peseta_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_peseta_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_peseta_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_peseta_seller
+		}
+
+		set_variable = {
+			name = peseta_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
+			value = var:peseta_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
+			multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peseta_state_buy_vriablity
+			value = var:peseta_quantity_var
+		}
+
+		scope:gold_to_peseta_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_peseta_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_peseta_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_peseta_state_1
+							add = owner.var:stockpiling_undervalued_peseta_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_peseta_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_peseta_state_1
+								subtract = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_peseta_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_peseta_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_peseta_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_peseta_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_peseta_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_peseta_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_peseta_seller
+		}
+
+		set_variable = {
+			name = peseta_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
+			value = var:peseta_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
+			multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peseta_state_buy_vriablity
+			value = var:peseta_quantity_var
+		}
+
+		scope:gold_to_peseta_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_peseta_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_peseta_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_peseta_state_1
+							subtract = owner.var:stockpiling_undervalued_peseta_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_peseta_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_peseta_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+
+								#add = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_peseta_state_1
+								add = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_buy_vriablity
+
+								#subtract = scope:gold_to_peseta_seller.var:stockpiling_undervalued_peseta_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#ottoman_lira
+ai_exchange_undervalued_ottoman_lira_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_ottoman_lira_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_ottoman_lira_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_ottoman_lira_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_ottoman_lira_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_ottoman_lira_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_ottoman_lira_seller
+		}
+
+		set_variable = {
+			name = ottoman_lira_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+			value = var:ottoman_lira_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+			multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+			value = var:ottoman_lira_quantity_var
+		}
+
+		scope:gold_to_ottoman_lira_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_ottoman_lira_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_ottoman_lira_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_ottoman_lira_state_1
+							add = owner.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_ottoman_lira_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_ottoman_lira_state_1
+								subtract = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_ottoman_lira_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_ottoman_lira_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_ottoman_lira_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_ottoman_lira_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_ottoman_lira_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_ottoman_lira_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_ottoman_lira_seller
+		}
+
+		set_variable = {
+			name = ottoman_lira_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+			value = var:ottoman_lira_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+			multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+			value = var:ottoman_lira_quantity_var
+		}
+
+		scope:gold_to_ottoman_lira_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_ottoman_lira_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_ottoman_lira_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_ottoman_lira_state_1
+							subtract = owner.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_ottoman_lira_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+
+								#add = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_ottoman_lira_state_1
+								add = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+
+								#subtract = scope:gold_to_ottoman_lira_seller.var:stockpiling_undervalued_ottoman_lira_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#lira
+ai_exchange_undervalued_lira_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_lira_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_lira_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_lira_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_lira_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_lira_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_lira_seller
+		}
+
+		set_variable = {
+			name = lira_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_lira_state_1_buy_in_gold
+			value = var:lira_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_lira_state_1_buy_in_gold
+			multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_lira_state_buy_vriablity
+			value = var:lira_quantity_var
+		}
+
+		scope:gold_to_lira_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_lira_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_lira_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_lira_state_1
+							add = owner.var:stockpiling_undervalued_lira_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_lira_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_lira_state_1
+								subtract = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_lira_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_lira_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_lira_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_lira_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_lira_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_lira_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_lira_seller
+		}
+
+		set_variable = {
+			name = lira_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_lira_state_1_buy_in_gold
+			value = var:lira_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_lira_state_1_buy_in_gold
+			multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_lira_state_buy_vriablity
+			value = var:lira_quantity_var
+		}
+
+		scope:gold_to_lira_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_lira_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_lira_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_lira_state_1
+							subtract = owner.var:stockpiling_undervalued_lira_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_lira_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_lira_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+
+								#add = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_lira_state_1
+								add = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_buy_vriablity
+
+								#subtract = scope:gold_to_lira_seller.var:stockpiling_undervalued_lira_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#peso
+ai_exchange_undervalued_peso_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_peso_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_peso_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_peso_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_peso_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_peso_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_peso_seller
+		}
+
+		set_variable = {
+			name = peso_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peso_state_1_buy_in_gold
+			value = var:peso_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_peso_state_1_buy_in_gold
+			multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peso_state_buy_vriablity
+			value = var:peso_quantity_var
+		}
+
+		scope:gold_to_peso_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_peso_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_peso_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_peso_state_1
+							add = owner.var:stockpiling_undervalued_peso_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_peso_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_peso_state_1
+								subtract = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_peso_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_peso_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_peso_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_peso_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_peso_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_peso_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_peso_seller
+		}
+
+		set_variable = {
+			name = peso_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peso_state_1_buy_in_gold
+			value = var:peso_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_peso_state_1_buy_in_gold
+			multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_peso_state_buy_vriablity
+			value = var:peso_quantity_var
+		}
+
+		scope:gold_to_peso_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_peso_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_peso_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_peso_state_1
+							subtract = owner.var:stockpiling_undervalued_peso_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_peso_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_peso_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+
+								#add = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_peso_state_1
+								add = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_buy_vriablity
+
+								#subtract = scope:gold_to_peso_seller.var:stockpiling_undervalued_peso_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#rouble
+ai_exchange_undervalued_rouble_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_rouble_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_rouble_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_rouble_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_rouble_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_rouble_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_rouble_seller
+		}
+
+		set_variable = {
+			name = rouble_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
+			value = var:rouble_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
+			multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rouble_state_buy_vriablity
+			value = var:rouble_quantity_var
+		}
+
+		scope:gold_to_rouble_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_rouble_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_rouble_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_rouble_state_1
+							add = owner.var:stockpiling_undervalued_rouble_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_rouble_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_rouble_state_1
+								subtract = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_rouble_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_rouble_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_rouble_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_rouble_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_rouble_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_rouble_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_rouble_seller
+		}
+
+		set_variable = {
+			name = rouble_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
+			value = var:rouble_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
+			multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_rouble_state_buy_vriablity
+			value = var:rouble_quantity_var
+		}
+
+		scope:gold_to_rouble_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_rouble_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_rouble_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_rouble_state_1
+							subtract = owner.var:stockpiling_undervalued_rouble_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_rouble_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_rouble_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+
+								#add = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_rouble_state_1
+								add = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_buy_vriablity
+
+								#subtract = scope:gold_to_rouble_seller.var:stockpiling_undervalued_rouble_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#swiss_franc
+ai_exchange_undervalued_swiss_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_swiss_franc_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_swiss_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_swiss_franc_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_swiss_franc_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_swiss_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_swiss_franc_seller
+		}
+
+		set_variable = {
+			name = swiss_franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+			value = var:swiss_franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_buy_vriablity
+			value = var:swiss_franc_quantity_var
+		}
+
+		scope:gold_to_swiss_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_swiss_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_swiss_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_swiss_franc_state_1
+							add = owner.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_swiss_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_swiss_franc_state_1
+								subtract = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_swiss_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_swiss_franc_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_swiss_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_swiss_franc_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_swiss_franc_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_swiss_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_swiss_franc_seller
+		}
+
+		set_variable = {
+			name = swiss_franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+			value = var:swiss_franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_swiss_franc_state_buy_vriablity
+			value = var:swiss_franc_quantity_var
+		}
+
+		scope:gold_to_swiss_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_swiss_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_swiss_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_swiss_franc_state_1
+							subtract = owner.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_swiss_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+
+								#add = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_swiss_franc_state_1
+								add = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+
+								#subtract = scope:gold_to_swiss_franc_seller.var:stockpiling_undervalued_swiss_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#belgian_franc
+ai_exchange_undervalued_belgian_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_belgian_franc_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_belgian_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_belgian_franc_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_belgian_franc_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_belgian_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_belgian_franc_seller
+		}
+
+		set_variable = {
+			name = belgian_franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+			value = var:belgian_franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_buy_vriablity
+			value = var:belgian_franc_quantity_var
+		}
+
+		scope:gold_to_belgian_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_belgian_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_belgian_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_belgian_franc_state_1
+							add = owner.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_belgian_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_belgian_franc_state_1
+								subtract = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_belgian_franc_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_belgian_franc_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_belgian_franc_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_belgian_franc_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_belgian_franc_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_belgian_franc_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_belgian_franc_seller
+		}
+
+		set_variable = {
+			name = belgian_franc_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+			value = var:belgian_franc_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+			multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_belgian_franc_state_buy_vriablity
+			value = var:belgian_franc_quantity_var
+		}
+
+		scope:gold_to_belgian_franc_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_belgian_franc_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_belgian_franc_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_belgian_franc_state_1
+							subtract = owner.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_belgian_franc_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+
+								#add = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_belgian_franc_state_1
+								add = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+
+								#subtract = scope:gold_to_belgian_franc_seller.var:stockpiling_undervalued_belgian_franc_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#florin
+ai_exchange_undervalued_florin_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_florin_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_florin_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_florin_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_florin_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_florin_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_florin_seller
+		}
+
+		set_variable = {
+			name = florin_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_florin_state_1_buy_in_gold
+			value = var:florin_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_florin_state_1_buy_in_gold
+			multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_florin_state_buy_vriablity
+			value = var:florin_quantity_var
+		}
+
+		scope:gold_to_florin_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_florin_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_florin_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_florin_state_1
+							add = owner.var:stockpiling_undervalued_florin_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_florin_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_florin_state_1
+								subtract = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_florin_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_florin_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_florin_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_florin_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_florin_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_florin_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_florin_seller
+		}
+
+		set_variable = {
+			name = florin_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_florin_state_1_buy_in_gold
+			value = var:florin_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_florin_state_1_buy_in_gold
+			multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_florin_state_buy_vriablity
+			value = var:florin_quantity_var
+		}
+
+		scope:gold_to_florin_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_florin_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_florin_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_florin_state_1
+							subtract = owner.var:stockpiling_undervalued_florin_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_florin_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_florin_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+
+								#add = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_florin_state_1
+								add = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_buy_vriablity
+
+								#subtract = scope:gold_to_florin_seller.var:stockpiling_undervalued_florin_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#brazilian_real
+ai_exchange_undervalued_brazilian_real_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_brazilian_real_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_brazilian_real_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_brazilian_real_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_brazilian_real_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_brazilian_real_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_brazilian_real_seller
+		}
+
+		set_variable = {
+			name = brazilian_real_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+			value = var:brazilian_real_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+			multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_buy_vriablity
+			value = var:brazilian_real_quantity_var
+		}
+
+		scope:gold_to_brazilian_real_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_brazilian_real_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_brazilian_real_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_brazilian_real_state_1
+							add = owner.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_brazilian_real_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_brazilian_real_state_1
+								subtract = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_brazilian_real_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_brazilian_real_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_brazilian_real_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_brazilian_real_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_brazilian_real_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_brazilian_real_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_brazilian_real_seller
+		}
+
+		set_variable = {
+			name = brazilian_real_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+			value = var:brazilian_real_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+			multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_brazilian_real_state_buy_vriablity
+			value = var:brazilian_real_quantity_var
+		}
+
+		scope:gold_to_brazilian_real_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_brazilian_real_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_brazilian_real_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_brazilian_real_state_1
+							subtract = owner.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_brazilian_real_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+
+								#add = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_brazilian_real_state_1
+								add = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+
+								#subtract = scope:gold_to_brazilian_real_seller.var:stockpiling_undervalued_brazilian_real_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#dinar
+ai_exchange_undervalued_dinar_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_dinar_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_dinar_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_dinar_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_dinar_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_dinar_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_dinar_seller
+		}
+
+		set_variable = {
+			name = dinar_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
+			value = var:dinar_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
+			multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dinar_state_buy_vriablity
+			value = var:dinar_quantity_var
+		}
+
+		scope:gold_to_dinar_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_dinar_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_dinar_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_dinar_state_1
+							add = owner.var:stockpiling_undervalued_dinar_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_dinar_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_dinar_state_1
+								subtract = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_dinar_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_dinar_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_dinar_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_dinar_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_dinar_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_dinar_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_dinar_seller
+		}
+
+		set_variable = {
+			name = dinar_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
+			value = var:dinar_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
+			multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_dinar_state_buy_vriablity
+			value = var:dinar_quantity_var
+		}
+
+		scope:gold_to_dinar_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_dinar_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_dinar_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_dinar_state_1
+							subtract = owner.var:stockpiling_undervalued_dinar_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_dinar_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_dinar_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+
+								#add = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_dinar_state_1
+								add = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_buy_vriablity
+
+								#subtract = scope:gold_to_dinar_seller.var:stockpiling_undervalued_dinar_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#krone
+ai_exchange_undervalued_krone_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_krone_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_krone_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_krone_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_krone_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_krone_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_krone_seller
+		}
+
+		set_variable = {
+			name = krone_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_krone_state_1_buy_in_gold
+			value = var:krone_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_krone_state_1_buy_in_gold
+			multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_krone_state_buy_vriablity
+			value = var:krone_quantity_var
+		}
+
+		scope:gold_to_krone_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_krone_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_krone_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_krone_state_1
+							add = owner.var:stockpiling_undervalued_krone_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_krone_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_krone_state_1
+								subtract = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_krone_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_krone_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_krone_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_krone_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_krone_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_krone_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_krone_seller
+		}
+
+		set_variable = {
+			name = krone_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_krone_state_1_buy_in_gold
+			value = var:krone_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_krone_state_1_buy_in_gold
+			multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_krone_state_buy_vriablity
+			value = var:krone_quantity_var
+		}
+
+		scope:gold_to_krone_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_krone_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_krone_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_krone_state_1
+							subtract = owner.var:stockpiling_undervalued_krone_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_krone_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_krone_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+
+								#add = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_krone_state_1
+								add = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_buy_vriablity
+
+								#subtract = scope:gold_to_krone_seller.var:stockpiling_undervalued_krone_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#leu
+ai_exchange_undervalued_leu_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_leu_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_leu_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_leu_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_leu_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_leu_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_leu_seller
+		}
+
+		set_variable = {
+			name = leu_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_leu_state_1_buy_in_gold
+			value = var:leu_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_leu_state_1_buy_in_gold
+			multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_leu_state_buy_vriablity
+			value = var:leu_quantity_var
+		}
+
+		scope:gold_to_leu_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_leu_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_leu_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_leu_state_1
+							add = owner.var:stockpiling_undervalued_leu_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_leu_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_leu_state_1
+								subtract = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_leu_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_leu_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_leu_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_leu_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_leu_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_leu_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_leu_seller
+		}
+
+		set_variable = {
+			name = leu_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_leu_state_1_buy_in_gold
+			value = var:leu_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_leu_state_1_buy_in_gold
+			multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_leu_state_buy_vriablity
+			value = var:leu_quantity_var
+		}
+
+		scope:gold_to_leu_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_leu_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_leu_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_leu_state_1
+							subtract = owner.var:stockpiling_undervalued_leu_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_leu_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_leu_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+
+								#add = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_leu_state_1
+								add = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_buy_vriablity
+
+								#subtract = scope:gold_to_leu_seller.var:stockpiling_undervalued_leu_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#drachma
+ai_exchange_undervalued_drachma_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_drachma_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_drachma_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_drachma_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_drachma_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_drachma_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_drachma_seller
+		}
+
+		set_variable = {
+			name = drachma_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
+			value = var:drachma_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
+			multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_drachma_state_buy_vriablity
+			value = var:drachma_quantity_var
+		}
+
+		scope:gold_to_drachma_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_drachma_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_drachma_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_drachma_state_1
+							add = owner.var:stockpiling_undervalued_drachma_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_drachma_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_drachma_state_1
+								subtract = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_drachma_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_drachma_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_drachma_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_drachma_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_drachma_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_drachma_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_drachma_seller
+		}
+
+		set_variable = {
+			name = drachma_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
+			value = var:drachma_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
+			multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_drachma_state_buy_vriablity
+			value = var:drachma_quantity_var
+		}
+
+		scope:gold_to_drachma_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_drachma_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_drachma_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_drachma_state_1
+							subtract = owner.var:stockpiling_undervalued_drachma_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_drachma_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_drachma_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+
+								#add = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_drachma_state_1
+								add = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_buy_vriablity
+
+								#subtract = scope:gold_to_drachma_seller.var:stockpiling_undervalued_drachma_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#bath
+ai_exchange_undervalued_bath_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_bath_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_bath_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_bath_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_bath_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_bath_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_bath_seller
+		}
+
+		set_variable = {
+			name = bath_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_bath_state_1_buy_in_gold
+			value = var:bath_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_bath_state_1_buy_in_gold
+			multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_bath_state_buy_vriablity
+			value = var:bath_quantity_var
+		}
+
+		scope:gold_to_bath_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_bath_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_bath_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_bath_state_1
+							add = owner.var:stockpiling_undervalued_bath_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_bath_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_bath_state_1
+								subtract = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_bath_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_bath_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_bath_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_bath_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_bath_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_bath_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_bath_seller
+		}
+
+		set_variable = {
+			name = bath_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_bath_state_1_buy_in_gold
+			value = var:bath_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_bath_state_1_buy_in_gold
+			multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_bath_state_buy_vriablity
+			value = var:bath_quantity_var
+		}
+
+		scope:gold_to_bath_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_bath_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_bath_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_bath_state_1
+							subtract = owner.var:stockpiling_undervalued_bath_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_bath_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_bath_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+
+								#add = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_bath_state_1
+								add = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_buy_vriablity
+
+								#subtract = scope:gold_to_bath_seller.var:stockpiling_undervalued_bath_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+#qiran
+ai_exchange_undervalued_qiran_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_qiran_undervalued_1 = 0	
+		not  = {
+			has_law = law_type:law_qiran_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_qiran_undervalued_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_qiran_currency
+				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_qiran_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_qiran_seller
+		}
+
+		set_variable = {
+			name = qiran_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
+			value = var:qiran_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
+			multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_qiran_state_buy_vriablity
+			value = var:qiran_quantity_var
+		}
+
+		scope:gold_to_qiran_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_qiran_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_qiran_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = owner.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_qiran_state_1
+							add = owner.var:stockpiling_undervalued_qiran_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_qiran_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								add = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_qiran_state_1
+								subtract = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
+ai_exchange_overrated_qiran_decisions_1 = {
+	is_shown = {
+		is_ai = yes
+	}
+
+	possible = {
+		has_modifier = has_central_bank
+		var:ai_exchange_decisions_time_qiran_overrated_1 = 0	
+		not  = {
+			has_law = law_type:law_qiran_currency
+			or = {
+				is_subject = yes
+				is_subject_type = subject_type_customs_union
+				is_subject_type = subject_type_protectorate
+				has_law = law_type:law_isolationism
+			}
+		}
+	}          
+
+	when_taken = {
+		set_variable = {
+			name = ai_exchange_decisions_time_qiran_overrated_1
+			value = 1
+		}
+
+		every_country = {
+			limit  = {
+				is_player = yes
+			}
+			save_scope_as = is_player_for_notification
+		}
+	
+		random_country = {
+			limit = {
+				has_law = law_type:law_qiran_currency
+				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
+				money_supply > 100000000
+				has_modifier = has_central_bank
+				not = {
+					has_modifier = global_monetary_reference
+					is_player = yes
+					or = {
+						is_subject_of = root 
+						is_subject_type = subject_type_customs_union
+						is_subject_type = subject_type_protectorate   
+					} 
+				}
+			}
+			save_scope_as = undervalued_qiran_to_gold
+		}
+
+		root = {
+			save_scope_as = gold_to_qiran_seller
+		}
+
+		set_variable = {
+			name = qiran_quantity_var
+			value =  { 5000000 15000000 } 
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
+			value = var:qiran_quantity_var
+		}
+		change_variable = {
+			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
+			multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+		}
+
+		set_variable = {
+			name = stockpiling_undervalued_qiran_state_buy_vriablity
+			value = var:qiran_quantity_var
+		}
+
+		scope:gold_to_qiran_seller = {
+			if = {
+				limit = {
+					exists = scope:undervalued_qiran_to_gold
+				}
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							is_capital = yes
+						}
+						save_scope_as = gold_to_qiran_seller_capital_state
+						#########
+
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							add = owner.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+
+							#subtract = owner.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+						}
+		
+						#########
+						change_variable = {
+							name = stockpiling_qiran_state_1
+							subtract = owner.var:stockpiling_undervalued_qiran_state_buy_vriablity
+
+							#add = owner.var:stockpiling_undervalued_qiran_state_buy_vriablity
+						}
+					}
+				}
+				scope:undervalued_qiran_to_gold = {
+					every_scope_state = {
+						if = {
+							limit = {
+								has_modifier = bank_central_historic_place
+								is_capital = yes
+							}
+							#########
+
+							change_variable = {
+								name = central_bank_gold_reserves_state_1
+								subtract = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+
+								#add = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_1_buy_in_gold
+							}
+		
+							#########
+							change_variable = {
+								name = stockpiling_qiran_state_1
+								add = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_buy_vriablity
+
+								#subtract = scope:gold_to_qiran_seller.var:stockpiling_undervalued_qiran_state_buy_vriablity
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_chance = {
+		base = 100
+	}
+}
