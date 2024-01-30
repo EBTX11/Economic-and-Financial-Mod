@@ -1,14 +1,14 @@
-﻿#shares
-ai_exchange_undervalued_shares_decisions_1 = {
+﻿#money
+ai_exchange_undervalued_money_decisions_1 = {
 	is_shown = {
 		is_ai = yes
 	}
 
 	possible = {
 		has_modifier = has_central_bank
-		var:ai_exchange_decisions_time_shares_undervalued_1 = 0	
+		var:ai_exchange_decisions_time_money_undervalued_1 = 0	
 		not  = {
-			has_law = law_type:law_shares_currency
+			has_law = law_type:law_money_currency
 			or = {
 				is_subject = yes
 				is_subject_type = subject_type_customs_union
@@ -20,7 +20,7 @@ ai_exchange_undervalued_shares_decisions_1 = {
 
 	when_taken = {
 		set_variable = {
-			name = ai_exchange_decisions_time_shares_undervalued_1
+			name = ai_exchange_decisions_time_money_undervalued_1
 			value = 1
 		}
 
@@ -33,7 +33,7 @@ ai_exchange_undervalued_shares_decisions_1 = {
 	
 		random_country = {
 			limit = {
-				has_law = law_type:law_shares_currency
+				has_law = law_type:law_money_currency
 				money_supply > money_supply_stockpile_by_other_country_indexed_prestige_to_buy 
 				money_supply > 100000000
 				has_modifier = has_central_bank
@@ -47,36 +47,36 @@ ai_exchange_undervalued_shares_decisions_1 = {
 					} 
 				}
 			}
-			save_scope_as = undervalued_shares_to_gold
+			save_scope_as = undervalued_money_to_gold
 		}
 
 		root = {
-			save_scope_as = gold_to_shares_seller
+			save_scope_as = gold_to_money_seller
 		}
 
 		set_variable = {
-			name = shares_quantity_var
+			name = money_quantity_var
 			value =  { 5000000 15000000 } 
 		}
 
 		set_variable = {
-			name = stockpiling_undervalued_shares_state_1_buy_in_gold
-			value = var:shares_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_shares_state_1_buy_in_gold
-			multiplier = scope:undervalued_shares_to_gold.money_value_rapported_inflation
+			name = stockpiling_undervalued_money_state_1_buy_in_gold
+			value  = {
+				value = 1
+				add = var:money_quantity_var
+				multiplier = scope:undervalued_money_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
-			name = stockpiling_undervalued_shares_state_buy_vriablity
-			value = var:shares_quantity_var
+			name = stockpiling_undervalued_money_state_buy_vriablity
+			value = var:money_quantity_var
 		}
 
-		scope:gold_to_shares_seller = {
+		scope:gold_to_money_seller = {
 			if = {
 				limit = {
-					exists = scope:undervalued_shares_to_gold
+					exists = scope:undervalued_money_to_gold
 				}
 				every_scope_state = {
 					if = {
@@ -84,22 +84,22 @@ ai_exchange_undervalued_shares_decisions_1 = {
 							has_modifier = bank_central_historic_place
 							is_capital = yes
 						}
-						save_scope_as = gold_to_shares_seller_capital_state
+						save_scope_as = gold_to_money_seller_capital_state
 						#########
 
 						change_variable = {
 							name = central_bank_gold_reserves_state_1
-							subtract = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+							subtract = owner.var:stockpiling_undervalued_money_state_1_buy_in_gold
 						}
 		
 						#########
 						change_variable = {
-							name = stockpiling_shares_state_1
-							add = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+							name = stockpiling_money_state_1
+							add = owner.var:stockpiling_undervalued_money_state_buy_vriablity
 						}
 					}
 				}
-				scope:undervalued_shares_to_gold = {
+				scope:undervalued_money_to_gold = {
 					every_scope_state = {
 						if = {
 							limit = {
@@ -110,13 +110,13 @@ ai_exchange_undervalued_shares_decisions_1 = {
 
 							change_variable = {
 								name = central_bank_gold_reserves_state_1
-								add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+								add = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_1_buy_in_gold
 							}
 		
 							#########
 							change_variable = {
-								name = stockpiling_shares_state_1
-								subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+								name = stockpiling_money_state_1
+								subtract = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_buy_vriablity
 							}
 						}
 					}
@@ -129,16 +129,16 @@ ai_exchange_undervalued_shares_decisions_1 = {
 		base = 100
 	}
 }
-ai_exchange_overrated_shares_decisions_1 = {
+ai_exchange_overrated_money_decisions_1 = {
 	is_shown = {
 		is_ai = yes
 	}
 
 	possible = {
 		has_modifier = has_central_bank
-		var:ai_exchange_decisions_time_shares_overrated_1 = 0	
+		var:ai_exchange_decisions_time_money_overrated_1 = 0	
 		not  = {
-			has_law = law_type:law_shares_currency
+			has_law = law_type:law_money_currency
 			or = {
 				is_subject = yes
 				is_subject_type = subject_type_customs_union
@@ -150,7 +150,7 @@ ai_exchange_overrated_shares_decisions_1 = {
 
 	when_taken = {
 		set_variable = {
-			name = ai_exchange_decisions_time_shares_overrated_1
+			name = ai_exchange_decisions_time_money_overrated_1
 			value = 1
 		}
 
@@ -163,7 +163,7 @@ ai_exchange_overrated_shares_decisions_1 = {
 	
 		random_country = {
 			limit = {
-				has_law = law_type:law_shares_currency
+				has_law = law_type:law_money_currency
 				money_supply < money_supply_stockpile_by_other_country_indexed_prestige_to_sell
 				money_supply > 100000000
 				has_modifier = has_central_bank
@@ -177,37 +177,46 @@ ai_exchange_overrated_shares_decisions_1 = {
 					} 
 				}
 			}
-			save_scope_as = undervalued_shares_to_gold
+			save_scope_as = undervalued_money_to_gold
 		}
 
 		root = {
-			save_scope_as = gold_to_shares_seller
+			save_scope_as = gold_to_money_seller
 		}
 
 		set_variable = {
-			name = shares_quantity_var
+			name = money_quantity_var
 			value =  { 5000000 15000000 } 
 		}
 
 		set_variable = {
-			name = stockpiling_undervalued_shares_state_1_buy_in_gold
-			value = var:shares_quantity_var
+			name = stockpiling_undervalued_money_state_1_buy_in_gold
+			value  = {
+				value = 1
+				add = var:money_quantity_var
+				multiplier = scope:undervalued_money_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
-			name = stockpiling_undervalued_shares_state_1_buy_in_gold
-			multiplier = scope:undervalued_shares_to_gold.money_value_rapported_inflation
+		
+		set_variable = {
+			name = stockpiling_undervalued_money_state_1_buy_in_gold
+			value  = {
+				value = 1
+				add = var:money_quantity_var
+				multiplier = scope:undervalued_money_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
-			name = stockpiling_undervalued_shares_state_buy_vriablity
-			value = var:shares_quantity_var
+			name = stockpiling_undervalued_money_state_buy_vriablity
+			value = var:money_quantity_var
 		}
 
-		scope:gold_to_shares_seller = {
+		scope:gold_to_money_seller = {
 			if = {
 				limit = {
-					exists = scope:undervalued_shares_to_gold
-					stockpiling_shares_state > var:shares_quantity_var
+					exists = scope:undervalued_money_to_gold
+					stockpiling_money_state > var:money_quantity_var
 				}
 				every_scope_state = {
 					if = {
@@ -215,26 +224,26 @@ ai_exchange_overrated_shares_decisions_1 = {
 							has_modifier = bank_central_historic_place
 							is_capital = yes
 						}
-						save_scope_as = gold_to_shares_seller_capital_state
+						save_scope_as = gold_to_money_seller_capital_state
 						#########
 
 						change_variable = {
 							name = central_bank_gold_reserves_state_1
-							add = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+							add = owner.var:stockpiling_undervalued_money_state_1_buy_in_gold
 
-							#subtract = owner.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+							#subtract = owner.var:stockpiling_undervalued_money_state_1_buy_in_gold
 						}
 		
 						#########
 						change_variable = {
-							name = stockpiling_shares_state_1
-							subtract = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+							name = stockpiling_money_state_1
+							subtract = owner.var:stockpiling_undervalued_money_state_buy_vriablity
 
-							#add = owner.var:stockpiling_undervalued_shares_state_buy_vriablity
+							#add = owner.var:stockpiling_undervalued_money_state_buy_vriablity
 						}
 					}
 				}
-				scope:undervalued_shares_to_gold = {
+				scope:undervalued_money_to_gold = {
 					every_scope_state = {
 						if = {
 							limit = {
@@ -245,17 +254,17 @@ ai_exchange_overrated_shares_decisions_1 = {
 
 							change_variable = {
 								name = central_bank_gold_reserves_state_1
-								subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+								subtract = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_1_buy_in_gold
 
-								#add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_1_buy_in_gold
+								#add = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_1_buy_in_gold
 							}
 		
 							#########
 							change_variable = {
-								name = stockpiling_shares_state_1
-								add = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+								name = stockpiling_money_state_1
+								add = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_buy_vriablity
 
-								#subtract = scope:gold_to_shares_seller.var:stockpiling_undervalued_shares_state_buy_vriablity
+								#subtract = scope:gold_to_money_seller.var:stockpiling_undervalued_money_state_buy_vriablity
 							}
 						}
 					}
@@ -331,11 +340,11 @@ ai_exchange_undervalued_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_franc_state_1_buy_in_gold
-			value = var:franc_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:franc_quantity_var
+				multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -461,11 +470,20 @@ ai_exchange_overrated_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_franc_state_1_buy_in_gold
-			value = var:franc_quantity_var
+			value  = {
+				value = 1
+				add = var:franc_quantity_var
+				multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:franc_quantity_var
+				multiplier = scope:undervalued_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -601,11 +619,11 @@ ai_exchange_undervalued_dollar_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
-			value = var:dollar_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
-			multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:dollar_quantity_var
+				multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -731,11 +749,20 @@ ai_exchange_overrated_dollar_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
-			value = var:dollar_quantity_var
+			value  = {
+				value = 1
+				add = var:dollar_quantity_var
+				multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_dollar_state_1_buy_in_gold
-			multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:dollar_quantity_var
+				multiplier = scope:undervalued_dollar_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -871,11 +898,11 @@ ai_exchange_undervalued_mark_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_mark_state_1_buy_in_gold
-			value = var:mark_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_mark_state_1_buy_in_gold
-			multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:mark_quantity_var
+				multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1001,11 +1028,20 @@ ai_exchange_overrated_mark_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_mark_state_1_buy_in_gold
-			value = var:mark_quantity_var
+			value  = {
+				value = 1
+				add = var:mark_quantity_var
+				multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_mark_state_1_buy_in_gold
-			multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:mark_quantity_var
+				multiplier = scope:undervalued_mark_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1141,11 +1177,11 @@ ai_exchange_undervalued_sterling_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
-			value = var:sterling_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
-			multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:sterling_quantity_var
+				multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1271,11 +1307,20 @@ ai_exchange_overrated_sterling_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
-			value = var:sterling_quantity_var
+			value  = {
+				value = 1
+				add = var:sterling_quantity_var
+				multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_sterling_state_1_buy_in_gold
-			multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:sterling_quantity_var
+				multiplier = scope:undervalued_sterling_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1411,11 +1456,11 @@ ai_exchange_undervalued_real_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_real_state_1_buy_in_gold
-			value = var:real_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_real_state_1_buy_in_gold
-			multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:real_quantity_var
+				multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1541,11 +1586,20 @@ ai_exchange_overrated_real_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_real_state_1_buy_in_gold
-			value = var:real_quantity_var
+			value  = {
+				value = 1
+				add = var:real_quantity_var
+				multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_real_state_1_buy_in_gold
-			multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:real_quantity_var
+				multiplier = scope:undervalued_real_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1681,11 +1735,11 @@ ai_exchange_undervalued_gulden_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
-			value = var:gulden_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
-			multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:gulden_quantity_var
+				multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1811,11 +1865,20 @@ ai_exchange_overrated_gulden_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
-			value = var:gulden_quantity_var
+			value  = {
+				value = 1
+				add = var:gulden_quantity_var
+				multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_gulden_state_1_buy_in_gold
-			multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:gulden_quantity_var
+				multiplier = scope:undervalued_gulden_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -1951,11 +2014,11 @@ ai_exchange_undervalued_yuan_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
-			value = var:yuan_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
-			multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:yuan_quantity_var
+				multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2081,11 +2144,20 @@ ai_exchange_overrated_yuan_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
-			value = var:yuan_quantity_var
+			value  = {
+				value = 1
+				add = var:yuan_quantity_var
+				multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_yuan_state_1_buy_in_gold
-			multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:yuan_quantity_var
+				multiplier = scope:undervalued_yuan_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2221,11 +2293,11 @@ ai_exchange_undervalued_rupee_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
-			value = var:rupee_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
-			multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:rupee_quantity_var
+				multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2351,11 +2423,20 @@ ai_exchange_overrated_rupee_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
-			value = var:rupee_quantity_var
+			value  = {
+				value = 1
+				add = var:rupee_quantity_var
+				multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_rupee_state_1_buy_in_gold
-			multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:rupee_quantity_var
+				multiplier = scope:undervalued_rupee_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2491,11 +2572,11 @@ ai_exchange_undervalued_yen_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_yen_state_1_buy_in_gold
-			value = var:yen_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_yen_state_1_buy_in_gold
-			multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:yen_quantity_var
+				multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2621,11 +2702,20 @@ ai_exchange_overrated_yen_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_yen_state_1_buy_in_gold
-			value = var:yen_quantity_var
+			value  = {
+				value = 1
+				add = var:yen_quantity_var
+				multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_yen_state_1_buy_in_gold
-			multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:yen_quantity_var
+				multiplier = scope:undervalued_yen_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2761,11 +2851,11 @@ ai_exchange_undervalued_peseta_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
-			value = var:peseta_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
-			multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:peseta_quantity_var
+				multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -2891,11 +2981,20 @@ ai_exchange_overrated_peseta_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
-			value = var:peseta_quantity_var
+			value  = {
+				value = 1
+				add = var:peseta_quantity_var
+				multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_peseta_state_1_buy_in_gold
-			multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:peseta_quantity_var
+				multiplier = scope:undervalued_peseta_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3031,11 +3130,11 @@ ai_exchange_undervalued_ottoman_lira_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
-			value = var:ottoman_lira_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
-			multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:ottoman_lira_quantity_var
+				multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3161,11 +3260,20 @@ ai_exchange_overrated_ottoman_lira_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
-			value = var:ottoman_lira_quantity_var
+			value  = {
+				value = 1
+				add = var:ottoman_lira_quantity_var
+				multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_ottoman_lira_state_1_buy_in_gold
-			multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:ottoman_lira_quantity_var
+				multiplier = scope:undervalued_ottoman_lira_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3301,11 +3409,11 @@ ai_exchange_undervalued_lira_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_lira_state_1_buy_in_gold
-			value = var:lira_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_lira_state_1_buy_in_gold
-			multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:lira_quantity_var
+				multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3431,11 +3539,20 @@ ai_exchange_overrated_lira_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_lira_state_1_buy_in_gold
-			value = var:lira_quantity_var
+			value  = {
+				value = 1
+				add = var:lira_quantity_var
+				multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_lira_state_1_buy_in_gold
-			multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:lira_quantity_var
+				multiplier = scope:undervalued_lira_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3571,11 +3688,11 @@ ai_exchange_undervalued_peso_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_peso_state_1_buy_in_gold
-			value = var:peso_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_peso_state_1_buy_in_gold
-			multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:peso_quantity_var
+				multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3701,11 +3818,20 @@ ai_exchange_overrated_peso_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_peso_state_1_buy_in_gold
-			value = var:peso_quantity_var
+			value  = {
+				value = 1
+				add = var:peso_quantity_var
+				multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_peso_state_1_buy_in_gold
-			multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:peso_quantity_var
+				multiplier = scope:undervalued_peso_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3841,11 +3967,11 @@ ai_exchange_undervalued_rouble_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
-			value = var:rouble_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
-			multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:rouble_quantity_var
+				multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -3971,11 +4097,20 @@ ai_exchange_overrated_rouble_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
-			value = var:rouble_quantity_var
+			value  = {
+				value = 1
+				add = var:rouble_quantity_var
+				multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_rouble_state_1_buy_in_gold
-			multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:rouble_quantity_var
+				multiplier = scope:undervalued_rouble_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4111,11 +4246,11 @@ ai_exchange_undervalued_swiss_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
-			value = var:swiss_franc_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:swiss_franc_quantity_var
+				multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4241,11 +4376,20 @@ ai_exchange_overrated_swiss_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
-			value = var:swiss_franc_quantity_var
+			value  = {
+				value = 1
+				add = var:swiss_franc_quantity_var
+				multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_swiss_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:swiss_franc_quantity_var
+				multiplier = scope:undervalued_swiss_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4381,11 +4525,11 @@ ai_exchange_undervalued_belgian_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
-			value = var:belgian_franc_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:belgian_franc_quantity_var
+				multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4511,11 +4655,20 @@ ai_exchange_overrated_belgian_franc_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
-			value = var:belgian_franc_quantity_var
+			value  = {
+				value = 1
+				add = var:belgian_franc_quantity_var
+				multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_belgian_franc_state_1_buy_in_gold
-			multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:belgian_franc_quantity_var
+				multiplier = scope:undervalued_belgian_franc_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4651,11 +4804,11 @@ ai_exchange_undervalued_florin_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_florin_state_1_buy_in_gold
-			value = var:florin_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_florin_state_1_buy_in_gold
-			multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:florin_quantity_var
+				multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4781,11 +4934,20 @@ ai_exchange_overrated_florin_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_florin_state_1_buy_in_gold
-			value = var:florin_quantity_var
+			value  = {
+				value = 1
+				add = var:florin_quantity_var
+				multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_florin_state_1_buy_in_gold
-			multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:florin_quantity_var
+				multiplier = scope:undervalued_florin_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -4921,11 +5083,11 @@ ai_exchange_undervalued_brazilian_real_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
-			value = var:brazilian_real_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
-			multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:brazilian_real_quantity_var
+				multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5051,11 +5213,20 @@ ai_exchange_overrated_brazilian_real_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
-			value = var:brazilian_real_quantity_var
+			value  = {
+				value = 1
+				add = var:brazilian_real_quantity_var
+				multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_brazilian_real_state_1_buy_in_gold
-			multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:brazilian_real_quantity_var
+				multiplier = scope:undervalued_brazilian_real_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5191,11 +5362,11 @@ ai_exchange_undervalued_dinar_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
-			value = var:dinar_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
-			multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:dinar_quantity_var
+				multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5321,11 +5492,20 @@ ai_exchange_overrated_dinar_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
-			value = var:dinar_quantity_var
+			value  = {
+				value = 1
+				add = var:dinar_quantity_var
+				multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_dinar_state_1_buy_in_gold
-			multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:dinar_quantity_var
+				multiplier = scope:undervalued_dinar_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5461,11 +5641,11 @@ ai_exchange_undervalued_krone_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_krone_state_1_buy_in_gold
-			value = var:krone_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_krone_state_1_buy_in_gold
-			multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:krone_quantity_var
+				multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5591,11 +5771,20 @@ ai_exchange_overrated_krone_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_krone_state_1_buy_in_gold
-			value = var:krone_quantity_var
+			value  = {
+				value = 1
+				add = var:krone_quantity_var
+				multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_krone_state_1_buy_in_gold
-			multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:krone_quantity_var
+				multiplier = scope:undervalued_krone_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5731,11 +5920,11 @@ ai_exchange_undervalued_leu_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_leu_state_1_buy_in_gold
-			value = var:leu_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_leu_state_1_buy_in_gold
-			multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:leu_quantity_var
+				multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -5861,11 +6050,20 @@ ai_exchange_overrated_leu_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_leu_state_1_buy_in_gold
-			value = var:leu_quantity_var
+			value  = {
+				value = 1
+				add = var:leu_quantity_var
+				multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_leu_state_1_buy_in_gold
-			multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:leu_quantity_var
+				multiplier = scope:undervalued_leu_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6001,11 +6199,11 @@ ai_exchange_undervalued_drachma_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
-			value = var:drachma_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
-			multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:drachma_quantity_var
+				multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6131,11 +6329,20 @@ ai_exchange_overrated_drachma_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
-			value = var:drachma_quantity_var
+			value  = {
+				value = 1
+				add = var:drachma_quantity_var
+				multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_drachma_state_1_buy_in_gold
-			multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:drachma_quantity_var
+				multiplier = scope:undervalued_drachma_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6271,11 +6478,11 @@ ai_exchange_undervalued_bath_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_bath_state_1_buy_in_gold
-			value = var:bath_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_bath_state_1_buy_in_gold
-			multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:bath_quantity_var
+				multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6401,11 +6608,20 @@ ai_exchange_overrated_bath_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_bath_state_1_buy_in_gold
-			value = var:bath_quantity_var
+			value  = {
+				value = 1
+				add = var:bath_quantity_var
+				multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_bath_state_1_buy_in_gold
-			multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:bath_quantity_var
+				multiplier = scope:undervalued_bath_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6541,11 +6757,11 @@ ai_exchange_undervalued_qiran_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
-			value = var:qiran_quantity_var
-		}
-		change_variable = {
-			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
-			multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:qiran_quantity_var
+				multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
@@ -6671,11 +6887,20 @@ ai_exchange_overrated_qiran_decisions_1 = {
 
 		set_variable = {
 			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
-			value = var:qiran_quantity_var
+			value  = {
+				value = 1
+				add = var:qiran_quantity_var
+				multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+			}
 		}
-		change_variable = {
+		
+		set_variable = {
 			name = stockpiling_undervalued_qiran_state_1_buy_in_gold
-			multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+			value  = {
+				value = 1
+				add = var:qiran_quantity_var
+				multiplier = scope:undervalued_qiran_to_gold.money_value_rapported_inflation
+			}
 		}
 
 		set_variable = {
