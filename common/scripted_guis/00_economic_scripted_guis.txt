@@ -2777,7 +2777,8 @@ sterling_quantity_increase = {
 		if = {
 			limit = {
 				has_variable = sterling_quantity
-				sterling_quantity < market.owner.stockpiling_sterling_state
+				#var:sterling_quantity < market.owner.stockpiling_sterling_state
+				var:sterling_quantity < sell_limit_currency_var_rest
 			}
 			change_variable = {
 				name = sterling_quantity
@@ -2807,11 +2808,15 @@ buy_sterling_market_panel_enabled = {
 	is_valid = {
 		stockpiling_sterling_state > player.var:sterling_quantity
 		buy_sterling_market_panel < player.money_supply
+		money_quantity < player.sell_limit_currency_var_rest
 		player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 	}
 }
 
 buy_sterling_market_panel = {
+	is_shown = {
+		var:sterling_buy_1 > 0
+	}
 	effect = {
 		root = {
 			save_scope_as = target
@@ -2821,1089 +2826,391 @@ buy_sterling_market_panel = {
 				is_player = yes
 			}
 			save_scope_as = player_country
-			change_variable = {
-				name = sell_limit_currency_var_1
-				add = var:sterling_quantity
-			}
+			#change_variable = {
+			#	name = sell_limit_currency_var_1
+			#	add = var:sterling_quantity
+			#}
 		}
 
-		every_scope_state = {
-			if = {
-				limit = {
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_sterling_state_1
-					subtract = scope:player_country.var:sterling_quantity
-				}
-			}
-
-
-			###############################################
-
-			#franc
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_franc_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_franc_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#money
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_money_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_money_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#dollar
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_dollar_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_dollar_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#mark
-			if = {
-				limit = {
-					and = {
-						scope:player_country = {
-							has_law = law_type:law_mark_currency
-						}
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-				}
-				change_variable = {
-					name = stockpiling_mark_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#real
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_real_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_real_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#gulden
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_gulden_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_gulden_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#yuan
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_yuan_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_yuan_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#rupee
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_rupee_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_rupee_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#yen
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_yen_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_yen_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#peseta
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_peseta_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_peseta_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#ottoman_lira
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_ottoman_lira_currency
-
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_ottoman_lira_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#lira
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_lira_currency
-
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_lira_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#peso
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_peso_currency
-
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_peso_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#rouble
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_rouble_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_rouble_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#swiss_franc
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_swiss_franc_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_swiss_franc_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#belgian_franc
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_belgian_franc_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_belgian_franc_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#florin
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_florin_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_florin_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#brazilian_real
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_brazilian_real_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_brazilian_real_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#dinar
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_dinar_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_dinar_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#krone
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_krone_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_krone_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#leu
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_leu_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_leu_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#drachma
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_drachma_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_drachma_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#bath
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_bath_currency
-
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_bath_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			#qiran
-			if = {
-				limit = {
-					scope:player_country = {
-						has_law = law_type:law_qiran_currency
-					}
-					has_modifier = bank_central_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_qiran_state_1
-					add = {
-						add = scope:player_country.var:sterling_quantity
-						multiply = {
-							add = {
-								add = owner.money_value_rapported_inflation
-								divide = scope:player_country.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-			}
-
-			###############################################
-
+		change_variable = {
+			name = sterling_order
+			add = 1
 		}
-		every_country = {
+
+		#1
+		if = {
 			limit = {
-				is_player = yes
+				var:sterling_order = 1
+				var:sterling_sell_1 = 0
 			}
+			scope:target = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_sell_1 #Player country quantity of sterling buy 
+					value  = scope:player_country.var:sterling_quantity
+				}
 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_sterling_state_1
-						add = owner.var:sterling_quantity
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_1
+					value  = {
+						value = money_value_rapported_inflation
+						divide = scope:player_country.money_value_rapported_inflation 
 					}
 				}
 
-				###############################################
-
-				#franc
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = franc_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_franc_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
+				set_variable = {
+					name = to_add_to_specific_reserves_currency_1 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = scope:player_country.var:sterling_quantity
 							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
+								add = {
+									add = owner.money_value_rapported_inflation
+									divide = scope:player_country.money_value_rapported_inflation
+								}
 							}
 						}
 					}
 				}
+			}
+			scope:player_country = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_buy_1 #Player country quantity of sterling buy 
+					value  = var:sterling_quantity
+				}
+				
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_1
+					value = scope:target.var:sterling_to_player_currency_exchange_rate_1
+				}
 
-				#money
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = money_as_state_currency
-						is_capital = yes
+				#Player currency to subtract to money_suply
+				set_variable = {
+					name = to_subtract_to_money_suply_1 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = var:sterling_quantity
+							multiply = var:sterling_to_player_currency_exchange_rate_1
+						}
 					}
-					change_variable = {
-						name = stockpiling_money_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
+				}
+				set_variable = {
+					name = buy_sterling_1
+					value  = 1
+				}
+				add_to_variable_list = {
+					name = order_display_1
+					target = prev
+				}
+			}
+		}
+
+		#2
+		if = {
+			limit = {
+				var:sterling_order = 2
+				var:sterling_sell_2 = 0
+			}
+			scope:target = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_sell_2 #Player country quantity of sterling buy 
+					value  = scope:player_country.var:sterling_quantity
+				}
+
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_2
+					value  = {
+						value = money_value_rapported_inflation
+						divide = scope:player_country.money_value_rapported_inflation 
+					}
+				}
+
+				set_variable = {
+					name = to_add_to_specific_reserves_currency_2 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = scope:player_country.var:sterling_quantity
 							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
+								add = {
+									add = owner.money_value_rapported_inflation
+									divide = scope:player_country.money_value_rapported_inflation
+								}
 							}
 						}
 					}
 				}
+			}
+			scope:player_country = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_buy_2 #Player country quantity of sterling buy 
+					value  = var:sterling_quantity
+				}
+				
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_2
+					value = scope:target.var:sterling_to_player_currency_exchange_rate_2
+				}
 
-				#dollar
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = dollar_as_state_currency
-						is_capital = yes
+				#Player currency to subtract to money_suply
+				set_variable = {
+					name = to_subtract_to_money_suply_2 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = var:sterling_quantity
+							multiply = var:sterling_to_player_currency_exchange_rate_2
+						}
 					}
-					change_variable = {
-						name = stockpiling_dollar_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
+				}
+				set_variable = {
+					name = buy_sterling_2 #Player country quantity of currency lost
+					value  = 1
+				}
+				add_to_variable_list = {
+					name = order_display_2
+					target = prev
+				}
+			}
+		}
+
+		#3
+		if = {
+			limit = {
+				var:sterling_order = 3
+				var:sterling_sell_3 = 0
+			}
+			scope:target = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_sell_3 #Player country quantity of sterling buy 
+					value  = scope:player_country.var:sterling_quantity
+				}
+
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_3
+					value  = {
+						value = money_value_rapported_inflation
+						divide = scope:player_country.money_value_rapported_inflation 
+					}
+				}
+
+				set_variable = {
+					name = to_add_to_specific_reserves_currency_3 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = scope:player_country.var:sterling_quantity
 							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
+								add = {
+									add = owner.money_value_rapported_inflation
+									divide = scope:player_country.money_value_rapported_inflation
+								}
 							}
 						}
 					}
 				}
+			}
+			scope:player_country = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_buy_3 #Player country quantity of sterling buy 
+					value  = var:sterling_quantity
+				}
+				
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_3
+					value = scope:target.var:sterling_to_player_currency_exchange_rate_3
+				}
 
-				#mark
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = mark_as_state_currency
-						is_capital = yes
+				#Player currency to subtract to money_suply
+				set_variable = {
+					name = to_subtract_to_money_suply_3 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = var:sterling_quantity
+							multiply = var:sterling_to_player_currency_exchange_rate_3
+						}
 					}
-					change_variable = {
-						name = stockpiling_mark_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
+				}
+				set_variable = {
+					name = buy_sterling_3 #Player country quantity of currency lost
+					value  = 1
+				}
+				add_to_variable_list = {
+					name = order_display_3
+					target = prev
+				}
+			}
+		}
+
+		#4
+		if = {
+			limit = {
+				var:sterling_order = 4
+				var:sterling_sell_4 = 0
+			}
+			scope:target = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_sell_4 #Player country quantity of sterling buy 
+					value  = scope:player_country.var:sterling_quantity
+				}
+
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_4
+					value  = {
+						value = money_value_rapported_inflation
+						divide = scope:player_country.money_value_rapported_inflation 
+					}
+				}
+
+				set_variable = {
+					name = to_add_to_specific_reserves_currency_4 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = scope:player_country.var:sterling_quantity
 							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
+								add = {
+									add = owner.money_value_rapported_inflation
+									divide = scope:player_country.money_value_rapported_inflation
+								}
 							}
 						}
 					}
 				}
+			}
+			scope:player_country = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_buy_4 #Player country quantity of sterling buy 
+					value  = var:sterling_quantity
+				}
+				
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_4
+					value = scope:target.var:sterling_to_player_currency_exchange_rate_4
+				}
 
-				#real
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = real_as_state_currency
-						is_capital = yes
+				#Player currency to subtract to money_suply
+				set_variable = {
+					name = to_subtract_to_money_suply_4 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = var:sterling_quantity
+							multiply = var:sterling_to_player_currency_exchange_rate_4
+						}
 					}
-					change_variable = {
-						name = stockpiling_real_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
+				}
+				set_variable = {
+					name = buy_sterling_4 #Player country quantity of currency lost
+					value  = 1
+				}
+				add_to_variable_list = {
+					name = order_display_4
+					target = prev
+				}
+			}
+		}
+
+		#5
+		if = {
+			limit = {
+				var:sterling_order = 5
+				var:sterling_sell_5 = 0
+			}
+			scope:target = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_sell_5 #Player country quantity of sterling buy 
+					value  = scope:player_country.var:sterling_quantity
+				}
+
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_5
+					value  = {
+						value = money_value_rapported_inflation
+						divide = scope:player_country.money_value_rapported_inflation 
+					}
+				}
+
+				set_variable = {
+					name = to_add_to_specific_reserves_currency_5 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = scope:player_country.var:sterling_quantity
 							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
+								add = {
+									add = owner.money_value_rapported_inflation
+									divide = scope:player_country.money_value_rapported_inflation
+								}
 							}
 						}
 					}
 				}
+			}
+			scope:player_country = {
+				#Sterling quantity
+				set_variable = {
+					name = sterling_buy_5 #Player country quantity of sterling buy 
+					value  = var:sterling_quantity
+				}
+				
+				#exchange rate
+				set_variable = {
+					name = sterling_to_player_currency_exchange_rate_5
+					value = scope:target.var:sterling_to_player_currency_exchange_rate_5
+				}
 
-				#gulden
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = gulden_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_gulden_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
+				#Player currency to subtract to money_suply
+				set_variable = {
+					name = to_subtract_to_money_suply_5 #Player country quantity of currency lost
+					value  = {
+						value = 0
+						add = {
+							add = var:sterling_quantity
+							multiply = var:sterling_to_player_currency_exchange_rate_5
 						}
 					}
 				}
-
-				#yuan
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = yuan_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_yuan_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
+				set_variable = {
+					name = buy_sterling_5 #Player country quantity of currency lost
+					value  = 1
 				}
-
-				#rupee
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = rupee_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_rupee_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
+				add_to_variable_list = {
+					name = order_display_5
+					target = prev
 				}
+			}
+		}
 
-				#yen
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = yen_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_yen_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#peseta
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = peseta_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_peseta_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#ottoman_lira
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = ottoman_lira_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_ottoman_lira_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#lira
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = lira_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_lira_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#peso
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = peso_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_peso_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#rouble
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = rouble_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_rouble_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#swiss_franc
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = swiss_franc_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_swiss_franc_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#belgian_franc
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = belgian_franc_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_belgian_franc_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#florin
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = florin_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_florin_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#brazilian_real
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = brazilian_real_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_brazilian_real_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#dinar
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = dinar_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_dinar_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#krone
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = krone_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_krone_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#leu
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = leu_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_leu_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#drachma
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = drachma_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_drachma_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#bath
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = bath_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bath_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				#qiran
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						has_modifier = qiran_as_state_currency
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_qiran_state_1
-						subtract = {
-							value = 1
-							multiply = owner.var:sterling_quantity
-							multiply = {
-								value = scope:target.money_value_rapported_inflation
-								divide = owner.money_value_rapported_inflation
-							}
-						}
-					}
-				}
-
-				###############################################
-
+		#reset
+		if = {
+			limit = {
+				var:sterling_order >= 5
+			}
+			set_variable = {
+				name = sterling_order
+				#Player country quantity of sterling buy 
+				value  = 0
 			}
 		}
 	}
@@ -5026,6 +4333,7 @@ money_quantity_increase = {
 			limit = {
 				has_variable = money_quantity
 				money_quantity < market.owner.stockpiling_money_state
+				money_quantity < player.sell_limit_currency_var_rest
 			}
 			change_variable = {
 				name = money_quantity
@@ -7314,6 +6622,7 @@ franc_quantity_increase = {
 			limit = {
 				has_variable = franc_quantity
 				franc_quantity < market.owner.stockpiling_franc_state
+				franc_quantity < player.sell_limit_currency_var_rest
 			}
 			change_variable = {
 				name = franc_quantity
@@ -9563,6 +8872,7 @@ dollar_quantity_increase = {
 			limit = {
 				has_variable = dollar_quantity
 				dollar_quantity < market.owner.stockpiling_dollar_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = dollar_quantity
@@ -11812,6 +11122,7 @@ mark_quantity_increase = {
 			limit = {
 				has_variable = mark_quantity
 				mark_quantity < market.owner.stockpiling_mark_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = mark_quantity
@@ -14058,6 +13369,7 @@ real_quantity_increase = {
 			limit = {
 				has_variable = real_quantity
 				real_quantity < market.owner.stockpiling_real_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = real_quantity
@@ -16307,6 +15619,7 @@ gulden_quantity_increase = {
 			limit = {
 				has_variable = gulden_quantity
 				gulden_quantity < market.owner.stockpiling_gulden_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = gulden_quantity
@@ -18557,6 +17870,7 @@ yuan_quantity_increase = {
 			limit = {
 				has_variable = yuan_quantity
 				yuan_quantity < market.owner.stockpiling_yuan_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = yuan_quantity
@@ -20810,6 +20124,7 @@ rupee_quantity_increase = {
 			limit = {
 				has_variable = rupee_quantity
 				rupee_quantity < market.owner.stockpiling_rupee_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = rupee_quantity
@@ -23059,6 +22374,7 @@ yen_quantity_increase = {
 			limit = {
 				has_variable = yen_quantity
 				yen_quantity < market.owner.stockpiling_yen_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = yen_quantity
@@ -25309,6 +24625,7 @@ peseta_quantity_increase = {
 			limit = {
 				has_variable = peseta_quantity
 				peseta_quantity < market.owner.stockpiling_peseta_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = peseta_quantity
@@ -27562,6 +26879,7 @@ ottoman_lira_quantity_increase = {
 			limit = {
 				has_variable = ottoman_lira_quantity
 				ottoman_lira_quantity < market.owner.stockpiling_ottoman_lira_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = ottoman_lira_quantity
@@ -29811,6 +29129,7 @@ lira_quantity_increase = {
 			limit = {
 				has_variable = lira_quantity
 				lira_quantity < market.owner.stockpiling_lira_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = lira_quantity
@@ -32060,6 +31379,7 @@ peso_quantity_increase = {
 			limit = {
 				has_variable = peso_quantity
 				peso_quantity < market.owner.stockpiling_peso_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = peso_quantity
@@ -34310,6 +33630,7 @@ rouble_quantity_increase = {
 			limit = {
 				has_variable = rouble_quantity
 				rouble_quantity < market.owner.stockpiling_rouble_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = rouble_quantity
@@ -36560,6 +35881,7 @@ swiss_franc_quantity_increase = {
 			limit = {
 				has_variable = swiss_franc_quantity
 				swiss_franc_quantity < market.owner.stockpiling_swiss_franc_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = swiss_franc_quantity
@@ -38811,6 +38133,7 @@ belgian_franc_quantity_increase = {
 			limit = {
 				has_variable = belgian_franc_quantity
 				belgian_franc_quantity < market.owner.stockpiling_belgian_franc_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = belgian_franc_quantity
@@ -41063,6 +40386,7 @@ florin_quantity_increase = {
 			limit = {
 				has_variable = florin_quantity
 				florin_quantity < market.owner.stockpiling_florin_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = florin_quantity
@@ -43316,6 +42640,7 @@ brazilian_real_quantity_increase = {
 			limit = {
 				has_variable = brazilian_real_quantity
 				brazilian_real_quantity < market.owner.stockpiling_brazilian_real_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = brazilian_real_quantity
@@ -45567,6 +44892,7 @@ dinar_quantity_increase = {
 			limit = {
 				has_variable = dinar_quantity
 				dinar_quantity < market.owner.stockpiling_dinar_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = dinar_quantity
@@ -47820,6 +47146,7 @@ krone_quantity_increase = {
 			limit = {
 				has_variable = krone_quantity
 				krone_quantity < market.owner.stockpiling_krone_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = krone_quantity
@@ -50073,6 +49400,7 @@ leu_quantity_increase = {
 			limit = {
 				has_variable = leu_quantity
 				leu_quantity < market.owner.stockpiling_leu_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = leu_quantity
@@ -52322,6 +51650,7 @@ drachma_quantity_increase = {
 			limit = {
 				has_variable = drachma_quantity
 				drachma_quantity < market.owner.stockpiling_drachma_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = drachma_quantity
@@ -54572,6 +53901,7 @@ bath_quantity_increase = {
 			limit = {
 				has_variable = bath_quantity
 				bath_quantity < market.owner.stockpiling_bath_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = bath_quantity
@@ -56821,6 +56151,7 @@ qiran_quantity_increase = {
 			limit = {
 				has_variable = qiran_quantity
 				qiran_quantity < market.owner.stockpiling_qiran_state
+				player.var:sell_limit_currency_var_1 < player.sell_limit_currency_var_0
 			}
 			change_variable = {
 				name = qiran_quantity
