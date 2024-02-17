@@ -13,6 +13,18 @@ fluctuations_monthly_add = {
 	}
 	if = {
 		limit = {
+			has_modifier = foreign_exchange_controls
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		remove_modifier = foreign_exchange_controls
+	}
+	if = {
+		limit = {
  		#has_law = law_type:law_revaluation
 		}
 		add_modifier = {
@@ -29,11 +41,43 @@ fluctuations_monthly_add = {
 			multiplier = inflation_value
 		}
 	}
+
+
+
+
+	if = {
+		limit = {
+ 			inflation_value > 0.5
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		add_modifier = {
+			name = foreign_exchange_controls
+		}
+	}
+	if = {
+		limit = {
+ 			inflation_value < -0.5
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		add_modifier = {
+			name = foreign_exchange_controls
+		}
+	}
 }
 
 #############################
 
-fluctuations_law_add = {
+inflation_value_based_on_mining = {
     if = {
         limit = {
             has_law = law_type:law_revaluation_25
@@ -129,6 +173,31 @@ fluctuations_law_add = {
 			change_variable = {
 				name = law_currency
 				add = 4
+			}
+		}
+	}
+
+	################################################################################################
+	
+    if = {
+        limit = {
+			var:devaluation_on = 1
+		}
+		owner = {
+			change_variable = {
+				name = law_currency
+				add = var:inflation_value_predicted_devaluation_month_valided
+			}
+		}
+	}
+	if = {
+        limit = {
+			var:revaluation_on = 1
+		}
+		owner = {
+			change_variable = {
+				name = law_currency
+				add = var:inflation_value_predicted_revaluation_month_valided
 			}
 		}
 	}

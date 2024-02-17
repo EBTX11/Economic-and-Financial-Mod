@@ -11,6 +11,12 @@ template hud_visibility {
 
 types topbar_components
 {
+	
+	#####################################################################################################################
+	#####################################################################################################################
+	#####################################################################################################################
+	#####################################################################################################################
+
 	### SECONDARY ICONS
 	type topbar_secondary_icons = container {
 		position = { 150 40 }
@@ -232,9 +238,53 @@ types topbar_components
 					}
 				}
 
-				### Currency value
+				### has_currency_standards_no_gcentral_banking_tech_visibility
 				flowcontainer = {
-					name = "tutorial_highlight_currency_value"
+					visible = "[GetScriptedGui('has_currency_standards_no_central_banking_tech_visibility').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+
+					name = "has_currency_standards_no_gcentral_banking_tech_visibility"
+					minimumsize = { 90 28 }
+					maximumsize = { 90 28 }
+					#tooltip = "MONEY_VALUE"
+
+					using = tooltip_below
+					onclick = "[InformationPanelBar.OpenPanelTab('diplomatic_overview', 'default')]"
+					enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
+
+					textbox = {
+						parentanchor = vcenter
+						text = "money_value_in_paper_no_bc_top_bar"
+						align = left|nobaseline
+						autoresize = yes
+					}
+				}
+
+				### has_central_banking_no_gold_standard_tech_visibility
+				flowcontainer = {
+					visible = "[GetScriptedGui('has_central_banking_no_gold_standard_tech_visibility').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+
+					name = "has_central_banking_no_gold_standard_tech_visibility"
+					minimumsize = { 90 28 }
+					maximumsize = { 90 28 }
+					#tooltip = "MONEY_VALUE"
+
+					using = tooltip_below
+					onclick = "[InformationPanelBar.OpenPanelTab('diplomatic_overview', 'default')]"
+					enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
+
+					textbox = {
+						parentanchor = vcenter
+						text = "money_value_in_paper_top_bar"
+						align = left|nobaseline
+						autoresize = yes
+					}
+				}
+
+				### has_gold_standard_no_gold_exchange_standard_tech_visibility
+				flowcontainer = {
+					visible = "[GetScriptedGui('has_gold_standard_no_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+
+					name = "has_gold_standard_no_gold_exchange_standard_tech_visibility"
 					minimumsize = { 90 28 }
 					maximumsize = { 90 28 }
 					tooltip = "MONEY_VALUE"
@@ -255,66 +305,30 @@ types topbar_components
 										size = { 280 100 }
 									}
 
-###########################################################################################################################################################################################
-############# Ligne qui affiche la valeur
-
 									blockoverride "line_plotpoints" {
-
-
-										#plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.MakeScope.ScriptValue('inflation_value_red'), '(CFixedPoint)0', '(CFixedPoint)1' )]"
-
-
-										#plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.MakeScope.ScriptValue('money_value'), '(CFixedPoint)0', GetMax(GetPlayer.MakeScope.ScriptValue('money_value'))]"
-
-
-										#plotpoints = "[GetTrendPlotPointsNormalized(Country.GetGDPTrend, '(CFixedPoint)0', GetMax(Country.GetGDPTrend) )]"
-
-										#Country.GetCustom( Arg0 )
-
 										plotpoints = "[GetTrendPlotPointsNormalized(Country.GetMintingTrend, '(CFixedPoint)0', GetMax(Country.GetMintingTrend) )]"
-
-
-
-
 									}
-
-###########################################################################################################################################################################################
-############# Valeur max du graph
 
 									blockoverride "maxvalue" {
 										raw_text = "100"
 									}
 
-###########################################################################################################################################################################################
-############# Valeur min du graph
-
 									blockoverride "minvalue" {
 										raw_text = "0.01"
 									}
-
-###########################################################################################################################################################################################
-############# Début de la date du graph
 
 									blockoverride "startdate" {
 										text = "[GetOldestDate(Country.GetRadicalsTrend)]"
 									}
 
-###########################################################################################################################################################################################
-############# fin de la date du graph
-
 									blockoverride "enddate" {
 										text = "[GetLatestDate(Country.GetRadicalsTrend)]"
 									}
 
-###########################################################################################################################################################################################
-
 									blockoverride "extra_plotlines" {
 									}
+
 									blockoverride "multiitem" {}
-
-
-###########################################################################################################################################################################################
-############# Affiche une valeur => no historique data
 
 									blockoverride "empty_state_visibility" {
 										visible = "[IsEmpty(GetPlayer.GetMintingTrend)]"
@@ -332,13 +346,84 @@ types topbar_components
 					enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
 
 					textbox = {
-
 						parentanchor = vcenter
-						text = "[Country.GetCustom('currencytexture')] :#p [GetPlayer.MakeScope.ScriptValue('money_value_rapported_inflation')|D]#! @gold!"
+						text = "money_value_in_gold_top_bar"
 						align = left|nobaseline
 						autoresize = yes
 					}
+				}
 
+				### has_gold_exchange_standard_tech_visibility
+				flowcontainer = {
+					visible = "[GetScriptedGui('has_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+
+					name = "has_gold_exchange_standard_tech_visibility"
+					minimumsize = { 90 28 }
+					maximumsize = { 90 28 }
+					tooltip = "MONEY_VALUE_GES"
+
+					tooltipwidget = {
+						TooltipWidgetType = {
+							blockoverride "tooltip_content_after" {
+								v3_plotline = {
+									using = default_list_position
+
+									blockoverride "header" {
+										text = ""
+									}
+									blockoverride "line_color" {
+										color = "[Pop.GetPopType.GetColor]"
+									}
+									blockoverride "size" {
+										size = { 280 100 }
+									}
+
+									blockoverride "line_plotpoints" {
+										plotpoints = "[GetTrendPlotPointsNormalized(Country.GetMintingTrend, '(CFixedPoint)0', GetMax(Country.GetMintingTrend) )]"
+									}
+
+									blockoverride "maxvalue" {
+										raw_text = "100"
+									}
+
+									blockoverride "minvalue" {
+										raw_text = "0.01"
+									}
+
+									blockoverride "startdate" {
+										text = "[GetOldestDate(Country.GetRadicalsTrend)]"
+									}
+
+									blockoverride "enddate" {
+										text = "[GetLatestDate(Country.GetRadicalsTrend)]"
+									}
+
+									blockoverride "extra_plotlines" {
+									}
+
+									blockoverride "multiitem" {}
+
+									blockoverride "empty_state_visibility" {
+										visible = "[IsEmpty(GetPlayer.GetMintingTrend)]"
+									}
+									blockoverride "empty_state_text" {
+										text = "GRAPH_NOT_INITIALIZED"
+									}
+								}
+							}
+						}
+					}
+
+					using = tooltip_below
+					onclick = "[InformationPanelBar.OpenPanelTab('diplomatic_overview', 'default')]"
+					enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
+
+					textbox = {
+						parentanchor = vcenter
+						text = "money_value_in_reference_currency_top_bar"
+						align = left|nobaseline
+						autoresize = yes
+					}
 				}
 			}
 
@@ -521,6 +606,11 @@ types topbar_components
 			}
 		}
 	}
+
+	#####################################################################################################################
+	#####################################################################################################################
+	#####################################################################################################################
+	#####################################################################################################################
 
 	type topbar = widget {
 		widget = {
@@ -807,6 +897,11 @@ types topbar_components
 								}
 							}
 
+							#####################################################################################################################
+							#####################################################################################################################
+							#####################################################################################################################
+							#####################################################################################################################
+
 							### MONEY
 							container = {
 								name = "tutorial_highlight_treasury"
@@ -1050,6 +1145,12 @@ types topbar_components
 									}
 								}
 							}
+
+							#####################################################################################################################
+							#####################################################################################################################
+							#####################################################################################################################
+							#####################################################################################################################
+
 						}
 
 						#shows only on hover
