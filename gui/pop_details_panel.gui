@@ -38,6 +38,7 @@ types pop_details_panel
 				size = { 30 30 }
 				onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
 				tooltip = "GO_TO_BUTTON_STATE"
+				input_action = "go_to_details"
 			}
 		}
 
@@ -244,7 +245,7 @@ types pop_details_panel
 									datacontext = "[Pop.AccessBuilding]"
 									size = { @right_max_width 54 }
 									using = clean_button
-									onclick = "[InformationPanelBar.OpenStatePanel(Building.AccessSelf)]"
+									onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
 
 									textbox = {
 										margin = { 10 0 }
@@ -345,7 +346,7 @@ types pop_details_panel
 										margin = { 10 0 }
 										text = "[Religion.GetName]"
 										size = { 100% 100% }
-										margin_left = 30
+										margin_left = 60
 										align = right|nobaseline
 										elide = right
 										parentanchor = vcenter
@@ -416,7 +417,7 @@ types pop_details_panel
 								margin_right = 5
 							}
 							blockoverride "text_right" {
-								text = "LABEL_JOB_SATISFACTION"
+								raw_text = "[Pop.GetCurrentJobSatisfaction|0+]"
 								tooltip = "TOOLTIP_JOB_SATISFACTION"
 								margin_left = 5
 							}
@@ -676,7 +677,7 @@ types pop_details_panel
 							}
 
 							textbox = {
-								raw_text = "[GetPlayer.GetCustom('currencytexture')][Pop.GetIncome|+=D]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][Pop.GetIncome|+=D]"
 								tooltip = "[Pop.GetIncomeDesc]"
 								autoresize = yes
 								elide = right
@@ -710,7 +711,7 @@ types pop_details_panel
 								visible = "[Pop.IsEmployed]"
 
 								textbox = {
-									raw_text = "[GetPlayer.GetCustom('currencytexture')][Pop.GetWorkforceIncome|D=+]"
+									raw_text = "[GetPlayer.GetCustom('currency_symbol')][Pop.GetWorkforceIncome|D=+]"
 									tooltip = "[Pop.GetWorkforceIncomeDesc]"
 									autoresize = yes
 									elide = right
@@ -753,7 +754,7 @@ types pop_details_panel
 
 							textbox = {
 								visible = "[NotEqualTo_CFixedPoint(Pop.GetDependentIncome, '(CFixedPoint)0')]"
-								raw_text = "[GetPlayer.GetCustom('currencytexture')][Pop.GetDependentIncome|D=+]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][Pop.GetDependentIncome|D=+]"
 								tooltip = "[Pop.GetDependentIncomeDesc]"
 								autoresize = yes
 								elide = right
@@ -787,7 +788,7 @@ types pop_details_panel
 							}
 
 							textbox = {
-								raw_text = "[GetPlayer.GetCustom('currencytexture')][Negate_CFixedPoint(Pop.GetExpenses)|=D+]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][Negate_CFixedPoint(Pop.GetExpenses)|=D+]"
 								tooltip = "[Pop.GetExpensesDesc]"
 								autoresize = yes
 								elide = right
@@ -808,7 +809,7 @@ types pop_details_panel
 							}
 
 							textbox = {
-								raw_text = "#v [GetPlayer.GetCustom('currencytexture')][Pop.GetMoney|D=+]#!"
+								raw_text = "#v [GetPlayer.GetCustom('currency_symbol')][Pop.GetMoney|D=+]#!"
 								tooltip = "TOOLTIP_POP_NET_INCOME"
 								elide = right
 								align = left|nobaseline
@@ -969,7 +970,7 @@ types pop_details_panel
 			position = { 10 5 }
 			autoresize = yes
 			using = fontsize_xl
-			text = "[Goods.GetCompareIconAgainstBasePrice(Goods.GetMarketPrice)]"
+			text = "[Goods.GetCompareIconAgainstBasePrice(Goods.GetStatePrice)]"
 		}
 	}
 
@@ -1018,12 +1019,12 @@ types pop_details_panel
 			vertical_divider = {}
 			
 			widget = {
-				using = market_price_tooltip_with_graph
+				tooltip = "[Goods.GetStatePriceDesc]"
 				size = { 130 55 }
 				
 				textbox = {
 					align = left|nobaseline
-					text = "[Goods.GetCompareIconAgainstBasePrice( Goods.GetMarketPrice )]"
+					text = "[Goods.GetCompareIconAgainstBasePrice( Goods.GetStatePrice )]"
 					size = { 110 40 }
 					margin_left = 20
 					parentanchor = vcenter
@@ -1037,7 +1038,7 @@ types pop_details_panel
 					parentanchor = right
 
 					textbox = {
-						visible = "[GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')]"
+						visible = "[GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice), '(CFixedPoint)0.01')]"
 						align = right|nobaseline
 						text = "MARKET_PANEL_GOODS_PRICE_GOLD"
 						autoresize = yes
@@ -1046,7 +1047,7 @@ types pop_details_panel
 					}
 
 					textbox = {
-						visible = "[And( Not(LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')), Not(GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')))]"
+						visible = "[And( Not(LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice), '(CFixedPoint)-0.01')), Not(GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice), '(CFixedPoint)0.01')))]"
 						align = hcenter|nobaseline
 						text = "MARKET_PANEL_GOODS_PRICE"
 						autoresize = yes
@@ -1054,7 +1055,7 @@ types pop_details_panel
 					}
 
 					textbox = {
-						visible = "[LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')]"
+						visible = "[LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice), '(CFixedPoint)-0.01')]"
 						align = left|nobaseline
 						text = "MARKET_PANEL_GOODS_PRICE_BLUE"
 						autoresize = yes
@@ -1077,10 +1078,10 @@ types pop_details_panel
 						}
 						
 						blockoverride "value_left" {
-							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice))]"
 						}
 						blockoverride "value_right" {
-							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetStatePrice))]"
 						}
 					}
 				}

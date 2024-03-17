@@ -27,7 +27,6 @@ types state_panel_types {
 			
 			flowcontainer = {
 				direction = vertical
-				spacing = 2
 
 				flowcontainer = {
 					spacing = 7
@@ -47,37 +46,76 @@ types state_panel_types {
 						align = nobaseline
 					}
 				}
+
+				flowcontainer = {
+					spacing = 7
+					parentanchor = right|vcenter
+					margin_right = 10
+
+					textbox = {
+						raw_text = "[concept_pop_qualifications]: "
+						autoresize = yes
+						align = nobaseline
+						elide = right
+						maximumsize = { 130 -1 }
+					}
+					
+					textbox = {
+						visible = "[Not(State.HasInsufficientQualificationsForAvailablePositions)]"
+						raw_text = "@green_checkmark!"
+						autoresize = yes
+						align = nobaseline
+						maximumsize = { 130 -1 }
+						tooltip = "[State.GetPotentialQualificationsDesc]"
+					}
+					
+					textbox = {
+						visible = "[State.HasInsufficientQualificationsForAvailablePositions]"
+						raw_text = "@red_cross!"
+						autoresize = yes
+						align = nobaseline
+						maximumsize = { 130 -1 }
+						tooltip = "[State.GetPotentialQualificationsDesc]"
+					}
+				}
 			}
 
 			flowcontainer = {
-				spacing = 7
+				direction = vertical
 				parentanchor = right|vcenter
-				margin_right = 10
 
-				textbox = {
-					raw_text = "[concept_pop_qualifications]: "
-					autoresize = yes
-					align = nobaseline
-					elide = right
-					maximumsize = { 130 -1 }
+				flowcontainer = {
+					spacing = 7
+					parentanchor = right
+					textbox = {
+						raw_text = "[GetPopType('peasants').GetName]:"
+						autoresize = yes
+						align = nobaseline
+						elide = right
+					}
+
+					textbox = {
+						text = "[State.GetNumSubsistenceWorkingAdults|Dv]"
+						autoresize = yes
+						align = nobaseline
+					}
 				}
-				
-				textbox = {
-					visible = "[Not(State.HasInsufficientQualificationsForAvailablePositions)]"
-					raw_text = "@green_checkmark!"
-					autoresize = yes
-					align = nobaseline
-					maximumsize = { 130 -1 }
-					tooltip = "[State.GetPotentialQualificationsDesc]"
-				}
-				
-				textbox = {
-					visible = "[State.HasInsufficientQualificationsForAvailablePositions]"
-					raw_text = "@red_cross!"
-					autoresize = yes
-					align = nobaseline
-					maximumsize = { 130 -1 }
-					tooltip = "[State.GetPotentialQualificationsDesc]"
+
+				flowcontainer = {
+					spacing = 7
+					parentanchor = right
+					textbox = {
+						raw_text = "[concept_unemployed]:"
+						autoresize = yes
+						align = nobaseline
+						elide = right
+					}
+
+					textbox = {
+						text = "[State.GetNumUnemployedWorkingAdults|Dv]"
+						autoresize = yes
+						align = nobaseline
+					}
 				}
 			}
 		}
@@ -504,12 +542,19 @@ types state_buildings
 						
 						### EMPLOYMENT WARNING
 						icon = {
-							visible = "[Not(Building.ShouldShowAsHiring)]"
+							visible = "[Building.ShouldShowAsUnableToHire]"
 							size = { 30 30 }
 							texture = "gfx/interface/icons/generic_icons/employment_not_full.dds"
-							tooltip = "NOT_FULLY_EMPLOYED"
+							tooltip = "NOT_HIRING"
 						}
 
+						icon = {
+							visible = "[Building.ShouldShowAsUnwillingToHire]"
+							size = { 30 30 }
+							texture = "gfx/interface/icons/generic_icons/employment_not_hiring.dds"
+							tooltip = "NOT_HIRING"
+						}
+						
 						icon = {
 							visible = "[Building.ShouldShowAsHiring]"
 							size = { 30 30 }
@@ -569,7 +614,7 @@ types state_buildings
 						textbox = {
 							layoutpolicy_horizontal = expanding
 							alpha = "[TransparentIfFalse(Building.IsActive)]"
-							raw_text = "#v [GetPlayer.GetCustom('currencytexture')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|1+]#!"
+							raw_text = "#v [GetPlayer.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|1+]#!"
 							tooltip = "TOOLTIP_BUILDING_PRODUCTIVITY"
 							tooltipwidget = {
 								GraphTooltip_Productivity = {}
@@ -605,7 +650,7 @@ types state_buildings
 						
 						textbox = {
 							datacontext = "[Building]"
-							raw_text = "#N [GetPlayer.GetCustom('currencytexture')]#bold -[Building.GetSubsidies|D]#!"
+							raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]#bold -[Building.GetSubsidies|D]#!"
 							tooltip = "[Building.GetSubsidiesDesc]"
 							autoresize = yes
 							position = { 0 0 }

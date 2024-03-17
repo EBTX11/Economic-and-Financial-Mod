@@ -41,10 +41,6 @@ fluctuations_monthly_add = {
 			multiplier = inflation_value
 		}
 	}
-
-
-
-
 	if = {
 		limit = {
  			inflation_value > 0.5
@@ -80,50 +76,53 @@ fluctuations_monthly_add = {
 inflation_value_based_on_mining = {
     if = {
         limit = {
+			not = {
+				has_variable = law_currency
+			}
+        }
+		set_variable = {
+			name = law_currency
+			value = 0
+		}
+    }
+
+    if = {
+        limit = {
             has_law = law_type:law_revaluation_25
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                subtract = 1
-            }
-        }
+		change_variable = {
+			name = law_currency
+			subtract = 1
+		}
     }
 	if = {
         limit = {
 			has_law = law_type:law_revaluation_50
-
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                subtract = 2
-            }
-        }
+		change_variable = {
+			name = law_currency
+			subtract = 2
+		}
+        
     }
 	if = {
         limit = {
             has_law = law_type:law_revaluation_75
-
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                subtract = 3
-            }
-        }
+		change_variable = {
+			name = law_currency
+			subtract = 3
+		}
+        
     }
 	if = {
         limit = {
             has_law = law_type:law_revaluation_100
-
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                subtract = 4
-            }
-        }
+		change_variable = {
+			name = law_currency
+			subtract = 4
+		}
     }
     if = {
         limit = {
@@ -131,12 +130,10 @@ inflation_value_based_on_mining = {
 				has_law = law_type:law_devaluation_25
 			}
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                add = 1
-            }
-        }
+		change_variable = {
+			name = law_currency
+			add = 1
+		}
     }
     if = {
         limit = {
@@ -144,12 +141,10 @@ inflation_value_based_on_mining = {
 				has_law = law_type:law_devaluation_50
 			}
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                add = 2
-            }
-        }
+		change_variable = {
+			name = law_currency
+			add = 2
+		}
     }
     if = {
         limit = {
@@ -158,22 +153,18 @@ inflation_value_based_on_mining = {
 
 			}
         }
-        owner = {
-            change_variable = {
-                name = law_currency
-                add = 3
-            }
-        }
+		change_variable = {
+			name = law_currency
+			add = 3
+		}
     }
     if = {
         limit = {
 			has_law = law_type:law_devaluation_100
 		}
-		owner = {
-			change_variable = {
-				name = law_currency
-				add = 4
-			}
+		change_variable = {
+			name = law_currency
+			add = 4
 		}
 	}
 
@@ -183,22 +174,18 @@ inflation_value_based_on_mining = {
         limit = {
 			var:devaluation_on = 1
 		}
-		owner = {
-			change_variable = {
-				name = law_currency
-				add = var:inflation_value_predicted_devaluation_month_valided
-			}
+		change_variable = {
+			name = law_currency
+			add = var:inflation_value_predicted_devaluation_month_valided
 		}
 	}
 	if = {
         limit = {
 			var:revaluation_on = 1
 		}
-		owner = {
-			change_variable = {
-				name = law_currency
-				add = var:inflation_value_predicted_revaluation_month_valided
-			}
+		change_variable = {
+			name = law_currency
+			add = var:inflation_value_predicted_revaluation_month_valided
 		}
 	}
 }
@@ -209,6 +196,7 @@ fluctuations_2_monthly_add = {
     if = {
         limit = {
             has_modifier = weak_currency
+			has_variable = month_weak_currency
         }
         change_variable = {
 			name = month_weak_currency
@@ -217,11 +205,55 @@ fluctuations_2_monthly_add = {
     }
     if = {
         limit = {
+            has_modifier = normal_currency
+			has_variable = month_normal_currency
+        }
+		change_variable = {
+			name = month_normal_currency
+			add = 1
+		}
+    }
+    if = {
+        limit = {
             has_modifier = strong_currency
+			has_variable = month_strong_currency
         }
 		change_variable = {
 			name = month_strong_currency
 			add = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_weak_currency
+			}
+        }
+		set_variable = {
+			name = month_weak_currency
+			value = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_normal_currency
+			}
+        }
+		set_variable = {
+			name = month_normal_currency
+			value = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_strong_currency
+			}
+        }
+		set_variable = {
+			name = month_strong_currency
+			value = 1
 		}
     }
 }
@@ -249,7 +281,7 @@ fluctuations_1_monthly_add = {
 			}
 			add_modifier = {
 				name = weak_currency
-				multiplier = var:month_weak_currency
+				multiply = var:month_weak_currency
 			}
 		}
 		if = {
@@ -262,6 +294,27 @@ fluctuations_1_monthly_add = {
 				name = weak_currency
 				multiplier = 1
 			}
+		}
+	}
+	#############################
+
+	#############################
+	if = {
+		limit = {
+			has_modifier = normal_currency
+		}
+		remove_modifier = normal_currency
+	}
+	if = {
+		limit = {
+			money_value > 1
+			Not = {
+				has_modifier = strong_currency
+			}
+		}
+		add_modifier = {
+			name = normal_currency
+			multiply = var:month_normal_currency
 		}
 	}
 	#############################
@@ -288,28 +341,45 @@ fluctuations_1_monthly_add = {
 		}
 		add_modifier = {
 			name = strong_currency
-			multiplier = var:month_strong_currency
+			multiply = var:month_strong_currency
 		}
 	}
 	#############################
 
 }
 
-
-
-
 fluctuations_3_monthly_add = {
 	if = {
 		limit = {
 			has_modifier = weak_currency
-			month_normal_currency > 0
+			var:month_normal_currency > 0
 		}
-		owner = {
-			change_variable = {
-				name = month_normal_currency
-				add = -1
-				min = 0
-			}
+		change_variable = {
+			name = month_normal_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = weak_currency
+			var:month_strong_currency > 0
+		}
+		change_variable = {
+			name = month_strong_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = normal_currency
+			var:month_weak_currency > 0
+		}
+		change_variable = {
+			name = month_weak_currency
+			add = -1
+			min = 0
 		}
 	}
 	if = {
@@ -317,58 +387,35 @@ fluctuations_3_monthly_add = {
 			has_modifier = normal_currency
 			var:month_strong_currency > 0
 		}
-		owner = {
-			change_variable = {
-				name = month_strong_currency
-				add = -1
-				min = 0
-			}
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = normal_currency
-			month_normal_currency > 0
-		}
-		owner = {
-			change_variable = {
-				name = month_weak_currency
-				add = -1
-				min = 0
-			}
+		change_variable = {
+			name = month_strong_currency
+			add = -1
+			min = 0
 		}
 	}
 	if = {
 		limit = {
 			has_modifier = strong_currency
-			month_normal_currency > 0
+			var:month_normal_currency > 0
 		}
-		owner = {
-			change_variable = {
-				name = month_normal_currency
-				add = -1
-				min = 0
-			}
+		change_variable = {
+			name = month_normal_currency
+			add = -1
+			min = 0
 		}
 	}
 	if = {
 		limit = {
 			has_modifier = strong_currency
-			month_normal_currency > 0
+			var:month_weak_currency > 0
 		}
-		owner = {
-			change_variable = {
-				name = month_weak_currency
-				add = -1
-				min = 0
-			}
+		change_variable = {
+			name = month_weak_currency
+			add = -1
+			min = 0
 		}
 	}
-
-
-
 }
-
 fluctuations_1_annual_add = {
 	if = {
 		limit = {
@@ -381,7 +428,7 @@ fluctuations_1_annual_add = {
         }
 		add_modifier = {
 			name = natural_inflation
-			multiplier = var:years_natural_inflation
+			multiply = var:years_natural_inflation
 		}
     }
 }
@@ -389,13 +436,23 @@ fluctuations_2_annual_add = {
     if = {
         limit = {
             has_modifier = natural_inflation
+			has_variable = years_natural_inflation
         }
-        owner = {
-            change_variable = {
-                name = years_natural_inflation
-                add = 1
-            }
+		change_variable = {
+			name = years_natural_inflation
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+ 			not = {			
+				has_variable = years_natural_inflation
+			}
         }
+		set_variable = {
+			name = years_natural_inflation
+			value = 0
+		}
     }
 }
 fluctuations_market_price_monthly_add = {
