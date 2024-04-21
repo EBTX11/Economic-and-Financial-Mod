@@ -558,53 +558,47 @@ has_not_central_bank = {
 #####################################################################################################################################################
 #####################################################################################################################################################
 
-has_tech_central_bank_but_no_buildinng_central_bank = {
-	if = {
-		limit = {
-            any_scope_state = {
-                has_building = building_bank
-            }
-            has_law = law_type:law_no_market_liquidity
-            has_technology_researched = central_banking
-		}	        
-		trigger_event = {
-			id = original_currency_event.1
-		}
-    }
-}
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
-bank_central_has_bc_tech = {
+### initial central bank creation
+has_tech_central_bank_but_no_building_central_bank = {
+    ### redundancy: treated in event original_currency_event.1
     capital = {
         save_scope_as = central_bank_site
     }
-	if = {
-		limit = {
-            country_rank >= rank_value:unrecognized_regional_power
-			has_technology_researched = central_banking
-			is_revolutionary = no
+    if = {
+        limit = { ### check to make sure we're ready and stable enough
+            country_rank              >= rank_value:unrecognized_regional_power
+            has_technology_researched =  central_banking
+            is_revolutionary          =  no
             not  = {
                 any_scope_state = {
                     has_building = building_bank
                 }
             }
-            remove_building = building_bank
 		}
+        ### redundancy: treated in event original_currency_event.1
         scope:central_bank_site = {
             create_building = {
                building = building_bank
-               level = 5
+               level    = 5
                #reserves=1
             }
         }
-        has_tech_central_bank_but_no_buildinng_central_bank = yes
+        if = {
+            limit = {
+                has_law = law_type:law_no_market_liquidity
+            }
+            trigger_event = {
+                    id = original_currency_event.1
+                }
+            }
     }
 }
+
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
+#####################################################################################################################################################
 
 bank_central_1 = {
     capital = {
@@ -623,7 +617,6 @@ bank_central_1 = {
                #reserves=1
             }
         }
-        has_tech_central_bank_but_no_buildinng_central_bank = yes
     }
 }
 bank_central_2 = {
