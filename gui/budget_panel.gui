@@ -138,6 +138,7 @@ types budget
 				blockoverride "third_button_click"
 				{
 					onclick = "[InformationPanel.SelectTab('economy')]"
+					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 				}
 				blockoverride "third_button_visibility"
 				{
@@ -164,6 +165,7 @@ types budget
 				}
 				blockoverride "fourth_button_click" {
 					onclick = "[InformationPanel.SelectTab('finance')]"
+					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 				}
 				blockoverride "fourth_button_visibility" {
 					visible = "[InformationPanel.IsTabSelected('finance')]"
@@ -18118,224 +18120,503 @@ types budget
 						ef_bp_national_capacity_piechart = {}
 					}
 
-					widget = {
-						size = { @panel_width 30 }
+					#independent_economies
+					section_header_button = {
+						#visible = "[Not(IsDataModelEmpty(AccessPlayer.GetAvailableCompanies))]"
+							
+						blockoverride "left_text" {
+							text = "INDEPENDENT_ECONOMY"
+						}
+	
+						blockoverride "onclick" {
+							onclick = "[GetVariableSystem.Toggle('independent_economies')]"
+							onclick = "[GetScriptedGui('independent_economies_list_gerenation_ordered').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
-						hbox = {
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								size = { 110 20 }
-								align = hcenter|nobaseline
-								text = "COUNTRY_TITLE"
-								datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								size = { 40 20 }
-								align = hcenter|nobaseline
-								text = "c"
-								datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								align = hcenter|nobaseline
-								size = { 105 20 }
-								text = "money_value_no_formated"
-								datacontext = "[GetScriptedGui('cv_sort_by_currency_value')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								align = hcenter|nobaseline
-								size = { 105 20 }
-								text = "money_supply_no_formated"
-								datacontext = "[GetScriptedGui('cv_sort_by_money_supply')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								align = hcenter|nobaseline
-								size = { 105 20 }
-								text = "national_capacity_no_formated"
-								datacontext = "[GetScriptedGui('cv_sort_by_national_capacity')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
-							sort_button = {
-								layoutpolicy_horizontal = preferred
-								align = hcenter|nobaseline
-								size = { 105 20 }
-								text = "inflation_rate_no_formated"
-								datacontext = "[GetScriptedGui('cv_sort_by_inflation_value')]"
-								onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
-							}
+						}
+						
+						blockoverride "onclick_showmore" {
+							visible = "[Not(GetVariableSystem.Exists('independent_economies'))]"
+						}
+	
+						blockoverride "onclick_showless" {
+							visible = "[GetVariableSystem.Exists('independent_economies')]"
 						}
 					}
 
 					flowcontainer = {
+						using = default_list_position
 						direction = vertical
-						datamodel = "[GetPlayer.MakeScope.GetList('currency_variable_list_ordered_1')]"
+						visible = "[GetVariableSystem.Exists('independent_economies')]"
 
-						margin_top = 10
+						widget = {
+							size = { @panel_width 30 }
 
-						item = {
-							button = {
-								using = default_button
-								size = { @panel_width 40 }
+							hbox = {
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									size = { 110 20 }
+									align = hcenter|nobaseline
+									text = "COUNTRY_TITLE"
+									datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									size = { 40 20 }
+									align = hcenter|nobaseline
+									text = "c"
+									datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "money_value_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_currency_value')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "money_supply_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_money_supply')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "national_capacity_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_national_capacity')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "inflation_rate_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_inflation_value')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+							}
+						}
 
-								hbox = {
-									margin = { 12 0 }
+						flowcontainer = {
+							direction = vertical
+							datamodel = "[GetPlayer.MakeScope.GetList('independent_economies_list_ordered_1')]"
 
-									textbox = {
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
+							margin_top = 10
 
-										datacontext = "[Scope.GetCountry]"
+							item = {
+								button = {
+									using = default_button
+									size = { @panel_width 40 }
 
-										text = "[Country.GetName]"
-										size = { 100% 100% }
-										elide = right #Sert à ennlever la parrtie gauchee ou droit du text si trromp petit
-										align = left|nobaseline #Sert à centré le text
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+									hbox = {
+										margin = { 12 0 }
 
-									vertical_divider = {}
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
 
-									widget = {
-										layoutpolicy_horizontal = preferred
-										layoutpolicy_vertical = preferred
-										size = { 45 30 }
-
-										icon = {
-											size = { 36 36 }
-											name = dip_power_icon
 											datacontext = "[Scope.GetCountry]"
-											textbox = {
-												position = { 22 0 }
-												name = capital_value
-												text = "[Country.GetCustom('currency_symbol')]"
-												parentanchor = vcenter
-												align = hcenter|nobaseline
+
+											text = "[Country.GetName]"
+											size = { 100% 100% }
+											elide = right #Sert à ennlever la parrtie gauchee ou droit du text si trromp petit
+											align = left|nobaseline #Sert à centré le text
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										vertical_divider = {}
+
+										widget = {
+											layoutpolicy_horizontal = preferred
+											layoutpolicy_vertical = preferred
+											size = { 45 30 }
+
+											icon = {
+												size = { 36 36 }
+												name = dip_power_icon
+												datacontext = "[Scope.GetCountry]"
+												textbox = {
+													position = { 22 0 }
+													name = capital_value
+													text = "[Country.GetCustom('currency_symbol')]"
+													parentanchor = vcenter
+													align = hcenter|nobaseline
+
+												}
 
 											}
+										}
 
+										vertical_divider = {}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_gold_standard_no_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_gold_standard"
+
+											#margin_left = 12
+											text = "money_value_in_gold_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_gold_exchange_standard"
+
+											#margin_left = 12
+											text = "money_value_in_reference_currency_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_central_banking_tech_and_is_subject_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_subject"
+
+											#margin_left = 5
+											text = "money_value_subject_country_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+
+
+
+										vertical_divider = {}
+
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
+
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_SUPPLY_TOOLTIPS"
+
+											text = "[Country.MakeScope.ScriptValue('money_supply')|D=+]"
+
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										vertical_divider = {}
+
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
+
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "NATIONAL_CAPACITY_TOOLTIPS"
+
+											text = "[Country.MakeScope.ScriptValue('national_capacity')|D=+]"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										vertical_divider = {}
+
+										textbox = {
+
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
+											tooltip = "INFLATION_TITLE"
+
+
+											datacontext = "[Scope.GetCountry]"
+
+											raw_text = "#bold [Country.MakeScope.ScriptValue('inflation_value')|%|=-]#!"
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
 										}
 									}
+								}
+							}
+						}
+					}
 
-									vertical_divider = {}
+					#dependent_economies
+					section_header_button = {							
+						blockoverride "left_text" {
+							text = "DEPENDENT_ECONOMY"
+						}
+	
+						blockoverride "onclick" {
+							onclick = "[GetVariableSystem.Toggle('dependent_economies')]"
+							onclick = "[GetScriptedGui('dependent_economies_list_gerenation_ordered').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+						}
+						
+						blockoverride "onclick_showmore" {
+							visible = "[Not(GetVariableSystem.Exists('dependent_economies'))]"
+						}
+	
+						blockoverride "onclick_showless" {
+							visible = "[GetVariableSystem.Exists('dependent_economies')]"
+						}
+					}
 
-									textbox = {
-										visible = "[GetScriptedGui('has_gold_standard_no_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+					flowcontainer = {
+						using = default_list_position
+						direction = vertical
+						visible = "[GetVariableSystem.Exists('dependent_economies')]"
 
-										layoutstretchfactor_horizontal = 1.5
-										layoutpolicy_horizontal = expanding
-										datacontext = "[Scope.GetCountry]"
+						widget = {
+							size = { @panel_width 30 }
 
-										tooltip = "MONEY_VALUE_gold_standard"
+							hbox = {
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									size = { 110 20 }
+									align = hcenter|nobaseline
+									text = "COUNTRY_TITLE"
+									datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									size = { 40 20 }
+									align = hcenter|nobaseline
+									text = "c"
+									datacontext = "[GetScriptedGui('cv_sort_by_country_gdp')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "money_value_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_currency_value')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "money_supply_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_money_supply')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "national_capacity_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_national_capacity')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+								sort_button = {
+									layoutpolicy_horizontal = preferred
+									align = hcenter|nobaseline
+									size = { 105 20 }
+									text = "inflation_rate_no_formated"
+									datacontext = "[GetScriptedGui('cv_sort_by_inflation_value')]"
+									onclick = "[ScriptedGui.Execute(GuiScope.AddScope('player_country', GetPlayer.MakeScope).End )]"
+								}
+							}
+						}
 
-										#margin_left = 12
-										text = "money_value_in_gold_top_bar_for_list"
-										size = { 100% 100% }
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+						flowcontainer = {
+							direction = vertical
+							datamodel = "[GetPlayer.MakeScope.GetList('dependent_economies_list_ordered_1')]"
 
-									textbox = {
-										visible = "[GetScriptedGui('has_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+							margin_top = 10
 
-										layoutstretchfactor_horizontal = 1.5
-										layoutpolicy_horizontal = expanding
-										datacontext = "[Scope.GetCountry]"
+							item = {
+								button = {
+									using = default_button
+									size = { @panel_width 40 }
 
-										tooltip = "MONEY_VALUE_gold_exchange_standard"
+									hbox = {
+										margin = { 12 0 }
 
-										#margin_left = 12
-										text = "money_value_in_reference_currency_top_bar_for_list"
-										size = { 100% 100% }
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
 
-									textbox = {
-										visible = "[GetScriptedGui('has_central_banking_tech_and_is_subject_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+											datacontext = "[Scope.GetCountry]"
 
-										layoutstretchfactor_horizontal = 1.5
-										layoutpolicy_horizontal = expanding
-										datacontext = "[Scope.GetCountry]"
+											text = "[Country.GetName]"
+											size = { 100% 100% }
+											elide = right #Sert à ennlever la parrtie gauchee ou droit du text si trromp petit
+											align = left|nobaseline #Sert à centré le text
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
 
-										tooltip = "MONEY_VALUE_subject"
+										vertical_divider = {}
 
-										#margin_left = 5
-										text = "money_value_subject_country_top_bar_for_list"
-										size = { 100% 100% }
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+										widget = {
+											layoutpolicy_horizontal = preferred
+											layoutpolicy_vertical = preferred
+											size = { 45 30 }
+
+											icon = {
+												size = { 36 36 }
+												name = dip_power_icon
+												datacontext = "[Scope.GetCountry]"
+												textbox = {
+													position = { 22 0 }
+													name = capital_value
+													text = "[Country.GetCustom('currency_symbol')]"
+													parentanchor = vcenter
+													align = hcenter|nobaseline
+
+												}
+
+											}
+										}
+
+										vertical_divider = {}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_gold_standard_no_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_gold_standard"
+
+											#margin_left = 12
+											text = "money_value_in_gold_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_gold_exchange_standard"
+
+											#margin_left = 12
+											text = "money_value_in_reference_currency_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
+
+										textbox = {
+											visible = "[GetScriptedGui('has_central_banking_tech_and_is_subject_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+
+											layoutstretchfactor_horizontal = 1.5
+											layoutpolicy_horizontal = expanding
+											datacontext = "[Scope.GetCountry]"
+
+											tooltip = "MONEY_VALUE_subject"
+
+											#margin_left = 5
+											text = "money_value_subject_country_top_bar_for_list"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
 
 
 
 
-									vertical_divider = {}
+										vertical_divider = {}
 
-									textbox = {
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
 
-										datacontext = "[Scope.GetCountry]"
+											datacontext = "[Scope.GetCountry]"
 
-										tooltip = "MONEY_SUPPLY_TOOLTIPS"
+											tooltip = "MONEY_SUPPLY_TOOLTIPS"
 
-										text = "[Country.MakeScope.ScriptValue('money_supply')|D=+]"
+											text = "[Country.MakeScope.ScriptValue('money_supply')|D=+]"
 
-										size = { 100% 100% }
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
 
-									vertical_divider = {}
+										vertical_divider = {}
 
-									textbox = {
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
+										textbox = {
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
 
-										datacontext = "[Scope.GetCountry]"
+											datacontext = "[Scope.GetCountry]"
 
-										tooltip = "NATIONAL_CAPACITY_TOOLTIPS"
+											tooltip = "NATIONAL_CAPACITY_TOOLTIPS"
 
-										text = "[Country.MakeScope.ScriptValue('national_capacity')|D=+]"
-										size = { 100% 100% }
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
-									}
+											text = "[Country.MakeScope.ScriptValue('national_capacity')|D=+]"
+											size = { 100% 100% }
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
 
-									vertical_divider = {}
+										vertical_divider = {}
 
-									textbox = {
+										textbox = {
 
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
-										tooltip = "INFLATION_TITLE"
+											layoutstretchfactor_horizontal = 1
+											layoutpolicy_horizontal = expanding
+											tooltip = "INFLATION_TITLE"
 
 
-										datacontext = "[Scope.GetCountry]"
+											datacontext = "[Scope.GetCountry]"
 
-										raw_text = "#bold [Country.MakeScope.ScriptValue('inflation_value')|%|=-]#!"
-										elide = right
-										align = hcenter|nobaseline
-										parentanchor = left|vcenter
-										alwaystransparent = yes
+											raw_text = "#bold [Country.MakeScope.ScriptValue('inflation_value')|%|=-]#!"
+											elide = right
+											align = hcenter|nobaseline
+											parentanchor = left|vcenter
+											alwaystransparent = yes
+										}
 									}
 								}
 							}
@@ -18553,7 +18834,7 @@ types budget
 
 					flowcontainer = {
 						direction = vertical
-						datamodel = "[GetPlayer.MakeScope.GetList('currency_variable_list_ordered_1')]"
+						datamodel = "[GetPlayer.MakeScope.GetList('national_capacity_variable_list_ordered_1')]"
 
 						margin_top = 10
 
@@ -20255,6 +20536,31 @@ types budget
 				default_header = {
 					blockoverride "text" {
 						text = "COUNTRY_RATING_TITLE"
+					}
+
+					flowcontainer = {
+						direction = vertical
+						margin_top = 10
+						#margin_right = 20
+						
+						parentanchor = right|nobaseline
+
+						button_icon_round_action = {
+							name = "update_1"
+
+							parentanchor = right|nobaseline
+
+							size = { 30 30 }
+							onclick = "[GetScriptedGui('country_credit_rating_actualized').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+							using = tooltip_below
+
+							blockoverride "icon" {
+								texture = "gfx/interface/buttons/button_icons/reset.dds"
+							}
+							blockoverride "icon_size" {
+								size = { 120% 120% }
+							}
+						}
 					}
 				}
 
