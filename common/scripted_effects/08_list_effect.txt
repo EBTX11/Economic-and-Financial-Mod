@@ -587,8 +587,8 @@ national_debt_variable_list = {
             if = {
                 ordered_in_list = {
                     variable = list_before_order
-                    order_by = national_debt
-                    max = 15
+                    order_by = national_debt_compared_gdp
+                    max = 100
                     check_range_bounds = no
                     root = {
                         add_to_variable_list = {
@@ -600,6 +600,55 @@ national_debt_variable_list = {
             }
         }
         clear_variable_list = national_debt_variable_list
+    }
+}
+
+central_bank_debt_variable_list = {
+    every_country = {
+        limit = {
+            has_modifier = has_central_bank
+            NOT = {
+                is_subject = yes 
+                is_subject_type = subject_type_customs_union
+                is_subject_type = subject_type_protectorate                
+            }
+        }
+        root = {
+            add_to_variable_list = {
+                name = central_bank_debt_variable_list
+                target = prev
+            }
+        }
+    }
+    root  = {
+        if = {
+            clear_variable_list = list_before_order
+            every_in_list = {
+                variable = central_bank_debt_variable_list
+                root = {
+                    add_to_variable_list = {
+                        name = list_before_order
+                        target = prev
+                    }
+                }
+            }
+            clear_variable_list = central_bank_debt_variable_list_ordered_1
+            if = {
+                ordered_in_list = {
+                    variable = list_before_order
+                    order_by = central_bank_debt
+                    max = 100
+                    check_range_bounds = no
+                    root = {
+                        add_to_variable_list = {
+                            name = central_bank_debt_variable_list_ordered_1
+                            target = prev
+                        }
+                    }
+                }
+            }
+        }
+        clear_variable_list = central_bank_debt_variable_list
     }
 }
 
