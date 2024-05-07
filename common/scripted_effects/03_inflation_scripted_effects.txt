@@ -1,0 +1,467 @@
+fluctuations_monthly_add = {
+	if = {
+		limit = {
+			has_modifier = inflation_country
+		}
+		remove_modifier = inflation_country
+	}
+	if = {
+		limit = {
+			has_modifier = deflation_country
+		}
+		remove_modifier = deflation_country
+	}
+	if = {
+		limit = {
+			has_modifier = foreign_exchange_controls
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		remove_modifier = foreign_exchange_controls
+	}
+	if = {
+		limit = {
+ 		#has_law = law_type:law_revaluation
+		}
+		add_modifier = {
+			name = inflation_country
+			multiplier = inflation_value
+		}
+	}
+	else_if = {
+		limit = {
+			has_law = law_type:law_devaluation
+		}
+		add_modifier = {
+			name = deflation_country
+			multiplier = inflation_value
+		}
+	}
+	if = {
+		limit = {
+ 			inflation_value > 0.5
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		add_modifier = {
+			name = foreign_exchange_controls
+		}
+	}
+	if = {
+		limit = {
+ 			inflation_value < -0.5
+			not = {
+				or = {
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+		}
+		add_modifier = {
+			name = foreign_exchange_controls
+		}
+	}
+}
+
+#############################
+
+inflation_value_based_on_mining = {
+    if = {
+        limit = {
+			not = {
+				has_variable = law_currency
+			}
+        }
+		set_variable = {
+			name = law_currency
+			value = 0
+		}
+    }
+
+    if = {
+        limit = {
+            has_law = law_type:law_revaluation_25
+        }
+		change_variable = {
+			name = law_currency
+			subtract = 1
+		}
+    }
+	if = {
+        limit = {
+			has_law = law_type:law_revaluation_50
+        }
+		change_variable = {
+			name = law_currency
+			subtract = 2
+		}
+        
+    }
+	if = {
+        limit = {
+            has_law = law_type:law_revaluation_75
+        }
+		change_variable = {
+			name = law_currency
+			subtract = 3
+		}
+        
+    }
+	if = {
+        limit = {
+            has_law = law_type:law_revaluation_100
+        }
+		change_variable = {
+			name = law_currency
+			subtract = 4
+		}
+    }
+    if = {
+        limit = {
+			or = {
+				has_law = law_type:law_devaluation_25
+			}
+        }
+		change_variable = {
+			name = law_currency
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+			or = {
+				has_law = law_type:law_devaluation_50
+			}
+        }
+		change_variable = {
+			name = law_currency
+			add = 2
+		}
+    }
+    if = {
+        limit = {
+			or = {
+				has_law = law_type:law_devaluation_75
+
+			}
+        }
+		change_variable = {
+			name = law_currency
+			add = 3
+		}
+    }
+    if = {
+        limit = {
+			has_law = law_type:law_devaluation_100
+		}
+		change_variable = {
+			name = law_currency
+			add = 4
+		}
+	}
+
+	################################################################################################
+	
+    if = {
+        limit = {
+			var:devaluation_on = 1
+		}
+		change_variable = {
+			name = law_currency
+			add = var:inflation_value_predicted_devaluation_month_valided
+		}
+	}
+	if = {
+        limit = {
+			var:revaluation_on = 1
+		}
+		change_variable = {
+			name = law_currency
+			add = var:inflation_value_predicted_revaluation_month_valided
+		}
+	}
+}
+
+#############################
+
+fluctuations_2_monthly_add = {
+    if = {
+        limit = {
+            has_modifier = weak_currency
+			has_variable = month_weak_currency
+        }
+        change_variable = {
+			name = month_weak_currency
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+            has_modifier = normal_currency
+			has_variable = month_normal_currency
+        }
+		change_variable = {
+			name = month_normal_currency
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+            has_modifier = strong_currency
+			has_variable = month_strong_currency
+        }
+		change_variable = {
+			name = month_strong_currency
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_weak_currency
+			}
+        }
+		set_variable = {
+			name = month_weak_currency
+			value = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_normal_currency
+			}
+        }
+		set_variable = {
+			name = month_normal_currency
+			value = 1
+		}
+    }
+    if = {
+        limit = {
+			not = {
+				has_variable = month_strong_currency
+			}
+        }
+		set_variable = {
+			name = month_strong_currency
+			value = 1
+		}
+    }
+}
+
+fluctuations_1_monthly_add = {
+
+	#############################
+	if = {
+		limit = {
+			has_modifier = weak_currency
+		}
+		remove_modifier = weak_currency
+	}
+	if = {
+		limit = {
+            money_value > 0.00001
+			money_value < 1
+			Not = {
+				has_modifier = strong_currency
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = has_central_bank
+			}
+			add_modifier = {
+				name = weak_currency
+				multiply = var:month_weak_currency
+			}
+		}
+		if = {
+			limit = {
+				not = {
+					has_modifier = has_central_bank
+				}
+			}
+			add_modifier = {
+				name = weak_currency
+				multiplier = 1
+			}
+		}
+	}
+	#############################
+
+	#############################
+	if = {
+		limit = {
+			has_modifier = normal_currency
+		}
+		remove_modifier = normal_currency
+	}
+	if = {
+		limit = {
+			money_value > 1
+			Not = {
+				has_modifier = strong_currency
+			}
+		}
+		add_modifier = {
+			name = normal_currency
+			multiply = var:month_normal_currency
+		}
+	}
+	#############################
+
+	#############################
+	if = {
+		limit = {
+			has_modifier = strong_currency
+		}
+		remove_modifier = strong_currency
+	}
+	if = {
+		limit = {
+			#money_value > 10
+			or = {
+				country_rank = rank_value:great_power
+				this = c:SWI
+				this = c:NET
+			}
+			Not = {
+				has_modifier = weak_currency
+				money_value < 1
+			}
+		}
+		add_modifier = {
+			name = strong_currency
+			multiply = var:month_strong_currency
+		}
+	}
+	#############################
+
+}
+
+fluctuations_3_monthly_add = {
+	if = {
+		limit = {
+			has_modifier = weak_currency
+			var:month_normal_currency > 0
+		}
+		change_variable = {
+			name = month_normal_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = weak_currency
+			var:month_strong_currency > 0
+		}
+		change_variable = {
+			name = month_strong_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = normal_currency
+			var:month_weak_currency > 0
+		}
+		change_variable = {
+			name = month_weak_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = normal_currency
+			var:month_strong_currency > 0
+		}
+		change_variable = {
+			name = month_strong_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = strong_currency
+			var:month_normal_currency > 0
+		}
+		change_variable = {
+			name = month_normal_currency
+			add = -1
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_modifier = strong_currency
+			var:month_weak_currency > 0
+		}
+		change_variable = {
+			name = month_weak_currency
+			add = -1
+			min = 0
+		}
+	}
+}
+fluctuations_1_annual_add = {
+	if = {
+		limit = {
+			has_modifier = natural_inflation
+		}
+		remove_modifier = natural_inflation
+	}
+    if = {
+        limit = {
+        }
+		add_modifier = {
+			name = natural_inflation
+			multiply = var:years_natural_inflation
+		}
+    }
+}
+fluctuations_2_annual_add = {
+    if = {
+        limit = {
+            has_modifier = natural_inflation
+			has_variable = years_natural_inflation
+        }
+		change_variable = {
+			name = years_natural_inflation
+			add = 1
+		}
+    }
+    if = {
+        limit = {
+ 			not = {			
+				has_variable = years_natural_inflation
+			}
+        }
+		set_variable = {
+			name = years_natural_inflation
+			value = 0
+		}
+    }
+}
+fluctuations_market_price_monthly_add = {
+	set_variable = {
+		name = inflation_market_2
+		value = 0
+	}
+	change_variable = {
+		name = inflation_market_2
+		add = inflation_market_value
+	}
+}
