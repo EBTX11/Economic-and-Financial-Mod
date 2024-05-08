@@ -245,14 +245,13 @@ credit_at_central_bank_interest_per_week = {
 	remove_modifier = interest_at_the_central_bank
 	add_modifier = {
 		name = interest_at_the_central_bank
-		multiplier = credit_at_central_bank_interest_per_month
+		multiplier = credit_at_central_bank_interest_per_month_by_inflation
 	}
 }
 
 credit_at_central_bank_interest_per_week_off = {
 	remove_modifier = interest_at_the_central_bank
 }
-
 
 ai_credit_at_central_bank = {         
 	random_list = {
@@ -275,6 +274,18 @@ ai_credit_at_central_bank = {
 				add_treasury = {
 					add = var:ai_debt_issued_relative_GDP
 				}
+				change_variable = {
+					name = credit_at_central_bank
+					add = var:ai_debt_issued_relative_GDP
+				}
+				set_variable = {
+					name = ai_debt_issued_relative_GDP_in_gold
+					value = ai_debt_issued_relative_GDP
+				}
+				change_variable = {
+					name = ai_debt_issued_relative_GDP_in_gold
+					multiply = money_value_rapported_inflation
+				}
 				every_scope_state = {
 					if = {
 						limit = {
@@ -282,8 +293,7 @@ ai_credit_at_central_bank = {
 						}
 						change_variable = {
 							name = central_bank_gold_reserves_state_1
-							subtract = owner.ai_debt_issued_relative_GDP
-						
+							subtract = owner.ai_debt_issued_relative_GDP_in_gold
 						}
 					}
 				}
@@ -299,13 +309,22 @@ ai_credit_at_central_bank = {
 				}
 			}
 			
+			set_variable = {
+				name = ai_debt_issued_relative_GDP_in_gold
+				value = ai_debt_issued_relative_GDP
+			}
+			change_variable = {
+				name = ai_debt_issued_relative_GDP_in_gold
+				multiply = money_value_rapported_inflation
+			}
+			
 			if  = {
 				limit  = {
 					var:credit_at_central_bank > 0
 				}
 				change_variable = {
 					name = credit_at_central_bank
-					subtract = var:ai_debt_issued_relative_GDP
+					subtract = var:ai_debt_issued_relative_GDP_in_gold
 				}
 			}
 			if  = {
@@ -606,13 +625,14 @@ ai_buy_bond_1 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_1 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -627,10 +647,6 @@ ai_buy_bond_1 = {
 				add_to_variable_list = {
 					name = ai_buyer_country_1
 					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_1
-					target = scope:seller #prev
 				}
 				add_to_variable_list = {
 					name = ai_seller_country_general_1
@@ -671,6 +687,15 @@ ai_buy_bond_1 = {
 				change_variable = {
 					name = ai_total_bond_value_1
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_1_in_gold
+					value = var:ai_total_bond_value_1
+				}
+				change_variable = {
+					name = ai_total_bond_value_1_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -724,23 +749,25 @@ ai_buy_bond_1 = {
 						subtract = scope:buyer.var:ai_bond_quantity_1
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_1
-						add = scope:buyer.var:ai_total_bond_value_1
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_1_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_1
 					}
 				}
 			}
 
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_1
+			set_variable = {
+				name = central_bank_gold_loaned_1
+				value = scope:buyer.var:ai_total_bond_value_1
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_1
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_1
+				value = scope:buyer.var:ai_interest_calculated_1
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -760,6 +787,7 @@ ai_buy_bond_1 = {
 			}
 
 			###### ajout du modifier d'interet au pays qui vend
+
 			add_modifier = {
 				name = ai_buy_bond_1
 				months = 120
@@ -772,6 +800,13 @@ ai_buy_bond_1 = {
 				value = 1
 			}
 
+		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_1_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
 		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_1_message
@@ -797,13 +832,14 @@ ai_buy_bond_2 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_2 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -859,6 +895,15 @@ ai_buy_bond_2 = {
 					name = ai_total_bond_value_2
 					multiply = scope:seller.bond_price
 				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_2_in_gold
+					value = var:ai_total_bond_value_2
+				}
+				change_variable = {
+					name = ai_total_bond_value_2_in_gold
+					multiply = money_value_rapported_inflation
+				}
 
 				#interet total 
 				set_variable = {
@@ -911,25 +956,25 @@ ai_buy_bond_2 = {
 						subtract = scope:buyer.var:ai_bond_quantity_2
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_2
-						add = scope:buyer.var:ai_total_bond_value_2
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_2_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_2
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_2
+			set_variable = {
+				name = central_bank_gold_loaned_2
+				value = scope:buyer.var:ai_total_bond_value_2
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_2
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_2
+				value = scope:buyer.var:ai_interest_calculated_2
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -963,6 +1008,13 @@ ai_buy_bond_2 = {
 			}
 
 		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_2_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
+		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_2_message
 		} 	
@@ -987,13 +1039,14 @@ ai_buy_bond_3 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_3 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1049,6 +1102,15 @@ ai_buy_bond_3 = {
 					name = ai_total_bond_value_3
 					multiply = scope:seller.bond_price
 				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_3_in_gold
+					value = var:ai_total_bond_value_3
+				}
+				change_variable = {
+					name = ai_total_bond_value_3_in_gold
+					multiply = money_value_rapported_inflation
+				}
 
 				#interet total 
 				set_variable = {
@@ -1101,25 +1163,25 @@ ai_buy_bond_3 = {
 						subtract = scope:buyer.var:ai_bond_quantity_3
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_3
-						add = scope:buyer.var:ai_total_bond_value_3
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_3_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_3
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_3
+			set_variable = {
+				name = central_bank_gold_loaned_3
+				value = scope:buyer.var:ai_total_bond_value_3
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_3
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_3
+				value = scope:buyer.var:ai_interest_calculated_3
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -1153,6 +1215,13 @@ ai_buy_bond_3 = {
 			}
 
 		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_3_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
+		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_3_message
 		} 	
@@ -1177,13 +1246,14 @@ ai_buy_bond_4 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_4 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1239,6 +1309,15 @@ ai_buy_bond_4 = {
 					name = ai_total_bond_value_4
 					multiply = scope:seller.bond_price
 				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_4_in_gold
+					value = var:ai_total_bond_value_4
+				}
+				change_variable = {
+					name = ai_total_bond_value_4_in_gold
+					multiply = money_value_rapported_inflation
+				}
 
 				#interet total 
 				set_variable = {
@@ -1291,25 +1370,25 @@ ai_buy_bond_4 = {
 						subtract = scope:buyer.var:ai_bond_quantity_4
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_4
-						add = scope:buyer.var:ai_total_bond_value_4
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_4_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_4
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_4
+			set_variable = {
+				name = central_bank_gold_loaned_4
+				value = scope:buyer.var:ai_total_bond_value_4
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_4
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_4
+				value = scope:buyer.var:ai_interest_calculated_4
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -1343,6 +1422,13 @@ ai_buy_bond_4 = {
 			}
 
 		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_4_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
+		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_4_message
 		} 	
@@ -1367,13 +1453,14 @@ ai_buy_bond_5 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_5 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1429,6 +1516,15 @@ ai_buy_bond_5 = {
 					name = ai_total_bond_value_5
 					multiply = scope:seller.bond_price
 				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_5_in_gold
+					value = var:ai_total_bond_value_5
+				}
+				change_variable = {
+					name = ai_total_bond_value_5_in_gold
+					multiply = money_value_rapported_inflation
+				}
 
 				#interet total 
 				set_variable = {
@@ -1481,25 +1577,25 @@ ai_buy_bond_5 = {
 						subtract = scope:buyer.var:ai_bond_quantity_5
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_5
-						add = scope:buyer.var:ai_total_bond_value_5
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_5_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_5
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_5
+			set_variable = {
+				name = central_bank_gold_loaned_5
+				value = scope:buyer.var:ai_total_bond_value_5
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_5
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_5
+				value = scope:buyer.var:ai_interest_calculated_5
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -1533,12 +1629,18 @@ ai_buy_bond_5 = {
 			}
 
 		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_5_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
+		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_5_message
 		} 	
 	}
 }
-
 ai_buy_bond_6 = {
 	every_country = {
 		limit  = {
@@ -1558,13 +1660,14 @@ ai_buy_bond_6 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_6 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1604,7 +1707,7 @@ ai_buy_bond_6 = {
 				#interret lors de l'achat
 				set_variable = {
 					name = ai_interest_purchasing_6
-					value = scope:seller.interest_value_5Y
+					value = scope:seller.interest_value_10Y
 				}
 
 				#valeur de la quantité
@@ -1619,6 +1722,15 @@ ai_buy_bond_6 = {
 				change_variable = {
 					name = ai_total_bond_value_6
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_6_in_gold
+					value = var:ai_total_bond_value_6
+				}
+				change_variable = {
+					name = ai_total_bond_value_6_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -1636,7 +1748,7 @@ ai_buy_bond_6 = {
 				}
 				change_variable = {
 					name = ai_interest_calculated_6
-					multiply = scope:seller.interest_value_5Y
+					multiply = scope:seller.interest_value_10Y
 				}
 
 				#interet total à terme
@@ -1672,25 +1784,25 @@ ai_buy_bond_6 = {
 						subtract = scope:buyer.var:ai_bond_quantity_6
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_6
-						add = scope:buyer.var:ai_total_bond_value_6
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_6_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_6
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_6
+			set_variable = {
+				name = central_bank_gold_loaned_6
+				value = scope:buyer.var:ai_total_bond_value_6
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_6
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_6
+				value = scope:buyer.var:ai_interest_calculated_6
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -1713,7 +1825,7 @@ ai_buy_bond_6 = {
 
 			add_modifier = {
 				name = ai_buy_bond_6
-				months = 60
+				months = 120
 				multiplier = var:ai_interest_per_mounth_calculated_6
 			}
 
@@ -1723,6 +1835,13 @@ ai_buy_bond_6 = {
 				value = 1
 			}
 
+		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_6_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
 		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_6_message
@@ -1748,13 +1867,14 @@ ai_buy_bond_7 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_7 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1794,7 +1914,7 @@ ai_buy_bond_7 = {
 				#interret lors de l'achat
 				set_variable = {
 					name = ai_interest_purchasing_7
-					value = scope:seller.interest_value_5Y
+					value = scope:seller.interest_value_10Y
 				}
 
 				#valeur de la quantité
@@ -1809,6 +1929,15 @@ ai_buy_bond_7 = {
 				change_variable = {
 					name = ai_total_bond_value_7
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_7_in_gold
+					value = var:ai_total_bond_value_7
+				}
+				change_variable = {
+					name = ai_total_bond_value_7_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -1826,7 +1955,7 @@ ai_buy_bond_7 = {
 				}
 				change_variable = {
 					name = ai_interest_calculated_7
-					multiply = scope:seller.interest_value_5Y
+					multiply = scope:seller.interest_value_10Y
 				}
 
 				#interet total à terme
@@ -1862,25 +1991,25 @@ ai_buy_bond_7 = {
 						subtract = scope:buyer.var:ai_bond_quantity_7
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_7
-						add = scope:buyer.var:ai_total_bond_value_7
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_7_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_7
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_7
+			set_variable = {
+				name = central_bank_gold_loaned_7
+				value = scope:buyer.var:ai_total_bond_value_7
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_7
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_7
+				value = scope:buyer.var:ai_interest_calculated_7
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -1903,7 +2032,7 @@ ai_buy_bond_7 = {
 
 			add_modifier = {
 				name = ai_buy_bond_7
-				months = 60
+				months = 120
 				multiplier = var:ai_interest_per_mounth_calculated_7
 			}
 
@@ -1913,6 +2042,13 @@ ai_buy_bond_7 = {
 				value = 1
 			}
 
+		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_7_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
 		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_7_message
@@ -1938,13 +2074,14 @@ ai_buy_bond_8 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_8 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -1984,7 +2121,7 @@ ai_buy_bond_8 = {
 				#interret lors de l'achat
 				set_variable = {
 					name = ai_interest_purchasing_8
-					value = scope:seller.interest_value_5Y
+					value = scope:seller.interest_value_10Y
 				}
 
 				#valeur de la quantité
@@ -1999,6 +2136,15 @@ ai_buy_bond_8 = {
 				change_variable = {
 					name = ai_total_bond_value_8
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_8_in_gold
+					value = var:ai_total_bond_value_8
+				}
+				change_variable = {
+					name = ai_total_bond_value_8_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -2016,7 +2162,7 @@ ai_buy_bond_8 = {
 				}
 				change_variable = {
 					name = ai_interest_calculated_8
-					multiply = scope:seller.interest_value_5Y
+					multiply = scope:seller.interest_value_10Y
 				}
 
 				#interet total à terme
@@ -2052,25 +2198,25 @@ ai_buy_bond_8 = {
 						subtract = scope:buyer.var:ai_bond_quantity_8
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_8
-						add = scope:buyer.var:ai_total_bond_value_8
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_8_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_8
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_8
+			set_variable = {
+				name = central_bank_gold_loaned_8
+				value = scope:buyer.var:ai_total_bond_value_8
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_8
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_8
+				value = scope:buyer.var:ai_interest_calculated_8
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -2093,7 +2239,7 @@ ai_buy_bond_8 = {
 
 			add_modifier = {
 				name = ai_buy_bond_8
-				months = 60
+				months = 120
 				multiplier = var:ai_interest_per_mounth_calculated_8
 			}
 
@@ -2103,6 +2249,13 @@ ai_buy_bond_8 = {
 				value = 1
 			}
 
+		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_8_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
 		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_8_message
@@ -2128,13 +2281,14 @@ ai_buy_bond_9 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_9 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -2174,7 +2328,7 @@ ai_buy_bond_9 = {
 				#interret lors de l'achat
 				set_variable = {
 					name = ai_interest_purchasing_9
-					value = scope:seller.interest_value_5Y
+					value = scope:seller.interest_value_10Y
 				}
 
 				#valeur de la quantité
@@ -2189,6 +2343,15 @@ ai_buy_bond_9 = {
 				change_variable = {
 					name = ai_total_bond_value_9
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_9_in_gold
+					value = var:ai_total_bond_value_9
+				}
+				change_variable = {
+					name = ai_total_bond_value_9_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -2206,7 +2369,7 @@ ai_buy_bond_9 = {
 				}
 				change_variable = {
 					name = ai_interest_calculated_9
-					multiply = scope:seller.interest_value_5Y
+					multiply = scope:seller.interest_value_10Y
 				}
 
 				#interet total à terme
@@ -2242,25 +2405,25 @@ ai_buy_bond_9 = {
 						subtract = scope:buyer.var:ai_bond_quantity_9
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_9
-						add = scope:buyer.var:ai_total_bond_value_9
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_9_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_9
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_9
+			set_variable = {
+				name = central_bank_gold_loaned_9
+				value = scope:buyer.var:ai_total_bond_value_9
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_9
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_9
+				value = scope:buyer.var:ai_interest_calculated_9
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -2283,7 +2446,7 @@ ai_buy_bond_9 = {
 
 			add_modifier = {
 				name = ai_buy_bond_9
-				months = 60
+				months = 120
 				multiplier = var:ai_interest_per_mounth_calculated_9
 			}
 
@@ -2293,6 +2456,13 @@ ai_buy_bond_9 = {
 				value = 1
 			}
 
+		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_9_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
 		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_9_message
@@ -2318,13 +2488,14 @@ ai_buy_bond_10 = {
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_10 = 0
-			gold_reserves_var > gold_reserves_10
 			exists = scope:seller
 			scope:seller = {
 				not = {
 					this = root 
 				}
 			}
+			gold_reserves_var > gold_reserves_10
+			gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {	
@@ -2364,7 +2535,7 @@ ai_buy_bond_10 = {
 				#interret lors de l'achat
 				set_variable = {
 					name = ai_interest_purchasing_10
-					value = scope:seller.interest_value_5Y
+					value = scope:seller.interest_value_10Y
 				}
 
 				#valeur de la quantité
@@ -2379,6 +2550,15 @@ ai_buy_bond_10 = {
 				change_variable = {
 					name = ai_total_bond_value_10
 					multiply = scope:seller.bond_price
+				}
+				# transformation en or 
+				set_variable = {
+					name = ai_total_bond_value_10_in_gold
+					value = var:ai_total_bond_value_10
+				}
+				change_variable = {
+					name = ai_total_bond_value_10_in_gold
+					multiply = money_value_rapported_inflation
 				}
 
 				#interet total 
@@ -2396,7 +2576,7 @@ ai_buy_bond_10 = {
 				}
 				change_variable = {
 					name = ai_interest_calculated_10
-					multiply = scope:seller.interest_value_5Y
+					multiply = scope:seller.interest_value_10Y
 				}
 
 				#interet total à terme
@@ -2432,25 +2612,25 @@ ai_buy_bond_10 = {
 						subtract = scope:buyer.var:ai_bond_quantity_10
 					}
 					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_10
-						add = scope:buyer.var:ai_total_bond_value_10
+						name = central_bank_gold_reserves_state_1
+						add = scope:buyer.var:ai_total_bond_value_10_in_gold
+						#add = scope:buyer.var:ai_total_bond_value_10
 					}
 				}
 			}
 
-			
-
 			#################
 			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				add = scope:buyer.var:ai_total_bond_value_10
+			set_variable = {
+				name = central_bank_gold_loaned_10
+				value = scope:buyer.var:ai_total_bond_value_10
 			}	
 			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				add = scope:buyer.var:ai_interest_calculated_10
-			}	
+			set_variable = {
+				name = central_bank_interest_refund_per_year_10
+				value = scope:buyer.var:ai_interest_calculated_10
+			}
+			
 		}
 		scope:buyer = {
 			add_treasury = {
@@ -2473,7 +2653,7 @@ ai_buy_bond_10 = {
 
 			add_modifier = {
 				name = ai_buy_bond_10
-				months = 60
+				months = 120
 				multiplier = var:ai_interest_per_mounth_calculated_10
 			}
 
@@ -2484,11 +2664,19 @@ ai_buy_bond_10 = {
 			}
 
 		}
+		
+		if = {
+			limit = {
+				var:ai_total_bond_value_10_in_gold < scope:seller.central_bank_debt
+			}
+			#clear toute les valeur
+		}
 		scope:is_player_for_notification = {
 			post_notification = ai_selle_bond_maturity_10_message
 		} 	
 	}
 }
+
 
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
@@ -2505,8 +2693,6 @@ ai_buy_bond_10 = {
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
-#########################################################################################################################################################################################
-
 #########################################################################################################################################################################################
 
 #################Player
@@ -2667,47 +2853,43 @@ ai_bond_maturity_1 = {
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_1
+			variable = ai_seller_country_general_1
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_1 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_1
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_1
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_1
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_1
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_1
-						subtract = scope:buyer.var:ai_total_bond_value_1
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_1
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_1 
 				}
@@ -2785,8 +2967,6 @@ ai_bond_maturity_yers_time_1 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_2 = {	
@@ -2946,47 +3126,43 @@ ai_bond_maturity_2 = {
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_2
+			variable = ai_seller_country_general_2
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_2 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_2
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_2
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_2
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_2
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_2
-						subtract = scope:buyer.var:ai_total_bond_value_2
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_2
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_2 
 				}
@@ -3064,8 +3240,6 @@ ai_bond_maturity_yers_time_2 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_3 = {	
@@ -3225,47 +3399,43 @@ ai_bond_maturity_3 = {
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_3
+			variable = ai_seller_country_general_3
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_3 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_3
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_3
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_3
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_3
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_3
-						subtract = scope:buyer.var:ai_total_bond_value_3
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_3
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_3 
 				}
@@ -3343,8 +3513,6 @@ ai_bond_maturity_yers_time_3 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_4 = {	
@@ -3504,47 +3672,43 @@ ai_bond_maturity_4 = {
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_4
+			variable = ai_seller_country_general_4
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_4 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_4
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_4
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_4
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_4
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_4
-						subtract = scope:buyer.var:ai_total_bond_value_4
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_4
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_4 
 				}
@@ -3622,8 +3786,6 @@ ai_bond_maturity_yers_time_4 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_5 = {	
@@ -3783,47 +3945,43 @@ ai_bond_maturity_5 = {
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_5
+			variable = ai_seller_country_general_5
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_5 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_5
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_5
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_5
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_5
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_5
-						subtract = scope:buyer.var:ai_total_bond_value_5
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_5
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_5 
 				}
@@ -3901,8 +4059,6 @@ ai_bond_maturity_yers_time_5 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_6 = {	
@@ -4058,51 +4214,47 @@ ai_bond_maturity_6 = {
 
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_6 > 9
+			var:ai_selle_bond_maturity_yers_6 > 4
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_6
+			variable = ai_seller_country_general_6
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_6 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_6
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_6
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_6
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_6
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_6
-						subtract = scope:buyer.var:ai_total_bond_value_6
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_6
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_6 
 				}
@@ -4180,8 +4332,6 @@ ai_bond_maturity_yers_time_6 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_7 = {	
@@ -4337,51 +4487,47 @@ ai_bond_maturity_7 = {
 
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_7 > 9
+			var:ai_selle_bond_maturity_yers_7 > 4
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_7
+			variable = ai_seller_country_general_7
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_7 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_7
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_7
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_7
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_7
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_7
-						subtract = scope:buyer.var:ai_total_bond_value_7
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_7
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_7 
 				}
@@ -4459,8 +4605,6 @@ ai_bond_maturity_yers_time_7 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_8 = {	
@@ -4616,51 +4760,47 @@ ai_bond_maturity_8 = {
 
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_8 > 9
+			var:ai_selle_bond_maturity_yers_8 > 4
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_8
+			variable = ai_seller_country_general_8
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_8 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_8
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_8
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_8
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_8
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_8
-						subtract = scope:buyer.var:ai_total_bond_value_8
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_8
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_8 
 				}
@@ -4738,8 +4878,6 @@ ai_bond_maturity_yers_time_8 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_9 = {	
@@ -4895,51 +5033,47 @@ ai_bond_maturity_9 = {
 
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_9 > 9
+			var:ai_selle_bond_maturity_yers_9 > 4
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_9
+			variable = ai_seller_country_general_9
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_9 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_9
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_9
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_9
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_9
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_9
-						subtract = scope:buyer.var:ai_total_bond_value_9
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_9
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_9 
 				}
@@ -5017,8 +5151,6 @@ ai_bond_maturity_yers_time_9 = {
 }
 
 #############################################################################################################################################################################
-
-#########################################################################################################################################################################################
 
 #################Player
 bond_maturity_10 = {	
@@ -5174,51 +5306,47 @@ ai_bond_maturity_10 = {
 
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_10 > 9
+			var:ai_selle_bond_maturity_yers_10 > 4
 		}
 		#seller
 		every_in_list = {
-			variable = ai_seller_country_10
+			variable = ai_seller_country_general_10
 			save_scope_as = seller
 
-			every_in_list = {
-				variable = ai_buyer_country_10 #à change
-				save_scope_as = buyer
+			scope:seller = {
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = central_bank_gold_loaned
+					subtract = scope:buyer.var:ai_total_bond_value_10
+				}	
+				#interet que la banque centrale pays à l'année 
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = scope:buyer.var:ai_interest_calculated_10
+				}	
 				
-			}
-			
-			#################
-			#or prété à la banque du pays vendeur
-			change_variable = {
-				name = central_bank_gold_loaned
-				subtract = scope:buyer.var:ai_total_bond_value_10
-			}	
-			#interet que la banque centrale pays à l'année 
-			change_variable = {
-				name = central_bank_interest_refund_per_year
-				subtract = scope:buyer.var:ai_interest_calculated_10
-			}	
-			
-			remove_from_list = {
-				variable = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
+				remove_from_list = {
+					variable = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+				national_debt_variable_list_clear = yes
 
-			#### retour de l'investissement depuis la bc 
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_central_bank_gold_reserves_var_10
-						subtract = scope:buyer.var:ai_total_bond_value_10
+				#### retour de l'investissement depuis la bc 
+				every_scope_state = {
+					if = {
+						limit = {
+							has_modifier = bank_central_historic_place
+							#is_capital = yes
+						}
+						change_variable = {
+							name = central_bank_gold_reserves_state_1
+							subtract = scope:buyer.var:ai_total_bond_value_10
+						}
 					}
 				}
 			}
-
-			scope:buyer = {
+			root = {
 				add_treasury = {
 					add = var:ai_total_bond_value_10 
 				}

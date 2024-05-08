@@ -138,7 +138,7 @@ types budget
 				blockoverride "third_button_click"
 				{
 					onclick = "[InformationPanel.SelectTab('economy')]"
-					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetMetaPlayer.GetPlayedOrObservedCountry.MakeScope).End)]"
 				}
 				blockoverride "third_button_visibility"
 				{
@@ -165,7 +165,7 @@ types budget
 				}
 				blockoverride "fourth_button_click" {
 					onclick = "[InformationPanel.SelectTab('finance')]"
-					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+					onclick = "[GetScriptedGui('list_generation_when_player_open_tab').Execute( GuiScope.SetRoot(GetMetaPlayer.GetPlayedOrObservedCountry.MakeScope).End)]"
 				}
 				blockoverride "fourth_button_visibility" {
 					visible = "[InformationPanel.IsTabSelected('finance')]"
@@ -2837,7 +2837,7 @@ types budget
 										layoutstretchfactor_horizontal = 1
 										layoutpolicy_horizontal = expanding
 
-										text = "[GetPlayer.MakeScope.ScriptValue('national_debt')|-D] @gold!"
+										text = "[GetPlayer.MakeScope.ScriptValue('national_debt')|-D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 
 										align = left|nobaseline
@@ -2850,8 +2850,7 @@ types budget
 
 										position = { 75 8 }
 									}									
-								}
-								
+								}					
 								flowcontainer  = {
 									margin_top = 0
 									margin_right = 0
@@ -2865,7 +2864,7 @@ types budget
 										layoutstretchfactor_horizontal = 1
 										layoutpolicy_horizontal = expanding
 
-										text = "credit_at_central_bank"
+										text = "[concept_credit_at_central_bank]"
 
 										align = left|nobaseline
 										elide = right
@@ -2884,55 +2883,7 @@ types budget
 										layoutstretchfactor_horizontal = 1
 										layoutpolicy_horizontal = expanding
 
-										text = "[GetPlayer.MakeScope.Var('credit_at_central_bank').GetValue|-D] @gold!"
-
-
-										align = left|nobaseline
-										elide = right
-										default_format = "#white #bold"
-										autoresize = yes
-										fontsize = 25
-										allow_outside = yes
-										ignoreinvisible = yes
-
-										position = { 75 8 }
-									}
-
-									
-								}
-								flowcontainer  = {
-									margin_top = 0
-									margin_right = 0
-									margin_left = 0
-
-									spacing = 5
-
-									direction = horizontal
-									
-									textbox = {
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
-
-										text = "central_bank_debt"
-
-										align = left|nobaseline
-										elide = right
-										default_format = "#white #bold"
-										autoresize = yes
-										fontsize = 25
-										allow_outside = yes
-										ignoreinvisible = yes
-
-										position = { 75 8 }
-									}
-
-									vertical_divider = {}
-
-									textbox = {
-										layoutstretchfactor_horizontal = 1
-										layoutpolicy_horizontal = expanding
-
-										text = "[GetPlayer.MakeScope.ScriptValue('central_bank_debt')|-D] @gold!"
+										text = "[GetPlayer.MakeScope.Var('credit_at_central_bank').GetValue|-D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 
 										align = left|nobaseline
@@ -2996,13 +2947,56 @@ types budget
 
 									
 								}
+
+
+								flowcontainer  = {
+									margin_top = 0
+									margin_right = 0
+									margin_left = 0
+
+									spacing = 5
+
+									direction = horizontal
+									
+									textbox = {
+										layoutstretchfactor_horizontal = 1
+										layoutpolicy_horizontal = expanding
+
+										text = "[concept_central_bank_debt]"
+
+										align = left|nobaseline
+										elide = right
+										default_format = "#white #bold"
+										autoresize = yes
+										fontsize = 25
+										allow_outside = yes
+										ignoreinvisible = yes
+
+										position = { 75 8 }
+									}
+
+									vertical_divider = {}
+
+									textbox = {
+										layoutstretchfactor_horizontal = 1
+										layoutpolicy_horizontal = expanding
+
+										text = "[GetPlayer.MakeScope.ScriptValue('central_bank_debt')|-D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+
+
+										align = left|nobaseline
+										elide = right
+										default_format = "#white #bold"
+										autoresize = yes
+										fontsize = 25
+										allow_outside = yes
+										ignoreinvisible = yes
+
+										position = { 75 8 }
+									}
+								}
 							}
-
-
-
-
 						}
-
 					}
 
 				}
@@ -3029,23 +3023,9 @@ types budget
 
 					parentanchor = hcenter
 
-					spacing = 15
+					spacing = 25
 
 					direction = vertical
-
-					textbox = {
-						autoresize = yes
-						text = "emission de dette"
-						parentanchor = hcenter
-
-						align = hcenter
-						elide = right
-						default_format = "#white #bold"
-						autoresize = yes
-						fontsize = 35
-						allow_outside = no
-						ignoreinvisible = yes
-					}
 
 					flowcontainer = {
 						spacing = 25
@@ -3069,7 +3049,7 @@ types budget
 
 							textbox = {
 								autoresize = yes
-								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_gold_reserves_state')|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_gold_reserves_state')|+D] @gold!"
 								align = nobaseline
 								parentanchor = Hcenter
 								fontsize = 20
@@ -3115,137 +3095,6 @@ types budget
 							minimumsize = { 100 110 }
 							maximumsize = { 100 -1 }
 						}
-						#central_bank_gold_reserves_state_maximum_borrowable   #or maximum empruntable money_value_target_real
-						flowcontainer = {
-							spacing = 0
-							direction = vertical
-
-							textbox = {
-								autoresize = yes
-								text = "central_bank_gold_reserves_state_maximum_borrowable"
-								align = hcenter
-								parentanchor = hcenter
-								multiline = yes
-								minimumsize = { 100 40 }
-								maximumsize = { 100 -1 }
-							}
-
-							textbox = {
-								autoresize = yes
-								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_gold_reserves_state_maximum_borrowable')|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
-								align = nobaseline
-								parentanchor = hcenter
-								fontsize = 20
-							}
-
-							background = {
-								using = entry_bg_simple
-								margin = { 10 10 }
-							}
-
-							minimumsize = { 100 110 }
-							maximumsize = { 100 -1 }
-						}
-						#central_bank_gold_reserves_state_maximum_borrowable_compared_gdp"maximum empruntbale par rapport au pib 
-						flowcontainer = {
-							spacing = 0
-							margin_left = 50
-							direction = vertical
-
-							textbox = {
-								autoresize = yes
-								text = "central_bank_gold_reserves_state_maximum_borrowable_compared_gdp"
-								align = hcenter
-								parentanchor = hcenter
-								multiline = yes
-								minimumsize = { 100 40 }
-								maximumsize = { 100 -1 }
-							}
-
-							textbox = {
-								autoresize = yes
-								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_gold_reserves_state_maximum_borrowable_compared_gdp')|%|=]"
-								align = nobaseline
-								parentanchor = hcenter
-								fontsize = 20
-							}
-
-							background = {
-								using = entry_bg_simple
-								margin = { 10 10 }
-							}
-
-							minimumsize = { 100 110 }
-							maximumsize = { 100 -1 }
-						}
-					}
-
-					flowcontainer = {
-						spacing = 25
-						direction = horizontal
-
-						#national_debt
-						flowcontainer = {
-							spacing = 0
-							direction = vertical
-
-							textbox = {
-								autoresize = yes
-								text = "[concept_national_debt]"
-								align = hcenter
-								parentanchor = hcenter
-								multiline = yes
-								minimumsize = { 100 40 }
-								maximumsize = { 100 -1 }
-							}
-
-							textbox = {
-								autoresize = yes
-								text = "[GetPlayer.MakeScope.ScriptValue('national_debt')|-D2] @gold!"
-								align = nobaseline
-								parentanchor = Hcenter
-								fontsize = 20
-							}
-
-							background = {
-								using = entry_bg_simple
-								margin = { 10 10 }
-							}
-
-							minimumsize = { 100 110 }
-							maximumsize = { 100 -1 }
-						}
-						#national_debt_compared_gdp
-						flowcontainer = {
-							spacing = 0
-							direction = vertical
-
-							textbox = {
-								autoresize = yes
-								text = "national_debt_compared_gdp"
-								align = hcenter
-								parentanchor = hcenter
-								multiline = yes
-								minimumsize = { 100 40 }
-								maximumsize = { 100 -1 }
-							}
-
-							textbox = {
-								autoresize = yes
-								text = "[GetPlayer.MakeScope.ScriptValue('national_debt_compared_gdp')|%|=]"
-								align = nobaseline
-								parentanchor = hcenter
-								fontsize = 20
-							}
-							
-							background = {
-								using = entry_bg_simple
-								margin = { 10 10 }
-							}
-
-							minimumsize = { 100 110 }
-							maximumsize = { 100 -1 }
-						}
 						#central_bank_debt
 						flowcontainer = {
 							spacing = 0
@@ -3264,6 +3113,14 @@ types budget
 							textbox = {
 								autoresize = yes
 								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_debt')|-D2] @gold!"
+
+								align = nobaseline
+								parentanchor = hcenter
+								fontsize = 20
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('central_bank_debt_in_national_currency')|-D2][GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 								align = nobaseline
 								parentanchor = hcenter
@@ -3311,19 +3168,270 @@ types budget
 						}
 					}
 
+					flowcontainer = {
+						spacing = 25
+						direction = horizontal
+
+						#national_debt
+						flowcontainer = {
+							spacing = 0
+							direction = vertical
+
+							textbox = {
+								autoresize = yes
+								text = "[concept_national_debt]"
+								align = hcenter
+								parentanchor = hcenter
+								multiline = yes
+								minimumsize = { 100 40 }
+								maximumsize = { 100 -1 }
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('national_debt_in_gold')|-D2] @gold!"
+								align = nobaseline
+								parentanchor = Hcenter
+								fontsize = 20
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('national_debt')|-D2] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+								align = nobaseline
+								parentanchor = Hcenter
+								fontsize = 20
+							}
+
+							background = {
+								using = entry_bg_simple
+								margin = { 10 10 }
+							}
+
+							minimumsize = { 100 110 }
+							maximumsize = { 100 -1 }
+						}
+						#national_debt_compared_gdp
+						flowcontainer = {
+							spacing = 0
+							direction = vertical
+
+							textbox = {
+								autoresize = yes
+								text = "national_debt_compared_gdp"
+								align = hcenter
+								parentanchor = hcenter
+								multiline = yes
+								minimumsize = { 100 40 }
+								maximumsize = { 100 -1 }
+							}
+
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('national_debt_compared_gdp')|%|=]"
+								align = nobaseline
+								parentanchor = hcenter
+								fontsize = 20
+							}
+							
+							background = {
+								using = entry_bg_simple
+								margin = { 10 10 }
+							}
+
+							minimumsize = { 100 110 }
+							maximumsize = { 100 -1 }
+						}
+						#credit_at_central_bank
+						flowcontainer = {
+							spacing = 0
+							direction = vertical
+
+							textbox = {
+								autoresize = yes
+								text = "credit_at_central_bank"
+								align = hcenter
+								parentanchor = hcenter
+								multiline = yes
+								minimumsize = { 100 40 }
+								maximumsize = { 100 -1 }
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('credit_at_central_bank_in_gold')|+D] @gold!"
+								align = nobaseline
+								parentanchor = Hcenter
+								fontsize = 20
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.Var('credit_at_central_bank').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+								align = nobaseline
+								parentanchor = Hcenter
+								fontsize = 20
+							}
+
+							background = {
+								using = entry_bg_simple
+								margin = { 10 10 }
+							}
+
+							minimumsize = { 100 110 }
+							maximumsize = { 100 -1 }
+						}
+						# #national_debt_compared_gdp
+						# flowcontainer = {
+						# 	spacing = 0
+						# 	direction = vertical
+
+						# 	textbox = {
+						# 		autoresize = yes
+						# 		text = "national_debt_compared_gdp"
+						# 		align = hcenter
+						# 		parentanchor = hcenter
+						# 		multiline = yes
+						# 		minimumsize = { 100 40 }
+						# 		maximumsize = { 100 -1 }
+						# 	}
+
+						# 	textbox = {
+						# 		autoresize = yes
+						# 		text = "[GetPlayer.MakeScope.ScriptValue('national_debt_compared_gdp')|%|=]"
+						# 		align = nobaseline
+						# 		parentanchor = hcenter
+						# 		fontsize = 20
+						# 	}
+							
+						# 	background = {
+						# 		using = entry_bg_simple
+						# 		margin = { 10 10 }
+						# 	}
+
+						# 	minimumsize = { 100 110 }
+						# 	maximumsize = { 100 -1 }
+						# }
+					}
+
 					flowcontainer  = {
 						margin_top = 0
 						margin_right = 0
 						margin_bottom = 0
 						margin_left = 0
 
-						spacing = 5
+						spacing = 15
 						direction = vertical
 
 						parentanchor = hcenter
 
 						textbox = {
-							text = "debt_issued_relative_GDP"
+							text = "contract_debt_txt"
+							parentanchor = hcenter
+							align = hcenter|nobaseline
+
+							elide = left
+							default_format = "#white #bold"
+							autoresize = yes
+							fontsize = 20
+							allow_outside = yes
+							ignoreinvisible = yes
+							multiline = yes
+
+							minimumsize = { 0 0 }
+							maximumsize = { 490 -1 }
+						}
+
+						flowcontainer = {
+							spacing = 20
+							direction = vertical
+							parentanchor = hcenter
+
+							#national_debt
+							flowcontainer = {
+								spacing = 0
+								direction = vertical
+								parentanchor = hcenter
+
+								textbox = {
+									autoresize = yes
+									text = "gold_to_currency"
+									align = nobaseline
+									parentanchor = Hcenter
+									fontsize = 20
+								}
+
+								background = {
+									using = entry_bg_simple
+									margin = { 10 10 }
+								}
+
+								minimumsize = { 125 20 }
+								maximumsize = { 100 -1 }
+							}
+
+							flowcontainer = {
+								spacing = 25
+								direction = horizontal
+								parentanchor = hcenter
+
+								#From the central bank
+								flowcontainer = {
+									spacing = 0
+									direction = vertical
+
+									textbox = {
+										autoresize = yes
+										text = "[GetPlayer.MakeScope.ScriptValue('debt_issued_relative_GDP_in_gold')|D] @gold!"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 50
+									}
+									textbox = {
+										autoresize = yes
+										text = "from_the_central_bank"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 20
+									}
+
+									background = {
+										using = entry_bg_simple
+										margin = { 10 10 }
+									}
+
+									minimumsize = { 230 110 }
+									maximumsize = { 100 -1 }
+								}
+								#From the central bank
+								flowcontainer = {
+									spacing = 0
+									direction = vertical
+
+									textbox = {
+										autoresize = yes
+										text = "[GetPlayer.MakeScope.ScriptValue('debt_issued_relative_GDP')|D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 50
+									}
+									textbox = {
+										autoresize = yes
+										text = "to_gold_reserves"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 20
+									}
+
+									background = {
+										using = entry_bg_simple
+										margin = { 10 10 }
+									}
+
+									minimumsize = { 230 110 }
+									maximumsize = { 100 -1 }
+								}
+							}
+						}
+
+						textbox = {
+							text = "debt_issued_relative_GDP_2"
 
 							parentanchor = hcenter
 							align = hcenter|nobaseline
@@ -3331,7 +3439,7 @@ types budget
 							elide = left
 							default_format = "#white #bold"
 							autoresize = yes
-							fontsize = 30
+							fontsize = 25
 							allow_outside = yes
 							ignoreinvisible = yes
 						}
@@ -3341,6 +3449,7 @@ types budget
 							margin_right = 20
 							margin_left = 20
 							direction = horizontal
+							parentanchor = hcenter
 
 							spacing = 5
 
@@ -3353,7 +3462,7 @@ types budget
 								size = { 35 35 }
 								parentanchor = vcenter
 								onclick = "[GetScriptedGui('debt_issued_relative_GDP_reduce').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-								#enabled = "[GetScriptedGui('debt_issued_relative_GDP_reduce').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+								enabled = "[GetScriptedGui('debt_issued_relative_GDP_reduce').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
 								using = tooltip_below
 							}
 							textbox = {
@@ -3375,22 +3484,32 @@ types budget
 						button_icon_square = {
 							name = "set_debt_issued"
 
-							#tooltip = "money_value_target_set_x"
-							#enabled = "[GetScriptedGui('devaluation_revaluation_enabled').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
-							onclick = "[GetScriptedGui('set_debt_issued').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-							using = tooltip_below
 							parentanchor = hcenter
 
-							size = { 240 40 }
+							size = { 138 40 }
+							parentanchor = hcenter
+
 							align = hcenter|nobaseline
-							#margin_left = 12
-							text = "set_debt_issued"
+	
+							#tooltip = "money_value_target_set_x"
+							using = tooltip_below
+
+							#enabled = "[GetScriptedGui('devaluation_revaluation_enabled').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+							onclick = "[GetScriptedGui('set_debt_issued').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+							textbox = {
+								using = fontsize_large
+								autoresize = yes
+								text = "take"
+								parentanchor = hcenter|nobaseline
+								#default_format = "#white #bold"
+								align = vcenter|nobaseline
+								position = { 0 3 }
+								fontsize = 25
+
+							}
+
 						}
 					}
-
-
-
-
 				}
 
 				############################################################################################################################################################
@@ -3470,12 +3589,18 @@ types budget
 								minimumsize = { 100 40 }
 								maximumsize = { 100 -1 }
 							}
-
 							textbox = {
 								autoresize = yes
-								text = "[GetPlayer.MakeScope.Var('credit_at_central_bank').GetValue|D] @gold!"
+								text = "[GetPlayer.MakeScope.ScriptValue('credit_at_central_bank_in_gold')|+D] @gold!"
 								align = nobaseline
-								parentanchor = hcenter
+								parentanchor = Hcenter
+								fontsize = 20
+							}
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.Var('credit_at_central_bank').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+								align = nobaseline
+								parentanchor = Hcenter
 								fontsize = 20
 							}
 
@@ -3501,6 +3626,14 @@ types budget
 								multiline = yes
 								minimumsize = { 100 40 }
 								maximumsize = { 100 -1 }
+							}
+
+							textbox = {
+								autoresize = yes
+								text = "[GetPlayer.MakeScope.ScriptValue('credit_at_central_bank_interest_1_years')|D=-] @gold!"
+								align = nobaseline
+								parentanchor = hcenter
+								fontsize = 20
 							}
 
 							textbox = {
@@ -3555,103 +3688,222 @@ types budget
 					flowcontainer  = {
 						margin_top = 0
 						margin_right = 0
-						margin_left = 0
 						margin_bottom = 0
+						margin_left = 0
 
-						spacing = 20
-
+						spacing = 15
 						direction = vertical
 
 						parentanchor = hcenter
 
+						textbox = {
+							text = "refund_debt_txt"
+							parentanchor = hcenter
+							align = hcenter|nobaseline
+
+							elide = left
+							default_format = "#white #bold"
+							autoresize = yes
+							fontsize = 20
+							allow_outside = yes
+							ignoreinvisible = yes
+							multiline = yes
+
+							minimumsize = { 0 0 }
+							maximumsize = { 490 -1 }
+						}
+
 						flowcontainer = {
-							margin_top = 0
-							margin_right = 0
-							margin_left = 0
-
 							spacing = 20
-
 							direction = vertical
 							parentanchor = hcenter
 
-							background = {
-								using = entry_bg_simple
-								margin = { 10 10 }
-							}
-							textbox = {
-								autoresize = yes
-								text = "refund_credit_at_central_bank"
-								align = nobaseline
-								parentanchor = vcenter
-								#fontsize = 25
+							flowcontainer = {
+								spacing = 0
+								direction = vertical
+								parentanchor = hcenter
+
+								textbox = {
+									autoresize = yes
+									text = "currency_to_gold"
+									align = nobaseline
+									parentanchor = Hcenter
+									fontsize = 20
+								}
+
+								background = {
+									using = entry_bg_simple
+									margin = { 10 10 }
+								}
+
+								minimumsize = { 125 20 }
+								maximumsize = { 100 -1 }
 							}
 
 							flowcontainer = {
-								margin_top = 0
-								margin_right = 0
-								margin_left = 0
-
+								spacing = 25
 								direction = horizontal
-								spacing = 20
 								parentanchor = hcenter
 
-								### DOWNSIZE
-								button_icon_minus_action = {
-									name = "transfer_gold_to_central_bank_gold_reserves_reduce"
-									size = { 35 35 }
-									parentanchor = vcenter
-									tooltip = "transfer_gold_to_central_bank_gold_reserves_reduce"
-									onclick = "[GetScriptedGui('transfer_gold_to_central_bank_gold_reserves_reduce').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-									enabled = "[IsValid( Building.Downsize )]"
-									using = tooltip_below
-								}
-								textbox = {
-									name = "transfer_gold_to_central_bank_gold_reserves"
-									autoresize = yes
-									text = "[GetPlayer.MakeScope.Var('transfer_gold_to_central_bank_gold_reserves').GetValue|+D] [GetPlayer.GetCustom('currency_symbol')]"
-									#tooltip = "CENTRAL_BANK_INTEREST_EFFECT"
-									align = nobaseline
-									parentanchor = vcenter
-									fontsize = 35
+								#from_gold_reserves
+								flowcontainer = {
+									spacing = 0
+									direction = vertical
 
+									textbox = {
+										autoresize = yes
+										text = "[GetPlayer.MakeScope.Var('refund_credit_at_central_bank').GetValue|D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 50
+									}
+									textbox = {
+										autoresize = yes
+										text = "from_gold_reserves"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 20
+									}
+
+									background = {
+										using = entry_bg_simple
+										margin = { 10 10 }
+									}
+
+									minimumsize = { 230 110 }
+									maximumsize = { 100 -1 }
 								}
-								### EXPAND
-								button_icon_plus_action = {
-									name = "transfer_gold_to_central_bank_gold_reserves_increase"
-									size = { 35 35 }
-									parentanchor = vcenter
-									tooltip = "transfer_gold_to_central_bank_gold_reserves_increase"
-									onclick = "[GetScriptedGui('transfer_gold_to_central_bank_gold_reserves_increase').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
-									enabled = "[IsValid( Building.QueueConstruction )]"
+								#to_the_central_bank
+								flowcontainer = {
+									spacing = 0
+									direction = vertical
+
+									textbox = {
+										autoresize = yes
+										text = "[GetPlayer.MakeScope.ScriptValue('refund_credit_at_central_bank_in_gold')|D] @gold!"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 50
+									}
+									textbox = {
+										autoresize = yes
+										text = "to_the_central_bank"
+										align = nobaseline
+										parentanchor = Hcenter
+										fontsize = 20
+									}
+
+									background = {
+										using = entry_bg_simple
+										margin = { 10 10 }
+									}
+
+									minimumsize = { 230 110 }
+									maximumsize = { 100 -1 }
 								}
 							}
 						}
 
-						button_icon_square = {
-							name = "transfer_gold_to_central_bank_gold_reserves"
-
-							size = { 138 40 }
+						flowcontainer = {
+							margin_top = 10
+							margin_right = 20
+							margin_left = 20
+							direction = horizontal
 							parentanchor = hcenter
 
-							align = hcenter|nobaseline
+							spacing = 5
 
-							#tooltip = "transfer_gold_to_central_bank_gold_reserves"
-							using = tooltip_below
-
-							enabled = "[GetScriptedGui('transfer_gold_to_central_bank_gold_reserves_visible').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
-							onclick = "[GetScriptedGui('transfer_gold_to_central_bank_gold_reserves').Execute( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+							background = {
+								using = entry_bg
+							}
+							### DOWNSIZE
+							button_icon_minus_action = {
+								name = "refund_credit_at_central_bank_reduce"
+								size = { 35 35 }
+								parentanchor = vcenter
+								tooltip = "refund_credit_at_central_bank_reduce"
+								onclick = "[GetScriptedGui('refund_credit_at_central_bank_reduce').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+								enabled = "[GetScriptedGui('refund_credit_at_central_bank_reduce').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+								using = tooltip_below
+							}
 							textbox = {
-								using = fontsize_large
 								autoresize = yes
-								text = "Refund"
-								parentanchor = hcenter|nobaseline
-								#default_format = "#white #bold"
-								align = vcenter|nobaseline
-								position = { 0 3 }
-								fontsize = 25
+								text = "refund_credit_at_central_bank"
+								#tooltip = "CENTRAL_BANK_INTEREST_EFFECT"
+								align = nobaseline
+								parentanchor = vcenter
+								fontsize = 20
+							}
+							### EXPAND
+							button_icon_plus_action = {
+								name = "refund_credit_at_central_bank_increase"
+								size = { 35 35 }
+								parentanchor = vcenter
+								tooltip = "refund_credit_at_central_bank_increase"
+								onclick = "[GetScriptedGui('refund_credit_at_central_bank_increase').Execute( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+								enabled = "[GetScriptedGui('refund_credit_at_central_bank_increase').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
+							}
+						}
+						
+						flowcontainer = {
+							margin_top = 0
+							margin_right = 0
+							margin_left = 0
+							direction = horizontal
+							parentanchor = hcenter
+
+							spacing = 5
+
+							button_icon_square = {
+								name = "refund_credit_at_central_bank"
+
+								size = { 138 40 }
+
+								align = hcenter|nobaseline
+
+								#tooltip = "refund_credit_at_central_bank"
+								using = tooltip_below
+
+								enabled = "[GetScriptedGui('refund_credit_at_central_bank').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+								onclick = "[GetScriptedGui('refund_credit_at_central_bank').Execute( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+								textbox = {
+									using = fontsize_large
+									autoresize = yes
+									text = "refund"
+									parentanchor = hcenter|nobaseline
+									#default_format = "#white #bold"
+									align = vcenter|nobaseline
+									position = { 0 3 }
+									fontsize = 25
+
+								}
 
 							}
+							button_icon_square = {
+								name = "refund_credit_at_central_bank_all"
 
+								size = { 138 40 }
+
+								align = hcenter|nobaseline
+
+								#tooltip = "refund_credit_at_central_bank_all"
+								using = tooltip_below
+
+								enabled = "[GetScriptedGui('refund_credit_at_central_bank_all').IsValid( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+								onclick = "[GetScriptedGui('refund_credit_at_central_bank_all').Execute( GuiScope.SetRoot(GetPlayer.MakeScope ).End)]"
+								textbox = {
+									using = fontsize_large
+									autoresize = yes
+									text = "refund_all"
+									parentanchor = hcenter|nobaseline
+									#default_format = "#white #bold"
+									align = vcenter|nobaseline
+									position = { 0 3 }
+									fontsize = 25
+
+								}
+
+							}
 						}
 					}
 				}
@@ -22090,6 +22342,17 @@ types budget
 						textbox = {
 							using = fontsize_large
 							autoresize = yes
+							text = "country_credit_debt_issued_relative_GDP"
+							parentanchor = hcenter
+							elide = right
+							align = hcenter|nobaseline
+							fontsize = 17
+							default_format = "#white #bold"
+
+						}
+						textbox = {
+							using = fontsize_large
+							autoresize = yes
 							text = "country_credit_country_rank"
 							parentanchor = hcenter
 							elide = right
@@ -22385,6 +22648,13 @@ types budget
 									parentanchor = hcenter
 									align = hcenter
 								}
+								textbox = {
+									using = fontsize_large
+									autoresize = yes
+									text = "central_bank_gold_loaned_text_3"
+									parentanchor = hcenter
+									align = hcenter
+								}
 								background = {
 									using = entry_bg_simple
 									margin = { 10 10 }
@@ -22414,6 +22684,14 @@ types budget
 									using = fontsize_large
 									autoresize = yes
 									text = "central_bank_interest_refund_per_year_text_2"
+									parentanchor = hcenter
+									align = hcenter
+
+								}
+								textbox = {
+									using = fontsize_large
+									autoresize = yes
+									text = "central_bank_interest_refund_per_year_text_3"
 									parentanchor = hcenter
 									align = hcenter
 
@@ -22545,6 +22823,7 @@ types budget
 								datamodel = "[GetPlayer.MakeScope.GetList('ai_seller_country_general_1')]"
 								visible = "[GetScriptedGui('ai_quantity_purchasing_1_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
 
+
 								item = {
 									button = {
 										using = default_button
@@ -22587,12 +22866,15 @@ types budget
 												alwaystransparent = yes
 											}
 
+
 											vertical_divider = {}
 
 											textbox = {
 												layoutstretchfactor_horizontal = 2
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
+
+												tooltip = "MONEY_VALUE"
 
 												text = "[GetPlayer.MakeScope.Var('ai_interest_purchasing_1').GetValue|=%]"
 
@@ -22612,7 +22894,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_1').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_1').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22630,7 +22912,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_1').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_1').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22648,7 +22930,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_1').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_1').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22667,7 +22949,10 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.ScriptValue('ai_selle_bond_maturity_yers_1_reverse')]"
+												#text = "[GetPlayer.MakeScope.ScriptValue('ai_selle_bond_maturity_yers_1_reverse')]"
+
+												
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_4_in_gold').GetValue|+D] test"
 
 												margin_left = 12
 
@@ -22757,7 +23042,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_2').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_2').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22775,7 +23060,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_2').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_2').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22793,7 +23078,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_2').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_2').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22902,7 +23187,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_3').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_3').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22920,7 +23205,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_3').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_3').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -22938,7 +23223,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_3').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_3').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23047,7 +23332,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_4').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_4').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23065,7 +23350,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_4').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_4').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23083,7 +23368,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_4').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_4').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23192,7 +23477,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_5').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_5').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23210,7 +23495,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_5').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_5').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23228,7 +23513,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_5').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_5').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23337,7 +23622,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_6').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_6').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23355,7 +23640,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_6').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_6').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23373,7 +23658,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_6').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_6').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23482,7 +23767,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_7').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_7').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23500,7 +23785,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_7').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_7').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23518,7 +23803,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_7').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_7').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23627,7 +23912,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_8').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_8').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23645,7 +23930,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_8').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_8').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23663,7 +23948,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_8').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_8').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23772,7 +24057,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_9').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_9').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23790,7 +24075,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_9').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_9').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23808,7 +24093,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_9').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_9').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23917,7 +24202,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_10').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_total_bond_value_10').GetValue|+D]  [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23935,7 +24220,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_10').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_at_term_calculated_10').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23953,7 +24238,7 @@ types budget
 												layoutpolicy_horizontal = expanding
 												datacontext = "[Scope.GetCountry]"
 
-												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_10').GetValue|+D] @gold!"
+												text = "[GetPlayer.MakeScope.Var('ai_interest_calculated_10').GetValue|+D] [GetMetaPlayer.GetPlayedOrObservedCountry.GetCustom('currency_symbol')]"
 
 												margin_left = 12
 
@@ -23985,6 +24270,7 @@ types budget
 									}
 								}
 							}
+
 						}
 					}
 
