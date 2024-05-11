@@ -255,7 +255,7 @@ credit_at_central_bank_interest_per_week_off = {
 
 ai_credit_at_central_bank = {         
 	random_list = {
-		1 = {
+		0 = {
 			if  = {
 				limit  = {
 					national_debt_compared_gdp < 0.5
@@ -299,7 +299,7 @@ ai_credit_at_central_bank = {
 				}
 			}
 		}
-		1 = {
+		0 = {
 			#if  = {
 			set_variable = {
 				name = ai_debt_issued_relative_GDP
@@ -357,6 +357,323 @@ ai_credit_at_central_bank = {
 	}
 }
 
+ai_refund_central_bank = { #no on on_action  
+	set_variable = {
+		name = ai_debt_issued_relative_GDP
+		value = {
+			add = gdp
+			multiply = { 0.01 0.1 }
+		}
+	}
+	
+	set_variable = {
+		name = ai_debt_issued_relative_GDP_in_gold
+		value = ai_debt_issued_relative_GDP
+	}
+	change_variable = {
+		name = ai_debt_issued_relative_GDP_in_gold
+		multiply = money_value_rapported_inflation
+	}
+	
+	if  = {
+		limit  = {
+			var:credit_at_central_bank > 0
+		}
+		change_variable = {
+			name = credit_at_central_bank
+			subtract = var:ai_debt_issued_relative_GDP_in_gold
+		}
+	}
+	if  = {
+		limit  = {
+			var:credit_at_central_bank < 0
+		}
+		set_variable = {
+			name = credit_at_central_bank
+			value = 0
+		}
+	}
+	add_treasury = {
+		subtract = var:ai_debt_issued_relative_GDP
+	}
+		# every_scope_state = {
+		# 	if = {
+		# 		limit = {
+		# 			has_modifier = bank_central_historic_place
+		# 		}
+		# 		change_variable = {
+		# 			name = central_bank_gold_reserves_state_1
+		# 			add = owner.ai_debt_issued_relative_GDP
+				
+		# 		}
+		# 	}
+		# }
+	#}
+	
+	if  = {
+		limit  = {
+			var:credit_at_central_bank > 0
+		}
+		set_variable = {
+			name = central_bank_bought_the_credit
+			value = 0
+		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+#  ██████╗███████╗███╗   ██╗████████╗██████╗  █████╗ ██╗             ██████╗  █████╗ ███╗   ██╗██╗  ██╗        ██████╗ ██╗   ██╗██╗   ██╗      ██████╗ ██████╗ 
+# ██╔════╝██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██║             ██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝        ██╔══██╗██║   ██║╚██╗ ██╔╝     ██╔════╝██╔═══██╗
+# ██║     █████╗  ██╔██╗ ██║   ██║   ██████╔╝███████║██║             ██████╔╝███████║██╔██╗ ██║█████╔╝         ██████╔╝██║   ██║ ╚████╔╝      ██║     ██║   ██║
+# ██║     ██╔══╝  ██║╚██╗██║   ██║   ██╔══██╗██╔══██║██║             ██╔══██╗██╔══██║██║╚██╗██║██╔═██╗         ██╔══██╗██║   ██║  ╚██╔╝       ██║     ██║   ██║
+# ╚██████╗███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║███████╗███████╗██████╔╝██║  ██║██║ ╚████║██║  ██╗███████╗██████╔╝╚██████╔╝   ██║███████╗╚██████╗╚██████╔╝
+#  ╚═════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═════╝  ╚═════╝    ╚═╝╚══════╝ ╚═════╝ ╚═════╝ 
+#                                                                                                                                                              
+# ██╗   ██╗███╗   ██╗████████╗██████╗ ██╗   ██╗      ██████╗██████╗ ███████╗██████╗ ██╗████████╗                                                               
+# ██║   ██║████╗  ██║╚══██╔══╝██╔══██╗╚██╗ ██╔╝     ██╔════╝██╔══██╗██╔════╝██╔══██╗██║╚══██╔══╝                                                               
+# ██║   ██║██╔██╗ ██║   ██║   ██████╔╝ ╚████╔╝      ██║     ██████╔╝█████╗  ██║  ██║██║   ██║                                                                  
+# ██║   ██║██║╚██╗██║   ██║   ██╔══██╗  ╚██╔╝       ██║     ██╔══██╗██╔══╝  ██║  ██║██║   ██║                                                                  
+# ╚██████╔╝██║ ╚████║   ██║   ██║  ██║   ██║███████╗╚██████╗██║  ██║███████╗██████╔╝██║   ██║                                                                  
+#  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝ ╚═╝   ╚═╝                                                                  
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+central_bank_buy_country_credit = {
+	if  = {
+		limit = {
+			country_credit > country_credit_90 
+		}
+		change_variable = {
+			name = credit_at_central_bank
+			add = country_credit
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
+					is_capital = yes
+				}
+				change_variable = {
+					name = central_bank_gold_reserves_state_1
+					subtract = root.country_credit_in_gold
+				}
+			}
+		}
+		add_treasury = {
+			add = country_credit
+		}
+		change_variable = {
+			name = central_bank_bought_the_credit
+			add = 1
+		}
+		switch = {
+			trigger = var:central_bank_bought_the_credit
+			1 = {
+				take_loan_110_debt = yes 
+			}
+			2 = {
+				take_loan_120_debt = yes 
+			}
+			3 = {
+				take_loan_130_debt = yes 
+			}
+			4 = { 
+				take_loan_140_debt = yes 
+			}
+			5 = {
+				take_loan_150_debt = yes 
+			}
+			6 = {
+				bankruptcy_one_third = yes 
+			}
+			7 = { 
+				sell_goods_one_third = yes 
+			}
+			8 =  {
+				bankruptcy_two_third = yes 
+			}
+			9 = {
+				sell_all_goods = yes 
+			}
+
+			100 = {
+				apocalypse_now = yes 
+			}
+			101 = {
+				apocalypse_now = yes 
+			}
+		}
+	}
+}
+
+take_loan_110_debt = {
+	add_treasury = {
+		add = gold_reserves_10
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_10
+	}
+}
+take_loan_120_debt = {
+	add_treasury = {
+		add = gold_reserves_20
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_20
+	}
+}
+take_loan_130_debt = {
+	add_treasury = {
+		add = gold_reserves_30
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_30
+	}
+}
+take_loan_140_debt = {
+	add_treasury = {
+		add = gold_reserves_40
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_40
+	}
+}
+take_loan_150_debt = {
+	add_treasury = {
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_50
+	}
+}
+sell_goods_one_third = {
+	add_treasury = {
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_50
+	}
+
+}
+bankruptcy_one_third = {
+	add_treasury = {
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		subtract = {
+			value = var:credit_at_central_bank
+			multiply = 0.3
+		}
+	}
+}
+sell_all_goods = {
+	add_treasury = {
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_50
+	}
+
+}
+bankruptcy_two_third = {
+	add_treasury = {
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		add = gold_reserves_50
+	}
+	change_variable = {
+		name = credit_at_central_bank
+		subtract = {
+		 	value = var:credit_at_central_bank
+		 	multiply = 0.6
+		}
+	}
+}
+apocalypse_now = {
+	change_variable = {
+		name = credit_at_central_bank
+		subtract = var:credit_at_central_bank
+	}
+	every_scope_state = {
+		if = {
+			limit = {
+				has_modifier = bank_central_historic_place
+				is_capital = yes
+			}
+			set_variable = {
+				name = central_bank_gold_reserves_state_1
+				value = 0
+			}
+		}
+	}
+
+
+
+	every_scope_state = {
+		limit = {
+			has_building = building_government_administration
+		}
+		remove_building = building_government_administration
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_university
+		}
+		remove_building = building_university
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_skyscraper
+		}
+		remove_building = building_skyscraper
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_construction_sector
+		}
+		remove_building = building_construction_sector
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_port
+		}
+		remove_building = building_port
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_barracks
+		}
+		remove_building = building_barracks
+	}
+	every_scope_state = {
+		limit = {
+			has_building = building_naval_base
+		}
+		remove_building = building_naval_base
+	}
+}
+
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
@@ -382,7 +699,7 @@ stockpiling_bond_1 = {
     if = {
         limit = {
             bond_market_goods_sell_orders > 0
-			stockpiling_bond_var_1 < 10000000
+			stockpiling_bond_var_1 < 1000000
         }
         change_variable = {
             name = stockpiling_bond_var_2
@@ -434,7 +751,7 @@ stockpiling_company_stock_1 = {
     if = {
         limit = {
             company_stock_market_goods_sell_orders > 0
-			stockpiling_company_stock_var_1 < 10000000
+			stockpiling_company_stock_var_1 < 1000000
         }
         change_variable = {
             name = stockpiling_company_stock_var_2
@@ -486,7 +803,7 @@ stockpiling_mining_stock_1 = {
     if = {
         limit = {
             mining_stock_market_goods_delta > 0
-			stockpiling_mining_stock_var_1 < 10000000
+			stockpiling_mining_stock_var_1 < 1000000
         }
         change_variable = {
             name = stockpiling_mining_stock_var_2
@@ -546,7 +863,7 @@ stockpiling_railroad_stock_1 = {
     if = {
         limit = {
             railroad_stock_market_goods_delta > 0
-			stockpiling_railroad_stock_var_1 < 10000000
+			stockpiling_railroad_stock_var_1 < 1000000
         }
         change_variable = {
             name = stockpiling_railroad_stock_var_2
