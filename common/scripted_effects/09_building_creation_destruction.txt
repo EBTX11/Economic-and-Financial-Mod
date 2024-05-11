@@ -617,6 +617,7 @@ financial_center_place = {
     }
 }
 
+#finds special fc buildings and resets modifiers in that state to match
 financial_center_place_spe = {
     every_scope_state = {
         limit = {
@@ -902,6 +903,10 @@ initialize_historic_special_macro_facilities = {
 			add_modifier = {
 				name = has_central_bank
 			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
 		}
 	}
 	$FIN_CENT_SITE$ = {
@@ -919,6 +924,10 @@ initialize_historic_special_macro_facilities = {
 		owner = {
 			add_modifier = {
 				name = has_financial_center
+			}
+			set_variable = {
+				name = financial_center_location
+				value = $FIN_CENT_SITE$
 			}
 		}
 	}
@@ -950,6 +959,10 @@ initialize_historic_macro_facilities = {
 			add_modifier = {
 				name = has_central_bank
 			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
 		}
 	}
 	$FIN_CENT_SITE$ = {
@@ -967,6 +980,10 @@ initialize_historic_macro_facilities = {
 		owner = {
 			add_modifier = {
 				name = has_financial_center
+			}
+			set_variable = {
+				name = financial_center_location
+				value = $FIN_CENT_SITE$
 			}
 		}
 	}
@@ -994,35 +1011,102 @@ initialize_historic_stockpile = {
 			add_modifier = {
 				name = has_national_stockpile
 			}
+			set_variable = {
+				name = stockpile_location
+				value = $STOCKPILE_SITE$
+			}
 		}
 	}
 }
 
-macro_facilities_cb_pass = {
+initialize_new_central_bank = {
+	$CTRL_BANK_SITE$ = {
+		create_building = {
+			building = building_bank
+			level    = 5
+			reserves = 0
+		}
+		add_modifier = {
+			name = bank_central_place
+		}
+		owner = {
+			add_modifier = {
+				name = has_central_bank
+			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
+		}
+	}
+
+	## resize the new bank
+	macro_facilities_on_action = yes
+}
+
+## TODO
+central_bank_sanity_check = {
+	## sanity check that the central bank location is within the country;
+	## will probably break with TPG and GER
 	if = {
-		limit = { has_technology_researched = central_banking }
-		if = {
-			limit = {
-				c:USA ?= this
-				s:STATE_PENNSYLVANIA = {
-					any_scope_state = {
-						owner = c:USA
-						has_modifier = bank_central_historic_place
+		limit = {
+			not = { has_technology_researched = central_banking }
+			any_scope_state = {
+				or = {
+					has_building = building_bank
+					#has_building = building_bank_usa
+				}
+			}
+		}
+		every_scope_state = {
+			limit = 
+		}
+	}
+
+	if = {
+		limit = {
+			not = {
+				exists = var:central_bank_location
+				var:central_bank_location.owner = this
+			}
+		}
+		reinitialize_central_bank = yes
+	}
+
+
+}
+reinitialize_central_bank = {}
+
+## TODO
+reinitialize_financial_center = {}
+
+macro_facilities_cb_pass = {
+	central_bank_sanity_check = yes
+	
+	if = {
+		limit = {
+			has_technology_researched = central_banking
+			var:central_bank_location = {
+				has_modifier = bank_central_historic_place
+			}
+		}
+		switch = {
+			trigger = var:central_bank_location
+			s:STATE_PENNSYLVANIA.region_state:USA = {
+				s:STATE_PENNSYLVANIA.region_state:USA = {
+					create_building = {
+						#building = building_bank_usa
+						building = building_bank
+						level    = $SIZE$
 					}
 				}
 			}
-			s:STATE_PENNSYLVANIA.region_state:USA = {
-				create_building = {
-					#building = building_bank_usa
-					building = building_bank
-					level    = $SIZE$
-				}
-			}
-		} else = {
-			capital = {
-				create_building = {
-					building = building_bank
-					level    = $SIZE$
+			fallback = {
+				var:central_bank_location = {
+					create_building = {
+						building = building_bank
+						level    = $SIZE$
+					}
 				}
 			}
 		}
@@ -1030,228 +1114,153 @@ macro_facilities_cb_pass = {
 }
 
 macro_facilities_fc_pass = {
+	## sanity check that the financial center location is within the country;
+	## will probably break with TPG and GER
 	if = {
-		limit = { has_technology_researched = financial_center }
-		#FRA
-		if  = {
-			limit = {
-				c:FRA ?= this
-				s:STATE_ILE_DE_FRANCE = {
-					any_scope_state = {
-						owner = c:FRA
-						has_modifier = financial_center_historic_place
-					}
-				}
+		limit = {
+			has_technology_researched = financial_center
+			not = {
+				exists = var:financial_center_location
+				var:financial_center_location.owner = this
 			}
+		}
+		reinitialize_financial_center = yes
+	}
+
+	if = {
+		limit = {
+			has_technology_researched = financial_center
+			var:financial_center_location = {
+				has_modifier = financial_center_historic_place
+			}
+		}
+
+		switch = {
+			trigger = var:financial_center_location
+		
+			#FRA
 			s:STATE_ILE_DE_FRANCE.region_state:FRA = {
-				create_building = {
-					building = building_financial_centre_fra
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#GBR
-		else_if  = {
-			limit = {
-				c:GBR ?= this
-				s:STATE_HOME_COUNTIES = {
-					any_scope_state = {
-						owner = c:GBR
-						has_modifier = financial_center_historic_place
+				s:STATE_ILE_DE_FRANCE.region_state:FRA = {
+					create_building = {
+						building = building_financial_centre_fra
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#GBR
 			s:STATE_HOME_COUNTIES.region_state:GBR = {
-				create_building = {
-					building = s:STATE_HOME_COUNTIES.region_state:GBR
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#USA
-		else_if  = {
-			limit = {
-				c:USA ?= this
-				s:STATE_NEW_YORK = {
-					any_scope_state = {
-						owner = c:USA
-						has_modifier = financial_center_historic_place
+				s:STATE_HOME_COUNTIES.region_state:GBR = {
+					create_building = {
+						building = s:STATE_HOME_COUNTIES.region_state:GBR
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#USA
 			s:STATE_NEW_YORK.region_state:USA = {
-				create_building = {
-					building = building_financial_centre_usa
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#net
-		else_if  = {
-			limit = {
-				c:NET ?= this
-				s:STATE_HOLLAND = {
-					any_scope_state = {
-						owner = c:NET
-						has_modifier = financial_center_historic_place
+				s:STATE_NEW_YORK.region_state:USA = {
+					create_building = {
+						building = building_financial_centre_usa
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#NET
 			s:STATE_HOLLAND.region_state:NET = {
-				create_building = {
-					building = building_financial_centre_net
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#pru
-		else_if  = {
-			limit = {
-				c:PRU ?= this
-				s:STATE_BRANDENBURG = {
-					any_scope_state = {
-						owner = c:PRU
-						has_modifier = financial_center_historic_place
+				s:STATE_HOLLAND.region_state:NET = {
+					create_building = {
+						building = building_financial_centre_net
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#PRU
 			s:STATE_BRANDENBURG.region_state:PRU = {
-				create_building = {
-					building = building_financial_centre_ger
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#ger
-		else_if  = {
-			limit = {
-				c:GER ?= this
-				s:STATE_BRANDENBURG = {
-					any_scope_state = {
-						owner = c:GER
-						#TODO: set up logic for creating this modifier on GER establishment
-						has_modifier = financial_center_historic_place
+				s:STATE_BRANDENBURG.region_state:PRU = {
+					create_building = {
+						building = building_financial_centre_ger
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#GER
 			s:STATE_BRANDENBURG.region_state:GER = {
-				create_building = {
-					building = building_financial_centre_ger
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#aus
-		else_if  = {
-			limit = {
-				c:AUS ?= this
-				s:STATE_AUSTRIA = {
-					any_scope_state = {
-						owner = c:AUS
-						has_modifier = financial_center_historic_place
+				s:STATE_BRANDENBURG.region_state:GER = {
+					create_building = {
+						building = building_financial_centre_ger
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#AUS
 			s:STATE_AUSTRIA.region_state:AUS = {
-				create_building = {
-					building = building_financial_centre_aus
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#ita
-		else_if  = {
-			limit = {
-				c:ITA ?= this
-				s:STATE_LOMBARDY = {
-					any_scope_state = {
-						owner = c:ITA
-						has_modifier = financial_center_historic_place
+					s:STATE_AUSTRIA.region_state:AUS = {
+					create_building = {
+						building = building_financial_centre_aus
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#ITA
 			s:STATE_LOMBARDY.region_state:ITA = {
-				create_building = {
-					building = building_financial_centre_ita
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#chi
-		else_if  = {
-			limit = {
-				c:CHI ?= this
-				s:STATE_SHAOZHOU = {
-					any_scope_state = {
-						owner = c:CHI
-						has_modifier = financial_center_historic_place
+				s:STATE_LOMBARDY.region_state:ITA = {
+					create_building = {
+						building = building_financial_centre_ita
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#CHI
 			s:STATE_SHAOZHOU.region_state:CHI = {
-				create_building = {
-					building = building_financial_centre_chi
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#tpg
-		else_if  = {
-			limit = {
-				c:TPG ?= this
-				s:STATE_SHAOZHOU = {
-					any_scope_state = {
-						owner = c:TPG
-						#TODO: set up logic for creating this modifier on TPG establishment
-						has_modifier = financial_center_historic_place
+				s:STATE_SHAOZHOU.region_state:CHI = {
+					create_building = {
+						building = building_financial_centre_chi
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#TPG
 			s:STATE_SHAOZHOU.region_state:TPG = {
-				create_building = {
-					building = building_financial_centre_chi
-					level    = $SIZE$
-				}
-			}
-		}
-	
-		#jap
-		else_if  = {
-			limit = {
-				c:JAP ?= this
-				s:STATE_KANTO = {
-					any_scope_state = {
-						owner = c:JAP
-						has_modifier = financial_center_historic_place
+				s:STATE_SHAOZHOU.region_state:TPG = {
+					create_building = {
+						building = building_financial_centre_chi
+						level    = $SIZE$
 					}
 				}
 			}
+
+			#JAP
 			s:STATE_KANTO.region_state:JAP = {
-				create_building = {
-					building = building_financial_centre_jap
-					level    = $SIZE$
+				s:STATE_KANTO.region_state:JAP = {
+					create_building = {
+						building = building_financial_centre_jap
+						level    = $SIZE$
+					}
 				}
 			}
-		}
-		#other
-		else = {
-			capital = {
-				create_building = {
-					building = building_financial_centre
-					level    = $SIZE$
+
+			#other
+			fallback = {
+				var:financial_center_location = {
+					create_building = {
+						building = building_financial_centre
+						level    = $SIZE$
+					}
 				}
 			}
 		}
 	}
+
+	#finished with fc, continue on to cb
 	macro_facilities_cb_pass = {
 		SIZE = $SIZE$
 	}
@@ -1776,9 +1785,14 @@ macro_facilities_on_action = {
 
 has_tech_central_bank_but_no_building_central_bank = {
 	### redundancy: treated in event original_currency_event.1
-	capital = {
-		save_scope_as = central_bank_site
+	if = {
+		limit = {
+			has_variable = central_bank_location
+			not = { exists = var:central_bank_location }
+		}
+		remove_local_variable = central_bank_location
 	}
+
 	if = {
 		limit = { ### check to make sure we're ready and stable enough
 			#var:gdp_view = 1
