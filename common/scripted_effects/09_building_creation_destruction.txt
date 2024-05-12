@@ -617,6 +617,7 @@ financial_center_place = {
     }
 }
 
+#finds special fc buildings and resets modifiers in that state to match
 financial_center_place_spe = {
     every_scope_state = {
         limit = {
@@ -889,7 +890,7 @@ initialize_historic_special_macro_facilities = {
 	$CTRL_BANK_SITE$ = {
 		create_building = {
 			building = $BANK_BLDG_TYPE$
-			level    = 5
+			level    = $CB_SIZE$
 			reserves = 0
 		}
 		add_modifier = {
@@ -902,12 +903,16 @@ initialize_historic_special_macro_facilities = {
 			add_modifier = {
 				name = has_central_bank
 			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
 		}
 	}
 	$FIN_CENT_SITE$ = {
 		create_building = {
 			building = $FIN_BLDG_TYPE$
-			level    = 5
+			level    = $FC_SIZE$
 			reserves = 1
 		}
 		add_modifier = {
@@ -920,9 +925,15 @@ initialize_historic_special_macro_facilities = {
 			add_modifier = {
 				name = has_financial_center
 			}
+			set_variable = {
+				name = financial_center_location
+				value = $FIN_CENT_SITE$
+			}
 		}
 	}
-	macro_facilities_on_action = yes
+	## doesn't work
+	#gdp_view_on_action = yes
+	#macro_facilities_on_action = yes
 }
 
 ## for adding central bank and financial center at game start
@@ -935,7 +946,7 @@ initialize_historic_macro_facilities = {
 	$CTRL_BANK_SITE$ = {
 		create_building = {
 			building = $BANK_BLDG_TYPE$
-			level    = 5
+			level    = $CB_SIZE$
 			reserves = 0
 		}
 		add_modifier = {
@@ -948,12 +959,16 @@ initialize_historic_macro_facilities = {
 			add_modifier = {
 				name = has_central_bank
 			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
 		}
 	}
 	$FIN_CENT_SITE$ = {
 		create_building = {
 			building = $FIN_BLDG_TYPE$
-			level    = 5
+			level    = $FC_SIZE$
 			reserves = 1
 		}
 		add_modifier = {
@@ -966,9 +981,15 @@ initialize_historic_macro_facilities = {
 			add_modifier = {
 				name = has_financial_center
 			}
+			set_variable = {
+				name = financial_center_location
+				value = $FIN_CENT_SITE$
+			}
 		}
 	}
-	macro_facilities_on_action = yes
+	## doesn't work
+	#gdp_view_on_action = yes
+	#macro_facilities_on_action = yes
 }
 
 ## for adding national stockpile at game start
@@ -990,10 +1011,766 @@ initialize_historic_stockpile = {
 			add_modifier = {
 				name = has_national_stockpile
 			}
+			set_variable = {
+				name = stockpile_location
+				value = $STOCKPILE_SITE$
+			}
 		}
 	}
 }
 
+initialize_new_central_bank = {
+	$CTRL_BANK_SITE$ = {
+		create_building = {
+			building = building_bank
+			level    = 5
+			reserves = 0
+		}
+		add_modifier = {
+			name = bank_central_place
+		}
+		owner = {
+			add_modifier = {
+				name = has_central_bank
+			}
+			set_variable = {
+				name = central_bank_location
+				value = $CTRL_BANK_SITE$
+			}
+		}
+	}
+
+	## resize the new bank
+	macro_facilities_on_action = yes
+}
+
+## TODO
+central_bank_sanity_check = {
+	## sanity check that the central bank location is within the country;
+	## will probably break with TPG and GER
+	if = {
+		limit = {
+			not = { has_technology_researched = central_banking }
+			any_scope_state = {
+				or = {
+					has_building = building_bank
+					#has_building = building_bank_usa
+				}
+			}
+		}
+		every_scope_state = {
+			limit = 
+		}
+	}
+
+	if = {
+		limit = {
+			not = {
+				exists = var:central_bank_location
+				var:central_bank_location.owner = this
+			}
+		}
+		reinitialize_central_bank = yes
+	}
+
+
+}
+reinitialize_central_bank = {}
+
+## TODO
+reinitialize_financial_center = {}
+
+macro_facilities_cb_pass = {
+	central_bank_sanity_check = yes
+	
+	if = {
+		limit = {
+			has_technology_researched = central_banking
+			var:central_bank_location = {
+				has_modifier = bank_central_historic_place
+			}
+		}
+		switch = {
+			trigger = var:central_bank_location
+			s:STATE_PENNSYLVANIA.region_state:USA = {
+				s:STATE_PENNSYLVANIA.region_state:USA = {
+					create_building = {
+						#building = building_bank_usa
+						building = building_bank
+						level    = $SIZE$
+					}
+				}
+			}
+			fallback = {
+				var:central_bank_location = {
+					create_building = {
+						building = building_bank
+						level    = $SIZE$
+					}
+				}
+			}
+		}
+	}
+}
+
+macro_facilities_fc_pass = {
+	## sanity check that the financial center location is within the country;
+	## will probably break with TPG and GER
+	if = {
+		limit = {
+			has_technology_researched = financial_center
+			not = {
+				exists = var:financial_center_location
+				var:financial_center_location.owner = this
+			}
+		}
+		reinitialize_financial_center = yes
+	}
+
+	if = {
+		limit = {
+			has_technology_researched = financial_center
+			var:financial_center_location = {
+				has_modifier = financial_center_historic_place
+			}
+		}
+
+		switch = {
+			trigger = var:financial_center_location
+		
+			#FRA
+			s:STATE_ILE_DE_FRANCE.region_state:FRA = {
+				s:STATE_ILE_DE_FRANCE.region_state:FRA = {
+					create_building = {
+						building = building_financial_centre_fra
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#GBR
+			s:STATE_HOME_COUNTIES.region_state:GBR = {
+				s:STATE_HOME_COUNTIES.region_state:GBR = {
+					create_building = {
+						building = s:STATE_HOME_COUNTIES.region_state:GBR
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#USA
+			s:STATE_NEW_YORK.region_state:USA = {
+				s:STATE_NEW_YORK.region_state:USA = {
+					create_building = {
+						building = building_financial_centre_usa
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#NET
+			s:STATE_HOLLAND.region_state:NET = {
+				s:STATE_HOLLAND.region_state:NET = {
+					create_building = {
+						building = building_financial_centre_net
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#PRU
+			s:STATE_BRANDENBURG.region_state:PRU = {
+				s:STATE_BRANDENBURG.region_state:PRU = {
+					create_building = {
+						building = building_financial_centre_ger
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#GER
+			s:STATE_BRANDENBURG.region_state:GER = {
+				s:STATE_BRANDENBURG.region_state:GER = {
+					create_building = {
+						building = building_financial_centre_ger
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#AUS
+			s:STATE_AUSTRIA.region_state:AUS = {
+					s:STATE_AUSTRIA.region_state:AUS = {
+					create_building = {
+						building = building_financial_centre_aus
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#ITA
+			s:STATE_LOMBARDY.region_state:ITA = {
+				s:STATE_LOMBARDY.region_state:ITA = {
+					create_building = {
+						building = building_financial_centre_ita
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#CHI
+			s:STATE_SHAOZHOU.region_state:CHI = {
+				s:STATE_SHAOZHOU.region_state:CHI = {
+					create_building = {
+						building = building_financial_centre_chi
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#TPG
+			s:STATE_SHAOZHOU.region_state:TPG = {
+				s:STATE_SHAOZHOU.region_state:TPG = {
+					create_building = {
+						building = building_financial_centre_chi
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#JAP
+			s:STATE_KANTO.region_state:JAP = {
+				s:STATE_KANTO.region_state:JAP = {
+					create_building = {
+						building = building_financial_centre_jap
+						level    = $SIZE$
+					}
+				}
+			}
+
+			#other
+			fallback = {
+				var:financial_center_location = {
+					create_building = {
+						building = building_financial_centre
+						level    = $SIZE$
+					}
+				}
+			}
+		}
+	}
+
+	#finished with fc, continue on to cb
+	macro_facilities_cb_pass = {
+		SIZE = $SIZE$
+	}
+}
+
+macro_facilities_size_pass = {
+	switch = {
+		trigger = var:gdp_view
+		1 = {
+			macro_facilities_fc_pass = {
+				SIZE = 5
+			}
+		}
+		2 = {
+			macro_facilities_fc_pass = {
+				SIZE = 10
+			}
+		}
+		3 = {
+			macro_facilities_fc_pass = {
+				SIZE = 15
+			}
+		}
+		4 = {
+			macro_facilities_fc_pass = {
+				SIZE = 20
+			}
+		}
+		5 = {
+			macro_facilities_fc_pass = {
+				SIZE = 25
+			}
+		}
+		6 = {
+			macro_facilities_fc_pass = {
+				SIZE = 30
+			}
+		}
+		7 = {
+			macro_facilities_fc_pass = {
+				SIZE = 35
+			}
+		}
+		8 = {
+			macro_facilities_fc_pass = {
+				SIZE = 40
+			}
+		}
+		9 = {
+			macro_facilities_fc_pass = {
+				SIZE = 45
+			}
+		}
+		10 = {
+			macro_facilities_fc_pass = {
+				SIZE = 50
+			}
+		}
+		11 = {
+			macro_facilities_fc_pass = {
+				SIZE = 55
+			}
+		}
+		12 = {
+			macro_facilities_fc_pass = {
+				SIZE = 60
+			}
+		}
+		13 = {
+			macro_facilities_fc_pass = {
+				SIZE = 65
+			}
+		}
+		14 = {
+			macro_facilities_fc_pass = {
+				SIZE = 70
+			}
+		}
+		15 = {
+			macro_facilities_fc_pass = {
+				SIZE = 75
+			}
+		}
+		16 = {
+			macro_facilities_fc_pass = {
+				SIZE = 80
+			}
+		}
+		17 = {
+			macro_facilities_fc_pass = {
+				SIZE = 85
+			}
+		}
+		18 = {
+			macro_facilities_fc_pass = {
+				SIZE = 90
+			}
+		}
+		19 = {
+			macro_facilities_fc_pass = {
+				SIZE = 95
+			}
+		}
+		20 = {
+			macro_facilities_fc_pass = {
+				SIZE = 100
+			}
+		}
+		21 = {
+			macro_facilities_fc_pass = {
+				SIZE = 105
+			}
+		}
+		22 = {
+			macro_facilities_fc_pass = {
+				SIZE = 110
+			}
+		}
+		23 = {
+			macro_facilities_fc_pass = {
+				SIZE = 115
+			}
+		}
+		24 = {
+			macro_facilities_fc_pass = {
+				SIZE = 120
+			}
+		}
+		25 = {
+			macro_facilities_fc_pass = {
+				SIZE = 125
+			}
+		}
+		26 = {
+			macro_facilities_fc_pass = {
+				SIZE = 130
+			}
+		}
+		27 = {
+			macro_facilities_fc_pass = {
+				SIZE = 135
+			}
+		}
+		28 = {
+			macro_facilities_fc_pass = {
+				SIZE = 140
+			}
+		}
+		29 = {
+			macro_facilities_fc_pass = {
+				SIZE = 145
+			}
+		}
+		30 = {
+			macro_facilities_fc_pass = {
+				SIZE = 150
+			}
+		}
+		31 = {
+			macro_facilities_fc_pass = {
+				SIZE = 155
+			}
+		}
+		32 = {
+			macro_facilities_fc_pass = {
+				SIZE = 160
+			}
+		}
+		33 = {
+			macro_facilities_fc_pass = {
+				SIZE = 165
+			}
+		}
+		34 = {
+			macro_facilities_fc_pass = {
+				SIZE = 170
+			}
+		}
+		35 = {
+			macro_facilities_fc_pass = {
+				SIZE = 175
+			}
+		}
+		36 = {
+			macro_facilities_fc_pass = {
+				SIZE = 180
+			}
+		}
+		37 = {
+			macro_facilities_fc_pass = {
+				SIZE = 185
+			}
+		}
+		38 = {
+			macro_facilities_fc_pass = {
+				SIZE = 190
+			}
+		}
+		39 = {
+			macro_facilities_fc_pass = {
+				SIZE = 195
+			}
+		}
+		40 = {
+			macro_facilities_fc_pass = {
+				SIZE = 200
+			}
+		}
+		41 = {
+			macro_facilities_fc_pass = {
+				SIZE = 205
+			}
+		}
+		42 = {
+			macro_facilities_fc_pass = {
+				SIZE = 210
+			}
+		}
+		43 = {
+			macro_facilities_fc_pass = {
+				SIZE = 215
+			}
+		}
+		44 = {
+			macro_facilities_fc_pass = {
+				SIZE = 220
+			}
+		}
+		45 = {
+			macro_facilities_fc_pass = {
+				SIZE = 225
+			}
+		}
+		46 = {
+			macro_facilities_fc_pass = {
+				SIZE = 230
+			}
+		}
+		47 = {
+			macro_facilities_fc_pass = {
+				SIZE = 235
+			}
+		}
+		48 = {
+			macro_facilities_fc_pass = {
+				SIZE = 240
+			}
+		}
+		49 = {
+			macro_facilities_fc_pass = {
+				SIZE = 245
+			}
+		}
+		50 = {
+			macro_facilities_fc_pass = {
+				SIZE = 250
+			}
+		}
+		51 = {
+			macro_facilities_fc_pass = {
+				SIZE = 255
+			}
+		}
+		52 = {
+			macro_facilities_fc_pass = {
+				SIZE = 260
+			}
+		}
+		53 = {
+			macro_facilities_fc_pass = {
+				SIZE = 265
+			}
+		}
+		54 = {
+			macro_facilities_fc_pass = {
+				SIZE = 270
+			}
+		}
+		55 = {
+			macro_facilities_fc_pass = {
+				SIZE = 275
+			}
+		}
+		56 = {
+			macro_facilities_fc_pass = {
+				SIZE = 280
+			}
+		}
+		57 = {
+			macro_facilities_fc_pass = {
+				SIZE = 285
+			}
+		}
+		58 = {
+			macro_facilities_fc_pass = {
+				SIZE = 290
+			}
+		}
+		59 = {
+			macro_facilities_fc_pass = {
+				SIZE = 295
+			}
+		}
+		60 = {
+			macro_facilities_fc_pass = {
+				SIZE = 300
+			}
+		}
+		61 = {
+			macro_facilities_fc_pass = {
+				SIZE = 305
+			}
+		}
+		62 = {
+			macro_facilities_fc_pass = {
+				SIZE = 310
+			}
+		}
+		63 = {
+			macro_facilities_fc_pass = {
+				SIZE = 315
+			}
+		}
+		64 = {
+			macro_facilities_fc_pass = {
+				SIZE = 320
+			}
+		}
+		65 = {
+			macro_facilities_fc_pass = {
+				SIZE = 325
+			}
+		}
+		66 = {
+			macro_facilities_fc_pass = {
+				SIZE = 330
+			}
+		}
+		67 = {
+			macro_facilities_fc_pass = {
+				SIZE = 335
+			}
+		}
+		68 = {
+			macro_facilities_fc_pass = {
+				SIZE = 340
+			}
+		}
+		69 = {
+			macro_facilities_fc_pass = {
+				SIZE = 345
+			}
+		}
+		70 = {
+			macro_facilities_fc_pass = {
+				SIZE = 350
+			}
+		}
+		71 = {
+			macro_facilities_fc_pass = {
+				SIZE = 355
+			}
+		}
+		72 = {
+			macro_facilities_fc_pass = {
+				SIZE = 360
+			}
+		}
+		73 = {
+			macro_facilities_fc_pass = {
+				SIZE = 365
+			}
+		}
+		74 = {
+			macro_facilities_fc_pass = {
+				SIZE = 370
+			}
+		}
+		75 = {
+			macro_facilities_fc_pass = {
+				SIZE = 375
+			}
+		}
+		76 = {
+			macro_facilities_fc_pass = {
+				SIZE = 380
+			}
+		}
+		77 = {
+			macro_facilities_fc_pass = {
+				SIZE = 385
+			}
+		}
+		78 = {
+			macro_facilities_fc_pass = {
+				SIZE = 390
+			}
+		}
+		79 = {
+			macro_facilities_fc_pass = {
+				SIZE = 395
+			}
+		}
+		80 = {
+			macro_facilities_fc_pass = {
+				SIZE = 400
+			}
+		}
+		81 = {
+			macro_facilities_fc_pass = {
+				SIZE = 405
+			}
+		}
+		82 = {
+			macro_facilities_fc_pass = {
+				SIZE = 410
+			}
+		}
+		83 = {
+			macro_facilities_fc_pass = {
+				SIZE = 415
+			}
+		}
+		84 = {
+			macro_facilities_fc_pass = {
+				SIZE = 420
+			}
+		}
+		85 = {
+			macro_facilities_fc_pass = {
+				SIZE = 425
+			}
+		}
+		86 = {
+			macro_facilities_fc_pass = {
+				SIZE = 430
+			}
+		}
+		87 = {
+			macro_facilities_fc_pass = {
+				SIZE = 435
+			}
+		}
+		88 = {
+			macro_facilities_fc_pass = {
+				SIZE = 440
+			}
+		}
+		89 = {
+			macro_facilities_fc_pass = {
+				SIZE = 445
+			}
+		}
+		90 = {
+			macro_facilities_fc_pass = {
+				SIZE = 450
+			}
+		}
+		91 = {
+			macro_facilities_fc_pass = {
+				SIZE = 455
+			}
+		}
+		92 = {
+			macro_facilities_fc_pass = {
+				SIZE = 460
+			}
+		}
+		93 = {
+			macro_facilities_fc_pass = {
+				SIZE = 465
+			}
+		}
+		94 = {
+			macro_facilities_fc_pass = {
+				SIZE = 470
+			}
+		}
+		95 = {
+			macro_facilities_fc_pass = {
+				SIZE = 475
+			}
+		}
+		96 = {
+			macro_facilities_fc_pass = {
+				SIZE = 480
+			}
+		}
+		97 = {
+			macro_facilities_fc_pass = {
+				SIZE = 485
+			}
+		}
+		98 = {
+			macro_facilities_fc_pass = {
+				SIZE = 490
+			}
+		}
+		99 = {
+			macro_facilities_fc_pass = {
+				SIZE = 495
+			}
+		}
+		100 = {
+			macro_facilities_fc_pass = {
+				SIZE = 500
+			}
+		}
+	}
+}
 
 macro_facilities_on_action = {
 	if = {
@@ -1002,2485 +1779,20 @@ macro_facilities_on_action = {
 			country_rank     >= rank_value:unrecognized_regional_power
 			is_revolutionary =  no
 		}
-		#FRA
-		if  = {
-			limit = {
-				c:FRA ?= this
-				s:STATE_ILE_DE_FRANCE = {
-					any_state = {
-						owner = c:FRA
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_ILE_DE_FRANCE.region_state:FRA
-				FIN_BLDG_TYPE  = building_financial_centre_fra
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#GBR
-		else_if  = {
-			limit = {
-				c:GBR ?= this
-				s:STATE_HOME_COUNTIES = {
-					any_state = {
-						owner = c:GBR
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_HOME_COUNTIES.region_state:GBR
-				FIN_BLDG_TYPE  = building_financial_centre_gbr
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#USA
-		else_if  = {
-			limit = {
-				c:USA ?= this
-			}
-			if = { ## both historical fc and cb
-				limit = {
-					s:STATE_NEW_YORK = {
-						any_state = {
-							owner = c:USA
-							has_modifier = financial_center_historic_place
-						}
-					}
-					s:STATE_PENNSYLVANIA = {
-						any_state = {
-							owner = c:USA
-							has_modifier = bank_central_historic_place
-						}
-					}
-				}
-				macro_facilities = {
-					FIN_CENT_SITE  = s:STATE_NEW_YORK.region_state:USA
-					FIN_BLDG_TYPE  = building_financial_centre_usa
-					CTRL_BANK_SITE = s:STATE_PENNSYLVANIA.region_state:USA
-					BANK_BLDG_TYPE = building_bank_usa
-				}
-			} else_if = { ## only historical fc
-				limit = {
-					s:STATE_NEW_YORK = {
-						any_state = {
-							owner = c:USA
-							has_modifier = financial_center_historic_place
-						}
-					}
-				}
-				macro_facilities = {
-					FIN_CENT_SITE  = s:STATE_NEW_YORK.region_state:USA
-					FIN_BLDG_TYPE  = building_financial_centre_usa
-					CTRL_BANK_SITE = capital
-					BANK_BLDG_TYPE = building_bank
-				}
-			} else_if = { ## only historical cb
-				limit = {
-					s:STATE_PENNSYLVANIA = {
-						any_state = {
-							owner = c:USA
-							has_modifier = bank_central_historic_place
-						}
-					}
-				}
-				macro_facilities = {
-					FIN_CENT_SITE  = capital
-					FIN_BLDG_TYPE  = building_financial_centre
-					CTRL_BANK_SITE = s:STATE_PENNSYLVANIA.region_state:USA
-					BANK_BLDG_TYPE = building_bank_usa
-				}
-			} else = { ## neither historical fc nor cb
-				macro_facilities = {
-					FIN_CENT_SITE  = capital
-					FIN_BLDG_TYPE  = building_financial_centre
-					CTRL_BANK_SITE = capital
-					BANK_BLDG_TYPE = building_bank
-				}
-			}
-		}
-
-		#net
-		else_if  = {
-			limit = {
-				c:NET ?= this
-				s:STATE_HOLLAND = {
-					any_state = {
-						owner = c:NET
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_HOLLAND.region_state:NET
-				FIN_BLDG_TYPE  = building_financial_centre_net
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#pru
-		else_if  = {
-			limit = {
-				c:PRU ?= this
-				s:STATE_BRANDENBURG = {
-					any_state = {
-						owner = c:PRU
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_BRANDENBURG.region_state:PRU
-				FIN_BLDG_TYPE  = building_financial_centre_ger
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#ger
-		else_if  = {
-			limit = {
-				c:GER ?= this
-				s:STATE_BRANDENBURG = {
-					any_state = {
-						owner = c:GER
-						#TODO: set up logic for creating this modifier on GER establishment
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_BRANDENBURG.region_state:GER
-				FIN_BLDG_TYPE  = building_financial_centre_ger
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#aus
-		else_if  = {
-			limit = {
-				c:AUS ?= this
-				s:STATE_AUSTRIA = {
-					any_state = {
-						owner = c:AUS
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_AUSTRIA.region_state:AUS
-				FIN_BLDG_TYPE  = building_financial_centre_aus
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#ita
-		else_if  = {
-			limit = {
-				c:ITA ?= this
-				s:STATE_LOMBARDY = {
-					any_state = {
-						owner = c:ITA
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_LOMBARDY.region_state:ITA
-				FIN_BLDG_TYPE  = building_financial_centre_ita
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#chi
-		else_if  = {
-			limit = {
-				c:CHI ?= this
-				s:STATE_SHAOZHOU = {
-					any_state = {
-						owner = c:CHI
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_SHAOZHOU.region_state:CHI
-				FIN_BLDG_TYPE  = building_financial_centre_chi
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#tpg
-		else_if  = {
-			limit = {
-				c:TPG ?= this
-				s:STATE_SHAOZHOU = {
-					any_state = {
-						owner = c:TPG
-						#TODO: set up logic for creating this modifier on TPG establishment
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_SHAOZHOU.region_state:TPG
-				FIN_BLDG_TYPE  = building_financial_centre_chi
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-
-		#jap
-		else_if  = {
-			limit = {
-				c:JAP ?= this
-				s:STATE_KANTO = {
-					any_state = {
-						owner = c:JAP
-						has_modifier = financial_center_historic_place
-					}
-				}
-			}
-			macro_facilities = {
-				FIN_CENT_SITE  = s:STATE_KANTO.region_state:JAP
-				FIN_BLDG_TYPE  = building_financial_centre_jap
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-		#other
-		else = {
-			macro_facilities = {
-				FIN_CENT_SITE  = capital
-				FIN_BLDG_TYPE  = building_financial_centre
-				CTRL_BANK_SITE = capital
-				BANK_BLDG_TYPE = building_bank
-			}
-		}
-	}
-}
-macro_facilities = {
-	switch = {
-		trigger = var:gdp_view
-		1 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 5
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 5
-						#reserves=1
-					}
-				}
-			}
-		}
-		2 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 10
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 10
-						#reserves=1
-					}
-				}
-			}
-		}
-		3 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 15
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 15
-						#reserves=1
-					}
-				}
-			}
-		}
-		4 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 20
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 20
-						#reserves=1
-					}
-				}
-			}
-		}
-		5 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 25
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 25
-						#reserves=1
-					}
-				}
-			}
-		}
-		6 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 30
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 30
-						#reserves=1
-					}
-				}
-			}
-		}
-		7 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 35
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 35
-						#reserves=1
-					}
-				}
-			}
-		}
-		8 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 40
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 40
-						#reserves=1
-					}
-				}
-			}
-		}
-		9 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 45
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 45
-						#reserves=1
-					}
-				}
-			}
-		}
-		10 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 50
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 50
-						#reserves=1
-					}
-				}
-			}
-		}
-		11 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 55
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 55
-						#reserves=1
-					}
-				}
-			}
-		}
-		12 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 60
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 60
-						#reserves=1
-					}
-				}
-			}
-		}
-		13 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 65
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 65
-						#reserves=1
-					}
-				}
-			}
-		}
-		14 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 70
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 70
-						#reserves=1
-					}
-				}
-			}
-		}
-		15 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 75
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 75
-						#reserves=1
-					}
-				}
-			}
-		}
-		16 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 80
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 80
-						#reserves=1
-					}
-				}
-			}
-		}
-		17 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 85
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 85
-						#reserves=1
-					}
-				}
-			}
-		}
-		18 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 90
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 90
-						#reserves=1
-					}
-				}
-			}
-		}
-		19 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 95
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 95
-						#reserves=1
-					}
-				}
-			}
-		}
-		20 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 100
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 100
-						#reserves=1
-					}
-				}
-			}
-		}
-		21 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 105
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 105
-						#reserves=1
-					}
-				}
-			}
-		}
-		22 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 110
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 110
-						#reserves=1
-					}
-				}
-			}
-		}
-		23 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 115
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 115
-						#reserves=1
-					}
-				}
-			}
-		}
-		24 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 120
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 120
-						#reserves=1
-					}
-				}
-			}
-		}
-		25 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 125
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 125
-						#reserves=1
-					}
-				}
-			}
-		}
-		26 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 130
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 130
-						#reserves=1
-					}
-				}
-			}
-		}
-		27 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 135
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 135
-						#reserves=1
-					}
-				}
-			}
-		}
-		28 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 140
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 140
-						#reserves=1
-					}
-				}
-			}
-		}
-		29 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 145
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 145
-						#reserves=1
-					}
-				}
-			}
-		}
-		30 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 150
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 150
-						#reserves=1
-					}
-				}
-			}
-		}
-		31 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 155
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 155
-						#reserves=1
-					}
-				}
-			}
-		}
-		32 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 160
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 160
-						#reserves=1
-					}
-				}
-			}
-		}
-		33 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 165
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 165
-						#reserves=1
-					}
-				}
-			}
-		}
-		34 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 170
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 170
-						#reserves=1
-					}
-				}
-			}
-		}
-		35 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 175
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 175
-						#reserves=1
-					}
-				}
-			}
-		}
-		36 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 180
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 180
-						#reserves=1
-					}
-				}
-			}
-		}
-		37 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 185
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 185
-						#reserves=1
-					}
-				}
-			}
-		}
-		38 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 190
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 190
-						#reserves=1
-					}
-				}
-			}
-		}
-		39 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 195
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 195
-						#reserves=1
-					}
-				}
-			}
-		}
-		40 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 200
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 200
-						#reserves=1
-					}
-				}
-			}
-		}
-		41 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 205
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 205
-						#reserves=1
-					}
-				}
-			}
-		}
-		42 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 210
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 210
-						#reserves=1
-					}
-				}
-			}
-		}
-		43 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 215
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 215
-						#reserves=1
-					}
-				}
-			}
-		}
-		44 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 220
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 220
-						#reserves=1
-					}
-				}
-			}
-		}
-		45 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 225
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 225
-						#reserves=1
-					}
-				}
-			}
-		}
-		46 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 230
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 230
-						#reserves=1
-					}
-				}
-			}
-		}
-		47 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 235
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 235
-						#reserves=1
-					}
-				}
-			}
-		}
-		48 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 240
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 240
-						#reserves=1
-					}
-				}
-			}
-		}
-		49 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 245
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 245
-						#reserves=1
-					}
-				}
-			}
-		}
-		50 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 250
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 250
-						#reserves=1
-					}
-				}
-			}
-		}
-		51 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 255
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 255
-						#reserves=1
-					}
-				}
-			}
-		}
-		52 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 260
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 260
-						#reserves=1
-					}
-				}
-			}
-		}
-		53 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 265
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 265
-						#reserves=1
-					}
-				}
-			}
-		}
-		54 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 270
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 270
-						#reserves=1
-					}
-				}
-			}
-		}
-		55 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 275
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 275
-						#reserves=1
-					}
-				}
-			}
-		}
-		56 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 280
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 280
-						#reserves=1
-					}
-				}
-			}
-		}
-		57 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 285
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 285
-						#reserves=1
-					}
-				}
-			}
-		}
-		58 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 290
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 290
-						#reserves=1
-					}
-				}
-			}
-		}
-		59 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 295
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 295
-						#reserves=1
-					}
-				}
-			}
-		}
-		60 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 300
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 300
-						#reserves=1
-					}
-				}
-			}
-		}
-		61 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 305
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 305
-						#reserves=1
-					}
-				}
-			}
-		}
-		62 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 310
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 310
-						#reserves=1
-					}
-				}
-			}
-		}
-		63 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 315
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 315
-						#reserves=1
-					}
-				}
-			}
-		}
-		64 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 320
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 320
-						#reserves=1
-					}
-				}
-			}
-		}
-		65 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 325
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 325
-						#reserves=1
-					}
-				}
-			}
-		}
-		66 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 330
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 330
-						#reserves=1
-					}
-				}
-			}
-		}
-		67 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 335
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 335
-						#reserves=1
-					}
-				}
-			}
-		}
-		68 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 340
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 340
-						#reserves=1
-					}
-				}
-			}
-		}
-		69 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 345
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 345
-						#reserves=1
-					}
-				}
-			}
-		}
-		70 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 350
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 350
-						#reserves=1
-					}
-				}
-			}
-		}
-		71 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 355
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 355
-						#reserves=1
-					}
-				}
-			}
-		}
-		72 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 360
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 360
-						#reserves=1
-					}
-				}
-			}
-		}
-		73 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 365
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 365
-						#reserves=1
-					}
-				}
-			}
-		}
-		74 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 370
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 370
-						#reserves=1
-					}
-				}
-			}
-		}
-		75 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 375
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 375
-						#reserves=1
-					}
-				}
-			}
-		}
-		76 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 380
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 380
-						#reserves=1
-					}
-				}
-			}
-		}
-		77 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 385
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 385
-						#reserves=1
-					}
-				}
-			}
-		}
-		78 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 390
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 390
-						#reserves=1
-					}
-				}
-			}
-		}
-		79 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 395
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 395
-						#reserves=1
-					}
-				}
-			}
-		}
-		80 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 400
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 400
-						#reserves=1
-					}
-				}
-			}
-		}
-		81 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 405
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 405
-						#reserves=1
-					}
-				}
-			}
-		}
-		82 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 410
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 410
-						#reserves=1
-					}
-				}
-			}
-		}
-		83 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 415
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 415
-						#reserves=1
-					}
-				}
-			}
-		}
-		84 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 420
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 420
-						#reserves=1
-					}
-				}
-			}
-		}
-		85 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 425
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 425
-						#reserves=1
-					}
-				}
-			}
-		}
-		86 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 430
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 430
-						#reserves=1
-					}
-				}
-			}
-		}
-		87 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 435
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 435
-						#reserves=1
-					}
-				}
-			}
-		}
-		88 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 440
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 440
-						#reserves=1
-					}
-				}
-			}
-		}
-		89 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 445
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 445
-						#reserves=1
-					}
-				}
-			}
-		}
-		90 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 450
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 450
-						#reserves=1
-					}
-				}
-			}
-		}
-		91 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 455
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 455
-						#reserves=1
-					}
-				}
-			}
-		}
-		92 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 460
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 460
-						#reserves=1
-					}
-				}
-			}
-		}
-		93 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 465
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 465
-						#reserves=1
-					}
-				}
-			}
-		}
-		94 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 470
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 470
-						#reserves=1
-					}
-				}
-			}
-		}
-		95 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 475
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 475
-						#reserves=1
-					}
-				}
-			}
-		}
-		96 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 480
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 480
-						#reserves=1
-					}
-				}
-			}
-		}
-		97 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 485
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 485
-						#reserves=1
-					}
-				}
-			}
-		}
-		98 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 490
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 490
-						#reserves=1
-					}
-				}
-			}
-		}
-		99 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 495
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 495
-						#reserves=1
-					}
-				}
-			}
-		}
-		100 = {
-			if = {
-				limit = { has_technology_researched = financial_center } #xchange
-				$FIN_CENT_SITE$ = {
-					create_building = {
-						building = $FIN_BLDG_TYPE$
-						level    = 500
-						#reserves=1
-					}
-				}
-			}
-			if = {
-				limit = { has_technology_researched = central_banking }
-				$CTRL_BANK_SITE$ = {
-					create_building = {
-						building = $BANK_BLDG_TYPE$
-						level    = 500
-						#reserves=1
-					}
-				}
-			}
-		}
+		macro_facilities_size_pass = yes
 	}
 }
 
 has_tech_central_bank_but_no_building_central_bank = {
 	### redundancy: treated in event original_currency_event.1
-	capital = {
-		save_scope_as = central_bank_site
+	if = {
+		limit = {
+			has_variable = central_bank_location
+			not = { exists = var:central_bank_location }
+		}
+		remove_variable = central_bank_location
 	}
+
 	if = {
 		limit = { ### check to make sure we're ready and stable enough
 			#var:gdp_view = 1
