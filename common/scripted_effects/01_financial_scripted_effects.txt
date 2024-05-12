@@ -254,105 +254,49 @@ credit_at_central_bank_interest_per_week_off = {
 }
 
 ai_credit_at_central_bank = {         
-	random_list = {
-		0 = {
-			if  = {
-				limit  = {
-					national_debt_compared_gdp < 0.5
-				}
-				set_variable = {
-					name = ai_debt_issued_relative_GDP
-					value = {
-						add = gdp #central_bank_gold_reserves_state_1
-						multiply = { 0.1 0.25 }
-					}
-				}
-				change_variable = {
-					name = credit_at_central_bank
-					add = var:ai_debt_issued_relative_GDP
-				}
-				add_treasury = {
-					add = var:ai_debt_issued_relative_GDP
-				}
-				change_variable = {
-					name = credit_at_central_bank
-					add = var:ai_debt_issued_relative_GDP
-				}
-				set_variable = {
-					name = ai_debt_issued_relative_GDP_in_gold
-					value = ai_debt_issued_relative_GDP
-				}
-				change_variable = {
-					name = ai_debt_issued_relative_GDP_in_gold
-					multiply = money_value_rapported_inflation
-				}
-				every_scope_state = {
-					if = {
-						limit = {
-							has_modifier = bank_central_historic_place
-						}
-						change_variable = {
-							name = central_bank_gold_reserves_state_1
-							subtract = owner.ai_debt_issued_relative_GDP_in_gold
-						}
-					}
-				}
+	if  = {
+		limit  = {
+			national_debt_compared_gdp < 0.75
+			interest_value_10Y < 0.1
+			gold_reserves_var < gold_reserves_50
+			gold_reserves_var > 0
+		}
+		set_variable = {
+			name = ai_debt_issued_relative_GDP
+			value = {
+				add = gold_reserves_50
+				subtract = gold_reserves_var
 			}
 		}
-		0 = {
-			#if  = {
-			set_variable = {
-				name = ai_debt_issued_relative_GDP
-				value = {
-					add = gdp
-					multiply = { 0.01 0.1 }
-				}
-			}
-			
-			set_variable = {
-				name = ai_debt_issued_relative_GDP_in_gold
-				value = ai_debt_issued_relative_GDP
-			}
-			change_variable = {
-				name = ai_debt_issued_relative_GDP_in_gold
-				multiply = money_value_rapported_inflation
-			}
-			
-			if  = {
-				limit  = {
-					var:credit_at_central_bank > 0
+		change_variable = {
+			name = credit_at_central_bank
+			add = var:ai_debt_issued_relative_GDP
+		}
+		add_treasury = {
+			add = var:ai_debt_issued_relative_GDP
+		}
+		# change_variable = {
+		# 	name = credit_at_central_bank
+		# 	add = var:ai_debt_issued_relative_GDP
+		# }
+		set_variable = {
+			name = ai_debt_issued_relative_GDP_in_gold
+			value = ai_debt_issued_relative_GDP
+		}
+		change_variable = {
+			name = ai_debt_issued_relative_GDP_in_gold
+			multiply = money_value_rapported_inflation
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = bank_central_historic_place
 				}
 				change_variable = {
-					name = credit_at_central_bank
-					subtract = var:ai_debt_issued_relative_GDP_in_gold
+					name = central_bank_gold_reserves_state_1
+					subtract = owner.ai_debt_issued_relative_GDP_in_gold
 				}
 			}
-			if  = {
-				limit  = {
-					var:credit_at_central_bank < 0
-				}
-				set_variable = {
-					name = credit_at_central_bank
-					value = 0
-				}
-			}
-			add_treasury = {
-				subtract = var:ai_debt_issued_relative_GDP
-			}
-				# every_scope_state = {
-				# 	if = {
-				# 		limit = {
-				# 			has_modifier = bank_central_historic_place
-				# 		}
-				# 		change_variable = {
-				# 			name = central_bank_gold_reserves_state_1
-				# 			add = owner.ai_debt_issued_relative_GDP
-						
-				# 		}
-				# 	}
-				# }
-			#}
-
 		}
 	}
 }
