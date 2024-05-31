@@ -1,3 +1,18 @@
+
+fluctuations_market_price_monthly_add = {
+	set_variable = {
+		name = inflation_market_fixe
+		value = 0
+	}
+	change_variable = {
+		name = inflation_market_fixe
+		add = inflation_market_value
+	}
+}
+
+
+
+
 fluctuations_monthly_add = {
 	if = {
 		limit = {
@@ -269,53 +284,14 @@ fluctuations_1_monthly_add = {
 	}
 	if = {
 		limit = {
-            money_value > 0.00001
-			money_value < 1
-			Not = {
-				has_modifier = strong_currency
-			}
-		}
-		if = {
-			limit = {
-				has_modifier = has_central_bank
-			}
-			add_modifier = {
-				name = weak_currency
-				multiply = var:month_weak_currency
-			}
-		}
-		if = {
-			limit = {
-				not = {
-					has_modifier = has_central_bank
-				}
-			}
-			add_modifier = {
-				name = weak_currency
-				multiplier = 1
-			}
-		}
-	}
-	#############################
-
-	#############################
-	if = {
-		limit = {
-			has_modifier = normal_currency
-		}
-		remove_modifier = normal_currency
-	}
-	if = {
-		limit = {
-			money_value > 1
-			Not = {
-				has_modifier = strong_currency
-			}
+			money_value_rapported_inflation < 0.5 #average_gold_exchange_rate_currencies
+			has_modifier = has_central_bank
 		}
 		add_modifier = {
-			name = normal_currency
-			multiply = var:month_normal_currency
+			name = weak_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
 		}
+
 	}
 	#############################
 
@@ -328,20 +304,12 @@ fluctuations_1_monthly_add = {
 	}
 	if = {
 		limit = {
-			#money_value > 10
-			or = {
-				country_rank = rank_value:great_power
-				this = c:SWI
-				this = c:NET
-			}
-			Not = {
-				has_modifier = weak_currency
-				money_value < 1
-			}
+			money_value_rapported_inflation > 0.5 #average_gold_exchange_rate_currencies
+			has_modifier = has_central_bank
 		}
 		add_modifier = {
 			name = strong_currency
-			multiply = var:month_strong_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100 #var:month_strong_currency
 		}
 	}
 	#############################
@@ -454,14 +422,4 @@ fluctuations_2_annual_add = {
 			value = 0
 		}
     }
-}
-fluctuations_market_price_monthly_add = {
-	set_variable = {
-		name = inflation_market_2
-		value = 0
-	}
-	change_variable = {
-		name = inflation_market_2
-		add = inflation_market_value
-	}
 }
