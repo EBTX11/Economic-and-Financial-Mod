@@ -1,19 +1,81 @@
+currency_strength_modifier = {
 
-fluctuations_market_price_monthly_add = {
-	set_variable = {
-		name = inflation_market_fixe
-		value = 0
+	#strong_currency
+	if = {
+		limit = {
+			has_modifier = reference_currency
+		}
+		remove_modifier = reference_currency
 	}
-	change_variable = {
-		name = inflation_market_fixe
-		add = inflation_market_value
+	if = {
+		limit = {
+			has_modifier = has_central_bank
+            has_modifier = global_monetary_reference
+		}
+		add_modifier = {
+			name = reference_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100 
+		}
+	}
+	#strong_currency
+	if = {
+		limit = {
+			has_modifier = strong_currency
+		}
+		remove_modifier = strong_currency
+	}
+	if = {
+		limit = {
+			money_value_rapported_inflation > global_var:money_value_median
+			has_modifier = has_central_bank
+			Not = {
+                has_modifier = global_monetary_reference
+            }
+		}
+		add_modifier = {
+			name = strong_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100 
+		}
+	}
+	#weak_currency
+	if = {
+		limit = {
+			has_modifier = weak_currency
+		}
+		remove_modifier = weak_currency
+	}
+	if = {
+		limit = {
+			money_value_rapported_inflation < global_var:money_value_median
+			money_value_rapported_inflation > 0.0001
+			has_modifier = has_central_bank
+		}
+		add_modifier = {
+			name = weak_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
+		}
+
+	}
+	#extrem_weak_currency
+	if = {
+		limit = {
+			has_modifier = extreme_weak_currency
+		}
+		remove_modifier = extreme_weak_currency
+	}
+	if = {
+		limit = {
+			money_value_rapported_inflation < 0.001
+			has_modifier = has_central_bank
+		}
+		add_modifier = {
+			name = extreme_weak_currency
+			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
+		}
+
 	}
 }
-
-
-
-
-fluctuations_monthly_add = {
+inflation_modifier = {
 	if = {
 		limit = {
 			has_modifier = inflation_country
@@ -40,7 +102,8 @@ fluctuations_monthly_add = {
 	}
 	if = {
 		limit = {
- 		#has_law = law_type:law_revaluation
+ 			#has_law = law_type:law_revaluation
+		 	inflation_value > 0.02
 		}
 		add_modifier = {
 			name = inflation_country
@@ -49,7 +112,8 @@ fluctuations_monthly_add = {
 	}
 	else_if = {
 		limit = {
-			has_law = law_type:law_devaluation
+			#has_law = law_type:law_devaluation
+			inflation_value < -0.02
 		}
 		add_modifier = {
 			name = deflation_country
@@ -86,340 +150,1284 @@ fluctuations_monthly_add = {
 	}
 }
 
-#############################
-
-inflation_value_based_on_mining = {
-    if = {
-        limit = {
-			not = {
-				has_variable = law_currency
-			}
-        }
-		set_variable = {
-			name = law_currency
-			value = 0
-		}
-    }
-
-    if = {
-        limit = {
-            has_law = law_type:law_revaluation_25
-        }
-		change_variable = {
-			name = law_currency
-			subtract = 1
-		}
-    }
-	if = {
-        limit = {
-			has_law = law_type:law_revaluation_50
-        }
-		change_variable = {
-			name = law_currency
-			subtract = 2
-		}
-        
-    }
-	if = {
-        limit = {
-            has_law = law_type:law_revaluation_75
-        }
-		change_variable = {
-			name = law_currency
-			subtract = 3
-		}
-        
-    }
-	if = {
-        limit = {
-            has_law = law_type:law_revaluation_100
-        }
-		change_variable = {
-			name = law_currency
-			subtract = 4
-		}
-    }
-    if = {
-        limit = {
-			or = {
-				has_law = law_type:law_devaluation_25
-			}
-        }
-		change_variable = {
-			name = law_currency
-			add = 1
-		}
-    }
-    if = {
-        limit = {
-			or = {
-				has_law = law_type:law_devaluation_50
-			}
-        }
-		change_variable = {
-			name = law_currency
-			add = 2
-		}
-    }
-    if = {
-        limit = {
-			or = {
-				has_law = law_type:law_devaluation_75
-
-			}
-        }
-		change_variable = {
-			name = law_currency
-			add = 3
-		}
-    }
-    if = {
-        limit = {
-			has_law = law_type:law_devaluation_100
-		}
-		change_variable = {
-			name = law_currency
-			add = 4
-		}
+#inflation_on_consumer_goods
+inflation_on_consumer_goods_market_value_fluctuations = {
+	change_variable = {
+		name = inflation_on_consumer_goods_market_value_fluctuations_month_1
+		add = 1
 	}
-
-	################################################################################################
-	
     if = {
         limit = {
-			var:devaluation_on = 1
-		}
-		change_variable = {
-			name = law_currency
-			add = var:inflation_value_predicted_devaluation_month_valided
-		}
-	}
-	if = {
-        limit = {
-			var:revaluation_on = 1
-		}
-		change_variable = {
-			name = law_currency
-			add = var:inflation_value_predicted_revaluation_month_valided
-		}
-	}
-}
-
-#############################
-
-fluctuations_2_monthly_add = {
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_1
+            value = inflation_on_consumer_goods_market_value_abs
+        }
+    }
     if = {
         limit = {
-            has_modifier = weak_currency
-			has_variable = month_weak_currency
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_2
+            value = inflation_on_consumer_goods_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_01
+            value = 0
         }
         change_variable = {
-			name = month_weak_currency
-			add = 1
-		}
+            name = inflation_on_consumer_goods_market_value_dif_01
+            add = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_01
+            subtract = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_01
+            divide = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_1
+        }
+        # change_variable = {
+        #     name = inflation_on_consumer_goods_market_value_dif_01
+		# 	multiply = -1
+        # }
     }
     if = {
         limit = {
-            has_modifier = normal_currency
-			has_variable = month_normal_currency
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 3
         }
-		change_variable = {
-			name = month_normal_currency
-			add = 1
-		}
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_3
+            value = inflation_on_consumer_goods_market_value_abs
+        }
     }
     if = {
         limit = {
-            has_modifier = strong_currency
-			has_variable = month_strong_currency
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 4
         }
-		change_variable = {
-			name = month_strong_currency
-			add = 1
-		}
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_4
+            value = inflation_on_consumer_goods_market_value_abs
+        }
+
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_02
+            add = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_02
+            subtract = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_02
+            divide = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_3
+        }
+        # change_variable = {
+        #     name = inflation_on_consumer_goods_market_value_dif_02
+		# 	multiply = -1
+        # }
     }
     if = {
         limit = {
-			not = {
-				has_variable = month_weak_currency
-			}
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 5
         }
-		set_variable = {
-			name = month_weak_currency
-			value = 1
-		}
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_5
+            value = inflation_on_consumer_goods_market_value_abs
+        }
     }
     if = {
         limit = {
-			not = {
-				has_variable = month_normal_currency
-			}
+            var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 6
         }
-		set_variable = {
-			name = month_normal_currency
-			value = 1
-		}
-    }
-    if = {
-        limit = {
-			not = {
-				has_variable = month_strong_currency
-			}
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_fluctuations_var_month_6
+            value = inflation_on_consumer_goods_market_value_abs
         }
-		set_variable = {
-			name = month_strong_currency
-			value = 1
-		}
+
+
+        set_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_03
+            add = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_03
+            subtract = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_consumer_goods_market_value_dif_03
+            divide = var:inflation_on_consumer_goods_market_value_fluctuations_var_month_5
+        }
+        # change_variable = {
+        #     name = inflation_on_consumer_goods_market_value_dif_03
+		# 	multiply = -1
+        # }
     }
+
+	inflation_on_consumer_goods_rolling_inflation_6_months = yes 
+	reset_inflation_on_consumer_goods_market_value_fluctuations_month_1 = yes
 }
-
-fluctuations_1_monthly_add = {
-
-	#############################
-	if = {
-		limit = {
-			has_modifier = weak_currency
-		}
-		remove_modifier = weak_currency
+inflation_on_consumer_goods_rolling_inflation_6_months = {
+	set_variable = {
+		name = inflation_on_consumer_goods_rolling_inflation_6_months
+		value = var:inflation_on_consumer_goods_market_value_dif_01
 	}
-	if = {
-		limit = {
-			money_value_rapported_inflation < 0.5 #average_gold_exchange_rate_currencies
-			has_modifier = has_central_bank
-		}
-		add_modifier = {
-			name = weak_currency
-			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
-		}
-
+	change_variable = {
+		name = inflation_on_consumer_goods_rolling_inflation_6_months
+		add = var:inflation_on_consumer_goods_market_value_dif_02
 	}
-	#############################
-
-	#############################
-	if = {
-		limit = {
-			has_modifier = strong_currency
-		}
-		remove_modifier = strong_currency
+	change_variable = {
+		name = inflation_on_consumer_goods_rolling_inflation_6_months
+		add = var:inflation_on_consumer_goods_market_value_dif_03
 	}
-	if = {
-		limit = {
-			money_value_rapported_inflation > 0.5 #average_gold_exchange_rate_currencies
-			has_modifier = has_central_bank
-		}
-		add_modifier = {
-			name = strong_currency
-			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100 #var:month_strong_currency
-		}
-	}
-	#############################
-
-}
-
-fluctuations_3_monthly_add = {
-	if = {
-		limit = {
-			has_modifier = weak_currency
-			var:month_normal_currency > 0
-		}
-		change_variable = {
-			name = month_normal_currency
-			add = -1
-			min = 0
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = weak_currency
-			var:month_strong_currency > 0
-		}
-		change_variable = {
-			name = month_strong_currency
-			add = -1
-			min = 0
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = normal_currency
-			var:month_weak_currency > 0
-		}
-		change_variable = {
-			name = month_weak_currency
-			add = -1
-			min = 0
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = normal_currency
-			var:month_strong_currency > 0
-		}
-		change_variable = {
-			name = month_strong_currency
-			add = -1
-			min = 0
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = strong_currency
-			var:month_normal_currency > 0
-		}
-		change_variable = {
-			name = month_normal_currency
-			add = -1
-			min = 0
-		}
-	}
-	if = {
-		limit = {
-			has_modifier = strong_currency
-			var:month_weak_currency > 0
-		}
-		change_variable = {
-			name = month_weak_currency
-			add = -1
-			min = 0
-		}
+	change_variable = {
+		name = inflation_on_consumer_goods_rolling_inflation_6_months
+		divide = 3
 	}
 }
-fluctuations_1_annual_add = {
+reset_inflation_on_consumer_goods_market_value_fluctuations_month_1 = {
 	if = {
 		limit = {
-			has_modifier = natural_inflation
+			var:inflation_on_consumer_goods_market_value_fluctuations_month_1 = 6
 		}
-		remove_modifier = natural_inflation
-	}
-    if = {
-        limit = {
-        }
-		add_modifier = {
-			name = natural_inflation
-			multiply = var:years_natural_inflation
-		}
-    }
-}
-fluctuations_2_annual_add = {
-    if = {
-        limit = {
-            has_modifier = natural_inflation
-			has_variable = years_natural_inflation
-        }
-		change_variable = {
-			name = years_natural_inflation
-			add = 1
-		}
-    }
-    if = {
-        limit = {
- 			not = {			
-				has_variable = years_natural_inflation
-			}
-        }
 		set_variable = {
-			name = years_natural_inflation
+			name = inflation_on_consumer_goods_market_value_fluctuations_month_1
 			value = 0
 		}
-    }
+	}
 }
+#inflation_on_energy
+inflation_on_energy_market_value_fluctuations = {
+	change_variable = {
+		name = inflation_on_energy_market_value_fluctuations_month_1
+		add = 1
+	}
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_1
+            value = inflation_on_energy_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_2
+            value = inflation_on_energy_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_energy_market_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_01
+            add = var:inflation_on_energy_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_01
+            subtract = var:inflation_on_energy_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_01
+            divide = var:inflation_on_energy_market_value_fluctuations_var_month_1
+        }
+        # change_variable = {
+        #     name = inflation_on_energy_market_value_dif_01
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 3
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_3
+            value = inflation_on_energy_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 4
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_4
+            value = inflation_on_energy_market_value_abs
+        }
+
+        set_variable = {
+            name = inflation_on_energy_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_02
+            add = var:inflation_on_energy_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_02
+            subtract = var:inflation_on_energy_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_02
+            divide = var:inflation_on_energy_market_value_fluctuations_var_month_3
+        }
+        # change_variable = {
+        #     name = inflation_on_energy_market_value_dif_02
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 5
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_5
+            value = inflation_on_energy_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_energy_market_value_fluctuations_month_1 = 6
+        }
+        set_variable = {
+            name = inflation_on_energy_market_value_fluctuations_var_month_6
+            value = inflation_on_energy_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_energy_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_03
+            add = var:inflation_on_energy_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_03
+            subtract = var:inflation_on_energy_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_energy_market_value_dif_03
+            divide = var:inflation_on_energy_market_value_fluctuations_var_month_5
+        }
+        # change_variable = {
+        #     name = inflation_on_energy_market_value_dif_03
+		# 	multiply = -1
+        # }
+    }
+
+	inflation_on_energy_rolling_inflation_6_months = yes 
+	reset_inflation_on_energy_market_value_fluctuations_month_1 = yes
+}
+inflation_on_energy_rolling_inflation_6_months = {
+	set_variable = {
+		name = inflation_on_energy_rolling_inflation_6_months
+		value = var:inflation_on_energy_market_value_dif_01
+	}
+	change_variable = {
+		name = inflation_on_energy_rolling_inflation_6_months
+		add = var:inflation_on_energy_market_value_dif_02
+	}
+	change_variable = {
+		name = inflation_on_energy_rolling_inflation_6_months
+		add = var:inflation_on_energy_market_value_dif_03
+	}
+	change_variable = {
+		name = inflation_on_energy_rolling_inflation_6_months
+		divide = 3
+	}
+}
+reset_inflation_on_energy_market_value_fluctuations_month_1 = {
+	if = {
+		limit = {
+			var:inflation_on_energy_market_value_fluctuations_month_1 = 6
+		}
+		set_variable = {
+			name = inflation_on_energy_market_value_fluctuations_month_1
+			value = 0
+		}
+	}
+}
+#inflation_on_raw_material
+inflation_on_raw_material_market_value_fluctuations = {
+	change_variable = {
+		name = inflation_on_raw_material_market_value_fluctuations_month_1
+		add = 1
+	}
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_1
+            value = inflation_on_raw_material_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_2
+            value = inflation_on_raw_material_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_raw_material_market_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_01
+            add = var:inflation_on_raw_material_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_01
+            subtract = var:inflation_on_raw_material_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_01
+            divide = var:inflation_on_raw_material_market_value_fluctuations_var_month_1
+        }
+        # change_variable = {
+        #     name = inflation_on_raw_material_market_value_dif_01
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 3
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_3
+            value = inflation_on_raw_material_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 4
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_4
+            value = inflation_on_raw_material_market_value_abs
+        }
+
+        set_variable = {
+            name = inflation_on_raw_material_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_02
+            add = var:inflation_on_raw_material_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_02
+            subtract = var:inflation_on_raw_material_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_02
+            divide = var:inflation_on_raw_material_market_value_fluctuations_var_month_3
+        }
+        # change_variable = {
+        #     name = inflation_on_raw_material_market_value_dif_02
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 5
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_5
+            value = inflation_on_raw_material_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_raw_material_market_value_fluctuations_month_1 = 6
+        }
+        set_variable = {
+            name = inflation_on_raw_material_market_value_fluctuations_var_month_6
+            value = inflation_on_raw_material_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_raw_material_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_03
+            add = var:inflation_on_raw_material_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_03
+            subtract = var:inflation_on_raw_material_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_raw_material_market_value_dif_03
+            divide = var:inflation_on_raw_material_market_value_fluctuations_var_month_5
+        }
+        # change_variable = {
+        #     name = inflation_on_raw_material_market_value_dif_03
+		# 	multiply = -1
+        # }
+    }
+
+	inflation_on_raw_material_rolling_inflation_6_months = yes 
+	reset_inflation_on_raw_material_market_value_fluctuations_month_1 = yes
+}
+inflation_on_raw_material_rolling_inflation_6_months = {
+	set_variable = {
+		name = inflation_on_raw_material_rolling_inflation_6_months
+		value = var:inflation_on_raw_material_market_value_dif_01
+	}
+	change_variable = {
+		name = inflation_on_raw_material_rolling_inflation_6_months
+		add = var:inflation_on_raw_material_market_value_dif_02
+	}
+	change_variable = {
+		name = inflation_on_raw_material_rolling_inflation_6_months
+		add = var:inflation_on_raw_material_market_value_dif_03
+	}
+	change_variable = {
+		name = inflation_on_raw_material_rolling_inflation_6_months
+		divide = 3
+	}
+}
+reset_inflation_on_raw_material_market_value_fluctuations_month_1 = {
+	if = {
+		limit = {
+			var:inflation_on_raw_material_market_value_fluctuations_month_1 = 6
+		}
+		set_variable = {
+			name = inflation_on_raw_material_market_value_fluctuations_month_1
+			value = 0
+		}
+	}
+}
+#inflation_on_manufactured_goods
+inflation_on_manufactured_goods_market_value_fluctuations = {
+	change_variable = {
+		name = inflation_on_manufactured_goods_market_value_fluctuations_month_1
+		add = 1
+	}
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_1
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_2
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_01
+            add = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_01
+            subtract = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_01
+            divide = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_1
+        }
+        # change_variable = {
+        #     name = inflation_on_manufactured_goods_market_value_dif_01
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 3
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_3
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 4
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_4
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_02
+            add = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_02
+            subtract = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_02
+            divide = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_3
+        }
+        # change_variable = {
+        #     name = inflation_on_manufactured_goods_market_value_dif_02
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 5
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_5
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 6
+        }
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_fluctuations_var_month_6
+            value = inflation_on_manufactured_goods_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_03
+            add = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_03
+            subtract = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_manufactured_goods_market_value_dif_03
+            divide = var:inflation_on_manufactured_goods_market_value_fluctuations_var_month_5
+        }
+        # change_variable = {
+        #     name = inflation_on_manufactured_goods_market_value_dif_03
+		# 	multiply = -1
+        # }
+    }
+
+	inflation_on_manufactured_goods_rolling_inflation_6_months = yes 
+	reset_inflation_on_manufactured_goods_market_value_fluctuations_month_1 = yes
+}
+inflation_on_manufactured_goods_rolling_inflation_6_months = {
+	set_variable = {
+		name = inflation_on_manufactured_goods_rolling_inflation_6_months
+		value = var:inflation_on_manufactured_goods_market_value_dif_01
+	}
+	change_variable = {
+		name = inflation_on_manufactured_goods_rolling_inflation_6_months
+		add = var:inflation_on_manufactured_goods_market_value_dif_02
+	}
+	change_variable = {
+		name = inflation_on_manufactured_goods_rolling_inflation_6_months
+		add = var:inflation_on_manufactured_goods_market_value_dif_03
+	}
+	change_variable = {
+		name = inflation_on_manufactured_goods_rolling_inflation_6_months
+		divide = 3
+	}
+}
+reset_inflation_on_manufactured_goods_market_value_fluctuations_month_1 = {
+	if = {
+		limit = {
+			var:inflation_on_manufactured_goods_market_value_fluctuations_month_1 = 6
+		}
+		set_variable = {
+			name = inflation_on_manufactured_goods_market_value_fluctuations_month_1
+			value = 0
+		}
+	}
+}
+#inflation_on_military_equipment
+inflation_on_military_equipment_market_value_fluctuations = {
+	change_variable = {
+		name = inflation_on_military_equipment_market_value_fluctuations_month_1
+		add = 1
+	}
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_1
+            value = inflation_on_military_equipment_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_2
+            value = inflation_on_military_equipment_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_01
+            add = var:inflation_on_military_equipment_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_01
+            subtract = var:inflation_on_military_equipment_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_01
+            divide = var:inflation_on_military_equipment_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_01
+			multiply = -1
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 3
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_3
+            value = inflation_on_military_equipment_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 4
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_4
+            value = inflation_on_military_equipment_market_value_abs
+        }
+
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_02
+            add = var:inflation_on_military_equipment_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_02
+            subtract = var:inflation_on_military_equipment_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_02
+            divide = var:inflation_on_military_equipment_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_02
+			multiply = -1
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 5
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_5
+            value = inflation_on_military_equipment_market_value_abs
+        }
+    }
+    if = {
+        limit = {
+            var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 6
+        }
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_fluctuations_var_month_6
+            value = inflation_on_military_equipment_market_value_abs
+        }
+
+
+        set_variable = {
+            name = inflation_on_military_equipment_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_03
+            add = var:inflation_on_military_equipment_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_03
+            subtract = var:inflation_on_military_equipment_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_03
+            divide = var:inflation_on_military_equipment_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = inflation_on_military_equipment_market_value_dif_03
+			multiply = -1
+        }
+    }
+
+	inflation_on_military_equipment_rolling_inflation_6_months = yes 
+	reset_inflation_on_military_equipment_market_value_fluctuations_month_1 = yes
+}
+inflation_on_military_equipment_rolling_inflation_6_months = {
+	set_variable = {
+		name = inflation_on_military_equipment_rolling_inflation_6_months
+		value = var:inflation_on_military_equipment_market_value_dif_01
+	}
+	change_variable = {
+		name = inflation_on_military_equipment_rolling_inflation_6_months
+		add = var:inflation_on_military_equipment_market_value_dif_02
+	}
+	change_variable = {
+		name = inflation_on_military_equipment_rolling_inflation_6_months
+		add = var:inflation_on_military_equipment_market_value_dif_03
+	}
+	change_variable = {
+		name = inflation_on_military_equipment_rolling_inflation_6_months
+		divide = 3
+	}
+}
+reset_inflation_on_military_equipment_market_value_fluctuations_month_1 = {
+	if = {
+		limit = {
+			var:inflation_on_military_equipment_market_value_fluctuations_month_1 = 6
+		}
+		set_variable = {
+			name = inflation_on_military_equipment_market_value_fluctuations_month_1
+			value = 0
+		}
+	}
+}
+#money_value_dif_01
+money_value_dif_01_market_value_fluctuations = {
+	change_variable = {
+		name = money_value_dif_01_market_value_fluctuations_month_1
+		add = 1
+	}
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 1
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_1
+            value = money_value
+        }
+    }
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 2
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_2
+            value = money_value
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_01
+            add = var:money_value_dif_01_market_value_fluctuations_var_month_2
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_01
+            subtract = var:money_value_dif_01_market_value_fluctuations_var_month_1
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_01
+            divide = var:money_value_dif_01_market_value_fluctuations_var_month_1
+        }
+        # change_variable = {
+        #     name = money_value_dif_01_market_value_dif_01
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 3
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_3
+            value = money_value
+        }
+    }
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 4
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_4
+            value = money_value
+        }
+
+        set_variable = {
+            name = money_value_dif_01_market_value_dif_02
+            value = 0
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_02
+            add = var:money_value_dif_01_market_value_fluctuations_var_month_4
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_02
+            subtract = var:money_value_dif_01_market_value_fluctuations_var_month_3
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_02
+            divide = var:money_value_dif_01_market_value_fluctuations_var_month_3
+        }
+        # change_variable = {
+        #     name = money_value_dif_01_market_value_dif_02
+		# 	multiply = -1
+        # }
+    }
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 5
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_5
+            value = money_value
+        }
+    }
+    if = {
+        limit = {
+            var:money_value_dif_01_market_value_fluctuations_month_1 = 6
+        }
+        set_variable = {
+            name = money_value_dif_01_market_value_fluctuations_var_month_6
+            value = money_value
+        }
+
+
+        set_variable = {
+            name = money_value_dif_01_market_value_dif_03
+            value = 0
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_03
+            add = var:money_value_dif_01_market_value_fluctuations_var_month_6
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_03
+            subtract = var:money_value_dif_01_market_value_fluctuations_var_month_5
+        }
+        change_variable = {
+            name = money_value_dif_01_market_value_dif_03
+            divide = var:money_value_dif_01_market_value_fluctuations_var_month_5
+        }
+        # change_variable = {
+        #     name = money_value_dif_01_market_value_dif_03
+		# 	multiply = -1
+        # }
+    }
+
+	money_value_dif_01_rolling_inflation_6_months = yes 
+	reset_money_value_dif_01_market_value_fluctuations_month_1 = yes
+}
+money_value_dif_01_rolling_inflation_6_months = {
+	set_variable = {
+		name = money_value_dif_01_rolling_inflation_6_months
+		value = var:money_value_dif_01_market_value_dif_01
+	}
+	change_variable = {
+		name = money_value_dif_01_rolling_inflation_6_months
+		add = var:money_value_dif_01_market_value_dif_02
+	}
+	change_variable = {
+		name = money_value_dif_01_rolling_inflation_6_months
+		add = var:money_value_dif_01_market_value_dif_03
+	}
+	change_variable = {
+		name = money_value_dif_01_rolling_inflation_6_months
+		divide = 3
+	}
+}
+reset_money_value_dif_01_market_value_fluctuations_month_1 = {
+	if = {
+		limit = {
+			var:money_value_dif_01_market_value_fluctuations_month_1 = 8
+		}
+		set_variable = {
+			name = money_value_dif_01_market_value_fluctuations_month_1
+			value = 0
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# #############################
+
+# inflation_value_based_on_mining = {
+#     if = {
+#         limit = {
+# 			not = {
+# 				has_variable = law_currency
+# 			}
+#         }
+# 		set_variable = {
+# 			name = law_currency
+# 			value = 0
+# 		}
+#     }
+
+#     if = {
+#         limit = {
+#             has_law = law_type:law_revaluation_25
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			subtract = 1
+# 		}
+#     }
+# 	if = {
+#         limit = {
+# 			has_law = law_type:law_revaluation_50
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			subtract = 2
+# 		}
+        
+#     }
+# 	if = {
+#         limit = {
+#             has_law = law_type:law_revaluation_75
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			subtract = 3
+# 		}
+        
+#     }
+# 	if = {
+#         limit = {
+#             has_law = law_type:law_revaluation_100
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			subtract = 4
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			or = {
+# 				has_law = law_type:law_devaluation_25
+# 			}
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			add = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			or = {
+# 				has_law = law_type:law_devaluation_50
+# 			}
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			add = 2
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			or = {
+# 				has_law = law_type:law_devaluation_75
+
+# 			}
+#         }
+# 		change_variable = {
+# 			name = law_currency
+# 			add = 3
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			has_law = law_type:law_devaluation_100
+# 		}
+# 		change_variable = {
+# 			name = law_currency
+# 			add = 4
+# 		}
+# 	}
+
+# 	################################################################################################
+	
+#     if = {
+#         limit = {
+# 			var:devaluation_on = 1
+# 		}
+# 		change_variable = {
+# 			name = law_currency
+# 			add = var:inflation_value_predicted_devaluation_month_valided
+# 		}
+# 	}
+# 	if = {
+#         limit = {
+# 			var:revaluation_on = 1
+# 		}
+# 		change_variable = {
+# 			name = law_currency
+# 			add = var:inflation_value_predicted_revaluation_month_valided
+# 		}
+# 	}
+# }
+
+# #############################
+
+# fluctuations_market_price_monthly_add = {
+# 	set_variable = {
+# 		name = inflation_market_fixe
+# 		value = 0
+# 	}
+# 	change_variable = {
+# 		name = inflation_market_fixe
+# 		add = inflation_market_value
+# 	}
+# }
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+# fluctuations_2_monthly_add = {
+#     if = {
+#         limit = {
+#             has_modifier = weak_currency
+# 			has_variable = month_weak_currency
+#         }
+#         change_variable = {
+# 			name = month_weak_currency
+# 			add = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+#             has_modifier = normal_currency
+# 			has_variable = month_normal_currency
+#         }
+# 		change_variable = {
+# 			name = month_normal_currency
+# 			add = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+#             has_modifier = strong_currency
+# 			has_variable = month_strong_currency
+#         }
+# 		change_variable = {
+# 			name = month_strong_currency
+# 			add = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			not = {
+# 				has_variable = month_weak_currency
+# 			}
+#         }
+# 		set_variable = {
+# 			name = month_weak_currency
+# 			value = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			not = {
+# 				has_variable = month_normal_currency
+# 			}
+#         }
+# 		set_variable = {
+# 			name = month_normal_currency
+# 			value = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+# 			not = {
+# 				has_variable = month_strong_currency
+# 			}
+#         }
+# 		set_variable = {
+# 			name = month_strong_currency
+# 			value = 1
+# 		}
+#     }
+# }
+# fluctuations_3_monthly_add = {
+# 	if = {
+# 		limit = {
+# 			has_modifier = weak_currency
+# 			var:month_normal_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_normal_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# 	if = {
+# 		limit = {
+# 			has_modifier = weak_currency
+# 			var:month_strong_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_strong_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# 	if = {
+# 		limit = {
+# 			has_modifier = normal_currency
+# 			var:month_weak_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_weak_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# 	if = {
+# 		limit = {
+# 			has_modifier = normal_currency
+# 			var:month_strong_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_strong_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# 	if = {
+# 		limit = {
+# 			has_modifier = strong_currency
+# 			var:month_normal_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_normal_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# 	if = {
+# 		limit = {
+# 			has_modifier = strong_currency
+# 			var:month_weak_currency > 0
+# 		}
+# 		change_variable = {
+# 			name = month_weak_currency
+# 			add = -1
+# 			min = 0
+# 		}
+# 	}
+# }
+# fluctuations_1_annual_add = {
+# 	if = {
+# 		limit = {
+# 			has_modifier = natural_inflation
+# 		}
+# 		remove_modifier = natural_inflation
+# 	}
+#     if = {
+#         limit = {
+#         }
+# 		add_modifier = {
+# 			name = natural_inflation
+# 			multiply = var:years_natural_inflation
+# 		}
+#     }
+# }
+# fluctuations_2_annual_add = {
+#     if = {
+#         limit = {
+#             has_modifier = natural_inflation
+# 			has_variable = years_natural_inflation
+#         }
+# 		change_variable = {
+# 			name = years_natural_inflation
+# 			add = 1
+# 		}
+#     }
+#     if = {
+#         limit = {
+#  			not = {			
+# 				has_variable = years_natural_inflation
+# 			}
+#         }
+# 		set_variable = {
+# 			name = years_natural_inflation
+# 			value = 0
+# 		}
+#     }
+# }
