@@ -40,36 +40,36 @@ country_credit_debt_issued_relative_GDP = {
 		limit  = {
 			national_debt_compared_gdp < 0.1
 		}
-		add = 150
-	}
-	if = {
-		limit  = {
-			national_debt_compared_gdp > 0.1
-			national_debt_compared_gdp < 0.2
-		}
 		add = 100
 	}
 
 	if = {
 		limit  = {
+			national_debt_compared_gdp > 0.1
+			national_debt_compared_gdp < 0.2
+		}
+		add = 75
+	}
+	if = {
+		limit  = {
 			national_debt_compared_gdp > 0.2
 			national_debt_compared_gdp < 0.3
 		}
-		add = 75
+		add = 50
 	}
 	if = {
 		limit  = {
 			national_debt_compared_gdp > 0.3
 			national_debt_compared_gdp < 0.4
 		}
-		add = 50
+		add = 25
 	}
 	if = {
 		limit  = {
 			national_debt_compared_gdp > 0.4
 			national_debt_compared_gdp < 0.5
 		}
-		add = 25
+		add = 15
 	}
 	if = {
 		limit  = {
@@ -90,37 +90,31 @@ country_credit_debt_issued_relative_GDP = {
 			national_debt_compared_gdp > 0.7
 			national_debt_compared_gdp < 0.8
 		}
-		add = 15
+		add = 0
 	}
 	if = {
 		limit  = {
 			national_debt_compared_gdp > 0.8
 			national_debt_compared_gdp < 0.9
 		}
-		add = 0
-	}
-	if = {
-		limit  = {
-			national_debt_compared_gdp > 0.9
-			national_debt_compared_gdp < 0.1
-		}
 		add = -25
 	}
 	if = {
 		limit  = {
-			national_debt_compared_gdp > 1
+			national_debt_compared_gdp > 0.9
+			national_debt_compared_gdp < 1
 		}
 		add = -50
 	}
 	if = {
 		limit  = {
-			national_debt_compared_gdp > 2
+			national_debt_compared_gdp > 1
 		}
 		add = -100
 	}
 	if = {
 		limit  = {
-			national_debt_compared_gdp > 3
+			national_debt_compared_gdp > 2
 		}
 		add = -200
 	}
@@ -157,7 +151,7 @@ country_credit_country_rank = {
 		limit  = {
 			country_rank >= rank_value:minor_power
 		}
-		add = 25
+		add = 0
 	}
 	if = {
 		limit  = {
@@ -320,6 +314,68 @@ country_credit_rating_sol = {
 	}
 
 }
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+# national_debt_allowed
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+national_debt_allowed_relative_gdp = {
+	value = 0
+	if = {
+		limit  = {
+			country_credit_rating > 499
+		}
+		add = 1
+	}
+	if = {
+		limit  = {
+			country_credit_rating < 499
+			country_credit_rating > 375
+		}
+		add = 0.90
+		
+	}
+	if = {
+		limit  = {
+			country_credit_rating < 375
+			country_credit_rating > 249
+		}
+		add = 0.80
+		
+	}
+	if = {
+		limit  = {
+			country_credit_rating < 249
+			country_credit_rating > 200
+		}
+		add = 0.70
+		
+	}
+	if = {
+		limit  = {
+			country_credit_rating < 199
+			country_credit_rating > 151
+		}
+		add = 0.60
+		
+	}
+	if = {
+		limit  = {
+			country_credit_rating < 150
+			country_credit_rating > 99
+		}
+		add = 0.50
+	}
+}
+
 
 ########################################################################################################################################
 ########################################################################################################################################
@@ -1880,23 +1936,14 @@ sell_ironclads_in_gold_market_panel = {
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
-price_bond_in_gold = {
+price_bond = {
 	value = player.var:bond_quantity
 	multiply = bond_price
 }
 
-# price_bond_in_gold_ai_1M = {
-# 	value = 1000000
-# 	multiply = bond_price
-# }
-
-# price_bond_in_gold_ai_500K = {
-# 	value = 500000
-# 	multiply = bond_price
-# }
 
 bond_final_interest_5Y = {
-	value = price_bond_in_gold
+	value = price_bond
 	multiply = interest_value_5Y
 	multiply = 5
 }
@@ -1906,13 +1953,18 @@ bond_monthly_interest_5Y = {
 	divide = 60
 }
 
+bond_weekly_interest_5Y = {
+	value = bond_monthly_interest_5Y
+	divide = 4
+}
+
 total_at_term_5Y = {
 	value = bond_final_interest_5Y
-	add = price_bond_in_gold
+	add = price_bond
 }
 
 bond_final_interest_10Y = {
-	value = price_bond_in_gold
+	value = price_bond
 	multiply = interest_value_10Y
 	multiply = 10
 }
@@ -1922,10 +1974,25 @@ bond_monthly_interest_10Y = {
 	divide = 120
 }
 
+bond_weekly_interest_10Y = {
+	value = bond_monthly_interest_10Y
+	divide = 4
+}
+
 total_at_term_10Y = {
 	value = bond_final_interest_10Y
-	add = price_bond_in_gold
+	add = price_bond
 }
+
+# price_bond_ai_1M = {
+# 	value = 1000000
+# 	multiply = bond_price
+# }
+
+# price_bond_ai_500K = {
+# 	value = 500000
+# 	multiply = bond_price
+# }
 
 ###########################################################################################################################################################################################
 
@@ -2176,16 +2243,16 @@ gold_lent_to_other = { #buy
 	}
 }
 
-# gold_lent_to_other_in_gold = { 
+# gold_lent_to_other_in_gold = {
 # 	value = gold_lent_to_other
 # 	multiply = money_value_rapported_inflation
 # }
 
-gold_lent_to_us = { 
+gold_lent_to_us = {
 	value = 1
 }
 
-#gold_loaned_to_central_bank remplace tout 
+#gold_loaned_to_central_bank remplace tout
 gold_loaned_to_central_bank = {
 	value = 0
 	add = var:central_bank_gold_loaned_1
@@ -2198,6 +2265,17 @@ gold_loaned_to_central_bank = {
 	add = var:central_bank_gold_loaned_8
 	add = var:central_bank_gold_loaned_9
 	add = var:central_bank_gold_loaned_10
+
+	add = var:ai_central_bank_gold_loaned_1
+	add = var:ai_central_bank_gold_loaned_2
+	add = var:ai_central_bank_gold_loaned_3
+	add = var:ai_central_bank_gold_loaned_4
+	add = var:ai_central_bank_gold_loaned_5
+	add = var:ai_central_bank_gold_loaned_6
+	add = var:ai_central_bank_gold_loaned_7
+	add = var:ai_central_bank_gold_loaned_8
+	add = var:ai_central_bank_gold_loaned_9
+	add = var:ai_central_bank_gold_loaned_10
 }
 # central_bank_gold_loaned_in_gold = {
 # 	value = central_bank_gold_loaned
@@ -2216,6 +2294,18 @@ central_bank_interest_refund_per_year = {
 	add = var:central_bank_interest_refund_per_year_8
 	add = var:central_bank_interest_refund_per_year_9
 	add = var:central_bank_interest_refund_per_year_10
+
+	
+	add = var:ai_central_bank_interest_refund_per_year_1
+	add = var:ai_central_bank_interest_refund_per_year_2
+	add = var:ai_central_bank_interest_refund_per_year_3
+	add = var:ai_central_bank_interest_refund_per_year_4
+	add = var:ai_central_bank_interest_refund_per_year_5
+	add = var:ai_central_bank_interest_refund_per_year_6
+	add = var:ai_central_bank_interest_refund_per_year_7
+	add = var:ai_central_bank_interest_refund_per_year_8
+	add = var:ai_central_bank_interest_refund_per_year_9
+	add = var:ai_central_bank_interest_refund_per_year_10
 }
 # central_bank_interest_refund_per_year_in_gold = {
 # 	value = central_bank_interest_refund_per_year
@@ -2341,7 +2431,7 @@ bond_quantity_scripted_all = {
 	value = 0
 	add = {
 		value = 0
-		add = scope:seller.central_bank_debt 
+		add = scope:seller.central_bank_debt
 		divide = scope:seller.bond_price
 	}
 }
@@ -2349,7 +2439,6 @@ bond_quantity_scripted_all = {
 gold_loan_preview  = {
 	value = bond_quantity_scripted
 	multiply = scope:seller.bond_price
-	multiply = money_value_rapported_inflation
 }
 
 bond_quantity_scripted_test = {
@@ -2499,25 +2588,25 @@ buy_bond_order_valid_5Y = {
 ########################################################################################################################################
 
 
-bond_price_in_gold = {
-	value = bond_price
-	multiply = gold_value_rapported_inflation
-}
+# bond_price_in_gold = {
+# 	value = bond_price
+# 	multiply = gold_value_rapported_inflation
+# }
 
-bond_final_interest_5Y_in_gold = {
-	value = bond_final_interest_5Y
-	multiply = money_value_rapported_inflation
-}
+# bond_final_interest_5Y_in_gold = {
+# 	value = bond_final_interest_5Y
+# 	multiply = money_value_rapported_inflation
+# }
 
-bond_monthly_interest_5Y_in_gold = {
-	value = bond_monthly_interest_5Y
-	multiply = money_value_rapported_inflation
-}
+# bond_monthly_interest_5Y_in_gold = {
+# 	value = bond_monthly_interest_5Y
+# 	multiply = money_value_rapported_inflation
+# }
 
-total_at_term_5Y_in_gold = {
-	value = total_at_term_5Y
-	multiply = money_value_rapported_inflation
-}
+# total_at_term_5Y_in_gold = {
+# 	value = total_at_term_5Y
+# 	multiply = money_value_rapported_inflation
+# }
 
 #text = "[GetPlayer.MakeScope.ScriptValue('bond_final_interest_5Y_in_gold')|D] @gold!"
 
