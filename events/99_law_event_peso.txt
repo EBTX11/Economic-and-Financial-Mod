@@ -14,36 +14,30 @@ law_event_peso.1 = {
 		capital = {
 			save_scope_as = central_bank_site
 		}
-		scope:central_bank_site = {
-			if = {
-				limit = {
-					not = {
-						root = {
-							has_law = law_type:law_peso_currency
-						}
-					}
-				}
-				change_variable = {
-                    name = central_bank_gold_reserves_state_1
-                    add = { 17500000 22500000 }
-                }
-				change_variable = {
-					name = stockpiling_peso_state_1
-					add = 100000000
-				}
-			} 
+		
+		set_variable = {
+			name = money_value_target_1
+			value = { 0.1 1 }
 		}
-		if = {
-			limit = {
-				not = {
-					root = {
-						has_law = law_type:law_peso_currency
-					}
+		change_variable = {
+			name = circulating_peso_c_var_1
+			add = { 50000009 100000009 }
+		}
+		scope:central_bank_site = {
+			change_variable = {
+				name = stockpiling_peso_state_1
+				add  = {
+					value = owner.var:circulating_peso_c_var_1
+					multiply = 0.1
 				}
 			}
-			set_variable = {
-				name = circulating_peso_c_var_1
-				value = 100000000
+			change_variable = {
+				name = central_bank_gold_reserves_state_1
+				add = {
+					value = owner.var:circulating_peso_c_var_1
+					add = var:stockpiling_peso_state_1
+					multiply = owner.var:money_value_target_1
+				}
 			}
 		}
 		activate_law = law_type:law_peso_currency
