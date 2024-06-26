@@ -1,4 +1,5 @@
 # COPY-PASTED FOR NOW
+@panel_width_minus_20 = 520
 @panel_width_minus_10 = 530			# used to be 530
 @panel_width = 540  				# used to be 460
 @panel_width_half = 270				# used to be 230
@@ -19,6 +20,69 @@ template information_tab_visibility_not {
 
 template is_not_player_and_not_colonizable_country {
 	visible = "[And(Not(Country.IsPlayer),Not(Country.IsColonizable))]"
+}
+
+### Checks if there are any triggers (GetDesc) or effects. Should only show up if there exists a target country context.
+template diplo_action_triggers_and_effects_visibility {
+	visible = "[Or(Not(StringIsEmpty(GetDesc(DiplomaticAction.ExecuteAction))), Not(StringIsEmpty(DiplomaticAction.GetEffectsDesc)))]"
+}
+
+template diplomatic_action_tooltip {
+	tooltipwidget = {
+		FancyTooltip_DiplomaticActionWithTargetCountry = {}
+	}
+}
+
+template diplomatic_action_button_properties {
+	enabled = "[IsValid(DiplomaticAction.ExecuteAction)]"
+	onclick = "[DiplomaticAction.ExecuteWithConfirmation]"
+	onclick = "[RightClickMenuManager.Close]"
+	using = diplomatic_action_tooltip
+
+	icon = {
+		visible = "[DiplomaticAction.IsActivePact]"
+		using = highlighted_square_selection
+	}	
+}
+
+template diplomatic_action_button_after_label {
+	hbox = {
+		spacing = 10
+		margin_right = 10
+
+		hbox = {
+			visible = "[Not(EqualTo_CFixedPoint(DiplomaticAction.GetMaintenanceCost, '(CFixedPoint)0'))]"
+			spacing = 5
+
+			icon = {
+				size = { 25 25 }
+				texture = "gfx/interface/icons/topbar/influence_icon.dds"
+			}
+
+			textbox = {
+				align = nobaseline
+				autoresize = yes
+				raw_text = "#v [DiplomaticAction.GetMaintenanceCost|0]#!"
+				min_width = 26
+			}
+		}
+
+		widget = { #we always want the space to be occupied so that the Diplo cost is aligned, but the divider to show if needed
+			layoutpolicy_vertical = expanding
+
+			vertical_divider = {
+				visible = "[And(Not(EqualTo_CFixedPoint(DiplomaticAction.GetMaintenanceCost, '(CFixedPoint)0')), And(DiplomaticAction.RequiresApproval, Not(DiplomaticAction.GetSecondCountry.IsPlayer)))]"
+			}
+		}
+
+		widget = {
+			size = { 30 30 }
+			
+			diplomatic_action_acceptance_icon = {
+				visible = "[Not(DiplomaticAction.GetType.CanSelectAnyState)]"
+			}
+		}
+	}
 }
 
 types country_panel_types
@@ -226,16 +290,16 @@ types country_panel_types
 		### TOP INFO
 		container = {
 			parentanchor = hcenter
-			minimumsize = { @panel_width_minus_10 -1 }
+			minimumsize = { @panel_width_minus_10 542 }
 			maximumsize = { @panel_width_minus_10 -1 }
 
 			# FLAG
 			widget = {
 				position = { 5 0 }
-				size = { 340 542 }
+				size = { 340 100% }
 
 				icon = {
-					size = { 340 542 }
+					size = { 340 100% }
 					position = { 3 0 }
 					texture = "gfx/interface/flag/fancy_flag_country_view.dds"
 				}
@@ -245,7 +309,7 @@ types country_panel_types
 						using = flag_button_glow
 						size = { 270 200 }
 						position = { -12 -2 }
-						using = tooltip_below
+						using = tooltip_es
 						alpha = 0.3
 
 						tooltipwidget = {
@@ -275,82 +339,125 @@ types country_panel_types
 				}
 			}
 
-			#RULER PORTRAIT
-			character_portrait_large_torso = {
-				datacontext = "[Country.AccessRuler]"
-				position = { 50 135 }
-				blockoverride "show_hat" {}
-				blockoverride "highlight" {}
-				blockoverride "commander_order_icon" {}
-			}
+			
 
-			#GOVERNMENT
 			flowcontainer = {
-				position = { 0 400 }
-				direction = vertical
-				minimumsize = { 260 -1 }
-				margin_top = 10
+				parentanchor = bottom
 				spacing = 10
-				margin_bottom = 5
-
-				using = main_bg
+				direction = vertical
 
 				flowcontainer = {
-					margin_left = 10
-					spacing = 10
+					parentanchor = right
 
-					icon = {
-						parentanchor = vcenter
-						texture = "gfx/interface/icons/generic_icons/in_government_icon.dds"
-						size = { 40 40 }
-					}
-					textbox = {
-						parentanchor = vcenter
-						autoresize = yes
-						multiline = yes
-						maximumsize = { 200 -1 }
-						minimumsize = { 200 -1 }
-						text = "COUNTRY_GOVERNMENT"
-						align = nobaseline
-						elide = right
-					}
-				}
+					spacing = -2 #this flowcontainer is a BIT too wide compared to the government info below it
+ 
+					# DIPLOMATIC PACTS
+					flowcontainer = {
+						datamodel = "[Country.AccessActiveDiplomaticPactTypes]"
+						direction = vertical
+						parentanchor = bottom
 
-				dynamicgridbox = {
-					datamodel = "[CountryPanel.AccessCountry.AccessInterestGroupsInGovernment]"
-					datamodel_wrap = 4
-					flipdirection = yes
-
-					item = {
-						widget = {
-							size = { 61 65 }
-
+						item = {
 							flowcontainer = {
-								parentanchor = hcenter
-								direction = vertical
-								tooltip = "CLOUT_PIECHART"
-								spacing = 2
+								datamodel = "[ContextualDiplomaticActionType.AccessCountry.AccessActiveDiplomaticPacts( ContextualDiplomaticActionType.Self )]"
+								item = {
+									flowcontainer = {
+										visible = "[ObjectsEqual(GetPlayer.Self, ContextualDiplomaticPact.GetOtherCountry)]"
 
-								widget = {
-									size = { 33 33 }
-									parentanchor = hcenter
+										icon = {
+											size =  { 45 45 }
+											texture = "gfx/interface/backgrounds/round_button_bg.dds"
 
-									ig_button = {
-										visible = "[Country.IsPlayer]"
-										size = { 100% 100% }
-										blockoverride "in_government_icon"{}
-									}
-									ig_icon = {
-										visible = "[Not(Country.IsPlayer)]"
-										size = { 100% 100% }
-										blockoverride "in_government_icon"{}
+											icon = {
+												parentanchor = center
+												size = { 75% 75% }
+												texture = "[ContextualDiplomaticActionType.GetDiplomaticActionType.GetTexture]"
+												tooltip = "[ContextualDiplomaticPact.GetTooltip]"
+											}
+										}
 									}
 								}
-								textbox = {
-									text = "[InterestGroup.GetClout|%1]"
-									autoresize = yes
+							}
+						}
+					}
+
+					#RULER PORTRAIT
+					character_portrait_large_torso = {
+						parentanchor = bottom
+						datacontext = "[Country.AccessRuler]"
+						blockoverride "show_hat" {}
+						blockoverride "highlight" {}
+						blockoverride "commander_order_icon" {}
+					}
+				}
+				
+				#GOVERNMENT
+				flowcontainer = {
+					direction = vertical
+					minimumsize = { 260 -1 }
+					margin_top = 10
+					spacing = 10
+					margin_bottom = 5
+
+					using = main_bg
+
+					flowcontainer = {
+						margin_left = 10
+						spacing = 10
+
+						icon = {
+							parentanchor = vcenter
+							texture = "gfx/interface/icons/generic_icons/in_government_icon.dds"
+							size = { 40 40 }
+						}
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							multiline = yes
+							maximumsize = { 200 -1 }
+							minimumsize = { 200 -1 }
+							text = "COUNTRY_GOVERNMENT"
+							align = nobaseline
+							elide = right
+						}
+					}
+
+					dynamicgridbox = {
+						datamodel = "[CountryPanel.AccessCountry.AccessInterestGroupsInGovernment]"
+						datamodel_wrap = 4
+						flipdirection = yes
+
+						item = {
+							widget = {
+								size = { 61 65 }
+
+								flowcontainer = {
 									parentanchor = hcenter
-									align = nobaseline
+									direction = vertical
+									tooltip = "CLOUT_PIECHART"
+									spacing = 2
+
+									widget = {
+										size = { 33 33 }
+										parentanchor = hcenter
+
+										ig_button = {
+											visible = "[Country.IsPlayer]"
+											size = { 100% 100% }
+											blockoverride "in_government_icon"{}
+										}
+										ig_icon = {
+											visible = "[Not(Country.IsPlayer)]"
+											size = { 100% 100% }
+											blockoverride "in_government_icon"{}
+										}
+									}
+									textbox = {
+										text = "[InterestGroup.GetClout|%1]"
+										autoresize = yes
+										parentanchor = hcenter
+										align = nobaseline
+									}
 								}
 							}
 						}
@@ -426,7 +533,8 @@ types country_panel_types
 					blockoverride "stats_tooltip" {
 						tooltip = "[Country.GetRankTooltip]"
 					}
-					blockoverride "no_icon" {
+
+					blockoverride "entire_icon" {
 						rank_badge = {
 							size = { 50 50 }
 							parentanchor = right|vcenter
@@ -442,12 +550,15 @@ types country_panel_types
 							}
 						}
 					}
+
 					blockoverride "information_icon" {
 						texture = "gfx/interface/icons/generic_icons/gdp.dds"
 					}
+
 					blockoverride "stats_label" {
 						text = "[concept_rank]"
 					}
+					
 					blockoverride "stats_value" {
 						raw_text = "#v [Country.GetRank]#!"
 					}
@@ -456,6 +567,83 @@ types country_panel_types
 						size = { 160 20 }
 						elide = right
 						fontsize_min = 15
+					}
+				}
+
+				#POWER BLOC
+				country_stats_entry = {
+					visible = "[Country.IsInPowerBloc]"
+					datacontext = "[Country.GetPowerBloc]"
+
+					blockoverride "stats_tooltip" {
+						tooltipwidget = {
+							FancyTooltip_PowerBloc = {}
+						}
+					}
+
+					### POWER BLOC EMBLEM BUTTON
+					blockoverride "entire_icon" {
+						button_icon_round = {
+							parentanchor = right|vcenter
+							position = { -5 0 }
+							onclick = "[InformationPanelBar.OpenPowerBlocPanelTab( PowerBloc.Self, 'default' )]"
+							onrightclick = "[RightClickMenuManager.ShowForPowerBloc( PowerBloc.AccessSelf )]"
+							onclick = "[PowerBlocPanel.ShowLeverage]"
+
+							blockoverride "size" {
+								size = { 45 45 }
+							}
+
+							blockoverride "icon_size" {
+								size = { 80% 80% }
+							}
+
+							blockoverride "icon" {
+								texture = "[PowerBloc.GetFlag.GetMediumPowerBlocCoaTexture]"
+								frame = "[PowerBloc.GetFlag.GetMediumPowerBlocCoaFrame]"
+								framesize = "[GetMediumPowerBlocCoaFrameSize]"
+							}
+						}
+					}
+
+					blockoverride "stats_label" {
+						text = "[concept_power_bloc]"
+					}
+
+					blockoverride "stats_value" {
+						text = "[PowerBloc.GetNameNoIcon]"
+					}
+
+					blockoverride "stats_rank" {
+						text = "POWER_BLOC_RANK_FORMATTED"
+					}
+				}
+
+				#NOT IN A POWER BLOC - LEVERAGE
+				country_stats_entry = {
+					visible = "[Not(Country.IsInPowerBloc)]"
+
+					blockoverride "stats_tooltip" {
+						tooltipwidget = {
+							RegularTooltip_Leverage = {
+								datacontext = "[GetPlayer.GetPowerBloc]"
+
+								blockoverride "has_power_bloc_context_visibility" {
+									visible = "[GetPlayer.IsInPowerBloc]"
+								}
+							}
+						}
+					}
+
+					blockoverride "information_icon" {
+						texture = "gfx/interface/icons/generic_icons/leverage.dds"
+					}
+
+					blockoverride "stats_label" {
+						text = "[concept_power_bloc]"
+					}
+					blockoverride "stats_value" {
+						text = "COUNTRY_PANEL_LEVERAGE_LABEL"
 					}
 				}
 
@@ -542,2102 +730,51 @@ types country_panel_types
 						text = "COUNTRY_GDP_ONE_LINE"
 					}
 					blockoverride "stats_value" {
-						text = "#v [Country.GetCustom('currency_symbol')][Country.GetGDP|D]#!"
+						raw_text = "@money![Country.GetGDP|Dv]"
 					}
 
 					blockoverride "stats_rank" {
 						text = "[Country.GetGDPRanking]"
 					}
 				}
-	
-				#####################################################################################################################
-				#####################################################################################################################
-				#####################################################################################################################
-				#####################################################################################################################
+				
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
 
-				##CURRENCY ### has_gold_standard_no_gold_exchange_standard_tech_visibility
-				country_stats_entry = {
-					visible = "[GetScriptedGui('has_gold_standard_no_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
-
-					tooltip = "MONEY_VALUE_gold_standard"
-					icon = {
-						size = { 36 36 }
-						name = dip_power_icon
-
-						#generic
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_generic')]"
-							parentanchor = vcenter
-						}	
-
-						#begin_tag_1	
-						#dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_algerian_dinar
-						textbox = {
-							position = { 180 -3 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_algerian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_iraqi_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_iraqi_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_libyan_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_libyan_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_moroccan_dirham
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dinar_moroccan_dirham')]"
-							parentanchor = vcenter
-						}	
-						#dinar_omanian_rial
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_omanian_rial')]"
-							parentanchor = vcenter
-						}	
-						#dinar_qiran
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_qiran')]"
-							parentanchor = vcenter
-						}	
-						#dinar_saudi_riyal
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_saudi_riyal')]"
-							parentanchor = vcenter
-						}	
-						#dinar_serbian_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_serbian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_tunisian_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_tunisian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_yugoslav_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_yugoslav_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_australian_dollar
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dollar_australian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_canadian_dollar
-						textbox = {
-							position = { 174 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_canadian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_caribbean_dollar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_caribbean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_confederate_states_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_confederate_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_liberian_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_liberian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_new_zealand_dollar
-						textbox = {
-							position = { 175 5 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_new_zealand_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_sierra_leonean_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_sierra_leonean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_united_states_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_united_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#eco_ariary
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ariary')]"
-							parentanchor = vcenter
-						}	
-						#eco_central_african_eco
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_central_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_east_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_east_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_ethiopian_birr
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ethiopian_birr')]"
-							parentanchor = vcenter
-						}	
-						#eco_ghanaian_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ghanaian_pound')]"
-							parentanchor = vcenter
-						}	
-						#eco_nigerian_naira
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_nigerian_naira')]"
-							parentanchor = vcenter
-						}	
-						#eco_south_african_rand
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_south_african_rand')]"
-							parentanchor = vcenter
-						}	
-						#eco_tuareg_ouguiya
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_eco_tuareg_ouguiya')]"
-							parentanchor = vcenter
-						}	
-						#eco_west_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_west_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#franc_belgian_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_belgian_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_french_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_french_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_luxembourgish_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_luxembourgish_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_swiss_franc
-						textbox = {
-							position = { 170 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_franc_swiss_franc')]"
-							parentanchor = vcenter
-						}	
-						#gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_bavarian_gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_bavarian_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_florin
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_florin')]"
-							parentanchor = vcenter
-						}	
-						#gulden_hungarian_forint
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_hungarian_forint')]"
-							parentanchor = vcenter
-						}	
-						#gulden_indies_guilder
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_indies_guilder')]"
-							parentanchor = vcenter
-						}	
-						#gulden_south_german_gulden
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_south_german_gulden')]"
-							parentanchor = vcenter
-						}	
-						#krone_czech_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_czech_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_danish_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_danish_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_estonian_kroon
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_estonian_kroon')]"
-							parentanchor = vcenter
-						}	
-						#krone_icelandic_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_icelandic_krona')]"
-							parentanchor = vcenter
-						}	
-						#krone_norwegian_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_norwegian_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_slovak_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_slovak_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_swedish_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_swedish_krona')]"
-							parentanchor = vcenter
-						}	
-						#leon_leu
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_leu')]"
-							parentanchor = vcenter
-						}	
-						#leon_lev
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_lev')]"
-							parentanchor = vcenter
-						}	
-						#lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_ducato
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ducato')]"
-							parentanchor = vcenter
-						}	
-						#lira_ottoman_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ottoman_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_pontificio
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_pontificio')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_sardo
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_sardo')]"
-							parentanchor = vcenter
-						}	
-						#lira_toscane_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_toscane_lira')]"
-							parentanchor = vcenter
-						}	
-						#mark
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_mark')]"
-							parentanchor = vcenter
-						}	
-						#mark_finnish_markka
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_mark_finnish_markka')]"
-							parentanchor = vcenter
-						}	
-						#peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_argentine_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_argentine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_bolivien_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_bolivien_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_chilean_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_chilean_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_colombian_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_colombian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_costa_rican_colon
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_costa_rican_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_cuban_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_cuban_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_ecuadorian_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_ecuadorian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_el_salvador_colon
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_el_salvador_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_guatemalan_quetzal
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_guatemalan_quetzal')]"
-							parentanchor = vcenter
-						}	
-						#peso_honduran_lempira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_honduran_lempira')]"
-							parentanchor = vcenter
-						}	
-						#peso_mexican_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_mexican_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_nicaraguan_cordoba
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_nicaraguan_cordoba')]"
-							parentanchor = vcenter
-						}	
-						#peso_paraguayan_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_paraguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_philippine_peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_philippine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_sol_de_oro
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_sol_de_oro')]"
-							parentanchor = vcenter
-						}	
-						#peso_uruguayan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_uruguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_venezuelan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_venezuelan_peso')]"
-							parentanchor = vcenter
-						}	
-						#pound_egyptian_pound
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_egyptian_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_irish_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_irish_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_sterling
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_sterling')]"
-							parentanchor = vcenter
-						}	
-						#real
-						textbox = {
-							position = { 190 -4 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real')]"
-							parentanchor = vcenter
-						}	
-						#real_brazilian_real
-						textbox = {
-							position = { 175 2 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real_brazilian_real')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indian_rupee
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indian_rupee')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indonesian_rupiah
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indonesian_rupiah')]"
-							parentanchor = vcenter
-						}	
-						#spe_baht
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_baht')]"
-							parentanchor = vcenter
-						}	
-						#spe_dong
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_dong')]"
-							parentanchor = vcenter
-						}	
-						#spe_drachma
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_drachma')]"
-							parentanchor = vcenter
-						}	
-						#spe_korean_won
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_korean_won')]"
-							parentanchor = vcenter
-						}	
-						#spe_latvian_lats
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_latvian_lats')]"
-							parentanchor = vcenter
-						}	
-						#spe_lithuanian_litas
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_lithuanian_litas')]"
-							parentanchor = vcenter
-						}	
-						#spe_peseta
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_peseta')]"
-							parentanchor = vcenter
-						}	
-						#spe_ruble
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_ruble')]"
-							parentanchor = vcenter
-						}	
-						#spe_uni
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_spe_uni')]"
-							parentanchor = vcenter
-						}	
-						#spe_yen
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yen')]"
-							parentanchor = vcenter
-						}	
-						#spe_yuan
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yuan')]"
-							parentanchor = vcenter
-						}	
-						#spe_zloti
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_zloti')]"
-							parentanchor = vcenter
-						}	
-						#thaler_hannoveraner_thaler
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_hannoveraner_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_prussian_thaler
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_prussian_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_saxon_thaler
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_thaler_saxon_thaler')]"
-							parentanchor = vcenter
-						}#end_tag_1
-
-					}
-					blockoverride "stats_label" {
-						text = "COUNTRY_CURRENCY_ONE_LINE"
-					}
-					blockoverride "stats_value" {
-						text = "#v [Country.GetCustom('currency_name')]#!"
-					}
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+				
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+			
+				country_panel_currency_panel_content = {
+					using = default_fade_in_out
 				}
 
-				##CURRENCY	### has_gold_exchange_standard_tech_visibility
-				country_stats_entry = {
-					visible = "[GetScriptedGui('has_gold_exchange_standard_tech_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
 
-					tooltip = "MONEY_VALUE_gold_exchange_standard"
-					icon = {
-						size = { 36 36 }
-						name = dip_power_icon
+				# ███╗   ███╗ ██████╗ ██████╗     ███████╗███╗   ██╗██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗    ██╔════╝████╗  ██║██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║    █████╗  ██╔██╗ ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║    ██╔══╝  ██║╚██╗██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝    ███████╗██║ ╚████║██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝     ╚══════╝╚═╝  ╚═══╝╚═════╝ 
 
-						#generic
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_generic')]"
-							parentanchor = vcenter
-						}
-
-						#begin_tag_1	
-						#dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_algerian_dinar
-						textbox = {
-							position = { 180 -3 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_algerian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_iraqi_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_iraqi_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_libyan_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_libyan_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_moroccan_dirham
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dinar_moroccan_dirham')]"
-							parentanchor = vcenter
-						}	
-						#dinar_omanian_rial
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_omanian_rial')]"
-							parentanchor = vcenter
-						}	
-						#dinar_qiran
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_qiran')]"
-							parentanchor = vcenter
-						}	
-						#dinar_saudi_riyal
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_saudi_riyal')]"
-							parentanchor = vcenter
-						}	
-						#dinar_serbian_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_serbian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_tunisian_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_tunisian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_yugoslav_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_yugoslav_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_australian_dollar
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dollar_australian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_canadian_dollar
-						textbox = {
-							position = { 174 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_canadian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_caribbean_dollar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_caribbean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_confederate_states_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_confederate_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_liberian_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_liberian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_new_zealand_dollar
-						textbox = {
-							position = { 175 5 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_new_zealand_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_sierra_leonean_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_sierra_leonean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_united_states_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_united_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#eco_ariary
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ariary')]"
-							parentanchor = vcenter
-						}	
-						#eco_central_african_eco
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_central_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_east_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_east_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_ethiopian_birr
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ethiopian_birr')]"
-							parentanchor = vcenter
-						}	
-						#eco_ghanaian_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ghanaian_pound')]"
-							parentanchor = vcenter
-						}	
-						#eco_nigerian_naira
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_nigerian_naira')]"
-							parentanchor = vcenter
-						}	
-						#eco_south_african_rand
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_south_african_rand')]"
-							parentanchor = vcenter
-						}	
-						#eco_tuareg_ouguiya
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_eco_tuareg_ouguiya')]"
-							parentanchor = vcenter
-						}	
-						#eco_west_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_west_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#franc_belgian_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_belgian_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_french_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_french_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_luxembourgish_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_luxembourgish_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_swiss_franc
-						textbox = {
-							position = { 170 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_franc_swiss_franc')]"
-							parentanchor = vcenter
-						}	
-						#gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_bavarian_gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_bavarian_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_florin
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_florin')]"
-							parentanchor = vcenter
-						}	
-						#gulden_hungarian_forint
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_hungarian_forint')]"
-							parentanchor = vcenter
-						}	
-						#gulden_indies_guilder
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_indies_guilder')]"
-							parentanchor = vcenter
-						}	
-						#gulden_south_german_gulden
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_south_german_gulden')]"
-							parentanchor = vcenter
-						}	
-						#krone_czech_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_czech_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_danish_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_danish_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_estonian_kroon
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_estonian_kroon')]"
-							parentanchor = vcenter
-						}	
-						#krone_icelandic_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_icelandic_krona')]"
-							parentanchor = vcenter
-						}	
-						#krone_norwegian_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_norwegian_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_slovak_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_slovak_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_swedish_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_swedish_krona')]"
-							parentanchor = vcenter
-						}	
-						#leon_leu
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_leu')]"
-							parentanchor = vcenter
-						}	
-						#leon_lev
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_lev')]"
-							parentanchor = vcenter
-						}	
-						#lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_ducato
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ducato')]"
-							parentanchor = vcenter
-						}	
-						#lira_ottoman_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ottoman_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_pontificio
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_pontificio')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_sardo
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_sardo')]"
-							parentanchor = vcenter
-						}	
-						#lira_toscane_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_toscane_lira')]"
-							parentanchor = vcenter
-						}	
-						#mark
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_mark')]"
-							parentanchor = vcenter
-						}	
-						#mark_finnish_markka
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_mark_finnish_markka')]"
-							parentanchor = vcenter
-						}	
-						#peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_argentine_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_argentine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_bolivien_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_bolivien_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_chilean_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_chilean_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_colombian_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_colombian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_costa_rican_colon
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_costa_rican_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_cuban_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_cuban_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_ecuadorian_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_ecuadorian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_el_salvador_colon
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_el_salvador_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_guatemalan_quetzal
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_guatemalan_quetzal')]"
-							parentanchor = vcenter
-						}	
-						#peso_honduran_lempira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_honduran_lempira')]"
-							parentanchor = vcenter
-						}	
-						#peso_mexican_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_mexican_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_nicaraguan_cordoba
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_nicaraguan_cordoba')]"
-							parentanchor = vcenter
-						}	
-						#peso_paraguayan_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_paraguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_philippine_peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_philippine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_sol_de_oro
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_sol_de_oro')]"
-							parentanchor = vcenter
-						}	
-						#peso_uruguayan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_uruguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_venezuelan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_venezuelan_peso')]"
-							parentanchor = vcenter
-						}	
-						#pound_egyptian_pound
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_egyptian_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_irish_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_irish_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_sterling
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_sterling')]"
-							parentanchor = vcenter
-						}	
-						#real
-						textbox = {
-							position = { 190 -4 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real')]"
-							parentanchor = vcenter
-						}	
-						#real_brazilian_real
-						textbox = {
-							position = { 175 2 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real_brazilian_real')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indian_rupee
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indian_rupee')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indonesian_rupiah
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indonesian_rupiah')]"
-							parentanchor = vcenter
-						}	
-						#spe_baht
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_baht')]"
-							parentanchor = vcenter
-						}	
-						#spe_dong
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_dong')]"
-							parentanchor = vcenter
-						}	
-						#spe_drachma
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_drachma')]"
-							parentanchor = vcenter
-						}	
-						#spe_korean_won
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_korean_won')]"
-							parentanchor = vcenter
-						}	
-						#spe_latvian_lats
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_latvian_lats')]"
-							parentanchor = vcenter
-						}	
-						#spe_lithuanian_litas
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_lithuanian_litas')]"
-							parentanchor = vcenter
-						}	
-						#spe_peseta
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_peseta')]"
-							parentanchor = vcenter
-						}	
-						#spe_ruble
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_ruble')]"
-							parentanchor = vcenter
-						}	
-						#spe_uni
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_spe_uni')]"
-							parentanchor = vcenter
-						}	
-						#spe_yen
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yen')]"
-							parentanchor = vcenter
-						}	
-						#spe_yuan
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yuan')]"
-							parentanchor = vcenter
-						}	
-						#spe_zloti
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_zloti')]"
-							parentanchor = vcenter
-						}	
-						#thaler_hannoveraner_thaler
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_hannoveraner_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_prussian_thaler
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_prussian_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_saxon_thaler
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_thaler_saxon_thaler')]"
-							parentanchor = vcenter
-						}#end_tag_1
-
-					}
-					blockoverride "stats_label" {
-						text = "COUNTRY_CURRENCY_ONE_LINE"
-					}
-					blockoverride "stats_value" {
-						text = "#v [Country.GetCustom('currency_name')]#!"
-					}
-				}
-
-				##CURRENCY ### subject_country
-				country_stats_entry = {
-					visible = "[GetScriptedGui('has_central_banking_tech_and_is_subject_visibility').IsShown( GuiScope.SetRoot(Country.MakeScope).End)]"
-
-					tooltip = "MONEY_VALUE_subject"
-					icon = {
-						size = { 36 36 }
-						name = dip_power_icon
-
-						#generic
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_generic')]"
-							parentanchor = vcenter
-						}
-						
-						#begin_tag_1	
-						#dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_algerian_dinar
-						textbox = {
-							position = { 180 -3 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_algerian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_iraqi_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_iraqi_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_libyan_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_libyan_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_moroccan_dirham
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dinar_moroccan_dirham')]"
-							parentanchor = vcenter
-						}	
-						#dinar_omanian_rial
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_omanian_rial')]"
-							parentanchor = vcenter
-						}	
-						#dinar_qiran
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_qiran')]"
-							parentanchor = vcenter
-						}	
-						#dinar_saudi_riyal
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_saudi_riyal')]"
-							parentanchor = vcenter
-						}	
-						#dinar_serbian_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_serbian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_tunisian_dinar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_tunisian_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dinar_yugoslav_dinar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dinar_yugoslav_dinar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_australian_dollar
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_dollar_australian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_canadian_dollar
-						textbox = {
-							position = { 174 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_canadian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_caribbean_dollar
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_caribbean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_confederate_states_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_confederate_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_liberian_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_liberian_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_new_zealand_dollar
-						textbox = {
-							position = { 175 5 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_dollar_new_zealand_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_sierra_leonean_dollar
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_sierra_leonean_dollar')]"
-							parentanchor = vcenter
-						}	
-						#dollar_united_states_dollar
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_dollar_united_states_dollar')]"
-							parentanchor = vcenter
-						}	
-						#eco_ariary
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ariary')]"
-							parentanchor = vcenter
-						}	
-						#eco_central_african_eco
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_central_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_east_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_east_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#eco_ethiopian_birr
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ethiopian_birr')]"
-							parentanchor = vcenter
-						}	
-						#eco_ghanaian_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_ghanaian_pound')]"
-							parentanchor = vcenter
-						}	
-						#eco_nigerian_naira
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_nigerian_naira')]"
-							parentanchor = vcenter
-						}	
-						#eco_south_african_rand
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_south_african_rand')]"
-							parentanchor = vcenter
-						}	
-						#eco_tuareg_ouguiya
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_eco_tuareg_ouguiya')]"
-							parentanchor = vcenter
-						}	
-						#eco_west_african_eco
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_eco_west_african_eco')]"
-							parentanchor = vcenter
-						}	
-						#franc_belgian_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_belgian_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_french_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_french_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_luxembourgish_franc
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_franc_luxembourgish_franc')]"
-							parentanchor = vcenter
-						}	
-						#franc_swiss_franc
-						textbox = {
-							position = { 170 0 }
-							fontsize = 30
-							text = "[Country.GetCustom('currency_symbol_franc_swiss_franc')]"
-							parentanchor = vcenter
-						}	
-						#gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_bavarian_gulden
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_bavarian_gulden')]"
-							parentanchor = vcenter
-						}	
-						#gulden_florin
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_florin')]"
-							parentanchor = vcenter
-						}	
-						#gulden_hungarian_forint
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_hungarian_forint')]"
-							parentanchor = vcenter
-						}	
-						#gulden_indies_guilder
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_indies_guilder')]"
-							parentanchor = vcenter
-						}	
-						#gulden_south_german_gulden
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_gulden_south_german_gulden')]"
-							parentanchor = vcenter
-						}	
-						#krone_czech_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_czech_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_danish_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_danish_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_estonian_kroon
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_estonian_kroon')]"
-							parentanchor = vcenter
-						}	
-						#krone_icelandic_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_icelandic_krona')]"
-							parentanchor = vcenter
-						}	
-						#krone_norwegian_krone
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_norwegian_krone')]"
-							parentanchor = vcenter
-						}	
-						#krone_slovak_koruna
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_slovak_koruna')]"
-							parentanchor = vcenter
-						}	
-						#krone_swedish_krona
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_krone_swedish_krona')]"
-							parentanchor = vcenter
-						}	
-						#leon_leu
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_leu')]"
-							parentanchor = vcenter
-						}	
-						#leon_lev
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_leon_lev')]"
-							parentanchor = vcenter
-						}	
-						#lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_ducato
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ducato')]"
-							parentanchor = vcenter
-						}	
-						#lira_ottoman_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_ottoman_lira')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_pontificio
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_pontificio')]"
-							parentanchor = vcenter
-						}	
-						#lira_scudo_sardo
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_scudo_sardo')]"
-							parentanchor = vcenter
-						}	
-						#lira_toscane_lira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_lira_toscane_lira')]"
-							parentanchor = vcenter
-						}	
-						#mark
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_mark')]"
-							parentanchor = vcenter
-						}	
-						#mark_finnish_markka
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_mark_finnish_markka')]"
-							parentanchor = vcenter
-						}	
-						#peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_argentine_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_argentine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_bolivien_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_bolivien_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_chilean_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_chilean_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_colombian_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_colombian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_costa_rican_colon
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_costa_rican_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_cuban_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_cuban_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_ecuadorian_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_ecuadorian_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_el_salvador_colon
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_el_salvador_colon')]"
-							parentanchor = vcenter
-						}	
-						#peso_guatemalan_quetzal
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_guatemalan_quetzal')]"
-							parentanchor = vcenter
-						}	
-						#peso_honduran_lempira
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_honduran_lempira')]"
-							parentanchor = vcenter
-						}	
-						#peso_mexican_peso
-						textbox = {
-							position = { 180 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_peso_mexican_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_nicaraguan_cordoba
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_nicaraguan_cordoba')]"
-							parentanchor = vcenter
-						}	
-						#peso_paraguayan_peso
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_paraguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_philippine_peso
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_philippine_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_sol_de_oro
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_sol_de_oro')]"
-							parentanchor = vcenter
-						}	
-						#peso_uruguayan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_uruguayan_peso')]"
-							parentanchor = vcenter
-						}	
-						#peso_venezuelan_peso
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_peso_venezuelan_peso')]"
-							parentanchor = vcenter
-						}	
-						#pound_egyptian_pound
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_egyptian_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_irish_pound
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_irish_pound')]"
-							parentanchor = vcenter
-						}	
-						#pound_sterling
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_pound_sterling')]"
-							parentanchor = vcenter
-						}	
-						#real
-						textbox = {
-							position = { 190 -4 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real')]"
-							parentanchor = vcenter
-						}	
-						#real_brazilian_real
-						textbox = {
-							position = { 175 2 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_real_brazilian_real')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indian_rupee
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indian_rupee')]"
-							parentanchor = vcenter
-						}	
-						#rupee_indonesian_rupiah
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_rupee_indonesian_rupiah')]"
-							parentanchor = vcenter
-						}	
-						#spe_baht
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_baht')]"
-							parentanchor = vcenter
-						}	
-						#spe_dong
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_dong')]"
-							parentanchor = vcenter
-						}	
-						#spe_drachma
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_drachma')]"
-							parentanchor = vcenter
-						}	
-						#spe_korean_won
-						textbox = {
-							position = { 175 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_korean_won')]"
-							parentanchor = vcenter
-						}	
-						#spe_latvian_lats
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_latvian_lats')]"
-							parentanchor = vcenter
-						}	
-						#spe_lithuanian_litas
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_lithuanian_litas')]"
-							parentanchor = vcenter
-						}	
-						#spe_peseta
-						textbox = {
-							position = { 180 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_peseta')]"
-							parentanchor = vcenter
-						}	
-						#spe_ruble
-						textbox = {
-							position = { 190 5 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_ruble')]"
-							parentanchor = vcenter
-						}	
-						#spe_uni
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_spe_uni')]"
-							parentanchor = vcenter
-						}	
-						#spe_yen
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yen')]"
-							parentanchor = vcenter
-						}	
-						#spe_yuan
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_yuan')]"
-							parentanchor = vcenter
-						}	
-						#spe_zloti
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_spe_zloti')]"
-							parentanchor = vcenter
-						}	
-						#thaler_hannoveraner_thaler
-						textbox = {
-							position = { 185 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_hannoveraner_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_prussian_thaler
-						textbox = {
-							position = { 190 0 }
-							fontsize = 40
-							text = "[Country.GetCustom('currency_symbol_thaler_prussian_thaler')]"
-							parentanchor = vcenter
-						}	
-						#thaler_saxon_thaler
-						textbox = {
-							position = { 175 0 }
-							fontsize = 35
-							text = "[Country.GetCustom('currency_symbol_thaler_saxon_thaler')]"
-							parentanchor = vcenter
-						}#end_tag_1
-
-					}
-					blockoverride "stats_label" {
-						text = "COUNTRY_CURRENCY_ONE_LINE"
-					}
-					blockoverride "stats_value" {
-						text = "#v [Country.GetCustom('currency_name')]#!"
-					}
-				}
-
-				#####################################################################################################################
-				#####################################################################################################################
-				#####################################################################################################################
-				#####################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
 
 				##POPULATION
 				country_stats_entry = {
@@ -2703,7 +840,7 @@ types country_panel_types
 						text = "[Country.GetStandardOfLivingRanking]"
 					}
 
-					blockoverride "no_icon" {}
+					blockoverride "entire_icon" {}
 
 					blockoverride "icon_hack" {
 						widget = {
@@ -2758,38 +895,6 @@ types country_panel_types
 					}
 				}
 			}
-
-
-			# DIPLOMATIC PACTS
-			flowcontainer = {
-				datamodel = "[Country.AccessActiveDiplomaticPactTypes]"
-				position = { -3 -150 }
-				parentanchor =  bottom
-				direction = vertical
-
-				item = {
-					flowcontainer = {
-						datamodel = "[ContextualDiplomaticActionType.AccessCountry.AccessActiveDiplomaticPacts( ContextualDiplomaticActionType.Self )]"
-						item = {
-							flowcontainer = {
-								visible = "[ObjectsEqual(GetPlayer.Self, ContextualDiplomaticPact.GetOtherCountry)]"
-	
-								icon = {
-									size =  { 45 45 }
-									texture = "gfx/interface/backgrounds/round_button_bg.dds"
-
-									icon = {
-										parentanchor = center
-										size = { 75% 75% }
-										texture = "[ContextualDiplomaticActionType.GetDiplomaticActionType.GetTexture]"
-										tooltip = "[ContextualDiplomaticPact.GetTooltip]"
-									}
-								}
-							}
-						}
-					}
-				}
-			}
 		}
 
 		widget = {
@@ -2804,63 +909,7 @@ types country_panel_types
 			size = { 10 10 }
 			visible = "[Country.IsColonizable]"
 		}
-	
-		# # Test var
-		# flowcontainer = {
-		# 	using = is_not_player_and_not_colonizable_country
-		# 	direction = vertical
-		# 	parentanchor = hcenter
 
-		# 	default_header = {
-		# 		blockoverride "text" {
-		# 			text = "test"
-		# 		}
-		# 	}
-
-		# 	flowcontainer = {
-		# 		parentanchor = hcenter
-		# 		margin_top = 10
-		# 		margin_bottom = 10
-		# 		direction = vertical
-
-		# 		# ATTITUDE / INFAMY
-		# 		flowcontainer = {
-		# 			direction = horizontal
-		# 			spacing = 10
-
-		# 			textbox = {
-		# 				autoresize = yes
-		# 				text = "[Country.MakeScope.Var('month_normal_currency').GetValue|+D]"
-
-		# 				align = nobaseline
-		# 				parentanchor = left
-		# 				fontsize = 20
-		# 			}
-
-				
-				
-		# 		}
-
-		# 		vertical_divider = {
-		# 			parentanchor = vcenter
-
-		# 			blockoverride "size" {
-		# 				size = { 2 120% }
-		# 			}
-		# 		}
-
-		# 		# ATTITUDE / INFAMY
-		# 		flowcontainer = {
-		# 			direction = horizontal
-		# 			spacing = 10				
-
-					
-
-				
-		# 		}
-		# 	}
-		# }
-		
 		# BEHAVIOR
 		flowcontainer = {
 			using = is_not_player_and_not_colonizable_country
@@ -2886,16 +935,19 @@ types country_panel_types
 
 					# ATTITUDE
 					flowcontainer = {
+						visible = "[And(Not(Country.IsColonizable), Not(Country.IsLocalPlayer))]"
 						spacing = 10
-						visible = "[And(Not(Country.IsColonizable),Not(Country.IsLocalPlayer))]"
-						margin_left = 8
+						margin_left = 10
 
 						textbox = {
-							text = "ATTITUDE"
+							parentanchor = vcenter
 							autoresize = yes
 							align = nobaseline
-							parentanchor = vcenter
 							minimumsize = { 70 -1 }
+							maximumsize = { 70 -1 }
+							fontsize_min = 12
+							elide = right
+							text = "ATTITUDE"
 						}
 
 						widget = {
@@ -2921,21 +973,27 @@ types country_panel_types
 						}
 
 						textbox = {
-							align = hcenter|nobaseline
-							autoresize = yes
-							text = "ai_attitude_human"
-							tooltip = "ai_attitude_human_tooltip"
 							visible = "[Country.IsPlayer]"
 							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							max_width = 130
+							fontsize_min = 12
+							elide = right
+							text = "ai_attitude_human"
+							tooltip = "ai_attitude_human_tooltip"
 						}
 
 						textbox = {
-							align = hcenter|nobaseline
-							autoresize = yes
-							text = "[Country.GetAttitudeTowards(GetPlayer).GetName]"
-							tooltip = "[Country.GetAttitudeTowards(GetPlayer).GetTooltip]"
 							visible = "[Not(Country.IsPlayer)]"
 							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							max_width = 130
+							fontsize_min = 12
+							elide = right
+							text = "[Country.GetAttitudeTowards(GetPlayer).GetName]"
+							tooltip = "[Country.GetAttitudeTowards(GetPlayer).GetTooltip]"
 						}
 					}
 
@@ -2947,18 +1005,20 @@ types country_panel_types
 
 					# TENSION
 					flowcontainer = {
+						visible = "[Country.IsColonizable]"
 						spacing = 10
 						tooltip = "[GetPlayer.GetTensionTooltip( Country.Self )]"
-						visible = "[Country.IsColonizable]"
 
 						textbox = {
-							text = "TENSION"
+							parentanchor = vcenter
+							minimumsize = { 70 -1 }
+							maximumsize = { 70 -1 }
 							autoresize = yes
 							align = nobaseline
 							default_format = "#title"
-							parentanchor = vcenter
-
-							minimumsize = { 70 -1 }
+							fontsize_min = 12
+							elide = right
+							text = "TENSION"
 						}
 
 						icon = {
@@ -2967,29 +1027,34 @@ types country_panel_types
 						}
 
 						textbox = {
-							raw_text = "#BOLD [Country.GetTensionWithDesc( GetPlayer )]#!"
+							parentanchor = vcenter
 							autoresize = yes
 							align = nobaseline
-							parentanchor = vcenter
+							max_width = 130
+							fontsize_min = 12
+							elide = right
+							raw_text = "#BOLD [Country.GetTensionWithDesc( GetPlayer )]#!"
 						}
 					}
 
 					# RELATIONS
 					flowcontainer = {
 						spacing = 10
-						margin_left = 8
+						margin_left = 10
 						name = "tutorial_highlight_country_diplomacy_tab_relations"
 						tooltip = "COUNTRY_RELATIONS_TOOLTIP"
 						visible = "[And(Not(Country.IsColonizable),Not(Country.IsLocalPlayer))]"
 
 						textbox = {
-							text = "RELATIONS"
+							parentanchor = vcenter
+							minimumsize = { 70 -1 }
+							maximumsize = { 70 -1 }
 							autoresize = yes
 							align = nobaseline
 							default_format = "#title"
-							parentanchor = vcenter
-
-							minimumsize = { 70 -1 }
+							fontsize_min = 12
+							elide = right
+							text = "RELATIONS"
 						}
 
 						icon = {
@@ -2998,10 +1063,13 @@ types country_panel_types
 						}
 
 						textbox = {
-							raw_text = "#BOLD [Country.GetRelationsWithDesc( GetPlayer )]#!"
+							parentanchor = vcenter
 							autoresize = yes
 							align = nobaseline
-							parentanchor = vcenter
+							max_width = 130
+							fontsize_min = 12
+							elide = right
+							raw_text = "#BOLD [Country.GetRelationsWithDesc( GetPlayer )]#!"
 						}
 					}
 
@@ -3014,7 +1082,7 @@ types country_panel_types
 					# INFAMY
 					flowcontainer = {
 						spacing = 10
-						margin_left = 8
+						margin_left = 10
 						tooltip = "[Country.GetInfamyDesc]"
 						visible = "[Not(Country.IsColonizable)]"
 						onmousehierarchyenter = "[SetTempMapModeByKey('mm_infamy')]"
@@ -3022,13 +1090,15 @@ types country_panel_types
 						alwaystransparent = no
 
 						textbox = {
-							text = "INFAMY"
+							parentanchor = vcenter
+							minimumsize = { 70 -1 }
+							maximumsize = { 70 -1 }
 							autoresize = yes
 							align = nobaseline
 							default_format = "#title"
-							parentanchor = vcenter
-
-							minimumsize = { 70 -1 }
+							fontsize_min = 12
+							elide = right
+							text = "INFAMY"
 						}
 
 						icon = {
@@ -3037,10 +1107,13 @@ types country_panel_types
 						}
 
 						textbox = {
-							raw_text = "#BOLD [Country.GetInfamyLabel|-]#!"
+							parentanchor = vcenter
 							autoresize = yes
 							align = nobaseline
-							parentanchor = vcenter
+							max_width = 130
+							fontsize_min = 12
+							elide = right
+							raw_text = "#BOLD [Country.GetInfamyLabel|-]#!"
 						}
 					}
 
@@ -3077,11 +1150,11 @@ types country_panel_types
 							flowcontainer = {
 								tooltip = "[AIStrategy.GetTooltip(Country.Self)]"
 								spacing = 10
-								
+
 								widget = {
 									parentanchor = vcenter
 									size = { 45 45 }
-									
+
 									icon = {
 										size = { 100% 100% }
 										texture = "gfx/interface/backgrounds/round_frame_dec.dds"
@@ -3115,51 +1188,139 @@ types country_panel_types
 			}
 		}
 
-		### TIMED MODIFIERS
+		# ### TIMED MODIFIERS
+		# default_header = {
+		# 	visible = "[Not(IsDataModelEmpty(Country.GetTimedModifiers))]"
+		# 	blockoverride "text" {
+		# 		text = "MODIFIERS"
+		# 	}
+		# }
+
+		# flowcontainer = {
+		# 	visible = "[Not(IsDataModelEmpty(Country.GetTimedModifiers))]"
+		# 	datamodel = "[Country.GetTimedModifiers]"
+		# 	margin_top = 10
+		# 	spacing = 5
+		# 	minimumsize = { @panel_width -1 }
+		# 	parentanchor = hcenter
+		# 	direction = vertical
+
+		# 	item = {
+		# 		container = {
+		# 			minimumsize = { @panel_width -1 }
+		# 			tooltip = "[TimedModifier.GetTooltip]"
+
+		# 			flowcontainer = {
+		# 				spacing = 10
+
+		# 				icon = {
+		# 					texture = "[TimedModifier.GetIcon]"
+		# 					size = { 25 25 }
+		# 				}
+
+		# 				textbox = {
+		# 					text = "[TimedModifier.GetName]"
+		# 					autoresize = yes
+		# 					align = nobaseline
+		# 					parentanchor = vcenter
+		# 				}
+		# 			}
+
+		# 			textbox = {
+		# 				text = "[TimedModifier.GetRemainingDuration]"
+		# 				autoresize = yes
+		# 				align = nobaseline
+		# 				parentanchor = right|vcenter
+		# 			}
+		# 		}
+		# 	}
+		# }
+
 		default_header = {
-			visible = "[Not(IsDataModelEmpty(Country.GetTimedModifiers))]"
+			visible = "[Country.IsSubject]"
+
 			blockoverride "text" {
-				text = "MODIFIERS"
+				text = "OVERLORD"
 			}
 		}
 
-		flowcontainer = {
-			visible = "[Not(IsDataModelEmpty(Country.GetTimedModifiers))]"
-			datamodel = "[Country.GetTimedModifiers]"
-			margin_top = 10
-			spacing = 5
-			minimumsize = { @panel_width -1 }
-			parentanchor = hcenter
-			direction = vertical
+		overlord = {
+			visible = "[And(And(Country.IsAIOrOtherPlayer, Country.GetSubjectType.IsValid), Not(Country.IsSubjectOf(GetPlayer.Self)))]"
 
-			item = {
-				container = {
-					minimumsize = { @panel_width -1 }
-					tooltip = "[TimedModifier.GetTooltip]"
+			blockoverride "diplo_actions_button_visibility" {
+				visible = no
+			}
 
-					flowcontainer = {
-						spacing = 10
+			blockoverride "overlord_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
+			}
 
-						icon = {
-							texture = "[TimedModifier.GetIcon]"
-							size = { 25 25 }
-						}
+			blockoverride "liberty_desire_overlord_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
+			}
 
-						textbox = {
-							text = "[TimedModifier.GetName]"
-							autoresize = yes
-							align = nobaseline
-							parentanchor = vcenter
-						}
-					}
+			blockoverride "whos_overlord_text" {
+				text = "COUNTRY_OVERLORD"
+			}
 
-					textbox = {
-						text = "[TimedModifier.GetRemainingDuration]"
-						autoresize = yes
-						align = nobaseline
-						parentanchor = right|vcenter
-					}
-				}
+			blockoverride "whos_liberty_desire_text" {
+				text = "COUNTRY_DIPLOMACY_TAB_LIBERTY_DESIRE"
+			}
+
+			blockoverride "active_pacts_datamodel" {
+				datamodel = "[CountryPanel.AccessCountry.GetNonSubjectDiplomaticPactsWith(Country.GetOverlord)]"
+			}
+
+			blockoverride "country_subject_type_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.GetSubjectType]"
+			}
+
+			blockoverride "country_liberty_desire_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry]"
+			}
+		}
+
+		overlord = {
+			visible = "[And(And(Country.IsAIOrOtherPlayer, Country.GetSubjectType.IsValid), Country.IsSubjectOf(GetPlayer.Self))]"
+
+			blockoverride "diplo_actions_button_visibility" {
+				visible = no
+			}
+
+			blockoverride "overlord_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
+			}
+
+			blockoverride "whos_overlord_text" {
+				text = "COUNTRY_OVERLORD"
+			}
+
+			blockoverride "whos_liberty_desire_text" {
+				text = "COUNTRY_DIPLOMACY_TAB_LIBERTY_DESIRE"
+			}
+
+			blockoverride "active_pacts_datamodel" {
+				datamodel = "[Country.GetNonSubjectDiplomaticPactsWith(Country.GetOverlord)]"
+			}
+
+			blockoverride "country_subject_type_datacontext" {
+				datacontext = "[Country.GetSubjectType]"
+			}
+
+			blockoverride "country_liberty_desire_datacontext" {
+				datacontext = "[Country]"
+			}
+		}
+
+		overlord = {
+			visible = "[And(Country.IsLocalPlayer, Country.GetSubjectType.IsValid)]"
+
+			blockoverride "overlord_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
+			}
+
+			blockoverride "liberty_desire_overlord_datacontext" {
+				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
 			}
 		}
 	}	
@@ -3307,85 +1468,678 @@ types diplomatic
 			}
 		}
 	}
-	
-	type diplomatic_info = 	flowcontainer {
-		using = default_list_position
-		direction = vertical
-		ignoreinvisible = yes
-		spacing = 15
-		
 
-		### WARS
-		default_header = {
-			blockoverride "text" {
-				text = WARS
-			}
+	type overlord = flowcontainer {
+		direction = vertical
+		minimumsize = { @panel_width_plus_14 -1 }
+
+		background = {
+			texture = "gfx/state_pictures/urban_european_overlord.dds"
+			alpha = 0.4
+			using = fade_top_illus
 		}
 
-		empty_state = {
-			blockoverride "visible" {
-				visible = "[IsDataModelEmpty(Country.AccessWars)]"
-			}
-			blockoverride "text" {
-				text = "NO_WARS"
-			}
-			blockoverride "margin" {
-				margin_top = 10
-				margin_bottom = 10
-			}			
-		}		
-			
-		flowcontainer = {
+		widget = {
 			parentanchor = hcenter
-			direction = vertical
-			visible = "[Not(IsDataModelEmpty(Country.AccessWars))]"
-			spacing = 10
-			datamodel = "[Country.AccessWars]"
+			size = { @panel_width 140 }
 
-			item = {
-				war_item = {
-					blockoverride "width" {
-						minimumsize = { 350 -1 }
-						maximumsize = { 350 -1 }
+			flowcontainer = {
+				parentanchor = vcenter
+				position = { 20 0 }
+
+				fancy_flag_ui = {
+					parentanchor = vcenter
+
+					block "overlord_datacontext" {
+						datacontext = "[AccessPlayer.AccessOverlord]"
 					}
-					blockoverride "width_2" {
-						size = { 330 50 }
+
+					blockoverride "rank_badge_block" {}
+				}
+
+				flowcontainer = {
+					parentanchor = vcenter
+					direction = vertical
+
+					textbox = {
+						block "overlord_datacontext" {
+							datacontext = "[AccessPlayer.AccessOverlord]"
+						}
+
+						minimumsize = { 255 -1 }
+						maximumsize = { 255 -1 }
+						autoresize = yes
+						align = nobaseline
+						elide = right
+						fontsize_min = 12
+						using = fontsize_xxl
+						raw_text = "[Country.GetNameNoFlag]"
+					}
+
+					textbox = {
+						block "overlord_datacontext" {
+							datacontext = "[AccessPlayer.AccessOverlord]"
+						}
+
+						autoresize = yes
+						align = nobaseline
+						raw_text = "[Country.GetDefinition.GetTier]"
+					}
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+
+						block "whos_overlord_text" {
+							text = "YOUR_OVERLORD"
+						}
+					}
+				}
+			}
+
+			rank_badge = {
+				size = { 45 45 }
+				position = { 0 10 }
+				datacontext = "[AccessPlayer.AccessOverlord]"
+
+				blockoverride "font_size_under_100_rank" {
+					using = fontsize_medium
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = right|vcenter
+				position = { -20 0 }
+
+				dynamicgridbox = {
+					parentanchor = vcenter
+					datamodel_wrap = 3
+
+					block "active_pacts_datamodel" {
+						datamodel = "[AccessPlayer.GetNonSubjectDiplomaticPactsWith(GetPlayer.GetOverlord.Self)]"
+					}
+
+					item = {
+						widget = {
+							size = { 40 40 }
+
+							icon = {
+								parentanchor = center
+								size = { 35 35 }
+								tooltip = "[DiplomaticPact.GetTooltip]"
+								texture = "[DiplomaticPact.GetDiplomaticActionType.GetTexture]"
+							}
+						}
+					}
+				}
+
+				widget = {
+					size = { 5 5 }
+				}
+
+				vertical_divider = {
+					block "diplo_actions_button_visibility" {}
+					size = { 2 140 }
+				}
+
+				widget = {
+					size = { 10 10 }
+				}
+
+
+				flowcontainer = {
+					direction = vertical
+					parentanchor = vcenter
+
+					block "overlord_datacontext" {
+						datacontext = "[AccessPlayer.AccessOverlord]"
+					}
+
+					block "diplo_actions_button_visibility" {}
+
+					### SUBJECT ACTIONS - LARGE
+					diplo_actions_button = {
+						size = { 50 50 }
 					}
 				}
 			}
 		}
-		
-		### ACTIVE DIPLOMATIC PLAYS
-		default_header = {
-			blockoverride "text" {
-				text = ACTIVE_DIPLOMATIC_PLAYS
-			}				
-		}		
-		
-		empty_state = {
-			blockoverride "visible" {
-				visible = "[IsDataModelEmpty(Country.AccessActiveDiplomaticPlays)]"
+
+		widget = {
+			parentanchor = hcenter
+			size = { 507 100 }
+
+			widget = {
+				parentanchor = hcenter
+				position = { -1 5 }
+				size = { 450 90 }
+
+				using = fancy_frame_solid_bg
+
+				textbox = {
+					parentanchor = hcenter
+					position = { 0 30 }
+					autoresize = yes
+					align = nobaseline
+					max_width = 400
+					elide = right
+					fontsize_min = 12
+
+					block "whos_liberty_desire_text" {
+						text = "YOUR_LIBERTY_DESIRE"
+					}
+				}
+			}	
+
+			### OVERLORD - PLAYER LIBERTY DESIRE BAR 
+			liberty_desire_bar_and_buttons = {
+
+				parentanchor = hcenter|bottom
+
+				blockoverride "liberty_desire_bar_and_frame_size" {
+					size = { 507 54 }
+				}
+
+				blockoverride "progressbar_and_frame_parentanchor" {
+					parentanchor = hcenter|bottom
+				}
+
+				blockoverride "bar_position" {
+					position = { 0 8 }
+				}
+
+				blockoverride "bar_size" {
+					size = { 409 22 }
+				}
+
+				blockoverride "liberty_desire_frame_texture" {
+					texture = "gfx/interface/backgrounds/player_liberty_desire_bar.dds"
+				}
+
+				blockoverride "subject_type_datacontext" {
+					block "country_subject_type_datacontext" {
+						datacontext = "[GetPlayer.GetSubjectType]"
+					}
+				}
+
+				blockoverride "liberty_desire_datacontext" {
+					block "country_liberty_desire_datacontext" {
+						datacontext = "[AccessPlayer]"
+					}
+				}
+
+				blockoverride "progressbar_type" {
+					gold_progressbar_horizontal = {
+						size = { 100% 100% }
+						visible = "[Not(Or( GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT')), GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))))]"
+						blockoverride "background" {}
+						blockoverride "frame" {}
+						blockoverride "glow_visible" {
+							visible = "[LibertyDesireLevel.IsActive( Country.GetLibertyDesireRaw )]"
+						}
+
+						blockoverride "values" {
+							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+							min = 0
+							max = 1
+						}
+					}
+
+					changed_value_decreased_progressbar_horizontal = {
+						size = { 100% 100% }
+						visible = "[GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
+
+						blockoverride "second_progressbar" {}
+
+						blockoverride "values" {
+							min = 0
+							max = 1
+							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+						}
+
+						blockoverride "glow_size" {
+							size = { 40 100% }
+						}
+
+						blockoverride "arrow_texture_density" {
+							texture_density = 6 #use to match height of progressbar
+						}
+					}
+
+					changed_value_increased_progressbar_horizontal = {
+						size = { 100% 100% }
+						visible = "[GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
+
+						blockoverride "second_progressbar" {}
+
+						blockoverride "values" {
+							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+							min = 0
+							max = 1
+						}
+
+						blockoverride "glow_size" {
+							size = { 40 100% }
+						}
+
+						blockoverride "arrow_texture_density" {
+							texture_density = 6 #use to match height of progressbar
+						}
+					}
+				}
+
+				blockoverride "autonomy_button_size" {
+					size = { 46	46 }
+				}
+
+				blockoverride "buttons_widget_position_and_size" {
+					size { 492 46 }
+				}
 			}
-			blockoverride "text" {
-				text = "NO_ACTIVE_DIPLOMATIC_PLAYS"
-			}
-			blockoverride "margin" {
-				margin_top = 10
-				margin_bottom = 10
-			}		
-		}	
+		}
+
+		widget = {
+			size = { 10 10 }
+		}
+	}
+
+	type liberty_desire_bar_and_buttons = container {
+
+		block "subject_type_datacontext" {
+			datacontext = "[AccessPlayer.GetSubjectType]"
+		}
+
+		block "liberty_desire_overlord_datacontext" {}
 		
+		# PROGRESSBAR AND FRAME
+		widget = {
+			block "progressbar_and_frame_parentanchor" {
+				parentanchor = bottom
+			}
+
+			block "liberty_desire_bar_and_frame_size" {
+				size = { 307 52 }
+			}
+
+			widget = {
+				parentanchor = center
+				allow_outside = yes
+
+				block "bar_position" {
+					position = { 0 4 }
+				}
+
+				block "bar_size" {
+					size = { 220 10 }
+				}
+
+				levels_progressbar = {
+					allow_outside = yes
+					block "liberty_desire_datacontext" {}
+
+					datamodel = "[GetLibertyDesireLevels]"
+
+					blockoverride "item_properties" {
+						layoutstretchfactor_horizontal = "[FixedPointToInt(LibertyDesireLevel.GetWidth)]"
+						layoutpolicy_vertical = expanding
+						tooltip = "[SelectLocalization( LibertyDesireLevel.IsActive( Country.GetLibertyDesireRaw ), 'LIBERTY_DESIRE_LEVEL_ACTIVE_TOOLTIP', 'LIBERTY_DESIRE_LEVEL_INACTIVE_TOOLTIP' )]"
+					}
+
+					blockoverride "level_active" {
+						visible = "[LibertyDesireLevel.IsActive( Country.GetLibertyDesireRaw )]"
+					}
+
+					blockoverride "last_level" {
+						visible = "[Not(EqualTo_CFixedPoint( LibertyDesireLevel.GetUpperBound, '(CFixedPoint)100' ))]"
+					}
+				}		
+			}
+
+			block "liberty_desire_frame" {
+				icon = {
+					size = { 100% 100% }
+
+					block "liberty_desire_frame_texture" {
+						texture = "gfx/interface/backgrounds/subject_liberty_desire_bar.dds"
+					}
+				}
+			}
+		}
+
+		### INCREASE/DECREASE AUTONOMY ICONS - COUNTRY IS NOT RELATED TO THE PLAYER
+		widget = {
+			parentanchor = center
+
+			# Unfortunately we cannot simply use GetPlayer.IsSubject here because that's less specific than IsSubjectOf.
+			# We need to use IsSubjectOf cause we want to make sure we're dealing with a direct subject.
+			visible = "[Not(Or(GetPlayer.IsSubjectOf(Country.Self), Country.IsSubjectOf(GetPlayer.Self)))]"
+			
+			block "buttons_widget_position_and_size" {
+				position = { 0 1 }
+				size { 294 40 }
+			}
+
+			### DECREASE AUTONOMY ICON
+			widget = {
+				parentanchor = vcenter
+
+				block "autonomy_button_size" {
+					size = { 40	40 }
+				}
+				
+				icon = {
+					visible = "[SubjectType.GetLowerAutonomySubjectType(Country.Self).IsValid]"
+					parentanchor = center
+					size = { 75% 75% }
+					tooltip = "SUBJECT_CAN_NOT_DECREASE_OWN_AUTONOMY_TOOLTIP"
+					using = tooltip_se
+					texture = "[SubjectType.GetLowerAutonomySubjectType(Country.Self).GetTexture]"
+				}
+
+				icon = {
+					visible = "[Not(SubjectType.GetLowerAutonomySubjectType(Country.Self).IsValid)]"
+					parentanchor = center
+					size = { 75% 75% }
+					tooltip = "SUBJECT_CAN_NOT_DECREASE_OWN_AUTONOMY_ANNEX_TOOLTIP"
+					using = tooltip_se
+					texture = "gfx/interface/icons/war_goals/annex_country.dds"
+				}
+			}
+
+			### INCREASE AUTONOMY ICON
+			widget = {
+				parentanchor = right|vcenter
+
+				block "autonomy_button_size" {
+					size = { 40	40 }
+				}
+				
+				icon = {
+					visible = "[SubjectType.GetHigherAutonomySubjectType(Country.Self).IsValid]"
+					parentanchor = center
+					size = { 75% 75% }
+					tooltip = "OTHER_COUNTRY_CAN_NOT_INCREASE_SUBJECT_AUTONOMY_TOOLTIP"
+					using = tooltip_se
+					texture = "[SubjectType.GetHigherAutonomySubjectType(Country.Self).GetTexture]"
+				}
+
+				icon = {
+					visible = "[Not(SubjectType.GetHigherAutonomySubjectType(Country.Self).IsValid)]"
+					parentanchor = center
+					size = { 75% 75% }
+					tooltip = "OTHER_COUNTRY_CAN_NOT_INCREASE_AUTONOMY_SUBJECT_TO_INDEPENDENCE_TOOLTIP"
+					using = tooltip_se
+					texture = "gfx/interface/icons/war_goals/independence.dds"
+				}
+			}
+		}
+
+		### INCREASE/DECREASE AUTONOMY ICONS AND BUTTONS - COUNTRY IS RELATED TO THE PLAYER (SUBJECT OR OVERLORD)
+		widget = {
+			parentanchor = center
+			visible = "[Or(GetPlayer.IsSubjectOf(Country.Self), Country.IsSubjectOf(GetPlayer.Self))]"
+			
+			block "buttons_widget_position_and_size" {
+				position = { 0 1 }
+				size { 294 40 }
+			}
+
+			### DECREASE AUTONOMY ICON - PLAYER IS SUBJECT
+			widget = {
+				parentanchor = vcenter
+				visible = "[GetPlayer.IsSubjectOf(Country.Self)]"
+
+				block "autonomy_button_size" {
+					size = { 40	40 }
+				}
+
+				icon = {
+					visible = "[SubjectType.GetLowerAutonomySubjectType(GetPlayer.Self).IsValid]"
+					parentanchor = center
+					size = { 75% 75% }
+					alpha = "[TransparentIfTrue('(bool)yes')]"
+					tooltip = "PLAYER_CAN_NOT_DECREASE_OWN_AUTONOMY_TOOLTIP"
+					using = tooltip_se
+					texture = "[SubjectType.GetLowerAutonomySubjectType(GetPlayer.Self).GetTexture]"
+				}
+
+				icon = {
+					visible = "[Not(SubjectType.GetLowerAutonomySubjectType(GetPlayer.Self).IsValid)]"
+					parentanchor = center
+					size = { 75% 75% }
+					alpha = "[TransparentIfTrue('(bool)yes')]"
+					tooltip = "SUBJECT_CAN_NOT_DECREASE_OWN_AUTONOMY_ANNEX_TOOLTIP"
+					using = tooltip_se
+					texture = "gfx/interface/icons/war_goals/annex_country.dds"
+				}
+			}
+
+			### DECREASE AUTONOMY - ANNEX - PLAYER IS OVERLORD
+			autonomy_button = {
+				parentanchor = vcenter
+				visible = "[And(Country.IsSubjectOf(GetPlayer.Self), Not(SubjectType.GetLowerAutonomySubjectType(Country.Self).IsValid))]"
+
+				blockoverride "datacontext" {
+					datacontext = "[GetDiplomaticPlayType('dp_annex_subject')]"
+				}
+
+				blockoverride "button_properties" {
+					enabled = "[IsValid(DiplomaticPlayType.GetStartCommandCountry(GetPlayer.Self, Country.Self))]"
+					onclick = "[DiplomaticPlayType.ShowConfirmationCountry(Country.Self)]"
+				}
+
+				blockoverride "clicksound" {
+					using = diplomatic_play_confirmation_sound
+				}
+
+				blockoverride "tooltip" {
+					tooltip = "[DiplomaticPlayType.GetStartTooltipCountry(GetPlayer.Self, Country.Self)]"
+				}
+
+				blockoverride "autonomy_icon_texture" {
+					texture = "gfx/interface/icons/war_goals/annex_country.dds"
+				}
+			}
+
+			### DECREASE AUTONOMY - SUBJECT TYPE - PLAYER IS OVERLORD
+			autonomy_button = {
+				parentanchor = vcenter
+				visible = "[And(Country.IsSubjectOf(GetPlayer.Self), SubjectType.GetLowerAutonomySubjectType(Country.Self).IsValid)]"
+
+                blockoverride "datacontext" {
+                    datacontext = "[GetCountryDiplomaticAction('da_decrease_autonomy', GetPlayer.Self, Country.Self)]"
+                }
+
+                blockoverride "clicksound" {
+					using = generic_diplomatic_action_sound
+				}
+
+                blockoverride "autonomy_icon_texture" {
+                    texture = "[SubjectType.GetLowerAutonomySubjectType(Country.Self).GetTexture]"
+                }
+			}
+
+			### INCREASE AUTONOMY - INDEPENDENCE - PLAYER IS OVERLORD (release subject instantly)
+			autonomy_button = {
+				parentanchor = right|vcenter
+				visible = "[And(Country.IsSubjectOf(GetPlayer.Self), Not(SubjectType.GetHigherAutonomySubjectType(Country.Self).IsValid))]"
+
+				blockoverride "datacontext" {
+					datacontext = "[Country.GetSubjectPact.GetDiplomaticAction]"
+				}
+
+				blockoverride "clicksound" {
+					using = generic_diplomatic_action_sound
+				}
+
+				blockoverride "autonomy_icon_texture" {
+					texture = "gfx/interface/icons/war_goals/independence.dds"
+				}
+			}
+
+			### INCREASE AUTONOMY - SUBJECT TYPE - PLAYER IS OVERLORD
+			autonomy_button = {
+				parentanchor = right|vcenter
+				visible = "[And(Country.IsSubjectOf(GetPlayer.Self), SubjectType.GetHigherAutonomySubjectType(Country.Self).IsValid)]"
+
+				blockoverride "datacontext" {
+					datacontext = "[GetCountryDiplomaticAction('da_increase_autonomy_of_subject', GetPlayer.Self, Country.Self)]"
+				}
+
+				blockoverride "clicksound" {
+					using = generic_diplomatic_action_sound
+				}
+
+				blockoverride "autonomy_icon_texture" {
+					texture = "[SubjectType.GetHigherAutonomySubjectType(Country.Self).GetTexture]"
+				}
+			}
+
+			### INCREASE AUTONOMY - INDEPENDENCE - PLAYER IS SUBJECT
+			autonomy_button = {
+				parentanchor = right|vcenter
+				visible = "[And(GetPlayer.IsSubjectOf(Country.Self), Not(SubjectType.GetHigherAutonomySubjectType(GetPlayer.Self).IsValid))]"
+
+				blockoverride "datacontext" {
+					datacontext = "[GetDiplomaticPlayType('dp_independence')]"
+				}
+
+				blockoverride "button_properties" {
+					enabled = "[IsValid(DiplomaticPlayType.GetStartCommandCountry(GetPlayer.Self, Country.Self))]"
+					onclick = "[DiplomaticPlayType.ShowConfirmationCountry(Country.Self)]"
+				}
+
+				blockoverride "clicksound" {
+					using = diplomatic_play_confirmation_sound
+				}
+
+				blockoverride "tooltip" {
+					tooltip = "[DiplomaticPlayType.GetStartTooltipCountry(GetPlayer.Self, Country.Self)]"
+				}
+
+				blockoverride "autonomy_icon_texture" {
+					texture = "gfx/interface/icons/war_goals/independence.dds"
+				}
+			}
+
+			### INCREASE AUTONOMY - SUBJECT TYPE - PLAYER IS SUBJECT
+			autonomy_button = {
+				parentanchor = right|vcenter
+				visible = "[And(GetPlayer.IsSubjectOf(Country.Self), SubjectType.GetHigherAutonomySubjectType(GetPlayer.Self).IsValid)]"
+
+				blockoverride "datacontext" {
+					datacontext = "[GetCountryDiplomaticAction('da_increase_autonomy_of_self', GetPlayer.Self, Country.Self)]"
+				}
+
+				blockoverride "clicksound" {
+					using = generic_diplomatic_action_sound
+				}
+
+				blockoverride "autonomy_icon_texture" {
+					texture = "[SubjectType.GetHigherAutonomySubjectType(GetPlayer.Self).GetTexture]"
+				}
+			}
+		}
+	}
+
+	type autonomy_button = button_icon_round_action {
+		using = tooltip_se
+
+		block "datacontext" {}
+
+		block "button_properties" {
+			enabled = "[IsValid(DiplomaticAction.ExecuteAction)]"
+			onclick = "[DiplomaticAction.ExecuteWithConfirmation]"
+		}
+
+		block "clicksound" {
+			using = generic_diplomatic_action_sound
+		}
+
+		block "tooltip" {
+			tooltipwidget = {
+				FancyTooltip_DiplomaticActionWithTargetCountry = {}
+			}
+		}
+
+		blockoverride "size" {
+			block "autonomy_button_size" {
+				size = { 38	38 }
+			}
+		}
+
+		blockoverride "icon_size" {
+			size = { 60% 60% }
+		}
+
+		blockoverride "icon" {
+			block "autonomy_icon_texture" {
+				texture = "[SubjectType.GetLowerAutonomySubjectType(Country.Self).GetTexture]"
+			}
+		}
+	}
+
+	type diplomatic_info = flowcontainer {
+		parentanchor = hcenter
+		direction = vertical
+		ignoreinvisible = yes
+
 		flowcontainer = {
 			parentanchor = hcenter
 			direction = vertical
-			visible = "[Not(IsDataModelEmpty(Country.AccessActiveDiplomaticPlays))]"
-			spacing = 10
+			spacing = 15
+
+			### WARS
+			default_header = {
+				blockoverride "text" {
+					text = "DIPLOMATIC_PLAYS_AND_WARS"
+				}
+			}
+
+			empty_state = {
+				blockoverride "visible" {
+					visible = "[And(IsDataModelEmpty(Country.AccessWars), IsDataModelEmpty(Country.AccessActiveDiplomaticPlays))]"
+				}
+				blockoverride "text" {
+					text = "NO_WARS_OR_DIPLOMATIC_PLAYS"
+				}
+				blockoverride "margin" {
+					margin_top = 10
+					margin_bottom = 10
+				}
+			}
 
 			flowcontainer = {
 				parentanchor = hcenter
-				datamodel = "[Country.AccessActiveDiplomaticPlays]"
 				direction = vertical
-				spacing = 5
+				visible = "[Not(IsDataModelEmpty(Country.AccessWars))]"
+				spacing = 10
+				datamodel = "[Country.AccessWars]"
+
+				item = {
+					war_item = {
+						blockoverride "width" {
+							minimumsize = { 350 -1 }
+							maximumsize = { 350 -1 }
+						}
+						blockoverride "width_2" {
+							size = { 330 50 }
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = hcenter
+				direction = vertical
+				visible = "[Not(IsDataModelEmpty(Country.AccessActiveDiplomaticPlays))]"
+				spacing = 10
+
+				flowcontainer = {
+					parentanchor = hcenter
+					datamodel = "[Country.AccessActiveDiplomaticPlays]"
+					direction = vertical
+					spacing = 5
 
 				item = {
 					diplomatic_play_item = {
@@ -3396,35 +2150,38 @@ types diplomatic
 		}
 
 
-		### DIPLOMATIC STATUS
-		flowcontainer = {
-			parentanchor = hcenter
-			direction = vertical
+			### DIPLOMATIC STATUS
+			flowcontainer = {
+				parentanchor = hcenter
+				direction = vertical
 
-			default_header = {
-				using = default_list_position
-				blockoverride "text" {
-					text = DIPLOMATIC_STATUS_HEADER
+				default_header = {
+					parentanchor = hcenter
+
+					blockoverride "text" {
+						text = DIPLOMATIC_STATUS_HEADER
+					}
 				}
+
+				empty_state = {
+					blockoverride "visible" {
+						visible = "[Not(Country.HasActiveDiplomacy)]"
+					}
+
+					blockoverride "text" {
+						text = "NO_ACTIVE_DIPLOMACY"
+					}
+
+				}
+
+				diplomatic_pact_container = {}
+
+				obligations_owed_from_container = {}
+
+				obligations_owed_to_container = {}
+
+				truce_container = {}
 			}
-			
-			empty_state = {
-				blockoverride "visible" {
-					visible = "[Not(Country.HasActiveDiplomacy)]"
-				}
-				blockoverride "text" {
-					text = "NO_ACTIVE_DIPLOMACY"
-				}
-
-			}
-
-			diplomatic_pact_container = {}	
-
-			obligations_owed_from_container = {}
-			
-			obligations_owed_to_container = {}
-			
-			truce_container = {}			
 		}
 	}
 }
@@ -3533,10 +2290,10 @@ types war_panel
 			position = { 0 0 }
 		}
 
-		block "no_icon" {
+		block "entire_icon" {
 			icon = {
 				block "information_icon" {
-					texture =
+					#texture = "gfx/interface/icons/generic_icons/gdp.dds"
 				}
 				size = { 40 40 }
 				position = { -5 0 }
@@ -3588,7 +2345,7 @@ types war_panel
 	type country_stats_entry_game_over = widget {
 		size =  { 300 50 }
 
-		block "no_icon" {
+		block "entire_icon" {
 			icon = {
 				position = { 5 0 }
 				block "information_icon" {
@@ -3859,8 +2616,18 @@ types war_panel
 				using = tooltip_above
 				texture = "[ContextualDiplomaticActionType.GetDiplomaticActionType.GetTexture]"
 				size = { 40 40 }
-				tooltip = "[ContextualDiplomaticActionType.GetDiplomaticActionType.GetName]"
 				parentanchor = vcenter
+				
+				datacontext = "[ContextualDiplomaticActionType.GetDiplomaticActionType]"
+				tooltipwidget = {
+					FancyTooltip_DiplomaticActionType = {
+						blockoverride "text_before_before" {
+							visible = "[GreaterThan_CFixedPoint(DiplomaticActionType.GetMaintenanceCost(GetPlayer.Self, Country.Self), '(CFixedPoint)0')]"
+							text = "DIPLOMATIC_ACTION_TYPE_COST"
+							margin_bottom = 15
+						}
+					}
+				}
 			}
 
 			textbox = {
@@ -3903,48 +2670,55 @@ types war_panel
 		}
 
 		container = {
-			visible = "[And(DiplomaticAction.RequiresApproval,Not(DiplomaticAction.GetSecondCountry.IsPlayer))]"
+			visible = "[And(DiplomaticAction.RequiresApproval, Not(DiplomaticAction.GetSecondCountry.IsPlayer))]"
 
 			icon = {
-				visible = "[DiplomaticAction.WillAIAccept]"
-				tooltip = "AI_WILL_ACCEPT_DESC"
+				visible = "[DiplomaticAction.WillAIAcceptNoObligation]"
+				texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
+
 				block "icon_size" {
 					size = { 30 30 }
 				}
-				texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
 			}
+			
+			icon = {
+				visible = "[And(Not(DiplomaticAction.WillAIAcceptNoObligation),DiplomaticAction.WillAIMaybeAcceptNoObligation)]"
+				texture = "gfx/interface/icons/generic_icons/undecided_icon.dds"
+
+				block "icon_size" {
+					size = { 30 30 }
+				}
+			}			
 
 			container = {
-				visible = "[Not(DiplomaticAction.WillAIAccept)]"
+				visible = "[And(Not(DiplomaticAction.WillAIAcceptNoObligation),Not(DiplomaticAction.WillAIMaybeAcceptNoObligation))]"
 
 				icon = {
-					visible = "[And( DiplomaticAction.CanCallInObligation, DiplomaticAction.WillAIAcceptWithCallInObligation)]"
-					tooltip = "AI_WILL_ACCEPT_WITH_CALL_IN_OBLIGATION_DESC"
+					visible = "[And( DiplomaticAction.CanCallInObligation, Or(DiplomaticAction.WillAIAcceptWithCallInObligation,DiplomaticAction.WillAIMaybeAcceptWithCallInObligation))]"
+					texture = "gfx/interface/icons/generic_icons/obligation.dds"
 
 					block "icon_size" {
 						size = { 30 30 }
 					}
-					texture = "gfx/interface/icons/generic_icons/obligation.dds"
 				}
 
 				icon = {
-					visible = "[DiplomaticAction.WillAIAcceptWithOweObligation]"
-					tooltip = "AI_WILL_ACCEPT_WITH_OWE_OBLIGATION_DESC"
+					visible = "[Or(DiplomaticAction.WillAIAcceptWithOweObligation,DiplomaticAction.WillAIMaybeAcceptWithOweObligation)]"
 					alpha = 0.5
-
+					texture = "gfx/interface/icons/generic_icons/obligation.dds"
+					
 					block "icon_size" {
 						size = { 30 30 }
 					}
-					texture = "gfx/interface/icons/generic_icons/obligation.dds"
 				}
 
 				icon = {
-					visible = "[And(Not(DiplomaticAction.WillAIAcceptWithOweObligation), Not(And( DiplomaticAction.CanCallInObligation, DiplomaticAction.WillAIAcceptWithCallInObligation)))]"
-					tooltip = "AI_WILL_NOT_ACCEPT_DESC"
+					visible = "[And(Not(Or(DiplomaticAction.WillAIAcceptWithOweObligation,DiplomaticAction.WillAIMaybeAcceptWithOweObligation)), Not(And( DiplomaticAction.CanCallInObligation, Or(DiplomaticAction.WillAIAcceptWithCallInObligation,DiplomaticAction.WillAIMaybeAcceptWithCallInObligation))))]"
+					texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
+					
 					block "icon_size" {
 						size = { 30 30 }
 					}
-					texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
 				}
 			}
 		}
@@ -3953,24 +2727,28 @@ types war_panel
 			visible = "[And(DiplomaticAction.RequiresApproval,DiplomaticAction.GetSecondCountry.IsPlayer)]"
 
 			icon = {
-				tooltip = "PLAYER_MIGHT_ACCEPT_DESC"
+				texture = "gfx/interface/icons/generic_icons/undecided_icon.dds"
+				
 				block "icon_size" {
 					size = { 30 30 }
 				}
-				texture = "gfx/interface/icons/generic_icons/undecided_icon.dds"
 			}
 		}
 	}
 
 	type diplomatic_action_button = button {
-		using = default_button_action
-		blockoverride "sound" {
-				clicksound = "[DiplomaticAction.GetSoundWithConfirmation]"
-		}
+		using = default_button
 		size = { @panel_width 50 }
 		enabled = "[IsValid(DiplomaticAction.ExecuteAction)]"
 		onclick = "[DiplomaticAction.ExecuteWithConfirmation]"
-		tooltip = "DIPLOMATIC_ACTION_TOOLTIP"
+		
+		block "sound" {
+			using = generic_diplomatic_action_sound
+		}
+
+		tooltipwidget = {
+			FancyTooltip_DiplomaticActionWithTargetCountry = {}
+    	}
 		
 		icon = {
 			parentanchor = vcenter
@@ -3982,11 +2760,33 @@ types war_panel
 		textbox = {
 			size = { 410 50 }
 			position = { 55 0 }
-			text = "DIPLOMATIC_ACTION_NAME"
+			text = "DIPLOMATIC_ACTION_ACTIVE_AND_NON_ACTIVE_NAME"
 			align = nobaseline
 			parentanchor = vcenter
 			widgetanchor = left|vcenter
 			using = fontsize_large
+			fontsize_min = 12
+			elide = right
+		}
+
+		flowcontainer = {
+			visible = "[Not(EqualTo_CFixedPoint(DiplomaticAction.GetMaintenanceCost, '(CFixedPoint)0'))]"
+			parentanchor = right|vcenter
+			spacing = 5
+			position = { -60 0 }
+
+			textbox = {
+				parentanchor = vcenter
+				align = nobaseline
+				autoresize = yes
+				raw_text = "#v [DiplomaticAction.GetMaintenanceCostFormatted]#!"
+			}
+		}
+
+		vertical_divider = {
+			visible = "[And(Not(EqualTo_CFixedPoint(DiplomaticAction.GetMaintenanceCost, '(CFixedPoint)0')), And(DiplomaticAction.RequiresApproval, Not(DiplomaticAction.GetSecondCountry.IsPlayer)))]"
+			parentanchor = right|vcenter
+			position = { -50 0 }
 		}
 
 		diplomatic_action_acceptance_icon = {
@@ -4003,14 +2803,15 @@ types war_panel
 	type diplomatic_play_button_country = button {
 		using = default_button
 		size = { @panel_width 50 }
-		blockoverride "sound" {
-			using = confirm_button_sound
-		}
 		tooltip = "[DiplomaticPlayType.GetStartTooltipCountry(GetPlayer,Country.Self)]"
 		enabled = "[IsValid(DiplomaticPlayType.GetStartCommandCountry(GetPlayer,Country.Self))]"
 		onclick = "[DiplomaticPlayType.ShowConfirmationCountry(Country.Self)]"
 		onmousehierarchyenter = "[AccessHighlightManager.HighlightCountry(Country.Self)]"
 		onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+		
+		blockoverride "sound" {
+			using = diplomatic_play_confirmation_sound
+		}
 
 		icon = {
 			parentanchor = vcenter
@@ -4027,20 +2828,23 @@ types war_panel
 			parentanchor = vcenter
 			widgetanchor = left|vcenter
 			using = fontsize_large
+			fontsize_min = 12
+			elide = right
 		}
 	}
 
 	type diplomatic_play_button_state = button {
 		using = default_button
 		size = { @panel_width 50 }
-		blockoverride "sound" {
-			using = confirm_button_sound
-		}
 		tooltip = "[DiplomaticPlayType.GetStartTooltipState(GetPlayer,State.Self)]"
 		enabled = "[IsValid(DiplomaticPlayType.GetStartCommandState(GetPlayer,State.Self))]"
 		onclick = "[DiplomaticPlayType.ShowConfirmationState(State.Self)]"
 		onmousehierarchyenter = "[AccessHighlightManager.HighlightState(State.Self)]"
 		onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+		
+		blockoverride "sound" {
+			using = confirm_button_sound
+		}
 
 		icon = {
 			parentanchor = vcenter
@@ -4050,17 +2854,21 @@ types war_panel
 		}
 
 		textbox = {
-			size = { 410 50 }
 			position = { 55 0 }
-
-			block "text" {
-				raw_text = "[DiplomaticPlayType.GetName] ([State.GetName])"
-			}
-			
 			align = nobaseline
 			parentanchor = vcenter
 			widgetanchor = left|vcenter
 			using = fontsize_large
+			fontsize_min = 12
+			elide = right
+
+			block "text_size" {
+				size = { 410 50 }
+			}
+
+			block "text" {
+				raw_text = "[DiplomaticPlayType.GetName] ([State.GetName])"
+			}
 		}
 	}
 }
@@ -4245,6 +3053,100 @@ types country_info
 			visible = "[Not(Country.IsPlayer)]"
 		}
 	}
+
+	type panel_dropdown = flowcontainer {
+		direction = vertical
+		parentanchor = hcenter
+			
+		section_header_button = {
+			using = default_fade_in_out
+			parentanchor = hcenter
+
+			block "section_header_tooltip" {}
+
+			block "section_header_size" {
+				size = { @panel_width 44 }
+			}
+
+			blockoverride "arrow_position" {
+				position = { 2 0 }
+				parentanchor = left|vcenter
+			}
+
+			blockoverride "left_textbox_margin_left" {
+				margin_left = 30
+			}
+
+			blockoverride "left_text" {
+				block "section_header_left_text" {
+					raw_text = "Name of dropdown"
+				}
+			}
+
+			blockoverride "right_text" {
+				section_header_right_text = {
+					block "section_header_right_text" {
+						raw_text = "#todo 999#!"
+					}
+				}
+			}
+		}
+
+		dynamicgridbox = {
+			block "items_parentanchor" {}
+
+			block "items_visibility"{
+				visible = "[GetVariableSystem.Exists('generic_dropdown')]"
+			}
+
+			block "dropdown_datamodel"{
+				datamodel = "[IsDataModelEmpty(DataModelRepeatedItem('(int32)2'))]"
+			}
+
+			item = {
+				block "item" {
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						raw_text = "First Datamodel Item"
+					}
+				}
+			}
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				block "empty_state_visibility" {
+					visible = "[And(And(IsDataModelEmpty(DataModelRepeatedItem('(int32)0')), IsDataModelEmpty(DataModelRepeatedItem('(int32)0'))), GetVariableSystem.Exists('generic_dropdown'))]"
+				}
+			}
+			blockoverride "text" {
+				block "empty_state_text" {
+					raw_text = "No items"
+				}
+			}				
+		}
+
+		block "second_list" {
+			dynamicgridbox = {
+				block "items_visibility"{
+					visible = "[GetVariableSystem.Exists('generic_dropdown')]"
+				}
+
+				block "second_dropdown_datamodel"{
+					datamodel = "[IsDataModelEmpty(DataModelRepeatedItem('(int32)3'))]"
+				}
+
+				item = {
+					block "second_item" {
+						textbox = {
+							autoresize = yes
+							align = nobaseline
+							raw_text = "Second Datamodel Item"
+						}
+					}
+				}
+			}
+		}
+	}
 }
-
-

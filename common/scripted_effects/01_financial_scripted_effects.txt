@@ -41,7 +41,7 @@ country_credit_rating = {
 			name = country_credit_rating_AAA
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 499
 			country_credit_rating >= 375
@@ -60,7 +60,7 @@ country_credit_rating = {
 			name = country_credit_rating_AA
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 375
 			country_credit_rating >= 250
@@ -79,7 +79,7 @@ country_credit_rating = {
 			name = country_credit_rating_A
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 250
 			country_credit_rating >= 200
@@ -98,7 +98,7 @@ country_credit_rating = {
 			name = country_credit_rating_BBB
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 200
 			country_credit_rating >= 150
@@ -117,7 +117,7 @@ country_credit_rating = {
 			name = country_credit_rating_BB
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 150
 			country_credit_rating >= 100
@@ -136,7 +136,7 @@ country_credit_rating = {
 			name = country_credit_rating_B
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 100
 			country_credit_rating >= 80
@@ -155,7 +155,7 @@ country_credit_rating = {
 			name = country_credit_rating_CCC
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 80
 			country_credit_rating >= 60
@@ -174,7 +174,7 @@ country_credit_rating = {
 			name = country_credit_rating_CC
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 60
 			country_credit_rating >= 40
@@ -194,7 +194,7 @@ country_credit_rating = {
 			name = country_credit_rating_C
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			country_credit_rating < 40
 		}
@@ -211,6 +211,103 @@ country_credit_rating = {
 		add_modifier = {
 			name = country_credit_rating_D
 		}
+	}
+}
+
+sovereign_bond_yields = {
+	if = {
+		limit = {
+			has_modifier = country_credit_rating_AAA
+		}	
+		set_variable = {
+			name = target_interest_rate
+			value = { 0 0.01 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_AA
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.01 0.02 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_A
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.02 0.03 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_BBB
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.03 0.04 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_BB
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.04 0.05 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_B
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.05 0.06 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_CCC
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.06 0.07 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_CC
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.07 0.08 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_C
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.08 0.09 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_modifier = country_credit_rating_D
+		}
+		set_variable = {  
+			name = target_interest_rate
+			value = { 0.10 0.15 }
+		}
+	}
+	set_variable = {
+		name = interest_value_5Y_variation
+		value = { 0.1 0.9 }
 	}
 }
 
@@ -1093,6 +1190,9 @@ stockpiling_railroad_stock_2_state = {
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 
+
+#remove_from_list
+
 ai_buy_bond_1 = {
 	every_country = {
 		limit  = {
@@ -1105,10 +1205,11 @@ ai_buy_bond_1 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_1 = 0
@@ -1119,7 +1220,7 @@ ai_buy_bond_1 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			#gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -1307,10 +1408,11 @@ ai_buy_bond_2 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
 		limit = {
 			scope:buyer.ai_selle_bond_maturity_yers_time_2 = 0
@@ -1320,8 +1422,8 @@ ai_buy_bond_2 = {
 					this = root
 				}
 			}
-			gold_reserves_var > gold_reserves_10 #la gold reserve actuel est superieur à 10 de la gold reserve total
-			gold_loan_preview < scope:seller.central_bank_debt
+			gold_reserves_var > gold_reserves_10
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -1500,7 +1602,7 @@ ai_buy_bond_3 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -1514,7 +1616,7 @@ ai_buy_bond_3 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -1702,7 +1804,7 @@ ai_buy_bond_4 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -1716,7 +1818,7 @@ ai_buy_bond_4 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -1904,7 +2006,7 @@ ai_buy_bond_5 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -1918,7 +2020,7 @@ ai_buy_bond_5 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -2106,7 +2208,7 @@ ai_buy_bond_6 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -2120,7 +2222,7 @@ ai_buy_bond_6 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -2308,7 +2410,7 @@ ai_buy_bond_7 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -2322,7 +2424,7 @@ ai_buy_bond_7 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -2510,7 +2612,7 @@ ai_buy_bond_8 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -2524,7 +2626,7 @@ ai_buy_bond_8 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -2712,7 +2814,7 @@ ai_buy_bond_9 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -2726,7 +2828,7 @@ ai_buy_bond_9 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -2914,7 +3016,7 @@ ai_buy_bond_10 = {
 		save_scope_as = buyer
 	}
 
-	random_in_list = {
+	random_in_global_list = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
@@ -2928,7 +3030,7 @@ ai_buy_bond_10 = {
 				}
 			}
 			gold_reserves_var > gold_reserves_10
-			gold_loan_preview < scope:seller.central_bank_debt
+			# gold_loan_preview < scope:seller.central_bank_debt
 		}
 
 		scope:seller = {
@@ -5348,17 +5450,9 @@ ai_bond_maturity_yers_time_10 = {
 #########################################################################################################################################################################################
 
 central_bank_interest_refund_per_year_in_gold = {
-	every_scope_state = {
-		if = {
-			limit = {
-				has_modifier = bank_central_historic_place
-				is_capital = yes
-			}
-			change_variable = {
-				name = central_bank_gold_reserves_state_1
-				subtract = root.central_bank_interest_refund_per_year
-			}
-		}
+	change_variable = {
+		name = debt_interest
+		subtract = central_bank_interest_refund_per_year
 	}
 }
 

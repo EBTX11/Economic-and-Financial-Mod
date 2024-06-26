@@ -67,7 +67,7 @@ GDP_dif_10_final = {
 
 #gold_reserves_1B
 gold_reserves_1B  = {
-	name = 00_ai_buy_building_construction_sector_test
+	#name = 00_ai_buy_building_construction_sector_test
 	add = 1
 }
 
@@ -78,6 +78,20 @@ army_size_var = {
 navy_size_var = {
 	value = 0
 	add = navy_size
+}
+
+currency_quantity_sell = {
+	value = 0.5
+	if = {
+		limit = {
+			# or = {
+			# 	trade_balance_in_currency < 0
+			# 	central_bank_gold_reserves_state < 0 
+			# }
+			has_modifier = extreme_weak_currency
+		}
+		add = 0.5
+	}
 }
 
 ########################################################################################################################################################
@@ -122,9 +136,14 @@ difference_with_average_gold_exchange_rate_currencies_revers = {
 
 	value = 1
 	subtract = difference_with_average_gold_exchange_rate_currencies
+	multiply = -1
+}
+difference_with_average_gold_exchange_rate_currencies_revers_normalized = {
+	value = difference_with_average_gold_exchange_rate_currencies_revers
+	multiply = -1
 }
 difference_with_average_gold_exchange_rate_currencies_revers_100 = {
-	value = difference_with_average_gold_exchange_rate_currencies_revers
+	value = difference_with_average_gold_exchange_rate_currencies_revers_normalized
 	multiply = 100
 }
 
@@ -626,14 +645,33 @@ money_supply_stockpile_by_other_country_reference_currency = {
 		value = money_supply_stockpile_by_other_country
 	}
 }
+
 reference_currency_owned_by_the_country_in_gold = {
 	value = 0
 	add = reference_currency_owned_by_the_country
 	multiply = global_monetary_reference
 }
+
 money_value_exchange_rate_with_reference_currency = {
 	value = money_value_rapported_inflation
 	divide = global_monetary_reference
+}
+
+amount_reference_currency_to_ensure_parity = {
+	value = money_supply
+	multiply = var:money_value_target_with_the_reference_currency_2
+	multiply = hedging_rate_in_reference_currency
+}
+hedging_rate_in_reference_currency  = {
+	value = 0.25 #pourra etre modifier à l'avenir 
+}
+
+reference_currency_owned_by_the_country_equivalent_gold = {
+	value = reference_currency_owned_by_the_country_in_gold
+	multiply = {
+		value = global_monetary_reference 
+		divide = var:money_value_target_1
+	}
 }
 
 ############################################################################################################################################################
@@ -875,7 +913,6 @@ money_value = {
 			has_modifier = has_central_bank
 			not = {
 				is_subject = yes
-				is_subject_type = subject_type_customs_union
 			}
 		}
 		value = money_value_0
@@ -884,7 +921,7 @@ money_value = {
 		limit = {
 			or = {
 				is_subject = yes
-				is_subject_type = subject_type_customs_union
+				
 			}
 			overlord = {
 				has_modifier = has_central_bank
@@ -897,7 +934,7 @@ money_value = {
 		limit = {
 			or = {
 				is_subject = yes
-				is_subject_type = subject_type_customs_union
+				
 			}
 			overlord = {
 				not = {
@@ -910,13 +947,27 @@ money_value = {
 	}
 	min = 0.0001
 }
-money_value_0 = {
-	value = national_capacity
-	divide = money_supply
+money_value_0 = {	
+	if = {
+		limit = {
+			not = {
+				has_technology_researched = gold_standard
+			}
+		}
+		value = 0.01
+	}
+	if = {
+		limit = {
+			has_technology_researched = gold_standard
+		}
+		value = national_capacity
+		divide = money_supply
+	}
+
 	max = 10
 }
 money_value_no_bc = {
-	value = 0.1
+	value = 1
 }
 money_value_raported_to_overrlord = {
 	value = money_value_rapported_inflation
@@ -931,6 +982,11 @@ gold_value_rapported_inflation = {
 	value = 1
 	divide = money_value_rapported_inflation
 }
+
+money_value_target_change_prediction = { 
+	value = money_value
+}
+
 money_value_target_real = {
 	add = var:money_value_target_1
 }
@@ -1020,6 +1076,8 @@ money_supply = {
 	value = 0 #à voir
 	add = money_supply_state
 	add = money_circulating
+
+	min = 1
 }
 money_supply_montly = {
 	value = 0
@@ -1058,7 +1116,7 @@ national_capacity = {
 
 	min = 0.01
 }
-national_capacity_for_global_monetary_reference= {
+national_capacity_for_global_monetary_reference = {
 	value = 1
 	if = {
 		add = gold_reserves
@@ -1068,10 +1126,10 @@ national_capacity_for_global_monetary_reference= {
 			limit = {
 				or = {
 					is_player = yes
-					gold_balance_scripted > 0
+					trade_balance_in_gold_fixe > 0
 				}
 			}
-			add = gold_balance_scripted
+			add = trade_balance_in_gold_fixe
 		}
 	}
 	min = 0.01
@@ -1081,16 +1139,28 @@ total_gold_reserves = {
 }
 central_bank_reserves = {
 	value = 0
-	add = central_bank_gold_reserves_state
-	add = gold_loaned_to_central_bank
-	add = var:trade_balance_in_gold_fixe 
-
 	if = {
 		limit = {
-			has_technology_researched = gold_exchange_standard #remplacer par une loi à voir
+			has_law = law_type:law_gold_standard
 		}
-		add = var:reference_currency_owned_by_the_country_in_gold_fixe #reference_currency_owned_by_the_country_in_gold
+		add = central_bank_gold_reserves_state
 	}
+	if = {
+		limit = {
+			has_law = law_type:law_gold_exchange_standard
+		}
+		add = var:reference_currency_owned_by_the_country_equivalent_gold_fixe
+	}
+
+	add = gold_loaned_to_central_bank
+	add = var:trade_balance_in_gold_fixe 
+}
+all_gold_value_inflation = {
+	value = 0
+	add = central_bank_gold_reserves_state
+	add = var:trade_balance_in_gold_fixe 
+
+	add = gold_loaned_to_central_bank
 }
 central_bank_gold_reserves_state = {
 	value = 1
@@ -1283,7 +1353,7 @@ national_debt_compared_gdp = {
 }
 credit_at_central_bank_interest_1_years = {
 	add = var:credit_at_central_bank
-	multiply = interest_value_10Y
+	multiply = country_interest #interest_value_10Y = on calcule par le taux vanila qui représente le taux de rémunération de la devise ou taux directeur/// au taux du marché 
 }
 credit_at_central_bank_interest_1_years_in_gold = {
 	value = 0
@@ -1318,6 +1388,17 @@ stockpiling_central_bank_gold_reserves_var_0 = {
 	value = var:stockpiling_central_bank_gold_reserves_var_1
 }
 
+
+
+
+
+
+
+
+
+
+
+
 ############
 total_import_trade_routes = {
 	every_country = {
@@ -1350,7 +1431,7 @@ total_export_trade_routes = {
 
 #export
 export_value = {
-	value= {
+	value = {
 		add = {
 			add = {
 				add= 20
@@ -1753,7 +1834,7 @@ export_value = {
 
 		}
 	}
-	multiply = 10
+	multiply = 4 #month
 	if = {
 		limit = {
 			has_modifier = weak_currency
@@ -2181,20 +2262,18 @@ import_value = {
 			}
 		}
 	}
-	multiply = 10
+	multiply = 4 #month
 }
 import_value_in_gold_week = {
 	value = import_value_in_currency_week
-	multiply = money_value_target_real #money_value
-	#divide = money_value_target_real #money_value
+	multiply = money_value_target_real
 }
 import_value_in_currency = {
-	value = var:import_value_in_currency #lex
+	value = var:import_value_in_currency
 }
 import_value_in_gold = {
 	value = import_value_in_currency
-	multiply = money_value_target_real #money_value
-	#divide = money_value_target_real #money_value
+	multiply = money_value_target_real
 }
 
 #import revers
@@ -2226,6 +2305,9 @@ trade_balance_in_currency_delta = {
 	value = 0
 	add = export_value_in_currency_week
 	subtract = import_value_in_currency_week
+
+	#6 mounth
+	multiply = 26
 }
 trade_balance_in_gold = {
 	value = 1
@@ -2468,11 +2550,11 @@ country_interest = {
     }
 }
 interest_value_5Y = {
-	value = country_interest
-	multiply = 0.66
+	value = var:target_interest_rate
+	multiply = var:interest_value_5Y_variation
 }
 interest_value_10Y = {
-	value = country_interest
+	value = var:target_interest_rate
 }
 
 ############################################################################################################################################################
@@ -2619,216 +2701,164 @@ inflation_value_for_modifier = {
 	min = -1
 }
 
-
 #inflation_on_consumer_goods
 inflation_on_consumer_goods_market_value = {
 	add = market.inflation_on_consumer_goods
 }
 inflation_on_consumer_goods = {
 	add = {
-		mg:grain = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+		market = {
+			mg:grain = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:fish = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:fish = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:fabric = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:fabric = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:clothes = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:clothes = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:furniture = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:furniture = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:paper = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:paper = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:services = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:services = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:transportation = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:transportation = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:electricity = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:porcelain = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:porcelain = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:meat = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:meat = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:fruit = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:fruit = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:wine = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:wine = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:tea = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:tea = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:tobacco = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:tobacco = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:opium = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:opium = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:automobiles = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:automobiles = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:telephones = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:telephones = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:radios = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:radios = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:luxury_clothes = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:luxury_clothes = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:luxury_furniture = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:luxury_furniture = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
-			}
-		}
-		mg:fine_art = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:fine_art = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
 		}
 	}
 	divide = {
-		mg:grain = {
-			add = market_goods_buy_orders
-		}
-		mg:fish = {
-			add = market_goods_buy_orders
-		}
-		mg:fabric = {
-			add = market_goods_buy_orders
-		}
-		mg:wood = {
-			add = market_goods_buy_orders
-		}
-		mg:clothes = {
-			add = market_goods_buy_orders
-		}
-		mg:furniture = {
-			add = market_goods_buy_orders
-		}
-		mg:paper = {
-			add = market_goods_buy_orders
-		}
-		mg:services = {
-			add = market_goods_buy_orders
-		}
-		mg:transportation = {
-			add = market_goods_buy_orders
-		}
-		mg:electricity = {
-			add = market_goods_buy_orders
-		}
-		mg:porcelain = {
-			add = market_goods_pricier
-		}
-		mg:meat = {
-			add = market_goods_pricier
-		}
-		mg:fruit = {
-			add = market_goods_pricier
-		}
-		mg:wine = {
-			add = market_goods_pricier
-		}
-		mg:tea = {
-			add = market_goods_pricier
-		}
-		mg:tobacco = {
-			add = market_goods_pricier
-		}
-		mg:opium = {
-			add = market_goods_pricier
-		}
-		mg:automobiles = {
-			add = market_goods_buy_orders
-		}
-		mg:telephones = {
-			add = market_goods_buy_orders
-		}
-		mg:radios = {
-			add = market_goods_buy_orders
-		}
-		mg:luxury_clothes = {
-			add = market_goods_buy_orders
-		}
-		mg:luxury_furniture = {
-			add = market_goods_buy_orders
-		}
-		mg:fine_art = {
-			add = market_goods_buy_orders
-		}
+		value = 0.1
+		add = market.mg:grain.market_goods_buy_orders
+		add = market.mg:fish.market_goods_buy_orders
+		add = market.mg:fabric.market_goods_buy_orders
+		add = market.mg:clothes.market_goods_buy_orders
+		add = market.mg:furniture.market_goods_buy_orders
+		add = market.mg:paper.market_goods_buy_orders
+		add = market.mg:services.market_goods_buy_orders
+		add = market.mg:transportation.market_goods_buy_orders
+		add = market.mg:porcelain.market_goods_buy_orders
+		add = market.mg:meat.market_goods_buy_orders
+		add = market.mg:fruit.market_goods_buy_orders
+		add = market.mg:wine.market_goods_buy_orders
+		add = market.mg:tea.market_goods_buy_orders
+		add = market.mg:tobacco.market_goods_buy_orders
+		add = market.mg:opium.market_goods_buy_orders
+		add = market.mg:automobiles.market_goods_buy_orders
+		add = market.mg:telephones.market_goods_buy_orders
+		add = market.mg:radios.market_goods_buy_orders
+		add = market.mg:luxury_clothes.market_goods_buy_orders
+		add = market.mg:luxury_furniture.market_goods_buy_orders
+		add = market.mg:fine_art.market_goods_buy_orders
 	}
 }
 inflation_on_consumer_goods_market_value_abs = {
@@ -2853,44 +2883,40 @@ inflation_on_energy_market_value = {
 }
 inflation_on_energy = {
 	add = {
-		mg:wood = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+		market = {
+			mg:wood = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:electricity = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:electricity = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:coal = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:coal = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:oil = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:oil = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
 		}
 	}
 	divide = {
-		mg:wood = {
-			add = market_goods_buy_orders
-		}
-		mg:electricity = {
-			add = market_goods_buy_orders
-		}
-		mg:coal = {
-			add = market_goods_buy_orders
-		}
-		mg:oil = {
-			add = market_goods_buy_orders
-		}
+		value = 0.1
+		add = market.mg:wood.market_goods_buy_orders
+		add = market.mg:electricity.market_goods_buy_orders
+		add = market.mg:hardwood.market_goods_buy_orders
+		add = market.mg:coal.market_goods_buy_orders
+		add = market.mg:oil.market_goods_buy_orders
 	}
 }
 inflation_on_energy_market_value_abs = {
@@ -2915,68 +2941,54 @@ inflation_on_raw_material_market_value = {
 }
 inflation_on_raw_material = {
 	add = {
-		mg:silk = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+		market = {
+			mg:silk = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:dye = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:dye = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:sulfur = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:sulfur = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:iron = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:iron = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:lead = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:lead = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:rubber = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:rubber = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
 		}
 	}
 	divide = {
-		mg:silk = {
-			add = market_goods_buy_orders
-
-		}
-		mg:dye = {
-			add = market_goods_buy_orders
-
-		}
-		mg:sulfur = {
-			add = market_goods_buy_orders
-
-		}
-		mg:iron = {
-			add = market_goods_buy_orders
-
-		}
-		mg:lead = {
-			add = market_goods_buy_orders
-
-		}
-		mg:rubber = {
-			add = market_goods_buy_orders
-
-		}
+		value = 0.1
+		add = market.mg:silk.market_goods_buy_orders
+		add = market.mg:dye.market_goods_buy_orders
+		add = market.mg:hardwood.market_goods_buy_orders
+		add = market.mg:sulfur.market_goods_buy_orders
+		add = market.mg:iron.market_goods_buy_orders
+		add = market.mg:lead.market_goods_buy_orders
+		add = market.mg:rubber.market_goods_buy_orders
 	}
 }
 inflation_on_raw_material_market_value_abs = {
@@ -3000,84 +3012,70 @@ inflation_on_manufactured_goods_market_value = {
 	add = market.inflation_on_manufactured_goods
 }
 inflation_on_manufactured_goods = {
+	value = 0
 	add = {
-		mg:clippers = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+		market = {
+			mg:clippers = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:steamers = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:steamers = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:engines = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:engines = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:steel = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:steel = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:glass = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:glass = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:fertilizer = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:fertilizer = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:tools = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:tools = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
-		}
-		mg:explosives = {
-			add = {
-				add = market_goods_pricier
-				multiply = market_goods_buy_orders
+			mg:explosives = {
+				add = {
+					add = market_goods_pricier
+					multiply = market_goods_buy_orders
+				}
 			}
 		}
 	}
 	divide = {
-		mg:clippers = {
-			add = market_goods_buy_orders
-		}
-		mg:steamers = {
-			add = market_goods_buy_orders
-		}
-		mg:hardwood = {
-			add = market_goods_buy_orders
-		}
-		mg:engines = {
-			add = market_goods_buy_orders
-		}
-		mg:steel = {
-			add = market_goods_buy_orders
-		}
-		mg:glass = {
-			add = market_goods_buy_orders
-		}
-		mg:fertilizer = {
-			add = market_goods_buy_orders
-		}
-		mg:tools = {
-			add = market_goods_buy_orders
-		}
-		mg:explosives = {
-			add = market_goods_buy_orders
-		}
+		value = 0.1
+		add = market.mg:clippers.market_goods_buy_orders
+		add = market.mg:steamers.market_goods_buy_orders
+		add = market.mg:hardwood.market_goods_buy_orders
+		add = market.mg:engines.market_goods_buy_orders
+		add = market.mg:steel.market_goods_buy_orders
+		add = market.mg:glass.market_goods_buy_orders
+		add = market.mg:fertilizer.market_goods_buy_orders
+		add = market.mg:tools.market_goods_buy_orders
+		add = market.mg:explosives.market_goods_buy_orders
 	}
 }
 inflation_on_manufactured_goods_market_value_abs = {

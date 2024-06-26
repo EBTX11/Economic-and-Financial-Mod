@@ -31,28 +31,22 @@ on_decade_pulse_country = {
 }
 
 on_production_method_changed = {
- 	effect = {
-		if = {
-			limit = {
-				is_building_group = building_national_stockpile
-			}
-			owner = {
-				validate_national_stockpiles_production_methods_store_0 = yes
-				validate_national_stockpiles_production_methods_store = yes
-				validate_national_stockpiles_production_methods_release_0 = yes
-				validate_national_stockpiles_production_methods_release = yes
-			}
-		}
+	effect = {
 		# if = {
 		# 	limit = {
-		# 		is_building_group = building_trade_center
+		# 		has_building = building_national_stockpile
 		# 	}
-		# 	owner = {
-		# 		validate_building_trade_center_production_methods_0 = yes
-		# 		validate_building_trade_center_production_methods_1 = yes
-		# 	}
-		# }
- 	}
+		owner = {
+			if = {
+				limit = {
+					has_modifier = has_national_stockpile
+				}
+				validate_national_stockpiles_production_methods_reset = yes
+				validate_national_stockpiles_production_methods_store_0 = yes
+				validate_national_stockpiles_production_methods_release_0 = yes
+			}
+		}
+	}
 }
 
 ############################################################################################################################################################
@@ -66,25 +60,25 @@ on_production_method_changed = {
 
 ef_on_monthly_pulse_country = {
     effect = {
-		#########################################	
-		#########################################	
+		#########################################
+		#########################################
 		every_country = {
 			limit = {
 				global_country_ranking = 1
 			}
 			national_debt_variable_list = yes
 		}
-		#########################################	
-		#########################################	
+		#########################################
+		#########################################
 		#currency_strength_modifier
 		currency_strength_modifier = yes
 		#########################################
-		#########################################	
+		#########################################
 		#inflation_modifier
 		inflation_modifier = yes
 		#########################################
 		#########################################
-		#inflation_value 
+		#inflation_value
 		inflation_on_consumer_goods_market_value_fluctuations = yes
 		inflation_on_energy_market_value_fluctuations = yes
 		inflation_on_raw_material_market_value_fluctuations = yes
@@ -92,27 +86,18 @@ ef_on_monthly_pulse_country = {
 		inflation_on_military_equipment_market_value_fluctuations = yes
 		money_value_dif_01_market_value_fluctuations = yes
 		#########################################
-		#########################################	
+		#########################################
 		#money_value
 		fluctuations_money_value_1_month = yes
 		#########################################
 		#########################################
-		central_bank_interest_actual = yes  #à quiu cela  sert ?
+		#central_bank_interest_actual = yes  #à quiu cela  sert ?
 		central_bank_gold_reserves_state = yes #à modifier pour unee valeur scripté
 		gdp_view_on_action = yes
 		#########################################
 		#########################################
 		destroy_building_not_allowed = yes
 		remove_country_building_modifier = yes
-		#########################################
-		#########################################
-		#transfer of gold to the central bank
-		if  = {
-			limit  = {
-				gold_reserves_var >= 1000000000
-			}
-			gold_reserves_1B = yes
-		}
 		#########################################
 		#########################################
 		if = {
@@ -157,19 +142,6 @@ ef_on_monthly_pulse_country = {
 				has_modifier = has_financial_center
 			}
 			RMSA_MMSA_order_trigger = yes
-		}
-		if = {
-			limit = {
-				credit_at_central_bank_interest_per_month > 0
-			}
-			credit_at_central_bank_interest_per_week = yes
-		}
-		if = {
-			limit = {
-				credit_at_central_bank_interest_per_month = 0
-				has_modifier = interest_at_the_central_bank
-			}
-			credit_at_central_bank_interest_per_week_off = yes
 		}
 		#########################################
 		#########################################
@@ -245,21 +217,30 @@ ef_on_monthly_pulse_country = {
 		}
 		#########################################
 		#########################################
+		#########################################
+		#transfer of gold to the central bank
+		# if  = {
+		# 	limit  = {
+		# 		gold_reserves_var >= 1000000000
+		# 	}
+		# 	gold_reserves_1B = yes
+		# }
+		#########################################
 	}
 }
 
 ef_on_half_yearly_pulse_country = {
 	effect = {
+		trade_balance = yes
+
 		#money_value var
 		fluctuations_money_value_1_year = yes
 		#GDP var
 		fluctuations_gdp_1_year = yes
 
-		reference_currency_in_gold_fixe = yes
 		buy_sell_currency_order = yes
 
-		check_bank_central_default = yes	
-
+		check_bank_central_default = yes
 
 		every_country = {
 			limit = {
@@ -273,9 +254,16 @@ ef_on_half_yearly_pulse_country = {
 				has_modifier = has_central_bank
 				is_ai = yes
 			}
-			ai_credit_at_central_bank = yes 
-			ai_refund_central_bank = yes 
-			ai_currency_deflation_inflation = yes 
+			ai_credit_at_central_bank = yes
+			ai_refund_central_bank = yes
+			ai_currency_deflation_inflation = yes
+		}
+		
+		if  = {
+			limit  = {
+				has_law = law_type:law_gold_exchange_standard
+			}
+			reference_currency_in_gold_fixe = yes
 		}
 	}
 }
@@ -462,23 +450,14 @@ ef_on_half_yearly_pulse_country = {
 
 ef_on_yearly_pulse_country = {
 	effect = {
-
-		trigger_event = { id = law_regulation_event.1 } #permet de shunt les loi gold standart au debut de partie 
+		every_country = {
+			limit = {
+				global_country_ranking = 1
+			}
+			median_currency_value = yes
+			global_monetary_reference_1 = yes
+		}
 		
-		# if = {
-		# 	limit = {
-		# 		money_supply < money_value_target
-		# 		has_modifier = has_central_bank
-		# 		not = {
-		# 			is_player = yes
-		# 			is_subject = yes
-		# 			is_subject_type = subject_type_customs_union
-		# 			is_revolutionary = yes
-		# 		}
-		# 	}
-		# 	money_creation_in_circulation_for_rebalancing = yes
-		# }
-
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -496,6 +475,8 @@ ef_on_yearly_pulse_country = {
 		############################################################################################################################################################
 		############################################################################################################################################################
 
+
+
 		#rating
 		if  = {
 			limit  = {
@@ -503,13 +484,21 @@ ef_on_yearly_pulse_country = {
 			}
 			country_credit_rating = yes
 		}
-		
-		every_country = {
+		if = {
 			limit = {
-				global_country_ranking = 1
+				credit_at_central_bank_interest_per_month > 5
 			}
-			median_currency_value = yes
+			credit_at_central_bank_interest_per_week = yes
 		}
+		if = {
+			limit = {
+				has_modifier = interest_at_the_central_bank
+				credit_at_central_bank_interest_per_month < 5
+			}
+			credit_at_central_bank_interest_per_week_off = yes
+		}
+
+
 
 		#Diver
 		fluctuations_1_annual_add = yes
@@ -543,16 +532,7 @@ ef_on_yearly_pulse_country = {
 
 		contract_1_year = yes
 
-		#gold_parity_with_reference_currency_correction_per_year
-		if  = {
-			limit = {
-				has_technology_researched = gold_exchange_standard
-				not = {
-					has_modifier = global_monetary_reference
-				}
-			}
-			gold_parity_with_reference_currency_correction_per_year = yes
-		}
+		sovereign_bond_yields = yes
 
 		#looting_1_year
 		if  = {
@@ -569,7 +549,6 @@ ef_on_yearly_pulse_country = {
 				not = {
 					or = {
 						is_subject = yes
-						is_subject_type = subject_type_customs_union
 						is_subject_type = subject_type_protectorate
 						has_law = law_type:law_isolationism
 					}
@@ -577,7 +556,7 @@ ef_on_yearly_pulse_country = {
 			}
 			ai_buy_central_bank_debt = yes
 		}
-		
+
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -625,7 +604,7 @@ ef_on_yearly_pulse_country = {
 		# 	#fonctionnalité caduque à explorer
 		# 	strong_currency_list = yes
 
-		
+
 			# A_credit_rating_variable_list_1 = yes
 			# A_credit_rating_variable_list_2 = yes
 			# A_credit_rating_variable_list_3 = yes
@@ -695,24 +674,22 @@ ef_on_yearly_pulse_country = {
 		###########################################################################################################################################################################################
 		###########################################################################################################################################################################################
 
-		every_country = {
-			if = {
-				limit = {
-					is_player = no
-					has_modifier = has_central_bank
-					has_technology_researched = gold_standard
-					not = {
-						or = {
-							has_modifier = global_monetary_reference
-							is_subject = yes
-							is_subject_type = subject_type_customs_union
-							is_subject_type = subject_type_protectorate
-							has_law = law_type:law_isolationism
-						}
+		if = {
+			limit = {
+				is_player = no
+				has_modifier = has_central_bank
+				has_technology_researched = gold_standard
+				not = {
+					or = {
+						has_modifier = global_monetary_reference
+						is_subject = yes
+						 
+						is_subject_type = subject_type_protectorate
+						has_law = law_type:law_isolationism
 					}
 				}
-				buy_sell_global_monetary_currency_reference = yes
 			}
+			buy_sell_global_monetary_currency_reference = yes
 		}
 
 		###########################################################################################################################################################################################
@@ -727,66 +704,22 @@ ef_on_yearly_pulse_country = {
 		###########################################################################################################################################################################################
 		###########################################################################################################################################################################################
 
-		every_country = {
-			if = {
-				limit = {
-					is_player = no
-					has_modifier = has_central_bank
-					has_technology_researched = gold_standard
-					not = {
-						or = {
-							is_subject = yes
-							is_subject_type = subject_type_customs_union
-							is_subject_type = subject_type_protectorate
-							has_law = law_type:law_isolationism
-						}
+		if = {
+			limit = {
+				is_player = no
+				has_modifier = has_central_bank
+				has_technology_researched = gold_standard
+				not = {
+					or = {
+						is_subject = yes
+						 
+						is_subject_type = subject_type_protectorate
+						has_law = law_type:law_isolationism
 					}
 				}
-				ai_buy_sell_currency = yes
 			}
+			ai_buy_sell_currency = yes
 		}
-
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-
-		#  █████╗ ██╗        ███████╗███████╗██╗     ██╗              ██████╗ ███╗   ██╗        ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
-		# ██╔══██╗██║        ██╔════╝██╔════╝██║     ██║             ██╔═══██╗████╗  ██║        ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
-		# ███████║██║        ███████╗█████╗  ██║     ██║             ██║   ██║██╔██╗ ██║        ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║███████║   ██║   ██║██║   ██║██╔██╗ ██║
-		# ██╔══██║██║        ╚════██║██╔══╝  ██║     ██║             ██║   ██║██║╚██╗██║        ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
-		# ██║  ██║██║███████╗███████║███████╗███████╗███████╗███████╗╚██████╔╝██║ ╚████║███████╗██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
-		# ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-		#                                                                                                                                                                              
-		#  █████╗ ██╗             ███╗   ███╗ █████╗ ██████╗ ██╗  ██╗███████╗████████╗                                                                                                 
-		# ██╔══██╗██║             ████╗ ████║██╔══██╗██╔══██╗██║ ██╔╝██╔════╝╚══██╔══╝                                                                                                 
-		# ███████║██║             ██╔████╔██║███████║██████╔╝█████╔╝ █████╗     ██║                                                                                                    
-		# ██╔══██║██║             ██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗ ██╔══╝     ██║                                                                                                    
-		# ██║  ██║███████╗███████╗██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██╗███████╗   ██║                                                                                                    
-		# ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝                                                                                                    
-
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-
-		sell_grain_on_international_market = yes
-		sell_wood_on_international_market = yes
-		sell_coal_on_international_market = yes
-		sell_iron_on_international_market = yes
-		sell_sulfur_on_international_market = yes
-		sell_lead_on_international_market = yes
-		sell_oil_on_international_market = yes
-		sell_dye_on_international_market = yes
-		sell_silk_on_international_market = yes
-		sell_rubber_on_international_market = yes
-		sell_ammunition_on_international_market = yes
-		sell_small_arms_on_international_market = yes
-		sell_artillery_on_international_market = yes
-		sell_tanks_on_international_market = yes
-		sell_aeroplanes_on_international_market = yes
-		sell_manowars_on_international_market = yes
-		sell_ironclads_on_international_market = yes	
 
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -860,7 +793,55 @@ ef_on_yearly_pulse_country = {
 			}
 			clear_variable_list_seller_country_10 = yes
 		}
-		
+
+		############################################################################################################################################################
+		############################################################################################################################################################
+		############################################################################################################################################################
+		############################################################################################################################################################
+
+		#  █████╗ ██╗        ███████╗███████╗██╗     ██╗              ██████╗ ███╗   ██╗        ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+		# ██╔══██╗██║        ██╔════╝██╔════╝██║     ██║             ██╔═══██╗████╗  ██║        ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+		# ███████║██║        ███████╗█████╗  ██║     ██║             ██║   ██║██╔██╗ ██║        ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║███████║   ██║   ██║██║   ██║██╔██╗ ██║
+		# ██╔══██║██║        ╚════██║██╔══╝  ██║     ██║             ██║   ██║██║╚██╗██║        ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+		# ██║  ██║██║███████╗███████║███████╗███████╗███████╗███████╗╚██████╔╝██║ ╚████║███████╗██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+		# ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+		#
+		#  █████╗ ██╗             ███╗   ███╗ █████╗ ██████╗ ██╗  ██╗███████╗████████╗
+		# ██╔══██╗██║             ████╗ ████║██╔══██╗██╔══██╗██║ ██╔╝██╔════╝╚══██╔══╝
+		# ███████║██║             ██╔████╔██║███████║██████╔╝█████╔╝ █████╗     ██║
+		# ██╔══██║██║             ██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗ ██╔══╝     ██║
+		# ██║  ██║███████╗███████╗██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██╗███████╗   ██║
+		# ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝
+
+		############################################################################################################################################################
+		############################################################################################################################################################
+		############################################################################################################################################################
+		############################################################################################################################################################
+
+		if = {
+			limit = {
+                has_modifier = has_national_stockpile
+				is_ai = yes
+			}
+			buy_sell_grain_on_international_market = yes
+			buy_sell_wood_on_international_market = yes
+			buy_sell_coal_on_international_market = yes
+			buy_sell_iron_on_international_market = yes
+			buy_sell_sulfur_on_international_market = yes
+			buy_sell_lead_on_international_market = yes
+			buy_sell_oil_on_international_market = yes
+			buy_sell_dye_on_international_market = yes
+			buy_sell_silk_on_international_market = yes
+			buy_sell_rubber_on_international_market = yes
+			buy_sell_ammunition_on_international_market = yes
+			buy_sell_small_arms_on_international_market = yes
+			buy_sell_artillery_on_international_market = yes
+			buy_sell_tanks_on_international_market = yes
+			buy_sell_aeroplanes_on_international_market = yes
+			buy_sell_manowars_on_international_market = yes
+			buy_sell_ironclads_on_international_market = yes
+		}
+
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -871,14 +852,14 @@ ef_on_yearly_pulse_country = {
 		# ███████║██║        ██████╔╝██║   ██║ ╚████╔╝      ██████╔╝██║   ██║██║██║     ██║  ██║██║██╔██╗ ██║██║  ███╗        ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ██████╔╝██║   ██║
 		# ██╔══██║██║        ██╔══██╗██║   ██║  ╚██╔╝       ██╔══██╗██║   ██║██║██║     ██║  ██║██║██║╚██╗██║██║   ██║        ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ██╔══██╗██║   ██║
 		# ██║  ██║██║███████╗██████╔╝╚██████╔╝   ██║███████╗██████╔╝╚██████╔╝██║███████╗██████╔╝██║██║ ╚████║╚██████╔╝███████╗╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ██║  ██║╚██████╔╝
-		# ╚═╝  ╚═╝╚═╝╚══════╝╚═════╝  ╚═════╝    ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
-		#                                                                                                                                                                                  
-		#  ██████╗████████╗██╗ ██████╗ ███╗   ██╗        ███████╗███████╗ ██████╗████████╗ ██████╗ ██████╗                                                                                 
-		# ██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║        ██╔════╝██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗                                                                                
-		# ██║        ██║   ██║██║   ██║██╔██╗ ██║        ███████╗█████╗  ██║        ██║   ██║   ██║██████╔╝                                                                                
-		# ██║        ██║   ██║██║   ██║██║╚██╗██║        ╚════██║██╔══╝  ██║        ██║   ██║   ██║██╔══██╗                                                                                
-		# ╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████╗███████║███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║                                                                                
-		#  ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝                                                                                
+		# ╚═╝  ╚═╝╚═╝╚══════╝╚═════╝  ╚═════╝    ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝
+		#
+		#  ██████╗████████╗██╗ ██████╗ ███╗   ██╗        ███████╗███████╗ ██████╗████████╗ ██████╗ ██████╗
+		# ██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║        ██╔════╝██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗
+		# ██║        ██║   ██║██║   ██║██╔██╗ ██║        ███████╗█████╗  ██║        ██║   ██║   ██║██████╔╝
+		# ██║        ██║   ██║██║   ██║██║╚██╗██║        ╚════██║██╔══╝  ██║        ██║   ██║   ██║██╔══██╗
+		# ╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████╗███████║███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║
+		#  ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
 
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -892,8 +873,8 @@ ef_on_yearly_pulse_country = {
 		# 		all_ai_buy_government_buildings_coast_tempo < gold_reserves_var_25
 		# 		is_ai = yes
 		# 	}
-		# 	ai_buy_building_construction_sector = yes 
-		# 	ai_buy_building_university = yes 
+		# 	ai_buy_building_construction_sector = yes
+		# 	ai_buy_building_university = yes
 
 		# 	if  = {
 		# 		limit  = {
@@ -920,56 +901,56 @@ ef_on_yearly_pulse_country = {
 		# 		ai_buy_resource_buildings_coast < gold_reserves_var_25 # to see
 		# 		is_ai = yes
 		# 	}
-		# 	ai_buy_building_fishing_wharf = yes 
-		# 	ai_buy_building_logging_camp = yes 
+		# 	ai_buy_building_fishing_wharf = yes
+		# 	ai_buy_building_logging_camp = yes
 
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = shaft_mining
 		# 		}
-		# 		ai_buy_building_coal_mine = yes 
+		# 		ai_buy_building_coal_mine = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = shaft_mining
 		# 		}
-		# 		ai_buy_building_iron_mine = yes 
+		# 		ai_buy_building_iron_mine = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = shaft_mining
 		# 		}
-		# 		ai_buy_building_lead_mine = yes 
+		# 		ai_buy_building_lead_mine = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = shaft_mining
 		# 		}
-		# 		ai_buy_building_sulfur_mine = yes 
+		# 		ai_buy_building_sulfur_mine = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = shaft_mining
 		# 		}
-		# 		ai_buy_building_gold_mine = yes 
+		# 		ai_buy_building_gold_mine = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = navigation
 		# 		}
-		# 		ai_buy_building_whaling_station = yes 
+		# 		ai_buy_building_whaling_station = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = rubber_mastication
 		# 		}
-		# 		ai_buy_building_rubber_plantation = yes 
+		# 		ai_buy_building_rubber_plantation = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = pumpjacks
 		# 		}
-		# 		ai_buy_building_oil_rig = yes 
+		# 		ai_buy_building_oil_rig = yes
 		# 	}
 		# }
 
@@ -986,43 +967,43 @@ ef_on_yearly_pulse_country = {
 		# 			has_strategy = ai_strategy_territorial_expansion
 		# 			has_strategy = ai_strategy_unify_germany
 		# 		}
-				
+
 		# 		ai_buy_military_buildings_coast < gold_reserves_var_35 # to see
 		# 		is_ai = yes
 		# 	}
-		# 	#ai_buy_building_construction_sector = yes 
-		# 	ai_buy_building_barracks = yes 
-		# 	ai_buy_building_naval_base = yes 
+		# 	#ai_buy_building_construction_sector = yes
+		# 	ai_buy_building_barracks = yes
+		# 	ai_buy_building_naval_base = yes
 
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = gunsmithing
 		# 		}
-		# 		ai_buy_building_arms_industry = yes 
+		# 		ai_buy_building_arms_industry = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = gunsmithing
 		# 		}
-		# 		ai_buy_building_artillery_foundries = yes 
+		# 		ai_buy_building_artillery_foundries = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = percussion_cap
 		# 		}
-		# 		ai_buy_building_munition_plants = yes 
+		# 		ai_buy_building_munition_plants = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = admiralty
 		# 		}
-		# 		ai_buy_building_military_shipyards = yes 
+		# 		ai_buy_building_military_shipyards = yes
 		# 	}
 		# 	if  = {
 		# 		limit = {
 		# 			has_technology_researched = military_aviation
 		# 		}
-		# 		ai_buy_building_war_machine_industry = yes 
+		# 		ai_buy_building_war_machine_industry = yes
 		# 	}
 		# }
 	}
@@ -1216,11 +1197,25 @@ ef_on_five_year_pulse_country = {
 			}
 			money_value_target_time_reset = yes
 		}
+
+		if = {
+			limit = {
+				has_modifier = has_central_bank
+				money_value_target > money_supply
+				not = {
+					is_subject_custom_trigger = yes
+				}
+			}
+			money_value_target_modification = yes #changement du gold standart tout les 5ans
+		}
+
+		#correction
 		if = {
 			limit = {
 				has_modifier = has_central_bank
 			}
 			trigger_event = { id = correct_currency_circulation.1 }
+			
 		}
 	}
 }
