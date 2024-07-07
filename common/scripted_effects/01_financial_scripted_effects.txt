@@ -218,7 +218,7 @@ sovereign_bond_yields = {
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_AAA
-		}	
+		}
 		set_variable = {
 			name = target_interest_rate
 			value = { 0 0.01 }
@@ -228,7 +228,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_AA
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.01 0.02 }
 		}
@@ -237,7 +237,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_A
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.02 0.03 }
 		}
@@ -246,7 +246,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_BBB
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.03 0.04 }
 		}
@@ -255,7 +255,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_BB
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.04 0.05 }
 		}
@@ -264,7 +264,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_B
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.05 0.06 }
 		}
@@ -273,7 +273,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_CCC
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.06 0.07 }
 		}
@@ -282,7 +282,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_CC
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.07 0.08 }
 		}
@@ -291,7 +291,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_C
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.08 0.09 }
 		}
@@ -300,7 +300,7 @@ sovereign_bond_yields = {
 		limit = {
 			has_modifier = country_credit_rating_D
 		}
-		set_variable = {  
+		set_variable = {
 			name = target_interest_rate
 			value = { 0.10 0.15 }
 		}
@@ -1190,16 +1190,13 @@ stockpiling_railroad_stock_2_state = {
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 
-
-#remove_from_list
-
 ai_buy_bond_1 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -1211,198 +1208,355 @@ ai_buy_bond_1 = {
 	}
 
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_1 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			#gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_1
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_1
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_1
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_1
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_1
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_1
-					value = var:ai_bond_quantity_1
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_1
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_1
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_1
-					multiply = var:ai_bond_quantity_1 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_1
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_1_in_gold
-				# 	value = var:ai_total_bond_value_1
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_1_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_1
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_1
-					multiply = var:ai_bond_quantity_1 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_1
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_1
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_1
-					value = var:ai_interest_calculated_1
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_1
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_1
-					value = var:ai_interest_calculated_1
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_1
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_1
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_1
-				value = scope:buyer.var:ai_total_bond_value_1
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_1
-				value = scope:buyer.var:ai_interest_calculated_1
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_1
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_1
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_1
-				months = 120
-				multiplier = var:ai_interest_per_mounth_calculated_1
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_1_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_1 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_1 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_1_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_1
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_1
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_1
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_1
+								value = var:ai_bond_quantity_1
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_1
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_1
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_1
+								multiply = var:ai_bond_quantity_1 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_1
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_1
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = var:ai_bond_quantity_1 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_1
+								value = var:ai_interest_calculated_1
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_1
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_1
+								value = var:ai_interest_calculated_1
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_1
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_1
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_1
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_1
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_1
+							}
+							set_variable = {
+								name = ai_maturity_time_1
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_1_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_1
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_1
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_1
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_1
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_1
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_1
+								value = var:ai_bond_quantity_1
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_1
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_1
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_1
+								multiply = var:ai_bond_quantity_1 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_1
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_1
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = var:ai_bond_quantity_1 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_1
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_1
+								value = var:ai_interest_calculated_1
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_1
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_1
+								value = var:ai_interest_calculated_1
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_1
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_1
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_1
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_1
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_1
+							}
+							set_variable = {
+								name = ai_maturity_time_1
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_1_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_1
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_1
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_1 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_1_message
+			# }
 		}
 	}
 }
 ai_buy_bond_2 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -1414,189 +1568,355 @@ ai_buy_bond_2 = {
 	}
 
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_2 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_2
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_2
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_2
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_2
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_2
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_2
-					value = var:ai_bond_quantity_2
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_2
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_2
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_2
-					multiply = var:ai_bond_quantity_2 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_2
-					multiply = scope:seller.bond_price
-				}
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_2
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_2
-					multiply = var:ai_bond_quantity_2 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_2
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_2
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_2
-					value = var:ai_interest_calculated_2
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_2
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_2
-					value = var:ai_interest_calculated_2
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_2
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_1
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_2
-				value = scope:buyer.var:ai_total_bond_value_2
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_2
-				value = scope:buyer.var:ai_interest_calculated_2
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_2
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_2
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_2
-				months = 120
-				multiplier = var:ai_interest_per_mounth_calculated_2
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_2_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_2 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_2 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_2_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_2
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_2
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_2
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_2
+								value = var:ai_bond_quantity_2
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_2
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_2
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_2
+								multiply = var:ai_bond_quantity_2 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_2
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_2
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = var:ai_bond_quantity_2 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_2
+								value = var:ai_interest_calculated_2
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_2
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_2
+								value = var:ai_interest_calculated_2
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_2
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_2
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_2
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_2
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_2
+							}
+							set_variable = {
+								name = ai_maturity_time_2
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_2_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_2
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_2
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_2
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_2
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_2
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_2
+								value = var:ai_bond_quantity_2
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_2
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_2
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_2
+								multiply = var:ai_bond_quantity_2 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_2
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_2
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = var:ai_bond_quantity_2 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_2
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_2
+								value = var:ai_interest_calculated_2
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_2
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_2
+								value = var:ai_interest_calculated_2
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_2
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_2
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_2
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_2
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_2
+							}
+							set_variable = {
+								name = ai_maturity_time_2
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_2_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_2
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_2
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_2 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_2_message
+			# }
 		}
 	}
 }
 ai_buy_bond_3 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -1606,199 +1926,357 @@ ai_buy_bond_3 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_3 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_3
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_3
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_3
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_3
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_3
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_3
-					value = var:ai_bond_quantity_3
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_3
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_3
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_3
-					multiply = var:ai_bond_quantity_3 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_3
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_3_in_gold
-				# 	value = var:ai_total_bond_value_3
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_3_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_3
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_3
-					multiply = var:ai_bond_quantity_3 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_3
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_3
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_3
-					value = var:ai_interest_calculated_3
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_3
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_3
-					value = var:ai_interest_calculated_3
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_3
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_3
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_3
-				value = scope:buyer.var:ai_total_bond_value_3
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_3
-				value = scope:buyer.var:ai_interest_calculated_3
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_3
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_3
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_3
-				months = 120
-				multiplier = var:ai_interest_per_mounth_calculated_3
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_3_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_3 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_3 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_3_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_3
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_3
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_3
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_3
+								value = var:ai_bond_quantity_3
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_3
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_3
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_3
+								multiply = var:ai_bond_quantity_3 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_3
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_3
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = var:ai_bond_quantity_3 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_3
+								value = var:ai_interest_calculated_3
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_3
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_3
+								value = var:ai_interest_calculated_3
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_3
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_3
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_3
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_3
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_3
+							}
+							set_variable = {
+								name = ai_maturity_time_3
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_3_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_3
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_3
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_3
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_3
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_3
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_3
+								value = var:ai_bond_quantity_3
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_3
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_3
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_3
+								multiply = var:ai_bond_quantity_3 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_3
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_3
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = var:ai_bond_quantity_3 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_3
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_3
+								value = var:ai_interest_calculated_3
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_3
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_3
+								value = var:ai_interest_calculated_3
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_3
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_3
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_3
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_3
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_3
+							}
+							set_variable = {
+								name = ai_maturity_time_3
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_3_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_3
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_3
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_3 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_3_message
+			# }
 		}
 	}
 }
 ai_buy_bond_4 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -1808,199 +2286,357 @@ ai_buy_bond_4 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_4 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_4
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_4
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_4
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_4
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_4
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_4
-					value = var:ai_bond_quantity_4
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_4
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_4
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_4
-					multiply = var:ai_bond_quantity_4 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_4
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_4_in_gold
-				# 	value = var:ai_total_bond_value_4
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_4_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_4
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_4
-					multiply = var:ai_bond_quantity_4 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_4
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_4
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_4
-					value = var:ai_interest_calculated_4
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_4
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_4
-					value = var:ai_interest_calculated_4
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_4
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_4
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_4
-				value = scope:buyer.var:ai_total_bond_value_4
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_4
-				value = scope:buyer.var:ai_interest_calculated_4
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_4
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_4
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_4
-				months = 120
-				multiplier = var:ai_interest_per_mounth_calculated_4
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_4_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_4 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_4 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_4_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_4
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_4
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_4
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_4
+								value = var:ai_bond_quantity_4
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_4
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_4
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_4
+								multiply = var:ai_bond_quantity_4 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_4
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_4
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = var:ai_bond_quantity_4 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_4
+								value = var:ai_interest_calculated_4
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_4
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_4
+								value = var:ai_interest_calculated_4
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_4
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_4
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_4
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_4
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_4
+							}
+							set_variable = {
+								name = ai_maturity_time_4
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_4_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_4
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_4
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_4
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_4
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_4
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_4
+								value = var:ai_bond_quantity_4
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_4
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_4
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_4
+								multiply = var:ai_bond_quantity_4 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_4
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_4
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = var:ai_bond_quantity_4 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_4
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_4
+								value = var:ai_interest_calculated_4
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_4
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_4
+								value = var:ai_interest_calculated_4
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_4
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_4
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_4
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_4
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_4
+							}
+							set_variable = {
+								name = ai_maturity_time_4
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_4_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_4
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_4
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_4 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_4_message
+			# }
 		}
 	}
 }
 ai_buy_bond_5 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -2010,199 +2646,357 @@ ai_buy_bond_5 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_5 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_5
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_5
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_5
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_5
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_5
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_5
-					value = var:ai_bond_quantity_5
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_5
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_5
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_5
-					multiply = var:ai_bond_quantity_5 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_5
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_5_in_gold
-				# 	value = var:ai_total_bond_value_5
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_5_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_5
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_5
-					multiply = var:ai_bond_quantity_5 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_5
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_5
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_5
-					value = var:ai_interest_calculated_5
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_5
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_5
-					value = var:ai_interest_calculated_5
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_5
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_5
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_5
-				value = scope:buyer.var:ai_total_bond_value_5
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_5
-				value = scope:buyer.var:ai_interest_calculated_5
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_5
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_5
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_5
-				months = 120
-				multiplier = var:ai_interest_per_mounth_calculated_5
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_5_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_5 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_5 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_5_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_5
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_5
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_5
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_5
+								value = var:ai_bond_quantity_5
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_5
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_5
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_5
+								multiply = var:ai_bond_quantity_5 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_5
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_5
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = var:ai_bond_quantity_5 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_5
+								value = var:ai_interest_calculated_5
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_5
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_5
+								value = var:ai_interest_calculated_5
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_5
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_5
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_5
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_5
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_5
+							}
+							set_variable = {
+								name = ai_maturity_time_5
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_5_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_5
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_5
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_5
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_5
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_5
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_5
+								value = var:ai_bond_quantity_5
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_5
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_5
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_5
+								multiply = var:ai_bond_quantity_5 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_5
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_5
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = var:ai_bond_quantity_5 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_5
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_5
+								value = var:ai_interest_calculated_5
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_5
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_5
+								value = var:ai_interest_calculated_5
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_5
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_5
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_5
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_5
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_5
+							}
+							set_variable = {
+								name = ai_maturity_time_5
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_5_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_5
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_5
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_5 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_5_message
+			# }
 		}
 	}
 }
 ai_buy_bond_6 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -2212,199 +3006,357 @@ ai_buy_bond_6 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_6 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_6
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_6
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_6
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_6
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_6
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_6
-					value = var:ai_bond_quantity_6
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_6
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_6
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_6
-					multiply = var:ai_bond_quantity_6 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_6
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_6_in_gold
-				# 	value = var:ai_total_bond_value_6
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_6_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_6
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_6
-					multiply = var:ai_bond_quantity_6 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_6
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_6
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_6
-					value = var:ai_interest_calculated_6
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_6
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_6
-					value = var:ai_interest_calculated_6
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_6
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_6
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_6
-				value = scope:buyer.var:ai_total_bond_value_6
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_6
-				value = scope:buyer.var:ai_interest_calculated_6
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_6
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_6
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_6
-				months = 60
-				multiplier = var:ai_interest_per_mounth_calculated_6
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_6_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_6 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_6 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_6_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_6
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_6
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_6
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_6
+								value = var:ai_bond_quantity_6
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_6
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_6
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_6
+								multiply = var:ai_bond_quantity_6 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_6
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_6
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = var:ai_bond_quantity_6 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_6
+								value = var:ai_interest_calculated_6
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_6
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_6
+								value = var:ai_interest_calculated_6
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_6
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_6
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_6
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_6
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_6
+							}
+							set_variable = {
+								name = ai_maturity_time_6
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_6_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_6
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_6
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_6
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_6
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_6
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_6
+								value = var:ai_bond_quantity_6
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_6
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_6
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_6
+								multiply = var:ai_bond_quantity_6 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_6
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_6
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = var:ai_bond_quantity_6 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_6
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_6
+								value = var:ai_interest_calculated_6
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_6
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_6
+								value = var:ai_interest_calculated_6
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_6
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_6
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_6
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_6
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_6
+							}
+							set_variable = {
+								name = ai_maturity_time_6
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_6_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_6
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_6
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_6 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_6_message
+			# }
 		}
 	}
 }
 ai_buy_bond_7 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -2414,199 +3366,357 @@ ai_buy_bond_7 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_7 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_7
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_7
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_7
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_7
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_7
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_7
-					value = var:ai_bond_quantity_7
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_7
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_7
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_7
-					multiply = var:ai_bond_quantity_7 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_7
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_7_in_gold
-				# 	value = var:ai_total_bond_value_7
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_7_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_7
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_7
-					multiply = var:ai_bond_quantity_7 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_7
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_7
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_7
-					value = var:ai_interest_calculated_7
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_7
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_7
-					value = var:ai_interest_calculated_7
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_7
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_7
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_7
-				value = scope:buyer.var:ai_total_bond_value_7
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_7
-				value = scope:buyer.var:ai_interest_calculated_7
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_7
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_7
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_7
-				months = 60
-				multiplier = var:ai_interest_per_mounth_calculated_7
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_7_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_7 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_7 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_7_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_7
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_7
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_7
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_7
+								value = var:ai_bond_quantity_7
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_7
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_7
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_7
+								multiply = var:ai_bond_quantity_7 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_7
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_7
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = var:ai_bond_quantity_7 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_7
+								value = var:ai_interest_calculated_7
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_7
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_7
+								value = var:ai_interest_calculated_7
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_7
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_7
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_7
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_7
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_7
+							}
+							set_variable = {
+								name = ai_maturity_time_7
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_7_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_7
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_7
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_7
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_7
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_7
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_7
+								value = var:ai_bond_quantity_7
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_7
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_7
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_7
+								multiply = var:ai_bond_quantity_7 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_7
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_7
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = var:ai_bond_quantity_7 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_7
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_7
+								value = var:ai_interest_calculated_7
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_7
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_7
+								value = var:ai_interest_calculated_7
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_7
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_7
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_7
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_7
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_7
+							}
+							set_variable = {
+								name = ai_maturity_time_7
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_7_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_7
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_7
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_7 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_7_message
+			# }
 		}
 	}
 }
 ai_buy_bond_8 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -2616,199 +3726,357 @@ ai_buy_bond_8 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_8 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_8
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_8
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_8
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_8
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_8
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_8
-					value = var:ai_bond_quantity_8
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_8
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_8
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_8
-					multiply = var:ai_bond_quantity_8 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_8
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_8_in_gold
-				# 	value = var:ai_total_bond_value_8
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_8_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_8
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_8
-					multiply = var:ai_bond_quantity_8 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_8
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_8
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_8
-					value = var:ai_interest_calculated_8
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_8
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_8
-					value = var:ai_interest_calculated_8
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_8
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_8
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_8
-				value = scope:buyer.var:ai_total_bond_value_8
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_8
-				value = scope:buyer.var:ai_interest_calculated_8
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_8
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_8
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_8
-				months = 60
-				multiplier = var:ai_interest_per_mounth_calculated_8
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_8_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_8 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_8 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_8_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_8
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_8
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_8
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_8
+								value = var:ai_bond_quantity_8
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_8
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_8
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_8
+								multiply = var:ai_bond_quantity_8 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_8
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_8
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = var:ai_bond_quantity_8 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_8
+								value = var:ai_interest_calculated_8
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_8
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_8
+								value = var:ai_interest_calculated_8
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_8
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_8
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_8
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_8
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_8
+							}
+							set_variable = {
+								name = ai_maturity_time_8
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_8_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_8
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_8
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_8
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_8
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_8
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_8
+								value = var:ai_bond_quantity_8
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_8
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_8
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_8
+								multiply = var:ai_bond_quantity_8 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_8
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_8
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = var:ai_bond_quantity_8 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_8
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_8
+								value = var:ai_interest_calculated_8
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_8
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_8
+								value = var:ai_interest_calculated_8
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_8
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_8
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_8
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_8
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_8
+							}
+							set_variable = {
+								name = ai_maturity_time_8
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_8_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_8
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_8
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_8 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_8_message
+			# }
 		}
 	}
 }
 ai_buy_bond_9 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -2818,199 +4086,357 @@ ai_buy_bond_9 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_9 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_9
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_9
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_9
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_9
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_9
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_9
-					value = var:ai_bond_quantity_9
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_9
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_9
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_9
-					multiply = var:ai_bond_quantity_9 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_9
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_9_in_gold
-				# 	value = var:ai_total_bond_value_9
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_9_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_9
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_9
-					multiply = var:ai_bond_quantity_9 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_9
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_9
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_9
-					value = var:ai_interest_calculated_9
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_9
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_9
-					value = var:ai_interest_calculated_9
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_9
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_9
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_9
-				value = scope:buyer.var:ai_total_bond_value_9
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_9
-				value = scope:buyer.var:ai_interest_calculated_9
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_9
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_9
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_9
-				months = 60
-				multiplier = var:ai_interest_per_mounth_calculated_9
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_9_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_9 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_9 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_9_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_9
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_9
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_9
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_9
+								value = var:ai_bond_quantity_9
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_9
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_9
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_9
+								multiply = var:ai_bond_quantity_9 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_9
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_9
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = var:ai_bond_quantity_9 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_9
+								value = var:ai_interest_calculated_9
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_9
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_9
+								value = var:ai_interest_calculated_9
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_9
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_9
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_9
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_9
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_9
+							}
+							set_variable = {
+								name = ai_maturity_time_9
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_9_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_9
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_9
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_9
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_9
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_9
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_9
+								value = var:ai_bond_quantity_9
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_9
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_9
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_9
+								multiply = var:ai_bond_quantity_9 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_9
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_9
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = var:ai_bond_quantity_9 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_9
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_9
+								value = var:ai_interest_calculated_9
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_9
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_9
+								value = var:ai_interest_calculated_9
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_9
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_9
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_9
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_9
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_9
+							}
+							set_variable = {
+								name = ai_maturity_time_9
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_9_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_9
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_9
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_9 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_9_message
+			# }
 		}
 	}
 }
 ai_buy_bond_10 = {
-	every_country = {
-		limit  = {
-			is_player = yes
-		}
-		save_scope_as = is_player_for_notification
-	}
+	# every_country = {
+	# 	limit  = {
+	# 		is_player = yes
+	# 	}
+	# 	save_scope_as = is_player_for_notification
+	# }
 
 	root = {
 		save_scope_as = buyer
@@ -3020,189 +4446,347 @@ ai_buy_bond_10 = {
 		variable = central_bank_debt_variable_list_ordered_1
 		save_scope_as = seller
 	}
+
 	if = {
-		limit = {
-			scope:buyer.ai_selle_bond_maturity_yers_time_10 = 0
-			exists = scope:seller
-			scope:seller = {
-				not = {
-					this = root
-				}
-			}
-			gold_reserves_var > gold_reserves_10
-			# gold_loan_preview < scope:seller.central_bank_debt
+		root = {
+			save_scope_as = buyer
 		}
 
-		scope:seller = {
-			#### ajout à la liste
-			add_to_variable_list = {
-				name = central_bank_debt_buyer_list
-				target = scope:buyer
-			}
-
-			scope:buyer = {
-				# Pour les liste du vendeur
-				add_to_variable_list = {
-					name = ai_buyer_country_10
-					target = prev
-				}
-				add_to_variable_list = {
-					name = ai_seller_country_general_10
-					target = scope:seller #prev
-				}
-
-				#ai_selle_bond_maturity_yers_time_10
-				change_variable = {
-					name = ai_selle_bond_maturity_yers_time_10
-					add = 1
-				}
-
-				#quantité
-				set_variable = {
-					name = ai_bond_quantity_10
-					value = bond_quantity_scripted
-				}
-				set_variable = {
-					name = ai_quantity_purchasing_10
-					value = var:ai_bond_quantity_10
-				}
-
-				#interret lors de l'achat
-				set_variable = {
-					name = ai_interest_purchasing_10
-					value = scope:seller.interest_value_10Y
-				}
-
-				#valeur de la quantité
-				set_variable = {
-					name = ai_total_bond_value_10
-					value = 1
-				}
-				change_variable = {
-					name = ai_total_bond_value_10
-					multiply = var:ai_bond_quantity_10 #bond quantité
-				}
-				change_variable = {
-					name = ai_total_bond_value_10
-					multiply = scope:seller.bond_price
-				}
-				# # transformation en or
-				# set_variable = {
-				# 	name = ai_total_bond_value_10_in_gold
-				# 	value = var:ai_total_bond_value_10
-				# }
-				# change_variable = {
-				# 	name = ai_total_bond_value_10_in_gold
-				# 	multiply = money_value_rapported_inflation
-				# }
-
-				#interet total
-				set_variable = {
-					name = ai_interest_calculated_10
-					value = 1
-				}
-				change_variable = {
-					name = ai_interest_calculated_10
-					multiply = var:ai_bond_quantity_10 #bond quantité
-				}
-				change_variable = {
-					name = ai_interest_calculated_10
-					multiply = scope:seller.bond_price
-				}
-				change_variable = {
-					name = ai_interest_calculated_10
-					multiply = scope:seller.interest_value_10Y
-				}
-
-				#interet total à terme
-				set_variable = {
-					name = ai_interest_at_term_calculated_10
-					value = var:ai_interest_calculated_10
-				}
-				change_variable = {
-					name = ai_interest_at_term_calculated_10
-					multiply = 10
-				}
-
-				#interet par mois
-				set_variable = {
-					name = ai_interest_per_mounth_calculated_10
-					value = var:ai_interest_calculated_10
-				}
-				change_variable = {
-					name = ai_interest_per_mounth_calculated_10
-					divide = 12
-				}
-			}
-
-			#### retrait des bond du pays vendeur
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						subtract = scope:buyer.var:ai_bond_quantity_10
-					}
-				}
-			}
-
-			#################
-			#or prété à la banque du pays vendeur
-			set_variable = {
-				name = ai_central_bank_gold_loaned_10
-				value = scope:buyer.var:ai_total_bond_value_10
-			}
-			#interet que la banque centrale pays à l'année
-			set_variable = {
-				name = ai_central_bank_interest_refund_per_year_10
-				value = scope:buyer.var:ai_interest_calculated_10
-			}
-
-		}
-		scope:buyer = {
-			add_treasury = {
-				subtract = var:ai_total_bond_value_10
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = bank_central_historic_place
-						is_capital = yes
-					}
-					change_variable = {
-						name = stockpiling_bond_var_state_1
-						add = scope:buyer.var:ai_quantity_purchasing_10
-					}
-				}
-			}
-
-			###### ajout du modifier d'interet au pays qui vend
-
-			add_modifier = {
-				name = ai_buy_bond_10
-				months = 60
-				multiplier = var:ai_interest_per_mounth_calculated_10
-			}
-
-			#demare le on_action
-			set_variable = {
-				name = ai_buy_bond_10_on
-				value = 1
-			}
-
+		random_in_global_list = {
+			variable = central_bank_debt_variable_list_ordered_1
+			save_scope_as = seller
 		}
 
 		if = {
 			limit = {
-				var:ai_total_bond_value_10 < scope:seller.central_bank_debt
+				scope:buyer.ai_selle_bond_maturity_yers_time_10 = 0
+				exists = scope:seller
+				scope:seller = {
+					central_bank_debt > 2500000
+					# all_gold_owned < 1
+					not = {
+						this = root
+					}
+				}
+				gold_reserves_var > gold_reserves_10
 			}
-			#clear toute les valeur
-		}
-		scope:is_player_for_notification = {
-			#post_notification = ai_selle_bond_maturity_10_message
+
+			random_list = {
+				1 = { #5Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_10
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_10
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_10
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_10
+								value = var:ai_bond_quantity_10
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_10
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_10
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_10
+								multiply = var:ai_bond_quantity_10 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_10
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_10
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = var:ai_bond_quantity_10 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = scope:seller.interest_value_5Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_10
+								value = var:ai_interest_calculated_10
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_10
+								multiply = 5
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_10
+								value = var:ai_interest_calculated_10
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_10
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_10
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_10
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_10
+								months = 60
+								multiplier = var:ai_interest_per_mounth_calculated_10
+							}
+							set_variable = {
+								name = ai_maturity_time_10
+								value = 5
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_10_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_10
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_10
+						}
+					}
+				}
+				1 = { #10Years
+					scope:seller = {
+						scope:buyer = {
+							# Pour les liste du vendeur
+							add_to_variable_list = {
+								name = ai_buyer_country_10
+								target = prev
+							}
+							add_to_variable_list = {
+								name = ai_seller_country_general_10
+								target = scope:seller #prev
+							}
+
+							#ai_selle_bond_maturity_yers_time_x
+							# change_variable = {
+							# 	name = ai_selle_bond_maturity_yers_time_x
+							# 	add = 1
+							# }
+
+							######
+
+							#quantité
+							set_variable = {
+								name = ai_bond_quantity_10
+								value = bond_quantity_scripted
+							}
+							set_variable = {
+								name = ai_quantity_purchasing_10
+								value = var:ai_bond_quantity_10
+							}
+
+							#interret lors de l'achat
+							set_variable = {
+								name = ai_interest_purchasing_10
+								value = scope:seller.interest_value_10Y
+							}
+
+							#valeur de la quantité
+							set_variable = {
+								name = ai_total_bond_value_10
+								value = 1
+							}
+							change_variable = {
+								name = ai_total_bond_value_10
+								multiply = var:ai_bond_quantity_10 #bond quantité
+							}
+							change_variable = {
+								name = ai_total_bond_value_10
+								multiply = scope:seller.bond_price
+							}
+
+							#interet total
+							set_variable = {
+								name = ai_interest_calculated_10
+								value = 1
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = var:ai_bond_quantity_10 #bond quantité
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = scope:seller.bond_price
+							}
+							change_variable = {
+								name = ai_interest_calculated_10
+								multiply = scope:seller.interest_value_10Y
+							}
+
+							#interet total à terme
+							set_variable = {
+								name = ai_interest_at_term_calculated_10
+								value = var:ai_interest_calculated_10
+							}
+							change_variable = {
+								name = ai_interest_at_term_calculated_10
+								multiply = 10
+							}
+
+							#interet par mois
+							set_variable = {
+								name = ai_interest_per_mounth_calculated_10
+								value = var:ai_interest_calculated_10
+							}
+							change_variable = {
+								name = ai_interest_per_mounth_calculated_10
+								divide = 12
+							}
+
+							add_treasury = {
+								subtract = var:ai_total_bond_value_10
+							}
+							every_scope_state = {
+								if = {
+									limit = {
+										has_modifier = bank_central_historic_place
+										is_capital = yes
+									}
+									change_variable = {
+										name = stockpiling_bond_var_state_1
+										add = scope:buyer.var:ai_quantity_purchasing_10
+									}
+								}
+							}
+							add_modifier = {
+								name = ai_buy_bond_10
+								months = 120
+								multiplier = var:ai_interest_per_mounth_calculated_10
+							}
+							set_variable = {
+								name = ai_maturity_time_10
+								value = 10
+							}
+							#demare le on_action
+							set_variable = {
+								name = ai_buy_bond_10_on
+								value = 1
+							}
+						}
+
+						#### retrait des bond du pays vendeur
+						every_scope_state = {
+							if = {
+								limit = {
+									has_modifier = bank_central_historic_place
+									is_capital = yes
+								}
+								change_variable = {
+									name = stockpiling_bond_var_state_1
+									subtract = scope:buyer.var:ai_bond_quantity_1
+								}
+							}
+						}
+
+						#################
+						#ajout à la liste des acheteur
+						add_to_variable_list = {
+							name = central_bank_debt_buyer_list
+							target = scope:buyer
+						}
+						#ajout à la varriable qui synthétise tout les crédit en or et les interet en or
+						change_variable = {
+							name = gold_loaned_to_central_bank
+							add = scope:buyer.var:ai_total_bond_value_10
+						}
+						#interet que la banque centrale pays à l'année
+						change_variable = {
+							name = central_bank_interest_refund_per_year
+							add = scope:buyer.var:ai_interest_calculated_10
+						}
+					}
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		var:ai_total_bond_value_10 < scope:seller.central_bank_debt
+			# 	}
+			# 	clear_toute_les_valeur
+			# }
+			# scope:is_player_for_notification = {
+			# 	post_notification = ai_selle_bond_maturity_10_message
+			# }
 		}
 	}
 }
@@ -3223,19 +4807,28 @@ ai_buy_bond_10 = {
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 
+#a faire
+
+
 bond_maturity_1 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_1
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_1
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_1 > 9
+			var:selle_bond_maturity_yers_1 > var:maturity_time_1
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_1
+			variable = seller_country_general_1
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3245,14 +4838,15 @@ bond_maturity_1 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_1
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_1
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_1
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_1
 				}
 			}
 			root = {
@@ -3306,10 +4900,6 @@ bond_maturity_1 = {
 					name = selle_bond_maturity_on_action_1
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_1_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_1
@@ -3321,32 +4911,25 @@ bond_maturity_1 = {
 		}
 	}
 }
-bond_maturity_yers_time_1 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_1 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_1
-			add = 1
-		}
-	}
-}
 bond_maturity_2 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_2
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_2
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_2 > 9
+			var:selle_bond_maturity_yers_2 > var:maturity_time_2
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_2
+			variable = seller_country_general_2
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3356,14 +4939,15 @@ bond_maturity_2 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_2
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_2
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_2
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_2
 				}
 			}
 			root = {
@@ -3417,10 +5001,6 @@ bond_maturity_2 = {
 					name = selle_bond_maturity_on_action_2
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_2_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_2
@@ -3432,32 +5012,25 @@ bond_maturity_2 = {
 		}
 	}
 }
-bond_maturity_yers_time_2 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_2 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_2
-			add = 1
-		}
-	}
-}
 bond_maturity_3 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_3
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_3
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_3 > 9
+			var:selle_bond_maturity_yers_3 > var:maturity_time_3
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_3
+			variable = seller_country_general_3
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3467,14 +5040,15 @@ bond_maturity_3 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_3
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_3
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_3
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_3
 				}
 			}
 			root = {
@@ -3528,10 +5102,6 @@ bond_maturity_3 = {
 					name = selle_bond_maturity_on_action_3
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_3_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_3
@@ -3543,32 +5113,25 @@ bond_maturity_3 = {
 		}
 	}
 }
-bond_maturity_yers_time_3 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_3 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_3
-			add = 1
-		}
-	}
-}
 bond_maturity_4 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_4
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_4
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_4 > 9
+			var:selle_bond_maturity_yers_4 > var:maturity_time_4
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_4
+			variable = seller_country_general_4
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3578,14 +5141,15 @@ bond_maturity_4 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_4
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_4
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_4
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_4
 				}
 			}
 			root = {
@@ -3639,10 +5203,6 @@ bond_maturity_4 = {
 					name = selle_bond_maturity_on_action_4
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_4_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_4
@@ -3654,49 +5214,43 @@ bond_maturity_4 = {
 		}
 	}
 }
-bond_maturity_yers_time_4 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_4 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_4
-			add = 1
-		}
-	}
-}
 bond_maturity_5 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_5
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_5
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_5 > 9
+			var:selle_bond_maturity_yers_5 > var:maturity_time_5
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_5
+			variable = seller_country_general_5
 			save_scope_as = seller
 
 			scope:seller = {
 				remove_from_list = {
 					variable = central_bank_debt_buyer_list
-					target = root #scope:buyer
+					target = ROOT #scope:buyer
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_5
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_5
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_5
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_5
 				}
 			}
 			root = {
@@ -3750,10 +5304,6 @@ bond_maturity_5 = {
 					name = selle_bond_maturity_on_action_5
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_5_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_5
@@ -3765,32 +5315,25 @@ bond_maturity_5 = {
 		}
 	}
 }
-bond_maturity_yers_time_5 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_5 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_5
-			add = 1
-		}
-	}
-}
 bond_maturity_6 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_6
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_6
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_6 > 4
+			var:selle_bond_maturity_yers_6 > var:maturity_time_6
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_6
+			variable = seller_country_general_6
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3800,14 +5343,15 @@ bond_maturity_6 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_6
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_6
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_6
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_6
 				}
 			}
 			root = {
@@ -3861,10 +5405,6 @@ bond_maturity_6 = {
 					name = selle_bond_maturity_on_action_6
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_6_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_6
@@ -3876,32 +5416,25 @@ bond_maturity_6 = {
 		}
 	}
 }
-bond_maturity_yers_time_6 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_6 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_6
-			add = 1
-		}
-	}
-}
 bond_maturity_7 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_7
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_7
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_7 > 4
+			var:selle_bond_maturity_yers_7 > var:maturity_time_7
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_7
+			variable = seller_country_general_7
 			save_scope_as = seller
 
 			scope:seller = {
@@ -3911,14 +5444,15 @@ bond_maturity_7 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_7
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_7
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_7
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_7
 				}
 			}
 			root = {
@@ -3972,10 +5506,6 @@ bond_maturity_7 = {
 					name = selle_bond_maturity_on_action_7
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_7_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_7
@@ -3987,32 +5517,25 @@ bond_maturity_7 = {
 		}
 	}
 }
-bond_maturity_yers_time_7 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_7 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_7
-			add = 1
-		}
-	}
-}
 bond_maturity_8 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_8
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_8
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_8 > 4
+			var:selle_bond_maturity_yers_8 > var:maturity_time_8
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_8
+			variable = seller_country_general_8
 			save_scope_as = seller
 
 			scope:seller = {
@@ -4022,14 +5545,15 @@ bond_maturity_8 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_8
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_8
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_8
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_8
 				}
 			}
 			root = {
@@ -4083,10 +5607,6 @@ bond_maturity_8 = {
 					name = selle_bond_maturity_on_action_8
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_8_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_8
@@ -4098,32 +5618,25 @@ bond_maturity_8 = {
 		}
 	}
 }
-bond_maturity_yers_time_8 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_8 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_8
-			add = 1
-		}
-	}
-}
 bond_maturity_9 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_9
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_9
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_9 > 4
+			var:selle_bond_maturity_yers_9 > var:maturity_time_9
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_9
+			variable = seller_country_general_9
 			save_scope_as = seller
 
 			scope:seller = {
@@ -4133,14 +5646,15 @@ bond_maturity_9 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_9
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_9
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_9
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_9
 				}
 			}
 			root = {
@@ -4194,10 +5708,6 @@ bond_maturity_9 = {
 					name = selle_bond_maturity_on_action_9
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_9_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_9
@@ -4209,32 +5719,25 @@ bond_maturity_9 = {
 		}
 	}
 }
-bond_maturity_yers_time_9 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_9 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_9
-			add = 1
-		}
-	}
-}
 bond_maturity_10 = {
+	#gui timer
+	change_variable = {
+		name = selle_bond_maturity_yers_time_10
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = selle_bond_maturity_yers_10
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:selle_bond_maturity_yers_10 > 4
+			var:selle_bond_maturity_yers_10 > var:maturity_time_10
 		}
 		#seller
 		every_in_list = {
-			variable = seller_country_10
+			variable = seller_country_general_10
 			save_scope_as = seller
 
 			scope:seller = {
@@ -4244,14 +5747,15 @@ bond_maturity_10 = {
 				}
 				national_debt_variable_list_clear = yes
 
-				#Reset variable
-				set_variable = {
-					name = central_bank_gold_loaned_10
-					value = 0
+				#### retour de l'investissement
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:total_bond_value_10
 				}
-				set_variable = {
-					name = central_bank_interest_refund_per_year_10
-					value = 0
+
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:interest_calculated_10
 				}
 			}
 			root = {
@@ -4305,10 +5809,6 @@ bond_maturity_10 = {
 					name = selle_bond_maturity_on_action_10
 					value = 0
 				}
-				set_variable = {
-					name = interest_per_mounth_calculated_10_for_player
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = buyer_country_10
@@ -4317,19 +5817,6 @@ bond_maturity_10 = {
 				clear_variable_list = seller_country_general_10
 				clear_variable_list = buyer_country_general_10
 			}
-		}
-	}
-}
-bond_maturity_yers_time_10 = {
-	if  = {
-		limit = {
-			not  = {
-				selle_bond_maturity_yers_time_10 > 12
-			}
-		}
-		change_variable = {
-			name = selle_bond_maturity_yers_time_10
-			add = 1
 		}
 	}
 }
@@ -4347,14 +5834,20 @@ bond_maturity_yers_time_10 = {
 #########################################################################################################################################################################################
 
 ai_bond_maturity_1 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_1
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_1
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_1 > 9
+			var:ai_selle_bond_maturity_yers_1 > var:maturity_time_1
 		}
 		#seller
 		every_in_list = {
@@ -4369,15 +5862,14 @@ ai_bond_maturity_1 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_1
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_1
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_1
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_1
 				}
 			}
 			root = {
@@ -4442,28 +5934,21 @@ ai_bond_maturity_1 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_1 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_1 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_1
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_2 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_2
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_2
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_2 > 9
+			var:ai_selle_bond_maturity_yers_2 > var:maturity_time_2
 		}
 		#seller
 		every_in_list = {
@@ -4478,15 +5963,14 @@ ai_bond_maturity_2 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_2
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_2
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_2
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_2
 				}
 			}
 			root = {
@@ -4551,28 +6035,21 @@ ai_bond_maturity_2 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_2 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_2 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_2
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_3 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_3
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_3
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_3 > 9
+			var:ai_selle_bond_maturity_yers_3 > var:maturity_time_3
 		}
 		#seller
 		every_in_list = {
@@ -4587,15 +6064,14 @@ ai_bond_maturity_3 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_3
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_3
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_3
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_3
 				}
 			}
 			root = {
@@ -4660,28 +6136,21 @@ ai_bond_maturity_3 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_3 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_3 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_3
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_4 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_4
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_4
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_4 > 9
+			var:ai_selle_bond_maturity_yers_4 > var:maturity_time_4
 		}
 		#seller
 		every_in_list = {
@@ -4696,15 +6165,14 @@ ai_bond_maturity_4 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_4
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_4
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_4
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_4
 				}
 			}
 			root = {
@@ -4769,28 +6237,21 @@ ai_bond_maturity_4 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_4 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_4 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_4
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_5 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_5
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_5
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_5 > 9
+			var:ai_selle_bond_maturity_yers_5 > var:maturity_time_5
 		}
 		#seller
 		every_in_list = {
@@ -4800,20 +6261,19 @@ ai_bond_maturity_5 = {
 			scope:seller = {
 				remove_from_list = {
 					variable = central_bank_debt_buyer_list
-					target = root #scope:buyer
+					target = ROOT #scope:buyer
 				}
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_5
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_5
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_5
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_5
 				}
 			}
 			root = {
@@ -4878,28 +6338,21 @@ ai_bond_maturity_5 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_5 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_5 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_5
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_6 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_6
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_6
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_6 > 4
+			var:ai_selle_bond_maturity_yers_6 > var:maturity_time_6
 		}
 		#seller
 		every_in_list = {
@@ -4914,15 +6367,14 @@ ai_bond_maturity_6 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_6
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_6
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_6
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_6
 				}
 			}
 			root = {
@@ -4987,28 +6439,21 @@ ai_bond_maturity_6 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_6 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_6 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_6
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_7 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_7
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_7
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_7 > 4
+			var:ai_selle_bond_maturity_yers_7 > var:maturity_time_7
 		}
 		#seller
 		every_in_list = {
@@ -5023,15 +6468,14 @@ ai_bond_maturity_7 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_7
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_7
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_7
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_7
 				}
 			}
 			root = {
@@ -5096,28 +6540,21 @@ ai_bond_maturity_7 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_7 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_7 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_7
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_8 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_8
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_8
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_8 > 4
+			var:ai_selle_bond_maturity_yers_8 > var:maturity_time_8
 		}
 		#seller
 		every_in_list = {
@@ -5132,15 +6569,14 @@ ai_bond_maturity_8 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_8
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_8
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_8
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_8
 				}
 			}
 			root = {
@@ -5205,28 +6641,21 @@ ai_bond_maturity_8 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_8 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_8 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_8
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_9 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_9
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_9
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_9 > 4
+			var:ai_selle_bond_maturity_yers_9 > var:maturity_time_9
 		}
 		#seller
 		every_in_list = {
@@ -5241,15 +6670,14 @@ ai_bond_maturity_9 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_9
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_9
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_9
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_9
 				}
 			}
 			root = {
@@ -5314,28 +6742,21 @@ ai_bond_maturity_9 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_9 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_9 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_9
-			add = 1
-		}
-	}
-}
 ai_bond_maturity_10 = {
+	#gui timer
+	change_variable = {
+		name = ai_selle_bond_maturity_yers_time_10
+		add = 1
+	}
+
+	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_10
 		add = 1
 	}
-
 	if = {
 		limit = {
-			var:ai_selle_bond_maturity_yers_10 > 4
+			var:ai_selle_bond_maturity_yers_10 > var:maturity_time_10
 		}
 		#seller
 		every_in_list = {
@@ -5350,15 +6771,14 @@ ai_bond_maturity_10 = {
 				national_debt_variable_list_clear = yes
 
 				#### retour de l'investissement
-				set_variable = {
-					name = ai_central_bank_gold_loaned_10
-					value = 0
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					subtract = root.var:ai_total_bond_value_10
 				}
 
-				#Reset variable
-				set_variable = {
-					name = ai_central_bank_interest_refund_per_year_10
-					value = 0
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					subtract = root.var:ai_interest_calculated_10
 				}
 			}
 			root = {
@@ -5423,19 +6843,6 @@ ai_bond_maturity_10 = {
 		}
 	}
 }
-ai_bond_maturity_yers_time_10 = {
-	if  = {
-		limit = {
-			not  = {
-				ai_selle_bond_maturity_yers_time_10 > 12
-			}
-		}
-		change_variable = {
-			name = ai_selle_bond_maturity_yers_time_10
-			add = 1
-		}
-	}
-}
 
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
@@ -5451,8 +6858,34 @@ ai_bond_maturity_yers_time_10 = {
 
 central_bank_interest_refund_per_year_in_gold = {
 	change_variable = {
-		name = debt_interest
+		name = gold_loaned_to_central_bank
 		subtract = central_bank_interest_refund_per_year
+	}
+	if = {
+		limit  = {
+			gold_loaned_to_central_bank < 0
+		}
+		set_variable = {
+			name = gold_loaned_to_central_bank
+			value = 0
+		}
+		set_variable = {
+			name = central_bank_interest_refund_per_year
+			value = 0
+		}
+
+		every_in_list = {
+			variable = central_bank_debt_buyer_list
+			save_scope_as = buyer
+
+			scope:buyer = {
+				add_to_variable_list = {
+					name = countries_with_central_bank_in_default
+					target = root
+				}
+			}
+		}
+		clear_variable_list = central_bank_debt_buyer_list
 	}
 }
 
@@ -6435,5 +7868,3 @@ clear_ironclads_contract_1_year = {
 		value = 0
 	}
 }
-
-#################
