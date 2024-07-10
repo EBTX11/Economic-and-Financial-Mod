@@ -96,7 +96,7 @@ currency_quantity_sell = {
 
 bg_financial_centre_lvl = {
 	value = 0
-	every_scope_building = { 
+	every_scope_building = {
 		limit = {
 			is_building_group = bg_financial_centre
 		}
@@ -104,9 +104,9 @@ bg_financial_centre_lvl = {
 	}
 }
 
-value_for_has_financial_center = { 
+value_for_has_financial_center = {
 	value = bg_financial_centre_lvl
-	multiply = investor_borrowings_year_var_2
+	multiply = private_bank_borrowings_year_var_2
 }
 
 ########################################################################################################################################################
@@ -248,7 +248,7 @@ weighted_average_currency_value = {
 		add = money_value_spe_zloti
 		add = money_value_thaler_hannoveraner_thaler
 		add = money_value_thaler_prussian_thaler
-		add = money_value_thaler_saxon_thaler		
+		add = money_value_thaler_saxon_thaler
 	}
 	divide = {
 		every_country = {
@@ -1841,7 +1841,6 @@ money_supply = {
 	value = 0 #à voir
 	add = money_supply_state
 	add = money_circulating
-
 	min = 1
 }
 money_supply_montly = {
@@ -1853,7 +1852,7 @@ money_supply_montly = {
 money_circulating = {
 	value = 0
 	add = pop_savings
-	add = investor_savings
+	add = private_bank_funds
 	add = building_saving
 
 	min = 1
@@ -1869,16 +1868,22 @@ total_money_supply = {
 percentage_money_supply_abroad = {
 	value = 0
 	add = money_supply_stockpile_by_other_country
-	divide = total_money_supply  
+	divide = total_money_supply
 }
 
 ##############################""
-investor_savings_monthly = {
+private_bank_funds_monthly = {
 	value = 0
 	add = investment_pool_income
 
 	min = 1
 }
+
+money_supply_state_25 = {
+	value = money_supply_state
+	multiply = 0.25
+}
+
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -1978,10 +1983,16 @@ country_credit = {
 building_saving = {
 	value = credit
 }
-investor_savings = {
+private_bank_funds = {
 	value = 0
 	add = investment_pool
 }
+
+private_bank_funds_pourcent = {
+	value = private_bank_funds 
+	divide = money_supply #money_circulating
+}
+
 country_credit_90 = {
 	value = credit
 	multiply = 0.9
@@ -1990,6 +2001,12 @@ central_bank_gold_reserves_state_to_ensure_the_conversion = {
 	value = money_value_target_real
 	multiply = money_supply
 }
+
+central_bank_gold_reserves_state_to_ensure_the_conversion_pourcent = {
+	value = central_bank_reserves  
+	divide = central_bank_gold_reserves_state_to_ensure_the_conversion
+}
+
 debt_issued_relative_GDP = {
 	value = gdp_var
 	multiply = var:debt_issued_relative_GDP_percentage
@@ -3481,6 +3498,7 @@ inflation_value = {
 	add = var:inflation_on_manufactured_goods_rolling_inflation_6_months
 	add = var:inflation_on_military_equipment_rolling_inflation_6_months
 	add = money_value_dif_01_rolling_inflation_6_months_limited
+	add = monetary_policy_inflation
 }
 
 money_value_dif_01_rolling_inflation_6_months_limited = {
@@ -3968,6 +3986,12 @@ inflation_on_military_equipment_market_value_abs = {
 	}
 }
 
+#monetary_policy_inflation
+monetary_policy_inflation = {
+	add = var:monetary_policy_inflation
+	divide = 100
+}
+
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -4038,7 +4062,7 @@ revaluation_money_value_target = {
 	if = {
 		limit = {
 			money_value > global_var:money_value_median
-			or = {				
+			or = {
 				money_value_median_2_1 > money_value
 				has_modifier = global_monetary_reference
 			}
@@ -4466,7 +4490,7 @@ devaluation_score_rate_currencies = {
 ############################################################################################################################################################
 ############################################################################################################################################################
 
-#
+#base_rate
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -4480,66 +4504,67 @@ pool_growth_rate_thanks_to_borrowing = {
 			has_modifier = country_credit_rating_AAA
 		}
 		add = 0.10
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_AA
 		}
 		add = 0.09
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_A
 		}
 		add = 0.08
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_BBB
 		}
 		add = 0.07
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_BB
 		}
 		add = 0.06
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_B
 		}
 		add = 0.05
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_CCC
 		}
 		add = 0.04
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_CC
 		}
 		add = 0.03
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 	if = {
 		limit = {
 			has_modifier = country_credit_rating_C
 		}
 		add = 0.02
-		multiply = investor_borrowings_year_var_2
+		multiply = private_bank_borrowings_year_var_2
 	}
 }
 
+#gui
 pool_growth_rate_thanks_credit_score = {
 	value = 0
 	if = {
@@ -4597,17 +4622,21 @@ pool_growth_rate_thanks_credit_score = {
 		add = 0.02
 	}
 }
-investor_borrowings_year = {
-	value = investor_savings
+
+private_bank_borrowings_year = {
+	value = private_bank_funds
 	multiply = pool_growth_rate_thanks_to_borrowing
+
+	if = {
+		limit = {
+			private_bank_funds_pourcent < 0.05
+		}
+		add = var:direct_transfer
+	}
 }
 
-delta_base_rate_reduce = {
-	add = var:base_rate_reduce #taux_directeur
-	subtract = 1 #taux_directeur_initial
-}
-
-investor_borrowings_year_var_1 = {
+#gui
+private_bank_borrowings_year_var_1 = {
 	if  = {
 		limit  = {
 			var:base_rate_percentage > 0.01
@@ -4624,7 +4653,23 @@ investor_borrowings_year_var_1 = {
 	}
 }
 
-investor_borrowings_year_var_2 = {
+base_rate_percentage_revers = {
+	value = 1 
+	subtract = {
+		value = var:base_rate_percentage
+		multiply = 10
+
+	}
+}
+
+private_bank_borrowings_year_var_2 = {
+	if  = {
+		limit  = {
+			var:base_rate_percentage > 0.01
+		}
+		value = base_rate_percentage_revers
+	}
+
 	if  = {
 		limit  = {
 			var:base_rate_percentage = 0.01
@@ -4746,3 +4791,15 @@ investor_borrowings_year_var_2 = {
 		value = 20
 	}
 }
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+#
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################

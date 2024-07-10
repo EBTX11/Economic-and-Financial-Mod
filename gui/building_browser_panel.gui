@@ -15,6 +15,9 @@
 @panel_width_plus_30 = 570			# used to be 490
 @panel_width_plus_70 = 610			# used to be 530
 
+
+@all_filter_selected_alpha = 0.35
+
 types building_browser_panel_types
 {
 	type building_browser_panel = fullscreen_block_window {
@@ -347,6 +350,11 @@ types building_browser_panel_types
 								text = "GROUPING"
 							}
 
+							blockoverride "filter_line_base_alpha" 
+							{
+								alpha = 1
+							}
+
 							blockoverride "filter_line_buttons"
 							{
 								building_browser_filter_line_button = {
@@ -434,9 +442,15 @@ types building_browser_panel_types
 
 									### BUILDING LOCATION FILTER
 									building_browser_filter_line = {
+
 										blockoverride "filter_line_label"
 										{
 											text = "LOCATION"
+										}
+
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('is_domestic')]"
 										}
 
 										blockoverride "filter_line_buttons"
@@ -460,6 +474,7 @@ types building_browser_panel_types
 												blockoverride "line_button_selected"
 												{
 													visible = "[Not(BuildingBrowserPanel.IsFiltered('is_domestic'))]"
+													alpha = @all_filter_selected_alpha
 												}
 
 											}
@@ -516,6 +531,11 @@ types building_browser_panel_types
 											text = "BUILDING_GROUP"
 										}
 
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[Not(And(And(Not(BuildingBrowserPanel.IsFiltered('is_urban')), Not(BuildingBrowserPanel.IsFiltered('is_rural'))), Not(BuildingBrowserPanel.IsFiltered('is_development'))))]"
+										}
+
 										blockoverride "filter_line_buttons"
 										{
 											building_browser_filter_line_button = {
@@ -539,6 +559,7 @@ types building_browser_panel_types
 												blockoverride "line_button_selected"
 												{
 													visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('is_urban')), Not(BuildingBrowserPanel.IsFiltered('is_rural'))), Not(BuildingBrowserPanel.IsFiltered('is_development')))]"
+													alpha = @all_filter_selected_alpha
 												}
 
 											}
@@ -627,6 +648,11 @@ types building_browser_panel_types
 											text = "BUILDING_FILTER_OWNERSHIP"
 										}
 
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[Not(And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign'))))]"
+										}
+
 										blockoverride "filter_line_buttons"
 										{
 											building_browser_filter_line_button = {
@@ -650,6 +676,7 @@ types building_browser_panel_types
 												blockoverride "line_button_selected"
 												{
 													visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign')))]"
+													alpha = @all_filter_selected_alpha
 												}
 
 											}
@@ -739,6 +766,7 @@ types building_browser_panel_types
 
 										blockoverride "left_text" {
 											text = "BUILDING_TYPE"
+											alpha = "[Select_float(BuildingBrowserPanel.BuildingTypeFilterAreAllTypesShown,'(float)0.5','(float)1.0')]"
 										}
 
 										blockoverride "onclick" {
@@ -746,17 +774,22 @@ types building_browser_panel_types
 										}
 
 										blockoverride "onclick_showmore" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]"
+											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_building_type' ))]"
 										}
 
 										blockoverride "onclick_showless" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_building_type' ))]"
+											visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]" 
+										}
+
+										background = {
+											using = filter_section_header_active_bg
+											visible = "[Not(BuildingBrowserPanel.BuildingTypeFilterAreAllTypesShown)]"
 										}
 									}
 
 
 									flowcontainer = {
-										visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_building_type' ))]"
+										visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]" 
 										using = pop_browser_filter_section
 
 										spacing = 10
@@ -923,6 +956,7 @@ types building_browser_panel_types
 
 										blockoverride "left_text" {
 											text = "STATE"
+											alpha = "[Select_float(BuildingBrowserPanel.StateFiltersAreAllStatesShown,'(float)0.5','(float)1.0')]"
 										}
 
 										blockoverride "onclick" {
@@ -930,16 +964,21 @@ types building_browser_panel_types
 										}
 
 										blockoverride "onclick_showmore" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_state' )]"
+											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_state' ))]"
 										}
 
 										blockoverride "onclick_showless" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_state' ))]"
+											visible = "[GetVariableSystem.Exists( 'building_browser_filter_state' )]"
+										}
+
+										background = {
+											using = filter_section_header_active_bg
+											visible = "[Not(BuildingBrowserPanel.StateFiltersAreAllStatesShown)]"
 										}
 									}
 
 									flowcontainer = {
-										visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_state' ))]"
+										visible = "[GetVariableSystem.Exists( 'building_browser_filter_state' )]"
 										using = pop_browser_filter_section
 
 										spacing = 10
@@ -1015,636 +1054,634 @@ types building_browser_panel_types
 										}
 									}
 
-									# EMPLOYMENT FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
+									# CASH_RESERVES FILTER
+									building_browser_filter_line = {
+									    blockoverride "filter_line_label" {
+									        text = "CASH_RESERVES"
+									    }
 
-										blockoverride "left_text" {
-											text = "EMPLOYMENT"
-										}
+									    blockoverride "filter_line_active_visible"
+									    {
+									    	visible = "[BuildingBrowserPanel.IsFiltered('full_cash_reserves')]"
+									    }
 
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_fully_employed' )]"
-										}
+									    blockoverride "filter_line_buttons" {
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "ALL"
+									            }
 
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_fully_employed' ))]"
-										}
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'off')]"
+									            }
 
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_fully_employed' )]"
-										}
-									}									
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+									            }
 
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_fully_employed' )]"
-										using = pop_browser_filter_section
+									            blockoverride "line_button_selected" {
+									                visible = "[Not(BuildingBrowserPanel.IsFiltered('full_cash_reserves'))]"
+									            	alpha = @all_filter_selected_alpha
+									            }
+									        }
 
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "FULL_CASH_RESERVES"
+									            }
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'yes')]"
+									            }
 
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('fully_employed'))]"
-												using = highlighted_square_selection
-											}
-										}
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_full_cash_reserves.dds"
+									            }
 
-										button = {
-											text = "FULLY_EMPLOYED"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterYes('full_cash_reserves')]"
+									            }
+									        }
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_unwilling_to_hire.dds"
-											}
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "NOT_FULL_CASH_RESERVES"
+									            }
 
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('fully_employed')]"
-												using = highlighted_square_selection
-											}
-										}
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'no')]"
+									            }
 
-										button = {
-											text = "HAS_UNEMPLOYMENT"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_full_cash_reserves.dds"
+									            }
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_is_hiring.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('fully_employed')]"
-												using = highlighted_square_selection
-											}
-										}
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterNo('full_cash_reserves')]"
+									            }
+									        }
+									    }
 									}
 
-									# CASH RESERVES FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
-
-										blockoverride "left_text" {
-											text = "CASH_RESERVES"
-										}
-
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_full_cash_reserves' )]"
-										}
-
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_full_cash_reserves' ))]"
-										}
-
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_full_cash_reserves' )]"
-										}
-									}
-
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_full_cash_reserves' )]"
-										using = pop_browser_filter_section
-
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
-
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('full_cash_reserves'))]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "FULL_CASH_RESERVES"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_full_cash_reserves.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('full_cash_reserves')]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "NOT_FULL_CASH_RESERVES"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('full_cash_reserves', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_full_cash_reserves.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('full_cash_reserves')]"
-												using = highlighted_square_selection
-											}
-										}
-									}
 
 									# SUBSIDIES FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
+									building_browser_filter_line = {
+									    blockoverride "filter_line_label" {
+									        text = "SUBSIDIES"
+									    }
+
+									    blockoverride "filter_line_active_visible"
+									    {
+									    	visible = "[BuildingBrowserPanel.IsFiltered('is_subsidized')]"
+									    }
+
+									    blockoverride "filter_line_buttons" {
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "ALL"
+									            }
+
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'off')]"
+									            }
+
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+									            }
+
+									            blockoverride "line_button_selected" {
+									                visible = "[Not(BuildingBrowserPanel.IsFiltered('is_subsidized'))]"
+									                alpha = @all_filter_selected_alpha
+									            }
+									        }
+
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "IS_SUBSIDIZED"
+									            }
+
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'yes')]"
+									            }
+
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_subsidized.dds"
+									            }
+
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterYes('is_subsidized')]"
+									            }
+									        }
+
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "IS_NOT_SUBSIDIZED"
+									            }
+
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'no')]"
+									            }
+
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_subsidized.dds"
+									            }
+
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterNo('is_subsidized')]"
+									            }
+									        }
+									    }
+									}
+
+									# INPUT SHORTAGE FILTER
+
+									building_browser_filter_line = {
+										blockoverride "filter_line_label"
+										{
+											text = "INPUT_SHORTAGE"
 										}
 
-										blockoverride "left_text" {
-											text = "SUBSIDIES"
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('has_any_input_shortage')]"
 										}
 
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_subsidies' )]"
-										}
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ALL"
+												}
 
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_subsidies' ))]"
-										}
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'off')]"
+												}
 
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_subsidies' )]"
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[Not(BuildingBrowserPanel.IsFiltered('has_any_input_shortage'))]"
+													alpha = @all_filter_selected_alpha
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "HAS_INPUT_SHORTAGE"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'yes')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_input_shortage.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('has_any_input_shortage')]"
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "NOT_INPUT_SHORTAGE"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'no')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_input_shortage.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterNo('has_any_input_shortage')]"
+												}
+											}
 										}
 									}
 
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_subsidies' )]"
-										using = pop_browser_filter_section
-
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
-
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('is_subsidized'))]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "IS_SUBSIDIZED"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_subsidized.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('is_subsidized')]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "IS_NOT_SUBSIDIZED"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsidized', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_subsidized.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('is_subsidized')]"
-												using = highlighted_square_selection
-											}
-										}
-									}
-
-									# INCORPORATION FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
-
-										blockoverride "left_text" {
-											text = "INCORPORATION"
-										}
-
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_incorporation' )]"
-										}
-
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_incorporation' ))]"
-										}
-
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_incorporation' )]"
-										}
-									}
-
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_incorporation' )]"
-										using = pop_browser_filter_section
-
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-												icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
-
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('incorporated_state'))]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "SITUATED_IN_INCORPORATED_STATE"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/state_status_icons/incorporated_state.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('incorporated_state')]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "NOT_SITUATED_IN_INCORPORATED_STATE"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/state_status_icons/unincorporated_state.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('incorporated_state')]"
-												using = highlighted_square_selection
-											}
-										}
-									}
+									widget = { size = { 10 10 }}
 
 									# SUBSISTENCE FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
-
-										blockoverride "left_text" {
+									building_browser_filter_line = {
+										blockoverride "filter_line_label"
+										{
 											text = "SUBSISTENCE"
 										}
 
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_subsistence' )]"
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('is_subsistence')]"
 										}
 
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_subsistence' ))]"
-										}
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ALL"
+												}
 
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_subsistence' )]"
-										}
-									}
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'off')]"
+												}
 
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_subsistence' )]"
-										using = pop_browser_filter_section
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
 
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
+												blockoverride "line_button_selected"
+												{
+													visible = "[Not(BuildingBrowserPanel.IsFiltered('is_subsistence'))]"
+													alpha = @all_filter_selected_alpha
+												}
 
-												icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
 											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "IS_SUBSISTENCE_BUILDING"
+												}
 
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('is_subsistence'))]"
-												using = highlighted_square_selection
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'yes')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_substinence.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('is_subsistence')]"
+												}
+
 											}
-										}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "NOT_SUBSISTENCE_BUILDING"
+												}
 
-										button = {
-											text = "IS_SUBSISTENCE_BUILDING"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'no')]"
+												}
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_substinence.dds"
-											}
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_substinence.dds"
+												}
 
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('is_subsistence')]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "NOT_SUBSISTENCE_BUILDING"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_subsistence', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_not_substinence.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('is_subsistence')]"
-												using = highlighted_square_selection
-											}
-										}
-									}
-
-									# CONSTRUCTION FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
-
-										blockoverride "left_text" {
-											text = "CONSTRUCTION"
-										}
-
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_construction' )]"
-										}
-
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_construction' ))]"
-										}
-
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_construction' )]"
-										}
-									}
-
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_construction' )]"
-										using = pop_browser_filter_section
-
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-												icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
-
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('has_queued_construction'))]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "HAS_CONSTRUCTION_QUEUED"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_queued_construction.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('has_queued_construction')]"
-												using = highlighted_square_selection
-											}
-										}
-
-										button = {
-											text = "NOT_CONSTRUCTION_QUEUED"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_queued_construction.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('has_queued_construction')]"
-												using = highlighted_square_selection
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterNo('is_subsistence')]"
+												}
 											}
 										}
 									}
 
 									# CAPPED BUILDING FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
-										}
-
-										blockoverride "left_text" {
+									building_browser_filter_line = {
+										blockoverride "filter_line_label"
+										{
 											text = "CAPPED_BUILDING"
 										}
 
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_capped_building' )]"
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('is_capped_building')]"
 										}
 
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_capped_building' ))]"
-										}
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ALL"
+												}
 
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_capped_building' )]"
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'off')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[Not(BuildingBrowserPanel.IsFiltered('is_capped_building'))]"
+													alpha = @all_filter_selected_alpha
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "IS_CAPPED_BUILDING"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'yes')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_cap.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('is_capped_building')]"
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "NOT_CAPPED_BUILDING"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'no')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_cap.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterNo('is_capped_building')]"
+												}
+											}
 										}
 									}
 
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_capped_building' )]"
-										using = pop_browser_filter_section
+									widget = { size = { 10 10 }}
 
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
+									# INCORPORATION FILTER
 
-												icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
-
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('is_capped_building'))]"
-												using = highlighted_square_selection
-											}
+									building_browser_filter_line = {
+										blockoverride "filter_line_label"
+										{
+											text = "INCORPORATION"
 										}
 
-										button = {
-											text = "IS_CAPPED_BUILDING"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
-
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_cap.dds"
-											}
-
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('is_capped_building')]"
-												using = highlighted_square_selection
-											}
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('incorporated_state')]"
 										}
 
-										button = {
-											text = "NOT_CAPPED_BUILDING"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('is_capped_building', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ALL"
+												}
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_cap.dds"
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'off')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[Not(BuildingBrowserPanel.IsFiltered('incorporated_state'))]"
+													alpha = @all_filter_selected_alpha
+												}
+
 											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "SITUATED_IN_INCORPORATED_STATE"
+												}
 
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('is_capped_building')]"
-												using = highlighted_square_selection
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'yes')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/state_status_icons/incorporated_state.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('incorporated_state')]"
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "NOT_SITUATED_IN_INCORPORATED_STATE"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('incorporated_state', 'no')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/state_status_icons/unincorporated_state.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterNo('incorporated_state')]"
+												}
 											}
 										}
 									}
 
-									# INPUT SHORTAGE FILTER
-									section_header_button = {
-										blockoverride "layout" {
-											using = pop_browser_section_header_size
+									# CONSTRUCTION FILTER
+									building_browser_filter_line = {
+										blockoverride "filter_line_label"
+										{
+											text = "CONSTRUCTION"
 										}
 
-										blockoverride "left_text" {
-											text = "INPUT_SHORTAGE"
+										blockoverride "filter_line_active_visible"
+										{
+											visible = "[BuildingBrowserPanel.IsFiltered('has_queued_construction')]"
 										}
 
-										blockoverride "onclick" {
-											onclick = "[GetVariableSystem.Toggle( 'building_browser_filter_input_shortage' )]"
-										}
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ALL"
+												}
 
-										blockoverride "onclick_showmore" {
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_filter_input_shortage' ))]"
-										}
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'off')]"
+												}
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
 
-										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_input_shortage' )]"
+												blockoverride "line_button_selected"
+												{
+													visible = "[Not(BuildingBrowserPanel.IsFiltered('has_queued_construction'))]"
+													alpha = @all_filter_selected_alpha
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "HAS_CONSTRUCTION_QUEUED"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'yes')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_queued_construction.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('has_queued_construction')]"
+												}
+
+											}
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "NOT_CONSTRUCTION_QUEUED"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('has_queued_construction', 'no')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_queued_construction.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterNo('has_queued_construction')]"
+												}
+											}
 										}
 									}
 
-									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_input_shortage' )]"
-										using = pop_browser_filter_section
+									widget = { size = { 10 10 }}
 
-										button = {
-											text = "ALL"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'off')]"
-											using = default_button
-											using = pop_browser_filter_button
+									# EMPLOYMENT FILTER
+									building_browser_filter_line = {
+									    blockoverride "filter_line_label" {
+									        text = "EMPLOYMENT"
+									    }
 
-												icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
-											}
+									    blockoverride "filter_line_active_visible"
+									    {
+									    	visible = "[BuildingBrowserPanel.IsFiltered('fully_employed')]"
+									    }
 
-											icon = {
-												visible = "[Not(BuildingBrowserPanel.IsFiltered('has_any_input_shortage'))]"
-												using = highlighted_square_selection
-											}
-										}
+									    blockoverride "filter_line_buttons" {
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "ALL"
+									            }
 
-										button = {
-											text = "HAS_INPUT_SHORTAGE"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'yes')]"
-											using = default_button
-											using = pop_browser_filter_button
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'off')]"
+									            }
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_input_shortage.dds"
-											}
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+									            }
 
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterYes('has_any_input_shortage')]"
-												using = highlighted_square_selection
-											}
-										}
+									            blockoverride "line_button_selected" {
+									                visible = "[Not(BuildingBrowserPanel.IsFiltered('fully_employed'))]"
+									                alpha = @all_filter_selected_alpha
+									            }
+									        }
 
-										button = {
-											text = "NOT_INPUT_SHORTAGE"
-											onclick = "[BuildingBrowserPanel.SetFilterMode('has_any_input_shortage', 'no')]"
-											using = default_button
-											using = pop_browser_filter_button
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "FULLY_EMPLOYED"
+									            }
 
-											icon = {
-												using = pop_browser_filter_button_icon
-												texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_no_input_shortage.dds"
-											}
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'yes')]"
+									            }
 
-											icon = {
-												visible = "[BuildingBrowserPanel.IsFilterNo('has_any_input_shortage')]"
-												using = highlighted_square_selection
-											}
-										}
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_unwilling_to_hire.dds"
+									            }
+
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterYes('fully_employed')]"
+									            }
+									        }
+
+									        building_browser_filter_line_button = {
+									            blockoverride "line_button_tooltip" {
+									                tooltip = "HAS_UNEMPLOYMENT"
+									            }
+
+									            blockoverride "line_button_onclick" {
+									                onclick = "[BuildingBrowserPanel.SetFilterMode('fully_employed', 'no')]"
+									            }
+
+									            blockoverride "line_button_icon_texture" {
+									                texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_is_hiring.dds"
+									            }
+
+									            blockoverride "line_button_selected" {
+									                visible = "[BuildingBrowserPanel.IsFilterNo('fully_employed')]"
+									            }
+									        }
+									    }
 									}
 
 									# HIRING STATUS FILTER
@@ -1655,6 +1692,7 @@ types building_browser_panel_types
 
 										blockoverride "left_text" {
 											text = "HIRING_STATUS"
+											alpha = "[Select_float(And(And(And(Not(BuildingBrowserPanel.IsFiltered('is_hiring')), Not(BuildingBrowserPanel.IsFiltered('is_unwilling_to_hire'))), Not(BuildingBrowserPanel.IsFiltered('is_unable_to_hire'))), Not(BuildingBrowserPanel.IsFiltered('has_failed_hires'))),'(float)0.5','(float)1.0')]"
 										}
 
 										blockoverride "onclick" {
@@ -1667,6 +1705,11 @@ types building_browser_panel_types
 
 										blockoverride "onclick_showless" {
 											visible = "[GetVariableSystem.Exists( 'building_browser_filter_hiring_status' )]"
+										}
+
+										background = {
+											using = filter_section_header_active_bg
+											visible = "[Not(And(And(And(Not(BuildingBrowserPanel.IsFiltered('is_hiring')), Not(BuildingBrowserPanel.IsFiltered('is_unwilling_to_hire'))), Not(BuildingBrowserPanel.IsFiltered('is_unable_to_hire'))), Not(BuildingBrowserPanel.IsFiltered('has_failed_hires'))))]"
 										}
 									}
 
@@ -2618,7 +2661,7 @@ types building_browser_panel_types {
 				flowcontainer = {
 					parentanchor = vcenter
 					textbox = {
-						raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetCurrentCashReserves|Dv]"
+						raw_text = "@money![Building.GetCurrentCashReserves|Dv]"
 						margin_left = 4
 						align = hcenter|nobaseline
 						autoresize = yes
@@ -2645,7 +2688,7 @@ types building_browser_panel_types {
 			textbox = {
 				visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
 				using = productivity_tooltip_with_graph
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+				raw_text = "@money![Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
 				align = nobaseline
 				autoresize = yes
 				margin_left = 5
@@ -2899,7 +2942,7 @@ types building_browser_panel_types {
 										using = expand_button_bg_dropdown
 										size = { 100% 100% }
 										onclick = "[BuildingBrowserBuildingTypeItem.ToggleSwitchProductionMethodMenu( ProductionMethodGroup.AccessSelf, PdxGuiWidget.AccessSelf)]"
-										enabled = "[Not(IsDataModelEmpty(BuildingBrowserBuildingTypeItem.GetOwnBuildings))]"
+										enabled = "[Not(IsDataModelEmpty(BuildingBrowserBuildingTypeItem.GetBuildingsInCountry))]"
 									}
 
 									### pm icon
@@ -2923,7 +2966,7 @@ types building_browser_panel_types {
 										position = { -2 2 }
 										parentanchor = bottom|left
 										blockoverride "visible" {
-											visible = "[And(GetPlayer.HasNewProductionMethodInGroup( ProductionMethodGroup.Self ), Not(IsDataModelEmpty(BuildingBrowserBuildingTypeItem.GetOwnBuildings)))]"
+											visible = "[And(GetPlayer.HasNewProductionMethodInGroup( ProductionMethodGroup.Self ), Not(IsDataModelEmpty(BuildingBrowserBuildingTypeItem.GetBuildingsInCountry)))]"
 										}
 									}
 
@@ -2990,7 +3033,7 @@ types building_browser_panel_types {
 
 						textbox = {
 							visible = "[And(Not(BuildingType.IsGovernmentFunded), Not(BuildingType.IsSubsistenceBuilding))]"
-							raw_text = "[GetPlayer.GetCustom('currency_symbol')][BuildingBrowserBuildingTypeItem.GetFilteredAverageProductivity|1]"
+							raw_text = "@money![BuildingBrowserBuildingTypeItem.GetFilteredAverageProductivity|1]"
 							size = { 100 @spreadsheet_header_height }
 							align = nobaseline
 							using = fontsize_large
@@ -3169,6 +3212,7 @@ types building_browser_panel_types {
 				addrow = @spreadsheet_height
 				addcolumn = @spreadsheet_width
 				datamodel = "[BuildingBrowserBuildingTypeItem.GetBuildings]"
+				datamodel_reuse_widgets = yes
 				parentanchor = hcenter
 				visible = "[GetVariableSystem.Exists(Concatenate('building_browser_building_type_', BuildingType.GetIDString))]"
 
@@ -3207,6 +3251,7 @@ types building_browser_panel_types {
 									flowcontainer = {
 										visible = "[Not(IsDataModelEmpty(Building.AccessState.AccessStateRegion.AccessTraits))]"
 										datamodel = "[Building.AccessState.AccessStateRegion.AccessTraits]"
+										datamodel_reuse_widgets = yes
 										parentanchor = vcenter
 										margin_left = 7
 
@@ -3299,6 +3344,18 @@ types building_browser_panel_types {
 			using = dark_area
 		}
 
+		background = {
+			using = fade_right_entry_header_colored
+			color = { 1 1 0.5 1 }
+			margin_left = 2
+			margin_top = 1
+
+			block "filter_line_active_visible"
+			{
+				visible = no
+			}
+		}
+
 		size = { 404 38 }
 
 		hbox = {
@@ -3309,19 +3366,50 @@ types building_browser_panel_types {
 
 			spacing = 2
 
-			textbox = {
-				size = { 132 0 }
-				layoutpolicy_vertical = expanding
-				margin = {8 8}
+			container = {
 
-				block "filter_line_label" 
-				{
-					raw_text = "#todo todo#!"
+				textbox = {
+					size = { 132 0 }
+					layoutpolicy_vertical = expanding
+					margin = {8 8}
+					align = nobaseline
+					fontsize_min = 12
+					elide = right
+
+					block "filter_line_base_alpha" 
+					{
+						alpha = 0.5
+					}	
+					
+
+					block "filter_line_label" 
+					{
+						raw_text = "#todo todo#!"
+					}					
 				}
 
-				
-				align = nobaseline
+				# put a full opacity text on top of the half opacity text if this line is active
+				textbox = {
+					size = { 132 0 }
+					layoutpolicy_vertical = expanding
+					margin = {8 8}
+					align = nobaseline
+					fontsize_min = 12
+					elide = right
+
+					block "filter_line_label" 
+					{
+						raw_text = "#todo todo#!"
+					}
+
+					block "filter_line_active_visible"
+					{
+						visible = no
+					}
+				}
 			}
+
+			
 
 			block "filter_line_buttons"
 			{
@@ -3371,4 +3459,14 @@ types building_browser_panel_types {
 		}
 	}
 	
+}
+
+
+template filter_section_header_active_bg
+{
+	using = fade_right_entry_header_colored
+	color = { 1 1 0.5 1 }
+	margin_bottom = -3
+	margin_left = 2
+	margin_top = -2
 }
