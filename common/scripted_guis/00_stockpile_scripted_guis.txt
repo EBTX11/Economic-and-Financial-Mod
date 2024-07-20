@@ -28,6 +28,18 @@ infamy_international_trade = {
 		}
 	}
 }
+not_has_tech_national_stockpile = {
+	is_shown = {
+		not = {
+			has_technology_researched = stockpiling_goods
+		}
+	}
+}
+has_tech_national_stockpile = {
+	is_shown = {
+		has_technology_researched = stockpiling_goods
+	}
+}
 
 has_national_stockpile = {
 	is_shown = {
@@ -1134,7 +1146,7 @@ sell_limit_var_show_0 = {
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#grain_in_curency
+#grain
 buy_grain_market_panel = {
 	effect = {
 		root = {
@@ -1311,7 +1323,7 @@ sell_grain_market_panel_enabled = {
 		# 	infamy >= infamy_threshold:pariah
 		# }
 		player.stockpiling_grain_var_state > player.var:grain_market_panel_quantity
-		money_supply_state > buy_grain_market_panel
+		money_supply_state > sell_grain_market_panel
 		player.var:grain_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -1323,224 +1335,10 @@ sell_grain_market_panel_enabled = {
 		}
 	}
 }
-
-#grain_in_gold
-buy_grain_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#grain quantity
-			set_variable = {
-				name = grain_sell_1
-				value  = scope:player_country.var:grain_market_panel_quantity
-			}
-			#grain price
-			set_variable = {
-				name = grain_sell_price
-				value = grain_price
-			}
-
-			#grain in gold by quantity
-			set_variable = {
-				name = grain_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:grain_market_panel_quantity
-					multiply = grain_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_grain_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#grain quantity
-			set_variable = {
-				name = grain_buy_1
-				value  = var:grain_market_panel_quantity
-			}
-
-			#grain price
-			set_variable = {
-				name = grain_buy_price
-				value = scope:target.grain_price
-			}
-
-			#grain price by quantity
-			set_variable = {
-				name = grain_buy_price_by_price_in_gold
-				value = scope:target.var:grain_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_grain_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_grain_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:grain_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = grain_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_grain_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_grain_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#grain quantity
-			set_variable = {
-				name = grain_buy_1
-				value  = scope:player_country.var:grain_market_panel_quantity
-			}
-			#grain price
-			set_variable = {
-				name = grain_buy_price
-				value = scope:player_country.grain_price
-			}
-			#grain price by quantity
-			set_variable = {
-				name = grain_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:grain_market_panel_quantity
-					multiply = scope:player_country.grain_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_grain_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#grain quantity
-			set_variable = {
-				name = grain_sell_1
-				value = var:grain_market_panel_quantity
-			}
-
-			#grain price
-			set_variable = {
-				name = grain_sell_price
-				value = grain_price
-			}
-
-			#grain price by quantity
-			set_variable = {
-				name = grain_sell_price_by_price_in_gold
-				value = scope:target.var:grain_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_grain_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = grain_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_grain_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_grain_1
-				target = prev
-			}
-		}
-	}
-}
-buy_grain_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_grain_var_state > player.var:grain_market_panel_quantity
-		player.var:grain_contract_1_year = 0
-		var:grain_release_status = 0
-
-		player.gold_reserve_rest > buy_grain_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_grain_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_grain_in_gold_custom_tooltip
-		}
-	}
-}
-sell_grain_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_grain_var_state > player.var:grain_market_panel_quantity
-		player.var:grain_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:grain_release_status = 0
-
-		gold_reserve_rest > sell_grain_in_gold_market_panel #player.buy_grain_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_grain_in_gold_market_panel #player.buy_grain_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_grain_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#wood_in_curency
+#wood
 buy_wood_market_panel = {
 	effect = {
 		root = {
@@ -1697,11 +1495,11 @@ sell_wood_market_panel = {
 }
 buy_wood_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_wood_var_state > player.var:wood_market_panel_quantity
-		player.stockpiling_money_state > buy_wood_market_panel
+		money_supply_state_market_owner > buy_wood_market_panel
 		player.var:wood_contract_1_year = 0
 		var:wood_release_status = 0
 	}
@@ -1713,11 +1511,11 @@ buy_wood_market_panel_enabled = {
 }
 sell_wood_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_wood_var_state > player.var:wood_market_panel_quantity
-		stockpiling_money_state > buy_wood_market_panel
+		money_supply_state > sell_wood_market_panel
 		player.var:wood_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -1729,224 +1527,10 @@ sell_wood_market_panel_enabled = {
 		}
 	}
 }
-
-#wood_in_gold
-buy_wood_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#wood quantity
-			set_variable = {
-				name = wood_sell_1
-				value  = scope:player_country.var:wood_market_panel_quantity
-			}
-			#wood price
-			set_variable = {
-				name = wood_sell_price
-				value = wood_price
-			}
-
-			#wood in gold by quantity
-			set_variable = {
-				name = wood_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:wood_market_panel_quantity
-					multiply = wood_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_wood_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#wood quantity
-			set_variable = {
-				name = wood_buy_1
-				value  = var:wood_market_panel_quantity
-			}
-
-			#wood price
-			set_variable = {
-				name = wood_buy_price
-				value = scope:target.wood_price
-			}
-
-			#wood price by quantity
-			set_variable = {
-				name = wood_buy_price_by_price_in_gold
-				value = scope:target.var:wood_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_wood_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_wood_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:wood_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = wood_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_wood_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_wood_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#wood quantity
-			set_variable = {
-				name = wood_buy_1
-				value  = scope:player_country.var:wood_market_panel_quantity
-			}
-			#wood price
-			set_variable = {
-				name = wood_buy_price
-				value = scope:player_country.wood_price
-			}
-			#wood price by quantity
-			set_variable = {
-				name = wood_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:wood_market_panel_quantity
-					multiply = scope:player_country.wood_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_wood_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#wood quantity
-			set_variable = {
-				name = wood_sell_1
-				value = var:wood_market_panel_quantity
-			}
-
-			#wood price
-			set_variable = {
-				name = wood_sell_price
-				value = wood_price
-			}
-
-			#wood price by quantity
-			set_variable = {
-				name = wood_sell_price_by_price_in_gold
-				value = scope:target.var:wood_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_wood_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = wood_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_wood_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_wood_1
-				target = prev
-			}
-		}
-	}
-}
-buy_wood_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_wood_var_state > player.var:wood_market_panel_quantity
-		player.var:wood_contract_1_year = 0
-		var:wood_release_status = 0
-
-		player.gold_reserve_rest > buy_wood_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_wood_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_wood_in_gold_custom_tooltip
-		}
-	}
-}
-sell_wood_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_wood_var_state > player.var:wood_market_panel_quantity
-		player.var:wood_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:wood_release_status = 0
-
-		gold_reserve_rest > sell_wood_in_gold_market_panel #player.buy_wood_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_wood_in_gold_market_panel #player.buy_wood_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_wood_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#coal_in_curency
+#coal
 buy_coal_market_panel = {
 	effect = {
 		root = {
@@ -2103,11 +1687,11 @@ sell_coal_market_panel = {
 }
 buy_coal_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_coal_var_state > player.var:coal_market_panel_quantity
-		player.stockpiling_money_state > buy_coal_market_panel
+		money_supply_state_market_owner > buy_coal_market_panel
 		player.var:coal_contract_1_year = 0
 		var:coal_release_status = 0
 	}
@@ -2119,11 +1703,11 @@ buy_coal_market_panel_enabled = {
 }
 sell_coal_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_coal_var_state > player.var:coal_market_panel_quantity
-		stockpiling_money_state > buy_coal_market_panel
+		money_supply_state > sell_coal_market_panel
 		player.var:coal_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -2135,224 +1719,10 @@ sell_coal_market_panel_enabled = {
 		}
 	}
 }
-
-#coal_in_gold
-buy_coal_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#coal quantity
-			set_variable = {
-				name = coal_sell_1
-				value  = scope:player_country.var:coal_market_panel_quantity
-			}
-			#coal price
-			set_variable = {
-				name = coal_sell_price
-				value = coal_price
-			}
-
-			#coal in gold by quantity
-			set_variable = {
-				name = coal_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:coal_market_panel_quantity
-					multiply = coal_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_coal_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#coal quantity
-			set_variable = {
-				name = coal_buy_1
-				value  = var:coal_market_panel_quantity
-			}
-
-			#coal price
-			set_variable = {
-				name = coal_buy_price
-				value = scope:target.coal_price
-			}
-
-			#coal price by quantity
-			set_variable = {
-				name = coal_buy_price_by_price_in_gold
-				value = scope:target.var:coal_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_coal_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_coal_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:coal_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = coal_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_coal_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_coal_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#coal quantity
-			set_variable = {
-				name = coal_buy_1
-				value  = scope:player_country.var:coal_market_panel_quantity
-			}
-			#coal price
-			set_variable = {
-				name = coal_buy_price
-				value = scope:player_country.coal_price
-			}
-			#coal price by quantity
-			set_variable = {
-				name = coal_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:coal_market_panel_quantity
-					multiply = scope:player_country.coal_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_coal_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#coal quantity
-			set_variable = {
-				name = coal_sell_1
-				value = var:coal_market_panel_quantity
-			}
-
-			#coal price
-			set_variable = {
-				name = coal_sell_price
-				value = coal_price
-			}
-
-			#coal price by quantity
-			set_variable = {
-				name = coal_sell_price_by_price_in_gold
-				value = scope:target.var:coal_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_coal_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = coal_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_coal_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_coal_1
-				target = prev
-			}
-		}
-	}
-}
-buy_coal_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_coal_var_state > player.var:coal_market_panel_quantity
-		player.var:coal_contract_1_year = 0
-		var:coal_release_status = 0
-
-		player.gold_reserve_rest > buy_coal_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_coal_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_coal_in_gold_custom_tooltip
-		}
-	}
-}
-sell_coal_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_coal_var_state > player.var:coal_market_panel_quantity
-		player.var:coal_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:coal_release_status = 0
-
-		gold_reserve_rest > sell_coal_in_gold_market_panel #player.buy_coal_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_coal_in_gold_market_panel #player.buy_coal_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_coal_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#iron_in_curency
+#iron
 buy_iron_market_panel = {
 	effect = {
 		root = {
@@ -2509,11 +1879,11 @@ sell_iron_market_panel = {
 }
 buy_iron_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_iron_var_state > player.var:iron_market_panel_quantity
-		player.stockpiling_money_state > buy_iron_market_panel
+		money_supply_state_market_owner > buy_iron_market_panel
 		player.var:iron_contract_1_year = 0
 		var:iron_release_status = 0
 	}
@@ -2525,11 +1895,11 @@ buy_iron_market_panel_enabled = {
 }
 sell_iron_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_iron_var_state > player.var:iron_market_panel_quantity
-		stockpiling_money_state > buy_iron_market_panel
+		money_supply_state > sell_iron_market_panel
 		player.var:iron_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -2541,224 +1911,10 @@ sell_iron_market_panel_enabled = {
 		}
 	}
 }
-
-#iron_in_gold
-buy_iron_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#iron quantity
-			set_variable = {
-				name = iron_sell_1
-				value  = scope:player_country.var:iron_market_panel_quantity
-			}
-			#iron price
-			set_variable = {
-				name = iron_sell_price
-				value = iron_price
-			}
-
-			#iron in gold by quantity
-			set_variable = {
-				name = iron_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:iron_market_panel_quantity
-					multiply = iron_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_iron_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#iron quantity
-			set_variable = {
-				name = iron_buy_1
-				value  = var:iron_market_panel_quantity
-			}
-
-			#iron price
-			set_variable = {
-				name = iron_buy_price
-				value = scope:target.iron_price
-			}
-
-			#iron price by quantity
-			set_variable = {
-				name = iron_buy_price_by_price_in_gold
-				value = scope:target.var:iron_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_iron_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_iron_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:iron_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = iron_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_iron_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_iron_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#iron quantity
-			set_variable = {
-				name = iron_buy_1
-				value  = scope:player_country.var:iron_market_panel_quantity
-			}
-			#iron price
-			set_variable = {
-				name = iron_buy_price
-				value = scope:player_country.iron_price
-			}
-			#iron price by quantity
-			set_variable = {
-				name = iron_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:iron_market_panel_quantity
-					multiply = scope:player_country.iron_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_iron_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#iron quantity
-			set_variable = {
-				name = iron_sell_1
-				value = var:iron_market_panel_quantity
-			}
-
-			#iron price
-			set_variable = {
-				name = iron_sell_price
-				value = iron_price
-			}
-
-			#iron price by quantity
-			set_variable = {
-				name = iron_sell_price_by_price_in_gold
-				value = scope:target.var:iron_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_iron_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = iron_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_iron_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_iron_1
-				target = prev
-			}
-		}
-	}
-}
-buy_iron_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_iron_var_state > player.var:iron_market_panel_quantity
-		player.var:iron_contract_1_year = 0
-		var:iron_release_status = 0
-
-		player.gold_reserve_rest > buy_iron_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_iron_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_iron_in_gold_custom_tooltip
-		}
-	}
-}
-sell_iron_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_iron_var_state > player.var:iron_market_panel_quantity
-		player.var:iron_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:iron_release_status = 0
-
-		gold_reserve_rest > sell_iron_in_gold_market_panel #player.buy_iron_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_iron_in_gold_market_panel #player.buy_iron_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_iron_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#sulfur_in_curency
+#sulfur
 buy_sulfur_market_panel = {
 	effect = {
 		root = {
@@ -2915,11 +2071,11 @@ sell_sulfur_market_panel = {
 }
 buy_sulfur_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_sulfur_var_state > player.var:sulfur_market_panel_quantity
-		player.stockpiling_money_state > buy_sulfur_market_panel
+		money_supply_state_market_owner > buy_sulfur_market_panel
 		player.var:sulfur_contract_1_year = 0
 		var:sulfur_release_status = 0
 	}
@@ -2931,11 +2087,11 @@ buy_sulfur_market_panel_enabled = {
 }
 sell_sulfur_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_sulfur_var_state > player.var:sulfur_market_panel_quantity
-		stockpiling_money_state > buy_sulfur_market_panel
+		money_supply_state > sell_sulfur_market_panel
 		player.var:sulfur_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -2947,224 +2103,10 @@ sell_sulfur_market_panel_enabled = {
 		}
 	}
 }
-
-#sulfur_in_gold
-buy_sulfur_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#sulfur quantity
-			set_variable = {
-				name = sulfur_sell_1
-				value  = scope:player_country.var:sulfur_market_panel_quantity
-			}
-			#sulfur price
-			set_variable = {
-				name = sulfur_sell_price
-				value = sulfur_price
-			}
-
-			#sulfur in gold by quantity
-			set_variable = {
-				name = sulfur_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:sulfur_market_panel_quantity
-					multiply = sulfur_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_sulfur_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#sulfur quantity
-			set_variable = {
-				name = sulfur_buy_1
-				value  = var:sulfur_market_panel_quantity
-			}
-
-			#sulfur price
-			set_variable = {
-				name = sulfur_buy_price
-				value = scope:target.sulfur_price
-			}
-
-			#sulfur price by quantity
-			set_variable = {
-				name = sulfur_buy_price_by_price_in_gold
-				value = scope:target.var:sulfur_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_sulfur_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_sulfur_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:sulfur_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = sulfur_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_sulfur_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_sulfur_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#sulfur quantity
-			set_variable = {
-				name = sulfur_buy_1
-				value  = scope:player_country.var:sulfur_market_panel_quantity
-			}
-			#sulfur price
-			set_variable = {
-				name = sulfur_buy_price
-				value = scope:player_country.sulfur_price
-			}
-			#sulfur price by quantity
-			set_variable = {
-				name = sulfur_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:sulfur_market_panel_quantity
-					multiply = scope:player_country.sulfur_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_sulfur_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#sulfur quantity
-			set_variable = {
-				name = sulfur_sell_1
-				value = var:sulfur_market_panel_quantity
-			}
-
-			#sulfur price
-			set_variable = {
-				name = sulfur_sell_price
-				value = sulfur_price
-			}
-
-			#sulfur price by quantity
-			set_variable = {
-				name = sulfur_sell_price_by_price_in_gold
-				value = scope:target.var:sulfur_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_sulfur_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = sulfur_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_sulfur_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_sulfur_1
-				target = prev
-			}
-		}
-	}
-}
-buy_sulfur_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_sulfur_var_state > player.var:sulfur_market_panel_quantity
-		player.var:sulfur_contract_1_year = 0
-		var:sulfur_release_status = 0
-
-		player.gold_reserve_rest > buy_sulfur_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_sulfur_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_sulfur_in_gold_custom_tooltip
-		}
-	}
-}
-sell_sulfur_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_sulfur_var_state > player.var:sulfur_market_panel_quantity
-		player.var:sulfur_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:sulfur_release_status = 0
-
-		gold_reserve_rest > sell_sulfur_in_gold_market_panel #player.buy_sulfur_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_sulfur_in_gold_market_panel #player.buy_sulfur_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_sulfur_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#lead_in_curency
+#lead
 buy_lead_market_panel = {
 	effect = {
 		root = {
@@ -3321,11 +2263,11 @@ sell_lead_market_panel = {
 }
 buy_lead_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_lead_var_state > player.var:lead_market_panel_quantity
-		player.stockpiling_money_state > buy_lead_market_panel
+		money_supply_state_market_owner > buy_lead_market_panel
 		player.var:lead_contract_1_year = 0
 		var:lead_release_status = 0
 	}
@@ -3337,11 +2279,11 @@ buy_lead_market_panel_enabled = {
 }
 sell_lead_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_lead_var_state > player.var:lead_market_panel_quantity
-		stockpiling_money_state > buy_lead_market_panel
+		money_supply_state > sell_lead_market_panel
 		player.var:lead_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -3353,224 +2295,10 @@ sell_lead_market_panel_enabled = {
 		}
 	}
 }
-
-#lead_in_gold
-buy_lead_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#lead quantity
-			set_variable = {
-				name = lead_sell_1
-				value  = scope:player_country.var:lead_market_panel_quantity
-			}
-			#lead price
-			set_variable = {
-				name = lead_sell_price
-				value = lead_price
-			}
-
-			#lead in gold by quantity
-			set_variable = {
-				name = lead_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:lead_market_panel_quantity
-					multiply = lead_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_lead_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#lead quantity
-			set_variable = {
-				name = lead_buy_1
-				value  = var:lead_market_panel_quantity
-			}
-
-			#lead price
-			set_variable = {
-				name = lead_buy_price
-				value = scope:target.lead_price
-			}
-
-			#lead price by quantity
-			set_variable = {
-				name = lead_buy_price_by_price_in_gold
-				value = scope:target.var:lead_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_lead_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_lead_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:lead_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = lead_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_lead_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_lead_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#lead quantity
-			set_variable = {
-				name = lead_buy_1
-				value  = scope:player_country.var:lead_market_panel_quantity
-			}
-			#lead price
-			set_variable = {
-				name = lead_buy_price
-				value = scope:player_country.lead_price
-			}
-			#lead price by quantity
-			set_variable = {
-				name = lead_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:lead_market_panel_quantity
-					multiply = scope:player_country.lead_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_lead_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#lead quantity
-			set_variable = {
-				name = lead_sell_1
-				value = var:lead_market_panel_quantity
-			}
-
-			#lead price
-			set_variable = {
-				name = lead_sell_price
-				value = lead_price
-			}
-
-			#lead price by quantity
-			set_variable = {
-				name = lead_sell_price_by_price_in_gold
-				value = scope:target.var:lead_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_lead_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = lead_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_lead_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_lead_1
-				target = prev
-			}
-		}
-	}
-}
-buy_lead_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_lead_var_state > player.var:lead_market_panel_quantity
-		player.var:lead_contract_1_year = 0
-		var:lead_release_status = 0
-
-		player.gold_reserve_rest > buy_lead_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_lead_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_lead_in_gold_custom_tooltip
-		}
-	}
-}
-sell_lead_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_lead_var_state > player.var:lead_market_panel_quantity
-		player.var:lead_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:lead_release_status = 0
-
-		gold_reserve_rest > sell_lead_in_gold_market_panel #player.buy_lead_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_lead_in_gold_market_panel #player.buy_lead_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_lead_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#oil_in_curency
+#oil
 buy_oil_market_panel = {
 	effect = {
 		root = {
@@ -3727,11 +2455,11 @@ sell_oil_market_panel = {
 }
 buy_oil_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_oil_var_state > player.var:oil_market_panel_quantity
-		player.stockpiling_money_state > buy_oil_market_panel
+		money_supply_state_market_owner > buy_oil_market_panel
 		player.var:oil_contract_1_year = 0
 		var:oil_release_status = 0
 	}
@@ -3743,11 +2471,11 @@ buy_oil_market_panel_enabled = {
 }
 sell_oil_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_oil_var_state > player.var:oil_market_panel_quantity
-		stockpiling_money_state > buy_oil_market_panel
+		money_supply_state > sell_oil_market_panel
 		player.var:oil_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -3759,224 +2487,10 @@ sell_oil_market_panel_enabled = {
 		}
 	}
 }
-
-#oil_in_gold
-buy_oil_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#oil quantity
-			set_variable = {
-				name = oil_sell_1
-				value  = scope:player_country.var:oil_market_panel_quantity
-			}
-			#oil price
-			set_variable = {
-				name = oil_sell_price
-				value = oil_price
-			}
-
-			#oil in gold by quantity
-			set_variable = {
-				name = oil_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:oil_market_panel_quantity
-					multiply = oil_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_oil_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#oil quantity
-			set_variable = {
-				name = oil_buy_1
-				value  = var:oil_market_panel_quantity
-			}
-
-			#oil price
-			set_variable = {
-				name = oil_buy_price
-				value = scope:target.oil_price
-			}
-
-			#oil price by quantity
-			set_variable = {
-				name = oil_buy_price_by_price_in_gold
-				value = scope:target.var:oil_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_oil_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_oil_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:oil_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = oil_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_oil_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_oil_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#oil quantity
-			set_variable = {
-				name = oil_buy_1
-				value  = scope:player_country.var:oil_market_panel_quantity
-			}
-			#oil price
-			set_variable = {
-				name = oil_buy_price
-				value = scope:player_country.oil_price
-			}
-			#oil price by quantity
-			set_variable = {
-				name = oil_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:oil_market_panel_quantity
-					multiply = scope:player_country.oil_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_oil_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#oil quantity
-			set_variable = {
-				name = oil_sell_1
-				value = var:oil_market_panel_quantity
-			}
-
-			#oil price
-			set_variable = {
-				name = oil_sell_price
-				value = oil_price
-			}
-
-			#oil price by quantity
-			set_variable = {
-				name = oil_sell_price_by_price_in_gold
-				value = scope:target.var:oil_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_oil_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = oil_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_oil_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_oil_1
-				target = prev
-			}
-		}
-	}
-}
-buy_oil_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_oil_var_state > player.var:oil_market_panel_quantity
-		player.var:oil_contract_1_year = 0
-		var:oil_release_status = 0
-
-		player.gold_reserve_rest > buy_oil_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_oil_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_oil_in_gold_custom_tooltip
-		}
-	}
-}
-sell_oil_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_oil_var_state > player.var:oil_market_panel_quantity
-		player.var:oil_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:oil_release_status = 0
-
-		gold_reserve_rest > sell_oil_in_gold_market_panel #player.buy_oil_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_oil_in_gold_market_panel #player.buy_oil_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_oil_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#dye_in_curency
+#dye
 buy_dye_market_panel = {
 	effect = {
 		root = {
@@ -4133,11 +2647,11 @@ sell_dye_market_panel = {
 }
 buy_dye_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_dye_var_state > player.var:dye_market_panel_quantity
-		player.stockpiling_money_state > buy_dye_market_panel
+		money_supply_state_market_owner > buy_dye_market_panel
 		player.var:dye_contract_1_year = 0
 		var:dye_release_status = 0
 	}
@@ -4149,11 +2663,11 @@ buy_dye_market_panel_enabled = {
 }
 sell_dye_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_dye_var_state > player.var:dye_market_panel_quantity
-		stockpiling_money_state > buy_dye_market_panel
+		money_supply_state > sell_dye_market_panel
 		player.var:dye_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -4165,224 +2679,10 @@ sell_dye_market_panel_enabled = {
 		}
 	}
 }
-
-#dye_in_gold
-buy_dye_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#dye quantity
-			set_variable = {
-				name = dye_sell_1
-				value  = scope:player_country.var:dye_market_panel_quantity
-			}
-			#dye price
-			set_variable = {
-				name = dye_sell_price
-				value = dye_price
-			}
-
-			#dye in gold by quantity
-			set_variable = {
-				name = dye_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:dye_market_panel_quantity
-					multiply = dye_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_dye_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#dye quantity
-			set_variable = {
-				name = dye_buy_1
-				value  = var:dye_market_panel_quantity
-			}
-
-			#dye price
-			set_variable = {
-				name = dye_buy_price
-				value = scope:target.dye_price
-			}
-
-			#dye price by quantity
-			set_variable = {
-				name = dye_buy_price_by_price_in_gold
-				value = scope:target.var:dye_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_dye_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_dye_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:dye_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = dye_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_dye_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_dye_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#dye quantity
-			set_variable = {
-				name = dye_buy_1
-				value  = scope:player_country.var:dye_market_panel_quantity
-			}
-			#dye price
-			set_variable = {
-				name = dye_buy_price
-				value = scope:player_country.dye_price
-			}
-			#dye price by quantity
-			set_variable = {
-				name = dye_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:dye_market_panel_quantity
-					multiply = scope:player_country.dye_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_dye_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#dye quantity
-			set_variable = {
-				name = dye_sell_1
-				value = var:dye_market_panel_quantity
-			}
-
-			#dye price
-			set_variable = {
-				name = dye_sell_price
-				value = dye_price
-			}
-
-			#dye price by quantity
-			set_variable = {
-				name = dye_sell_price_by_price_in_gold
-				value = scope:target.var:dye_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_dye_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = dye_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_dye_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_dye_1
-				target = prev
-			}
-		}
-	}
-}
-buy_dye_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_dye_var_state > player.var:dye_market_panel_quantity
-		player.var:dye_contract_1_year = 0
-		var:dye_release_status = 0
-
-		player.gold_reserve_rest > buy_dye_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_dye_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_dye_in_gold_custom_tooltip
-		}
-	}
-}
-sell_dye_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_dye_var_state > player.var:dye_market_panel_quantity
-		player.var:dye_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:dye_release_status = 0
-
-		gold_reserve_rest > sell_dye_in_gold_market_panel #player.buy_dye_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_dye_in_gold_market_panel #player.buy_dye_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_dye_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#silk_in_curency
+#silk
 buy_silk_market_panel = {
 	effect = {
 		root = {
@@ -4539,11 +2839,11 @@ sell_silk_market_panel = {
 }
 buy_silk_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_silk_var_state > player.var:silk_market_panel_quantity
-		player.stockpiling_money_state > buy_silk_market_panel
+		money_supply_state_market_owner > buy_silk_market_panel
 		player.var:silk_contract_1_year = 0
 		var:silk_release_status = 0
 	}
@@ -4555,11 +2855,11 @@ buy_silk_market_panel_enabled = {
 }
 sell_silk_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_silk_var_state > player.var:silk_market_panel_quantity
-		stockpiling_money_state > buy_silk_market_panel
+		money_supply_state > sell_silk_market_panel
 		player.var:silk_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -4571,224 +2871,10 @@ sell_silk_market_panel_enabled = {
 		}
 	}
 }
-
-#silk_in_gold
-buy_silk_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#silk quantity
-			set_variable = {
-				name = silk_sell_1
-				value  = scope:player_country.var:silk_market_panel_quantity
-			}
-			#silk price
-			set_variable = {
-				name = silk_sell_price
-				value = silk_price
-			}
-
-			#silk in gold by quantity
-			set_variable = {
-				name = silk_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:silk_market_panel_quantity
-					multiply = silk_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_silk_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#silk quantity
-			set_variable = {
-				name = silk_buy_1
-				value  = var:silk_market_panel_quantity
-			}
-
-			#silk price
-			set_variable = {
-				name = silk_buy_price
-				value = scope:target.silk_price
-			}
-
-			#silk price by quantity
-			set_variable = {
-				name = silk_buy_price_by_price_in_gold
-				value = scope:target.var:silk_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_silk_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_silk_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:silk_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = silk_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_silk_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_silk_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#silk quantity
-			set_variable = {
-				name = silk_buy_1
-				value  = scope:player_country.var:silk_market_panel_quantity
-			}
-			#silk price
-			set_variable = {
-				name = silk_buy_price
-				value = scope:player_country.silk_price
-			}
-			#silk price by quantity
-			set_variable = {
-				name = silk_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:silk_market_panel_quantity
-					multiply = scope:player_country.silk_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_silk_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#silk quantity
-			set_variable = {
-				name = silk_sell_1
-				value = var:silk_market_panel_quantity
-			}
-
-			#silk price
-			set_variable = {
-				name = silk_sell_price
-				value = silk_price
-			}
-
-			#silk price by quantity
-			set_variable = {
-				name = silk_sell_price_by_price_in_gold
-				value = scope:target.var:silk_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_silk_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = silk_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_silk_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_silk_1
-				target = prev
-			}
-		}
-	}
-}
-buy_silk_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_silk_var_state > player.var:silk_market_panel_quantity
-		player.var:silk_contract_1_year = 0
-		var:silk_release_status = 0
-
-		player.gold_reserve_rest > buy_silk_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_silk_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_silk_in_gold_custom_tooltip
-		}
-	}
-}
-sell_silk_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_silk_var_state > player.var:silk_market_panel_quantity
-		player.var:silk_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:silk_release_status = 0
-
-		gold_reserve_rest > sell_silk_in_gold_market_panel #player.buy_silk_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_silk_in_gold_market_panel #player.buy_silk_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_silk_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#rubber_in_curency
+#rubber
 buy_rubber_market_panel = {
 	effect = {
 		root = {
@@ -4945,11 +3031,11 @@ sell_rubber_market_panel = {
 }
 buy_rubber_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_rubber_var_state > player.var:rubber_market_panel_quantity
-		player.stockpiling_money_state > buy_rubber_market_panel
+		money_supply_state_market_owner > buy_rubber_market_panel
 		player.var:rubber_contract_1_year = 0
 		var:rubber_release_status = 0
 	}
@@ -4961,11 +3047,11 @@ buy_rubber_market_panel_enabled = {
 }
 sell_rubber_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_rubber_var_state > player.var:rubber_market_panel_quantity
-		stockpiling_money_state > buy_rubber_market_panel
+		money_supply_state > sell_rubber_market_panel
 		player.var:rubber_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -4977,224 +3063,10 @@ sell_rubber_market_panel_enabled = {
 		}
 	}
 }
-
-#rubber_in_gold
-buy_rubber_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#rubber quantity
-			set_variable = {
-				name = rubber_sell_1
-				value  = scope:player_country.var:rubber_market_panel_quantity
-			}
-			#rubber price
-			set_variable = {
-				name = rubber_sell_price
-				value = rubber_price
-			}
-
-			#rubber in gold by quantity
-			set_variable = {
-				name = rubber_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:rubber_market_panel_quantity
-					multiply = rubber_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_rubber_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#rubber quantity
-			set_variable = {
-				name = rubber_buy_1
-				value  = var:rubber_market_panel_quantity
-			}
-
-			#rubber price
-			set_variable = {
-				name = rubber_buy_price
-				value = scope:target.rubber_price
-			}
-
-			#rubber price by quantity
-			set_variable = {
-				name = rubber_buy_price_by_price_in_gold
-				value = scope:target.var:rubber_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_rubber_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_rubber_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:rubber_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = rubber_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_rubber_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_rubber_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#rubber quantity
-			set_variable = {
-				name = rubber_buy_1
-				value  = scope:player_country.var:rubber_market_panel_quantity
-			}
-			#rubber price
-			set_variable = {
-				name = rubber_buy_price
-				value = scope:player_country.rubber_price
-			}
-			#rubber price by quantity
-			set_variable = {
-				name = rubber_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:rubber_market_panel_quantity
-					multiply = scope:player_country.rubber_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_rubber_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#rubber quantity
-			set_variable = {
-				name = rubber_sell_1
-				value = var:rubber_market_panel_quantity
-			}
-
-			#rubber price
-			set_variable = {
-				name = rubber_sell_price
-				value = rubber_price
-			}
-
-			#rubber price by quantity
-			set_variable = {
-				name = rubber_sell_price_by_price_in_gold
-				value = scope:target.var:rubber_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_rubber_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = rubber_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_rubber_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_rubber_1
-				target = prev
-			}
-		}
-	}
-}
-buy_rubber_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_rubber_var_state > player.var:rubber_market_panel_quantity
-		player.var:rubber_contract_1_year = 0
-		var:rubber_release_status = 0
-
-		player.gold_reserve_rest > buy_rubber_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_rubber_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_rubber_in_gold_custom_tooltip
-		}
-	}
-}
-sell_rubber_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_rubber_var_state > player.var:rubber_market_panel_quantity
-		player.var:rubber_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:rubber_release_status = 0
-
-		gold_reserve_rest > sell_rubber_in_gold_market_panel #player.buy_rubber_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_rubber_in_gold_market_panel #player.buy_rubber_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_rubber_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#ammunition_in_curency
+#ammunition
 buy_ammunition_market_panel = {
 	effect = {
 		root = {
@@ -5351,11 +3223,11 @@ sell_ammunition_market_panel = {
 }
 buy_ammunition_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_ammunition_var_state > player.var:ammunition_market_panel_quantity
-		player.stockpiling_money_state > buy_ammunition_market_panel
+		money_supply_state_market_owner > buy_ammunition_market_panel
 		player.var:ammunition_contract_1_year = 0
 		var:ammunition_release_status = 0
 	}
@@ -5367,11 +3239,11 @@ buy_ammunition_market_panel_enabled = {
 }
 sell_ammunition_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_ammunition_var_state > player.var:ammunition_market_panel_quantity
-		stockpiling_money_state > buy_ammunition_market_panel
+		money_supply_state > sell_ammunition_market_panel
 		player.var:ammunition_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -5383,224 +3255,10 @@ sell_ammunition_market_panel_enabled = {
 		}
 	}
 }
-
-#ammunition_in_gold
-buy_ammunition_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#ammunition quantity
-			set_variable = {
-				name = ammunition_sell_1
-				value  = scope:player_country.var:ammunition_market_panel_quantity
-			}
-			#ammunition price
-			set_variable = {
-				name = ammunition_sell_price
-				value = ammunition_price
-			}
-
-			#ammunition in gold by quantity
-			set_variable = {
-				name = ammunition_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:ammunition_market_panel_quantity
-					multiply = ammunition_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_ammunition_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#ammunition quantity
-			set_variable = {
-				name = ammunition_buy_1
-				value  = var:ammunition_market_panel_quantity
-			}
-
-			#ammunition price
-			set_variable = {
-				name = ammunition_buy_price
-				value = scope:target.ammunition_price
-			}
-
-			#ammunition price by quantity
-			set_variable = {
-				name = ammunition_buy_price_by_price_in_gold
-				value = scope:target.var:ammunition_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_ammunition_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_ammunition_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:ammunition_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = ammunition_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_ammunition_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_ammunition_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#ammunition quantity
-			set_variable = {
-				name = ammunition_buy_1
-				value  = scope:player_country.var:ammunition_market_panel_quantity
-			}
-			#ammunition price
-			set_variable = {
-				name = ammunition_buy_price
-				value = scope:player_country.ammunition_price
-			}
-			#ammunition price by quantity
-			set_variable = {
-				name = ammunition_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:ammunition_market_panel_quantity
-					multiply = scope:player_country.ammunition_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_ammunition_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#ammunition quantity
-			set_variable = {
-				name = ammunition_sell_1
-				value = var:ammunition_market_panel_quantity
-			}
-
-			#ammunition price
-			set_variable = {
-				name = ammunition_sell_price
-				value = ammunition_price
-			}
-
-			#ammunition price by quantity
-			set_variable = {
-				name = ammunition_sell_price_by_price_in_gold
-				value = scope:target.var:ammunition_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_ammunition_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = ammunition_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_ammunition_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_ammunition_1
-				target = prev
-			}
-		}
-	}
-}
-buy_ammunition_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_ammunition_var_state > player.var:ammunition_market_panel_quantity
-		player.var:ammunition_contract_1_year = 0
-		var:ammunition_release_status = 0
-
-		player.gold_reserve_rest > buy_ammunition_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_ammunition_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_ammunition_in_gold_custom_tooltip
-		}
-	}
-}
-sell_ammunition_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_ammunition_var_state > player.var:ammunition_market_panel_quantity
-		player.var:ammunition_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:ammunition_release_status = 0
-
-		gold_reserve_rest > sell_ammunition_in_gold_market_panel #player.buy_ammunition_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_ammunition_in_gold_market_panel #player.buy_ammunition_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_ammunition_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#small_arms_in_curency
+#small_arms
 buy_small_arms_market_panel = {
 	effect = {
 		root = {
@@ -5757,11 +3415,11 @@ sell_small_arms_market_panel = {
 }
 buy_small_arms_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_small_arms_var_state > player.var:small_arms_market_panel_quantity
-		player.stockpiling_money_state > buy_small_arms_market_panel
+		money_supply_state_market_owner > buy_small_arms_market_panel
 		player.var:small_arms_contract_1_year = 0
 		var:small_arms_release_status = 0
 	}
@@ -5773,11 +3431,11 @@ buy_small_arms_market_panel_enabled = {
 }
 sell_small_arms_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_small_arms_var_state > player.var:small_arms_market_panel_quantity
-		stockpiling_money_state > buy_small_arms_market_panel
+		money_supply_state > sell_small_arms_market_panel
 		player.var:small_arms_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -5789,224 +3447,10 @@ sell_small_arms_market_panel_enabled = {
 		}
 	}
 }
-
-#small_arms_in_gold
-buy_small_arms_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#small_arms quantity
-			set_variable = {
-				name = small_arms_sell_1
-				value  = scope:player_country.var:small_arms_market_panel_quantity
-			}
-			#small_arms price
-			set_variable = {
-				name = small_arms_sell_price
-				value = small_arms_price
-			}
-
-			#small_arms in gold by quantity
-			set_variable = {
-				name = small_arms_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:small_arms_market_panel_quantity
-					multiply = small_arms_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_small_arms_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#small_arms quantity
-			set_variable = {
-				name = small_arms_buy_1
-				value  = var:small_arms_market_panel_quantity
-			}
-
-			#small_arms price
-			set_variable = {
-				name = small_arms_buy_price
-				value = scope:target.small_arms_price
-			}
-
-			#small_arms price by quantity
-			set_variable = {
-				name = small_arms_buy_price_by_price_in_gold
-				value = scope:target.var:small_arms_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_small_arms_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_small_arms_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:small_arms_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = small_arms_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_small_arms_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_small_arms_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#small_arms quantity
-			set_variable = {
-				name = small_arms_buy_1
-				value  = scope:player_country.var:small_arms_market_panel_quantity
-			}
-			#small_arms price
-			set_variable = {
-				name = small_arms_buy_price
-				value = scope:player_country.small_arms_price
-			}
-			#small_arms price by quantity
-			set_variable = {
-				name = small_arms_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:small_arms_market_panel_quantity
-					multiply = scope:player_country.small_arms_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_small_arms_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#small_arms quantity
-			set_variable = {
-				name = small_arms_sell_1
-				value = var:small_arms_market_panel_quantity
-			}
-
-			#small_arms price
-			set_variable = {
-				name = small_arms_sell_price
-				value = small_arms_price
-			}
-
-			#small_arms price by quantity
-			set_variable = {
-				name = small_arms_sell_price_by_price_in_gold
-				value = scope:target.var:small_arms_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_small_arms_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = small_arms_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_small_arms_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_small_arms_1
-				target = prev
-			}
-		}
-	}
-}
-buy_small_arms_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_small_arms_var_state > player.var:small_arms_market_panel_quantity
-		player.var:small_arms_contract_1_year = 0
-		var:small_arms_release_status = 0
-
-		player.gold_reserve_rest > buy_small_arms_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_small_arms_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_small_arms_in_gold_custom_tooltip
-		}
-	}
-}
-sell_small_arms_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_small_arms_var_state > player.var:small_arms_market_panel_quantity
-		player.var:small_arms_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:small_arms_release_status = 0
-
-		gold_reserve_rest > sell_small_arms_in_gold_market_panel #player.buy_small_arms_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_small_arms_in_gold_market_panel #player.buy_small_arms_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_small_arms_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#artillery_in_curency
+#artillery
 buy_artillery_market_panel = {
 	effect = {
 		root = {
@@ -6163,11 +3607,11 @@ sell_artillery_market_panel = {
 }
 buy_artillery_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_artillery_var_state > player.var:artillery_market_panel_quantity
-		player.stockpiling_money_state > buy_artillery_market_panel
+		money_supply_state_market_owner > buy_artillery_market_panel
 		player.var:artillery_contract_1_year = 0
 		var:artillery_release_status = 0
 	}
@@ -6179,11 +3623,11 @@ buy_artillery_market_panel_enabled = {
 }
 sell_artillery_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_artillery_var_state > player.var:artillery_market_panel_quantity
-		stockpiling_money_state > buy_artillery_market_panel
+		money_supply_state > sell_artillery_market_panel
 		player.var:artillery_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -6195,224 +3639,10 @@ sell_artillery_market_panel_enabled = {
 		}
 	}
 }
-
-#artillery_in_gold
-buy_artillery_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#artillery quantity
-			set_variable = {
-				name = artillery_sell_1
-				value  = scope:player_country.var:artillery_market_panel_quantity
-			}
-			#artillery price
-			set_variable = {
-				name = artillery_sell_price
-				value = artillery_price
-			}
-
-			#artillery in gold by quantity
-			set_variable = {
-				name = artillery_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:artillery_market_panel_quantity
-					multiply = artillery_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_artillery_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#artillery quantity
-			set_variable = {
-				name = artillery_buy_1
-				value  = var:artillery_market_panel_quantity
-			}
-
-			#artillery price
-			set_variable = {
-				name = artillery_buy_price
-				value = scope:target.artillery_price
-			}
-
-			#artillery price by quantity
-			set_variable = {
-				name = artillery_buy_price_by_price_in_gold
-				value = scope:target.var:artillery_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_artillery_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_artillery_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:artillery_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = artillery_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_artillery_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_artillery_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#artillery quantity
-			set_variable = {
-				name = artillery_buy_1
-				value  = scope:player_country.var:artillery_market_panel_quantity
-			}
-			#artillery price
-			set_variable = {
-				name = artillery_buy_price
-				value = scope:player_country.artillery_price
-			}
-			#artillery price by quantity
-			set_variable = {
-				name = artillery_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:artillery_market_panel_quantity
-					multiply = scope:player_country.artillery_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_artillery_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#artillery quantity
-			set_variable = {
-				name = artillery_sell_1
-				value = var:artillery_market_panel_quantity
-			}
-
-			#artillery price
-			set_variable = {
-				name = artillery_sell_price
-				value = artillery_price
-			}
-
-			#artillery price by quantity
-			set_variable = {
-				name = artillery_sell_price_by_price_in_gold
-				value = scope:target.var:artillery_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_artillery_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = artillery_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_artillery_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_artillery_1
-				target = prev
-			}
-		}
-	}
-}
-buy_artillery_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_artillery_var_state > player.var:artillery_market_panel_quantity
-		player.var:artillery_contract_1_year = 0
-		var:artillery_release_status = 0
-
-		player.gold_reserve_rest > buy_artillery_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_artillery_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_artillery_in_gold_custom_tooltip
-		}
-	}
-}
-sell_artillery_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_artillery_var_state > player.var:artillery_market_panel_quantity
-		player.var:artillery_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:artillery_release_status = 0
-
-		gold_reserve_rest > sell_artillery_in_gold_market_panel #player.buy_artillery_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_artillery_in_gold_market_panel #player.buy_artillery_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_artillery_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#tanks_in_curency
+#tanks
 buy_tanks_market_panel = {
 	effect = {
 		root = {
@@ -6569,11 +3799,11 @@ sell_tanks_market_panel = {
 }
 buy_tanks_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_tanks_var_state > player.var:tanks_market_panel_quantity
-		player.stockpiling_money_state > buy_tanks_market_panel
+		money_supply_state_market_owner > buy_tanks_market_panel
 		player.var:tanks_contract_1_year = 0
 		var:tanks_release_status = 0
 	}
@@ -6585,11 +3815,11 @@ buy_tanks_market_panel_enabled = {
 }
 sell_tanks_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_tanks_var_state > player.var:tanks_market_panel_quantity
-		stockpiling_money_state > buy_tanks_market_panel
+		money_supply_state > sell_tanks_market_panel
 		player.var:tanks_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -6601,224 +3831,10 @@ sell_tanks_market_panel_enabled = {
 		}
 	}
 }
-
-#tanks_in_gold
-buy_tanks_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#tanks quantity
-			set_variable = {
-				name = tanks_sell_1
-				value  = scope:player_country.var:tanks_market_panel_quantity
-			}
-			#tanks price
-			set_variable = {
-				name = tanks_sell_price
-				value = tanks_price
-			}
-
-			#tanks in gold by quantity
-			set_variable = {
-				name = tanks_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:tanks_market_panel_quantity
-					multiply = tanks_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_tanks_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#tanks quantity
-			set_variable = {
-				name = tanks_buy_1
-				value  = var:tanks_market_panel_quantity
-			}
-
-			#tanks price
-			set_variable = {
-				name = tanks_buy_price
-				value = scope:target.tanks_price
-			}
-
-			#tanks price by quantity
-			set_variable = {
-				name = tanks_buy_price_by_price_in_gold
-				value = scope:target.var:tanks_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_tanks_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_tanks_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:tanks_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = tanks_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_tanks_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_tanks_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#tanks quantity
-			set_variable = {
-				name = tanks_buy_1
-				value  = scope:player_country.var:tanks_market_panel_quantity
-			}
-			#tanks price
-			set_variable = {
-				name = tanks_buy_price
-				value = scope:player_country.tanks_price
-			}
-			#tanks price by quantity
-			set_variable = {
-				name = tanks_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:tanks_market_panel_quantity
-					multiply = scope:player_country.tanks_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_tanks_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#tanks quantity
-			set_variable = {
-				name = tanks_sell_1
-				value = var:tanks_market_panel_quantity
-			}
-
-			#tanks price
-			set_variable = {
-				name = tanks_sell_price
-				value = tanks_price
-			}
-
-			#tanks price by quantity
-			set_variable = {
-				name = tanks_sell_price_by_price_in_gold
-				value = scope:target.var:tanks_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_tanks_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = tanks_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_tanks_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_tanks_1
-				target = prev
-			}
-		}
-	}
-}
-buy_tanks_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_tanks_var_state > player.var:tanks_market_panel_quantity
-		player.var:tanks_contract_1_year = 0
-		var:tanks_release_status = 0
-
-		player.gold_reserve_rest > buy_tanks_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_tanks_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_tanks_in_gold_custom_tooltip
-		}
-	}
-}
-sell_tanks_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_tanks_var_state > player.var:tanks_market_panel_quantity
-		player.var:tanks_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:tanks_release_status = 0
-
-		gold_reserve_rest > sell_tanks_in_gold_market_panel #player.buy_tanks_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_tanks_in_gold_market_panel #player.buy_tanks_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_tanks_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#aeroplanes_in_curency
+#aeroplanes
 buy_aeroplanes_market_panel = {
 	effect = {
 		root = {
@@ -6975,11 +3991,11 @@ sell_aeroplanes_market_panel = {
 }
 buy_aeroplanes_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_aeroplanes_var_state > player.var:aeroplanes_market_panel_quantity
-		player.stockpiling_money_state > buy_aeroplanes_market_panel
+		money_supply_state_market_owner > buy_aeroplanes_market_panel
 		player.var:aeroplanes_contract_1_year = 0
 		var:aeroplanes_release_status = 0
 	}
@@ -6991,11 +4007,11 @@ buy_aeroplanes_market_panel_enabled = {
 }
 sell_aeroplanes_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_aeroplanes_var_state > player.var:aeroplanes_market_panel_quantity
-		stockpiling_money_state > buy_aeroplanes_market_panel
+		money_supply_state > sell_aeroplanes_market_panel
 		player.var:aeroplanes_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -7007,224 +4023,10 @@ sell_aeroplanes_market_panel_enabled = {
 		}
 	}
 }
-
-#aeroplanes_in_gold
-buy_aeroplanes_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#aeroplanes quantity
-			set_variable = {
-				name = aeroplanes_sell_1
-				value  = scope:player_country.var:aeroplanes_market_panel_quantity
-			}
-			#aeroplanes price
-			set_variable = {
-				name = aeroplanes_sell_price
-				value = aeroplanes_price
-			}
-
-			#aeroplanes in gold by quantity
-			set_variable = {
-				name = aeroplanes_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:aeroplanes_market_panel_quantity
-					multiply = aeroplanes_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_aeroplanes_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#aeroplanes quantity
-			set_variable = {
-				name = aeroplanes_buy_1
-				value  = var:aeroplanes_market_panel_quantity
-			}
-
-			#aeroplanes price
-			set_variable = {
-				name = aeroplanes_buy_price
-				value = scope:target.aeroplanes_price
-			}
-
-			#aeroplanes price by quantity
-			set_variable = {
-				name = aeroplanes_buy_price_by_price_in_gold
-				value = scope:target.var:aeroplanes_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_aeroplanes_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_aeroplanes_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:aeroplanes_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = aeroplanes_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_aeroplanes_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_aeroplanes_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#aeroplanes quantity
-			set_variable = {
-				name = aeroplanes_buy_1
-				value  = scope:player_country.var:aeroplanes_market_panel_quantity
-			}
-			#aeroplanes price
-			set_variable = {
-				name = aeroplanes_buy_price
-				value = scope:player_country.aeroplanes_price
-			}
-			#aeroplanes price by quantity
-			set_variable = {
-				name = aeroplanes_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:aeroplanes_market_panel_quantity
-					multiply = scope:player_country.aeroplanes_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_aeroplanes_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#aeroplanes quantity
-			set_variable = {
-				name = aeroplanes_sell_1
-				value = var:aeroplanes_market_panel_quantity
-			}
-
-			#aeroplanes price
-			set_variable = {
-				name = aeroplanes_sell_price
-				value = aeroplanes_price
-			}
-
-			#aeroplanes price by quantity
-			set_variable = {
-				name = aeroplanes_sell_price_by_price_in_gold
-				value = scope:target.var:aeroplanes_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_aeroplanes_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = aeroplanes_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_aeroplanes_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_aeroplanes_1
-				target = prev
-			}
-		}
-	}
-}
-buy_aeroplanes_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_aeroplanes_var_state > player.var:aeroplanes_market_panel_quantity
-		player.var:aeroplanes_contract_1_year = 0
-		var:aeroplanes_release_status = 0
-
-		player.gold_reserve_rest > buy_aeroplanes_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_aeroplanes_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_aeroplanes_in_gold_custom_tooltip
-		}
-	}
-}
-sell_aeroplanes_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_aeroplanes_var_state > player.var:aeroplanes_market_panel_quantity
-		player.var:aeroplanes_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:aeroplanes_release_status = 0
-
-		gold_reserve_rest > sell_aeroplanes_in_gold_market_panel #player.buy_aeroplanes_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_aeroplanes_in_gold_market_panel #player.buy_aeroplanes_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_aeroplanes_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#manowars_in_curency
+#manowars
 buy_manowars_market_panel = {
 	effect = {
 		root = {
@@ -7381,11 +4183,11 @@ sell_manowars_market_panel = {
 }
 buy_manowars_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_manowars_var_state > player.var:manowars_market_panel_quantity
-		player.stockpiling_money_state > buy_manowars_market_panel
+		money_supply_state_market_owner > buy_manowars_market_panel
 		player.var:manowars_contract_1_year = 0
 		var:manowars_release_status = 0
 	}
@@ -7397,11 +4199,11 @@ buy_manowars_market_panel_enabled = {
 }
 sell_manowars_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_manowars_var_state > player.var:manowars_market_panel_quantity
-		stockpiling_money_state > buy_manowars_market_panel
+		money_supply_state > sell_manowars_market_panel
 		player.var:manowars_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
@@ -7413,224 +4215,10 @@ sell_manowars_market_panel_enabled = {
 		}
 	}
 }
-
-#manowars_in_gold
-buy_manowars_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#manowars quantity
-			set_variable = {
-				name = manowars_sell_1
-				value  = scope:player_country.var:manowars_market_panel_quantity
-			}
-			#manowars price
-			set_variable = {
-				name = manowars_sell_price
-				value = manowars_price
-			}
-
-			#manowars in gold by quantity
-			set_variable = {
-				name = manowars_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:manowars_market_panel_quantity
-					multiply = manowars_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_manowars_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#manowars quantity
-			set_variable = {
-				name = manowars_buy_1
-				value  = var:manowars_market_panel_quantity
-			}
-
-			#manowars price
-			set_variable = {
-				name = manowars_buy_price
-				value = scope:target.manowars_price
-			}
-
-			#manowars price by quantity
-			set_variable = {
-				name = manowars_buy_price_by_price_in_gold
-				value = scope:target.var:manowars_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_manowars_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_manowars_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:manowars_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = manowars_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_manowars_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_manowars_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#manowars quantity
-			set_variable = {
-				name = manowars_buy_1
-				value  = scope:player_country.var:manowars_market_panel_quantity
-			}
-			#manowars price
-			set_variable = {
-				name = manowars_buy_price
-				value = scope:player_country.manowars_price
-			}
-			#manowars price by quantity
-			set_variable = {
-				name = manowars_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:manowars_market_panel_quantity
-					multiply = scope:player_country.manowars_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_manowars_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#manowars quantity
-			set_variable = {
-				name = manowars_sell_1
-				value = var:manowars_market_panel_quantity
-			}
-
-			#manowars price
-			set_variable = {
-				name = manowars_sell_price
-				value = manowars_price
-			}
-
-			#manowars price by quantity
-			set_variable = {
-				name = manowars_sell_price_by_price_in_gold
-				value = scope:target.var:manowars_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_manowars_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = manowars_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_manowars_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_manowars_1
-				target = prev
-			}
-		}
-	}
-}
-buy_manowars_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_manowars_var_state > player.var:manowars_market_panel_quantity
-		player.var:manowars_contract_1_year = 0
-		var:manowars_release_status = 0
-
-		player.gold_reserve_rest > buy_manowars_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_manowars_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_manowars_in_gold_custom_tooltip
-		}
-	}
-}
-sell_manowars_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_manowars_var_state > player.var:manowars_market_panel_quantity
-		player.var:manowars_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:manowars_release_status = 0
-
-		gold_reserve_rest > sell_manowars_in_gold_market_panel #player.buy_manowars_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_manowars_in_gold_market_panel #player.buy_manowars_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_manowars_custom_tooltip
-		}
-	}
-}
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#ironclads_in_curency
+#ironclads
 buy_ironclads_market_panel = {
 	effect = {
 		root = {
@@ -7787,11 +4375,11 @@ sell_ironclads_market_panel = {
 }
 buy_ironclads_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		stockpiling_ironclads_var_state > player.var:ironclads_market_panel_quantity
-		player.stockpiling_money_state > buy_ironclads_market_panel
+		money_supply_state_market_owner > buy_ironclads_market_panel
 		player.var:ironclads_contract_1_year = 0
 		var:ironclads_release_status = 0
 	}
@@ -7803,229 +4391,15 @@ buy_ironclads_market_panel_enabled = {
 }
 sell_ironclads_market_panel_enabled = {
 	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
+		# not  = {
+		# 	infamy >= infamy_threshold:pariah
+		# }
 		player.stockpiling_ironclads_var_state > player.var:ironclads_market_panel_quantity
-		stockpiling_money_state > buy_ironclads_market_panel
+		money_supply_state > sell_ironclads_market_panel
 		player.var:ironclads_contract_1_year = 0
 		var:sell_limit_var_1 < sell_limit_var_0
 
 		player.var:ironclads_release_status = 0
-	}
-	effect = {
-		custom_tooltip = {
-			text = sell_ironclads_custom_tooltip
-		}
-	}
-}
-
-#ironclads_in_gold
-buy_ironclads_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#ironclads quantity
-			set_variable = {
-				name = ironclads_sell_1
-				value  = scope:player_country.var:ironclads_market_panel_quantity
-			}
-			#ironclads price
-			set_variable = {
-				name = ironclads_sell_price
-				value = ironclads_price
-			}
-
-			#ironclads in gold by quantity
-			set_variable = {
-				name = ironclads_sell_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:ironclads_market_panel_quantity
-					multiply = ironclads_price
-					multiply = money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = sell_ironclads_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#ironclads quantity
-			set_variable = {
-				name = ironclads_buy_1
-				value  = var:ironclads_market_panel_quantity
-			}
-
-			#ironclads price
-			set_variable = {
-				name = ironclads_buy_price
-				value = scope:target.ironclads_price
-			}
-
-			#ironclads price by quantity
-			set_variable = {
-				name = ironclads_buy_price_by_price_in_gold
-				value = scope:target.var:ironclads_sell_price_by_price_in_gold
-			}
-
-			#for on_action
-			set_variable = {
-				name = buy_ironclads_in_gold_1
-				value = 1
-			}
-			
-			#for gui
-			set_variable = {
-				name = buy_ironclads_1
-				value = 1
-			}
-
-			#Verification gold reserve
-			set_variable = {
-				name = gold_reserve_rest
-				value = {
-					add = scope:player_country.gold_reserves_var
-					subtract = var:ironclads_sell_price_by_price_in_gold
-				}
-			}
-
-			set_variable = {
-				name = ironclads_contract_1_year
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_buy_ironclads_in_gold_1
-				target = prev
-			}
-		}
-
-	}
-}
-sell_ironclads_market_in_gold_panel = {
-	effect = {
-		root = {
-			save_scope_as = target
-		}
-		every_country = {
-			limit = {
-				is_player = yes
-			}
-			save_scope_as = player_country
-
-		}
-		##############
-
-		scope:target = {
-			#ironclads quantity
-			set_variable = {
-				name = ironclads_buy_1
-				value  = scope:player_country.var:ironclads_market_panel_quantity
-			}
-			#ironclads price
-			set_variable = {
-				name = ironclads_buy_price
-				value = scope:player_country.ironclads_price
-			}
-			#ironclads price by quantity
-			set_variable = {
-				name = ironclads_buy_price_by_price_in_gold
-				value = {
-					add = scope:player_country.var:ironclads_market_panel_quantity
-					multiply = scope:player_country.ironclads_price
-					multiply = scope:player_country.money_value_rapported_inflation
-				}
-			}
-
-			#for on_action & gui
-			set_variable = {
-				name = buy_ironclads_in_gold_1
-				value = 1
-			}
-		}
-		scope:player_country = {
-			#ironclads quantity
-			set_variable = {
-				name = ironclads_sell_1
-				value = var:ironclads_market_panel_quantity
-			}
-
-			#ironclads price
-			set_variable = {
-				name = ironclads_sell_price
-				value = ironclads_price
-			}
-
-			#ironclads price by quantity
-			set_variable = {
-				name = ironclads_sell_price_by_price_in_gold
-				value = scope:target.var:ironclads_buy_price_by_price_in_gold
-			}
-
-			set_variable = {
-				name = sell_ironclads_in_gold_1
-				value = 1
-			} 
-
-			set_variable = {
-				name = ironclads_contract_1_year
-				value = 1
-			}
-			set_variable = {
-				name = sell_ironclads_1
-				value = 1
-			}
-			add_to_variable_list = {
-				name = order_sell_in_gold_ironclads_1
-				target = prev
-			}
-		}
-	}
-}
-buy_ironclads_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		stockpiling_ironclads_var_state > player.var:ironclads_market_panel_quantity
-		player.var:ironclads_contract_1_year = 0
-		var:ironclads_release_status = 0
-
-		player.gold_reserve_rest > buy_ironclads_in_gold_market_panel #previsualisation de la gold reserve
-		player.gold_reserves_var > buy_ironclads_in_gold_market_panel #gold_reserve
-	}
-	effect = {
-		custom_tooltip = {
-			text = buy_ironclads_in_gold_custom_tooltip
-		}
-	}
-}
-sell_ironclads_market_panel_in_gold_enabled = {
-	is_valid = {
-		not  = {
-			infamy >= infamy_threshold:pariah
-		}
-		player.stockpiling_ironclads_var_state > player.var:ironclads_market_panel_quantity
-		player.var:ironclads_contract_1_year = 0
-		var:sell_limit_var_1 < sell_limit_var_0
-
-		player.var:ironclads_release_status = 0
-
-		gold_reserve_rest > sell_ironclads_in_gold_market_panel #player.buy_ironclads_in_gold_market_panel #previsualisation de la gold reserve
-		gold_reserves_var > sell_ironclads_in_gold_market_panel #player.buy_ironclads_in_gold_market_panel #gold_reserve
 	}
 	effect = {
 		custom_tooltip = {
