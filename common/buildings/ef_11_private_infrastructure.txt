@@ -1,4 +1,102 @@
-﻿building_financial_district = {
+﻿building_railway = {
+	building_group = bg_private_infrastructure	
+	texture = "gfx/interface/icons/building_icons/building_railway.dds"
+	
+	ai_nationalization_desire = 0.5 # AI is reluctant to privatize railways since they are likely to need subsidies anyway
+	
+	unlocking_technologies = {
+		railways
+	}
+
+	production_method_groups = {
+		pmg_base_building_railway
+		pmg_passenger_trains
+		############################################################################################################################################################
+		pmg_market_liquidity
+		pmg_private_ownership_railroad_stock
+		############################################################################################################################################################
+
+	}
+
+	required_construction = construction_cost_very_high
+	
+	ai_value = {
+		value = 2000 # Railways are important
+
+		if = { # Trans-Siberian Railway
+			limit = {
+				owner = {
+					has_journal_entry = je_trans_siberian_railway
+				}
+				NOT = {
+					has_building = building_railway
+				}
+				OR = {
+					state_region = s:STATE_MOSCOW
+					state_region = s:STATE_YAROSLAVL
+					state_region = s:STATE_NIZHNY_NOVGOROD
+					state_region = s:STATE_CHUVASHIA
+					state_region = s:STATE_KAZAN
+					state_region = s:STATE_UFA
+					state_region = s:STATE_CHELYABINSK
+					state_region = s:STATE_URAL
+					state_region = s:STATE_TOBOLSK
+					state_region = s:STATE_TOMSK
+					state_region = s:STATE_KRASNOYARSK
+					state_region = s:STATE_IRKUTSK
+					state_region = s:STATE_BURYATIA
+					state_region = s:STATE_TRANS_BAIKAL
+					state_region = s:STATE_YAKUTSK
+					state_region = s:STATE_OKHOTSK
+					state_region = s:STATE_AMUR
+					state_region = s:STATE_OUTER_MANCHURIA
+				}
+			}
+			add = 10000
+		}
+
+		if = { # Manchurian Railway
+			limit = {
+				exists = c:RUS
+				c:RUS ?= owner
+				OR = {
+					region = sr:region_manchuria
+				}
+				any_scope_building = {
+					is_building_type = building_railway
+					levels_owned_by_country = {  
+						target = c:RUS  
+						value  < 1
+					}
+				}
+			}
+			add = 10000
+		}
+	}
+	
+	should_auto_expand = { 
+		occupancy >= 0.8
+		OR = {
+			cash_reserves_ratio > 0.5
+			is_subsidized = yes
+		}
+		OR = {
+			state = {
+				sg:transportation = { 
+					state_goods_pricier > 0.5 
+				}
+			}
+			state.market_access < 1
+		}
+		NOT = { is_under_construction = yes }
+
+	}
+	ownership_type = self
+
+	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_railways.dds"
+}
+
+building_financial_district = {
 	building_group = bg_financial_districts
 	city_type = city
 	levels_per_mesh = 10
@@ -6,19 +104,16 @@
 	lens = infrastructure
 
 	texture = "gfx/interface/icons/building_icons/building_financial_district.dds"
-	unlocking_technologies = {
-		financial_center
-	}
 
 	production_method_groups = {
-		pmg_ownership_building_manufacturing_company
-		#pmg_ownership_building_financial_district
+		pmg_ownership_building_financial_district
 	}
+	
 	investment_scores = {
 		bg_financial_centre_score = {
 			group = "bg_financial_centre"
 			score = {
-				value = 1
+				value = 0.25
 				
 				if = {
 					limit = {
@@ -131,31 +226,31 @@
 				}				
 			}
 		}
-		# bg_mining_score = {
-		# 	group = "bg_mining"
-		# 	score = {
-		# 		value = 1
+		bg_mining_score = {
+			group = "bg_mining"
+			score = {
+				value = 1
 				
-		# 		if = {
-		# 			limit = {
-		# 				has_law = law_type:law_traditionalism
-		# 			}
-		# 			multiply = 0.25
-		# 		}
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_industry_banned
-		# 			}
-		# 			multiply = 0.5
-		# 		}	
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_agrarianism
-		# 			}
-		# 			multiply = 0.75
-		# 		}					
-		# 	}
-		# }
+				if = {
+					limit = {
+						has_law = law_type:law_traditionalism
+					}
+					multiply = 0.25
+				}
+				else_if = {
+					limit = {
+						has_law = law_type:law_industry_banned
+					}
+					multiply = 0.5
+				}	
+				else_if = {
+					limit = {
+						has_law = law_type:law_agrarianism
+					}
+					multiply = 0.75
+				}					
+			}
+		}
 		bg_logging_score = {
 			group = "bg_logging"
 			score = {
@@ -208,31 +303,31 @@
 				}				
 			}
 		}
-		# bg_oil_extraction_score = {
-		# 	group = "bg_oil_extraction"
-		# 	score = {
-		# 		value = 1
+		bg_oil_extraction_score = {
+			group = "bg_oil_extraction"
+			score = {
+				value = 1
 				
-		# 		if = {
-		# 			limit = {
-		# 				has_law = law_type:law_traditionalism
-		# 			}
-		# 			multiply = 0.1
-		# 		}
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_industry_banned
-		# 			}
-		# 			multiply = 0.5
-		# 		}	
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_agrarianism
-		# 			}
-		# 			multiply = 0.75
-		# 		}				
-		# 	}
-		# }
+				if = {
+					limit = {
+						has_law = law_type:law_traditionalism
+					}
+					multiply = 0.1
+				}
+				else_if = {
+					limit = {
+						has_law = law_type:law_industry_banned
+					}
+					multiply = 0.5
+				}	
+				else_if = {
+					limit = {
+						has_law = law_type:law_agrarianism
+					}
+					multiply = 0.75
+				}				
+			}
+		}
 		bg_power_score = {
 			group = "bg_power"
 			score = {
@@ -258,31 +353,31 @@
 				}					
 			}
 		}
-		# bg_infrastructure_score = {
-		# 	group = "bg_infrastructure"
-		# 	score = {
-		# 		value = 1
+		bg_infrastructure_score = {
+			group = "bg_infrastructure"
+			score = {
+				value = 1
 				
-		# 		if = {
-		# 			limit = {
-		# 				has_law = law_type:law_traditionalism
-		# 			}
-		# 			multiply = 0.1
-		# 		}
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_industry_banned
-		# 			}
-		# 			multiply = 0.5
-		# 		}	
-		# 		else_if = {
-		# 			limit = {
-		# 				has_law = law_type:law_agrarianism
-		# 			}
-		# 			multiply = 0.75
-		# 		}				
-		# 	}
-		# }
+				if = {
+					limit = {
+						has_law = law_type:law_traditionalism
+					}
+					multiply = 0.1
+				}
+				else_if = {
+					limit = {
+						has_law = law_type:law_industry_banned
+					}
+					multiply = 0.5
+				}	
+				else_if = {
+					limit = {
+						has_law = law_type:law_agrarianism
+					}
+					multiply = 0.75
+				}				
+			}
+		}
 	}
 
 	buildable = no
@@ -292,6 +387,7 @@
 
 	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
 }
+
 # building_manufacturing_company = {
 # 	building_group = bg_financial_districts
 # 	city_type = city
@@ -344,75 +440,75 @@
 
 # 	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
 # }
-building_mining_company = {
-	building_group = bg_financial_districts
-	city_type = city
-	levels_per_mesh = 10
+# building_mining_company = {
+# 	building_group = bg_financial_districts
+# 	city_type = city
+# 	levels_per_mesh = 10
 
-	lens = infrastructure
+# 	lens = infrastructure
 
-	texture = "gfx/interface/icons/building_icons/building_mining_company.dds"
+# 	texture = "gfx/interface/icons/building_icons/building_mining_company.dds"
 
-	unlocking_technologies = {
-		financial_center
-	}
+# 	unlocking_technologies = {
+# 		financial_center
+# 	}
 
-	production_method_groups = {
-		pmg_ownership_building_mining_company
-	}
+# 	production_method_groups = {
+# 		pmg_ownership_building_mining_company
+# 	}
 	
-	investment_scores = {
-		bg_mining_score = {
-			group = "bg_mining"
-			score = {
-				value = 10				
-			}
-		}
-		bg_oil_extraction_score = {
-			group = "bg_oil_extraction"
-			score = {
-				value = 10			
-			}
-		}
-	}
+# 	investment_scores = {
+# 		bg_mining_score = {
+# 			group = "bg_mining"
+# 			score = {
+# 				value = 10				
+# 			}
+# 		}
+# 		bg_oil_extraction_score = {
+# 			group = "bg_oil_extraction"
+# 			score = {
+# 				value = 10			
+# 			}
+# 		}
+# 	}
 
-	buildable = no
-	expandable = no
-	downsizeable = no
-	ownership_type = other
+# 	buildable = no
+# 	expandable = no
+# 	downsizeable = no
+# 	ownership_type = other
 
-	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
-}
-building_railway_company = {
-	building_group = bg_financial_districts
-	city_type = city
-	levels_per_mesh = 10
+# 	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
+# }
+# building_railway_company = {
+# 	building_group = bg_financial_districts
+# 	city_type = city
+# 	levels_per_mesh = 10
 
-	lens = infrastructure
+# 	lens = infrastructure
 
-	texture = "gfx/interface/icons/building_icons/building_railway_company.dds"
+# 	texture = "gfx/interface/icons/building_icons/building_railway_company.dds"
 
-	unlocking_technologies = {
-		financial_center
-	}
+# 	unlocking_technologies = {
+# 		financial_center
+# 	}
 
-	production_method_groups = {
-		pmg_ownership_building_railway_company
-	}
+# 	production_method_groups = {
+# 		pmg_ownership_building_railway_company
+# 	}
 	
-	investment_scores = {
-		bg_infrastructure_score = {
-			group = "bg_infrastructure"
-			score = {
-				value = 10				
-			}
-		}
-	}
+# 	investment_scores = {
+# 		bg_infrastructure_score = {
+# 			group = "bg_infrastructure"
+# 			score = {
+# 				value = 10				
+# 			}
+# 		}
+# 	}
 
-	buildable = no
-	expandable = no
-	downsizeable = no
-	ownership_type = other
+# 	buildable = no
+# 	expandable = no
+# 	downsizeable = no
+# 	ownership_type = other
 
-	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
-}
+# 	background = "gfx/interface/icons/building_icons/backgrounds/building_panel_bg_monuments.dds"
+# }
