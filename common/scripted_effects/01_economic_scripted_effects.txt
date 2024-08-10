@@ -50565,3 +50565,126 @@ investement_pool_borrowing = {
 		add = private_bank_borrowings_year
 	}
 }
+
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+#Bc production methode
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+central_bank_production_methods = { 
+	every_scope_state = { 
+		#pm_bond_production
+		if = { 
+			limit = { 	
+				owner  = { 	
+					national_debt_compared_gdp >= 0.10
+				}	
+				is_production_method_active = {
+					building_type = building_bank
+					production_method = pm_no_bond_production
+				}
+			}	
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_bond_production
+			}
+		}
+		if = { 
+			limit = { 	
+				owner  = { 	
+					national_debt_compared_gdp < 0.10
+				}	
+				is_production_method_active = {
+					building_type = building_bank
+					production_method = pm_bond_production
+				}
+			}	
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_no_bond_production 
+			}
+		}
+		#pm_gold_consuption
+		if = { 
+			limit = { 	
+				or = { 	
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_no_gold_standard_bank_money_currency
+					}
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_gold_exchange_standard_bank_money_currency
+					}
+				}
+			}	
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_no_gold_consuption
+			}
+		}
+		if = { 
+			limit = { 	
+				owner = { 	
+					or = { 
+						central_bank_gold_reserves_market_goods_sell_orders = 0
+						country_rank < rank_value:great_power						
+						is_subject_custom_trigger = yes
+					}
+				}
+				or = { 	
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_no_gold_consuption
+					}
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_gold_consuption
+					}
+				}
+			}	
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_paper_gold_consuption
+			}
+		}
+		if = { 
+			limit = { 	
+				owner = { 
+					or = { 
+						central_bank_gold_reserves_market_goods_sell_orders > 0
+						country_rank = rank_value:great_power
+					}
+					is_subject_custom_trigger = no
+				}	
+				or = { 	
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_no_gold_consuption
+					}
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_paper_gold_consuption
+					}
+				}
+			}	
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_gold_consuption
+			}
+		}
+
+
+
+
+
+	}
+}
