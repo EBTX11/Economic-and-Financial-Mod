@@ -28,6 +28,18 @@ types market_panel
 					soundeffect = "event:/SFX/UI/SideBar/markets_stop"
 				}
 			}
+			state = {
+				name = update_cache
+				# on_finish = "[GetScriptedGui('country_market_cache').Execute(GuiScope.SetRoot(AccessPlayer.MakeScope).End)]"
+				# on_finish = "[GetScriptedGui('country_btype_cache').Execute(GuiScope.SetRoot(AccessPlayer.MakeScope).End)]"
+				on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+				on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+			}
+			state = {
+				name = build_list
+				on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+				on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+			}
 		}
 		
 		datacontext = "[MarketPanel.AccessMarket]"
@@ -675,12 +687,62 @@ types market_panel
 					datamodel = "[Market.AccessMarketGoods( MarketPanel.GetFilters )]"
 					spacing = 2
 					parentanchor = hcenter
-					
+
 					item = {
 						goods_entry_button = {}
 					}
 				}
 				
+				############################################################################################################################################################
+				flowcontainer = {
+					direction = vertical
+					visible = "[MarketPanel.IsSelected('staple')]"
+
+					default_header_2texts = {
+						parentanchor = hcenter
+						blockoverride "text1" {
+							text = "currency_GOODS"
+						}
+					}	
+
+					widget = { size = { 5 5 } }		
+					
+					dynamicgridbox = {
+						flipdirection = yes
+						datamodel_wrap = 10
+						datamodel = "[GetGlobalList('gui_market_currency_list')]"
+						
+						item = {
+							goods_entry_button_x = {}
+						}
+					}							
+				}
+				flowcontainer = {
+					direction = vertical
+					visible = "[MarketPanel.IsSelected('luxury')]"
+
+					default_header_2texts = {
+						parentanchor = hcenter
+						blockoverride "text1" {
+							text = "financial_product_GOODS"
+						}
+					}	
+
+					widget = { size = { 5 5 } }		
+					
+					dynamicgridbox = {
+						flipdirection = yes
+						datamodel_wrap = 10
+						datamodel = "[GetGlobalList('gui_market_financial_product_list')]"
+						
+						item = {
+							goods_entry_button_x = {}
+						}
+					}							
+				}
+				############################################################################################################################################################
+
+
 				flowcontainer = {
 					direction = vertical
 					visible = "[Not(IsDataModelEmpty(Market.AccessLocalGoods( MarketPanel.GetFilters )))]"
@@ -719,8 +781,8 @@ types market_panel
 							}
 						}
 					}							
-				}					
-				
+				}	
+
 				textbox = {
 					parentanchor = hcenter
 					minimumsize = { 450 -1 }
@@ -780,6 +842,9 @@ types market_panel
 				
 				block "staple_onclick" {
 					onclick = "[MarketPanel.Filter('staple')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
 					using = market_filter_staple_button_sound
 				}
 				blockoverride "icon" {
@@ -794,6 +859,8 @@ types market_panel
 				
 				block "staple_onclick" {
 					onclick = "[MarketPanel.Filter('staple')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					using = market_filter_staple_button_sound
 				}
 				blockoverride "icon" {
@@ -821,7 +888,8 @@ types market_panel
 				
 				block "industrial_onclick" {
 					onclick = "[MarketPanel.Filter('industrial')]"
-					using = market_filter_industrial_button_sound
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
 				}
 				blockoverride "icon" {
 					texture = "gfx/interface/market_view/filter_industrial_goods.dds"
@@ -835,7 +903,8 @@ types market_panel
 				
 				block "industrial_onclick" {
 					onclick = "[MarketPanel.Filter('industrial')]"
-					using = market_filter_industrial_button_sound
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
 				}
 				blockoverride "icon" {
 					texture = "gfx/interface/market_view/filter_industrial_goods_selected.dds"
@@ -863,6 +932,8 @@ types market_panel
 				
 				block "luxury_onclick" {
 					onclick = "[MarketPanel.Filter('luxury')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					using = market_filter_luxury_button_sound
 				}
 				blockoverride "icon" {
@@ -877,6 +948,8 @@ types market_panel
 				
 				block "luxury_onclick" {
 					onclick = "[MarketPanel.Filter('luxury')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					using = market_filter_luxury_button_sound
 				}
 				blockoverride "icon" {
@@ -905,6 +978,8 @@ types market_panel
 				
 				block "military_onclick" {
 					onclick = "[MarketPanel.Filter('military')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					using = market_filter_military_button_sound
 				}
 				blockoverride "icon" {
@@ -919,6 +994,8 @@ types market_panel
 				
 				block "military_onclick" {
 					onclick = "[MarketPanel.Filter('military')]"
+					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					using = market_filter_military_button_sound
 				}
 				blockoverride "icon" {
@@ -948,6 +1025,8 @@ types market_panel
 		using = select_button_sound
 		onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
 
+		visible = "[Not(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(EqualTo_string(Goods.GetKey,'bond'),EqualTo_string(Goods.GetKey,'manufacture_stock')),EqualTo_string(Goods.GetKey,'agricultural_stock')),EqualTo_string(Goods.GetKey,'mining_stock')),EqualTo_string(Goods.GetKey,'railroad_stock')),EqualTo_string(Goods.GetKey,'war_bond')),EqualTo_string(Goods.GetKey,'mutual_funds')),EqualTo_string(Goods.GetKey,'paper_gold')),EqualTo_string(Goods.GetKey,'dinar_c')),EqualTo_string(Goods.GetKey,'dinar_algerian_dinar_c')),EqualTo_string(Goods.GetKey,'dinar_iraqi_dinar_c')),EqualTo_string(Goods.GetKey,'dinar_libyan_dinar_c')),EqualTo_string(Goods.GetKey,'dinar_moroccan_dirham_c')),EqualTo_string(Goods.GetKey,'dinar_omanian_rial_c')),EqualTo_string(Goods.GetKey,'dinar_qiran_c')),EqualTo_string(Goods.GetKey,'dinar_saudi_riyal_c')),EqualTo_string(Goods.GetKey,'dinar_serbian_dinar_c')),EqualTo_string(Goods.GetKey,'dinar_tunisian_dinar_c')),EqualTo_string(Goods.GetKey,'dinar_yugoslav_dinar_c')),EqualTo_string(Goods.GetKey,'dollar_australian_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_canadian_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_caribbean_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_confederate_states_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_liberian_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_new_zealand_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_sierra_leonean_dollar_c')),EqualTo_string(Goods.GetKey,'dollar_united_states_dollar_c')),EqualTo_string(Goods.GetKey,'eco_ariary_c')),EqualTo_string(Goods.GetKey,'eco_central_african_eco_c')),EqualTo_string(Goods.GetKey,'eco_east_african_eco_c')),EqualTo_string(Goods.GetKey,'eco_ethiopian_birr_c')),EqualTo_string(Goods.GetKey,'eco_ghanaian_pound_c')),EqualTo_string(Goods.GetKey,'eco_nigerian_naira_c')),EqualTo_string(Goods.GetKey,'eco_south_african_rand_c')),EqualTo_string(Goods.GetKey,'eco_tuareg_ouguiya_c')),EqualTo_string(Goods.GetKey,'eco_west_african_eco_c')),EqualTo_string(Goods.GetKey,'franc_belgian_franc_c')),EqualTo_string(Goods.GetKey,'franc_french_franc_c')),EqualTo_string(Goods.GetKey,'franc_luxembourgish_franc_c')),EqualTo_string(Goods.GetKey,'franc_swiss_franc_c')),EqualTo_string(Goods.GetKey,'gulden_c')),EqualTo_string(Goods.GetKey,'gulden_bavarian_gulden_c')),EqualTo_string(Goods.GetKey,'gulden_florin_c')),EqualTo_string(Goods.GetKey,'gulden_hungarian_forint_c')),EqualTo_string(Goods.GetKey,'gulden_indies_guilder_c')),EqualTo_string(Goods.GetKey,'gulden_south_german_gulden_c')),EqualTo_string(Goods.GetKey,'krone_czech_koruna_c')),EqualTo_string(Goods.GetKey,'krone_danish_krone_c')),EqualTo_string(Goods.GetKey,'krone_estonian_kroon_c')),EqualTo_string(Goods.GetKey,'krone_icelandic_krona_c')),EqualTo_string(Goods.GetKey,'krone_norwegian_krone_c')),EqualTo_string(Goods.GetKey,'krone_slovak_koruna_c')),EqualTo_string(Goods.GetKey,'krone_swedish_krona_c')),EqualTo_string(Goods.GetKey,'leon_leu_c')),EqualTo_string(Goods.GetKey,'leon_lev_c')),EqualTo_string(Goods.GetKey,'lira_c')),EqualTo_string(Goods.GetKey,'lira_ducato_c')),EqualTo_string(Goods.GetKey,'lira_ottoman_lira_c')),EqualTo_string(Goods.GetKey,'lira_scudo_pontificio_c')),EqualTo_string(Goods.GetKey,'lira_scudo_sardo_c')),EqualTo_string(Goods.GetKey,'lira_toscane_lira_c')),EqualTo_string(Goods.GetKey,'mark_c')),EqualTo_string(Goods.GetKey,'mark_finnish_markka_c')),EqualTo_string(Goods.GetKey,'peso_c')),EqualTo_string(Goods.GetKey,'peso_argentine_peso_c')),EqualTo_string(Goods.GetKey,'peso_bolivien_peso_c')),EqualTo_string(Goods.GetKey,'peso_chilean_peso_c')),EqualTo_string(Goods.GetKey,'peso_colombian_peso_c')),EqualTo_string(Goods.GetKey,'peso_costa_rican_colon_c')),EqualTo_string(Goods.GetKey,'peso_cuban_peso_c')),EqualTo_string(Goods.GetKey,'peso_ecuadorian_peso_c')),EqualTo_string(Goods.GetKey,'peso_el_salvador_colon_c')),EqualTo_string(Goods.GetKey,'peso_guatemalan_quetzal_c')),EqualTo_string(Goods.GetKey,'peso_honduran_lempira_c')),EqualTo_string(Goods.GetKey,'peso_mexican_peso_c')),EqualTo_string(Goods.GetKey,'peso_nicaraguan_cordoba_c')),EqualTo_string(Goods.GetKey,'peso_paraguayan_peso_c')),EqualTo_string(Goods.GetKey,'peso_philippine_peso_c')),EqualTo_string(Goods.GetKey,'peso_sol_de_oro_c')),EqualTo_string(Goods.GetKey,'peso_uruguayan_peso_c')),EqualTo_string(Goods.GetKey,'peso_venezuelan_peso_c')),EqualTo_string(Goods.GetKey,'pound_egyptian_pound_c')),EqualTo_string(Goods.GetKey,'pound_irish_pound_c')),EqualTo_string(Goods.GetKey,'pound_sterling_c')),EqualTo_string(Goods.GetKey,'real_c')),EqualTo_string(Goods.GetKey,'real_brazilian_real_c')),EqualTo_string(Goods.GetKey,'rupee_indian_rupee_c')),EqualTo_string(Goods.GetKey,'rupee_indonesian_rupiah_c')),EqualTo_string(Goods.GetKey,'spe_baht_c')),EqualTo_string(Goods.GetKey,'spe_dong_c')),EqualTo_string(Goods.GetKey,'spe_drachma_c')),EqualTo_string(Goods.GetKey,'spe_korean_won_c')),EqualTo_string(Goods.GetKey,'spe_latvian_lats_c')),EqualTo_string(Goods.GetKey,'spe_lithuanian_litas_c')),EqualTo_string(Goods.GetKey,'spe_peseta_c')),EqualTo_string(Goods.GetKey,'spe_ruble_c')),EqualTo_string(Goods.GetKey,'spe_uni_c')),EqualTo_string(Goods.GetKey,'spe_yen_c')),EqualTo_string(Goods.GetKey,'spe_yuan_c')),EqualTo_string(Goods.GetKey,'spe_zloti_c')),EqualTo_string(Goods.GetKey,'thaler_hannoveraner_thaler_c')),EqualTo_string(Goods.GetKey,'thaler_prussian_thaler_c')),EqualTo_string(Goods.GetKey,'thaler_saxon_thaler_c')))]"
+				
 		block "tooltip" {
 		}
 
@@ -1064,7 +1143,7 @@ types market_panel
 				
 				textbox = {
 					align = right|nobaseline
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
 					size = { 90 40 }
 					margin_right = 10
 					parentanchor = vcenter
@@ -1174,6 +1253,30 @@ types market_panel
 		}
 	}
 
+	############################################################################################################################################################
+	type goods_entry_button_x = flowcontainer {
+		datacontext = "[Scope.AccessMarketGoods.GetGoods]"
+	
+		container = {
+			tooltipwidget = {
+				FancyTooltip_Goods = {}
+			}	
+
+			button_icon_round = {
+				size = { 50 50 }
+				using = select_button_sound
+				onclick = "[InformationPanelBar.OpenGoodsPanel(Goods.GetMarket, Goods.Self)]"
+				onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+			}
+			
+			icon = {
+				size = { 50 50 }
+				texture = "[Goods.GetTexture]"
+			}								
+		}
+	}
+	############################################################################################################################################################
+	
 	type filter_button = button {
 		using = default_button
 		using = tooltip_above

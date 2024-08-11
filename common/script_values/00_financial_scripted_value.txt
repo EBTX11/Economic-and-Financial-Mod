@@ -341,7 +341,7 @@ national_debt_allowed_relative_gdp = {
 			country_credit_rating > 375
 		}
 		add = 0.90
-		
+
 	}
 	if = {
 		limit  = {
@@ -349,7 +349,7 @@ national_debt_allowed_relative_gdp = {
 			country_credit_rating > 249
 		}
 		add = 0.80
-		
+
 	}
 	if = {
 		limit  = {
@@ -357,7 +357,7 @@ national_debt_allowed_relative_gdp = {
 			country_credit_rating > 200
 		}
 		add = 0.70
-		
+
 	}
 	if = {
 		limit  = {
@@ -365,7 +365,7 @@ national_debt_allowed_relative_gdp = {
 			country_credit_rating > 151
 		}
 		add = 0.60
-		
+
 	}
 	if = {
 		limit  = {
@@ -428,7 +428,7 @@ stockpiling_bond_var_state = {
 		every_scope_state = {
 			if = {
 				limit = {
-					has_modifier = financial_center_historic_place 
+					has_modifier = financial_center_historic_place
 					is_incorporated = yes
 				}
 				add = var:stockpiling_bond_var_state_1
@@ -468,10 +468,49 @@ stockpiling_manufacture_stock_var_state = {
 		every_scope_state = {
 			if = {
 				limit = {
-					has_modifier = financial_center_historic_place 
+					has_modifier = financial_center_historic_place
 					is_incorporated = yes
 				}
 				add = var:stockpiling_manufacture_stock_var_state_1
+			}
+		}
+	}
+}
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+agricultural_stock_market_goods_sell_orders = {
+	value = {
+		add = market.mg:agricultural_stock.market_goods_sell_orders
+	}
+}
+agricultural_stock_market_goods_buy_orders = {
+	value = {
+		add = market.mg:agricultural_stock.market_goods_buy_orders
+	}
+}
+agricultural_stock_market_goods_delta = {
+	value = agricultural_stock_market_goods_sell_orders
+	subtract = agricultural_stock_market_goods_buy_orders
+}
+stockpiling_agricultural_stock_var_state = {
+	value = 0
+	add  = {
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = financial_center_historic_place
+					is_incorporated = yes
+				}
+				add = var:stockpiling_agricultural_stock_var_state_1
 			}
 		}
 	}
@@ -507,7 +546,7 @@ stockpiling_railroad_stock_var_state = {
 		every_scope_state = {
 			if = {
 				limit = {
-					has_modifier = financial_center_historic_place 
+					has_modifier = financial_center_historic_place
 					is_incorporated = yes
 				}
 				add = var:stockpiling_railroad_stock_var_state_1
@@ -546,7 +585,7 @@ stockpiling_mining_stock_var_state = {
 		every_scope_state = {
 			if = {
 				limit = {
-					has_modifier = financial_center_historic_place 
+					has_modifier = financial_center_historic_place
 					is_incorporated = yes
 				}
 				add = var:stockpiling_mining_stock_var_state_1
@@ -589,6 +628,7 @@ stockpiling_mining_stock_var_state = {
 country_indice = {
 	add = bond_market_index
 	add = manufacture_stock_index
+	add = agricultural_stock	
 	add = minting_stock_index
 	add = railroad_stock_index
 }
@@ -644,6 +684,28 @@ manufacture_stock_market_index = {
 manufacture_stock_index = {
 	value = stockpiling_manufacture_stock_var_state
 	multiply = manufacture_stock_market_index
+}
+
+# agricultural_stock_index
+
+agricultural_stock_market_index = {
+	value = 25
+	subtract = {
+		value = 25
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:agricultural_stock.market_goods_pricier
+				multiply = 25
+			}
+			divide = 25
+		}
+	}
+}
+
+agricultural_stock_index = {
+	value = stockpiling_agricultural_stock_var_state
+	multiply = agricultural_stock_market_index
 }
 
 # minting_stock_index
@@ -749,7 +811,7 @@ building_trade_center_lvl = {
 # 	occupancy >= 0.75
 # }
 
-# building_railway_lvl_2 = { #mee donnee si unn bbanntimeent lamhbda eest détennue à une part 
+# building_railway_lvl_2 = { #mee donnee si unn bbanntimeent lamhbda eest détennue à une part
 #     value = 0
 # 	if = {
 # 		limit = {
@@ -791,7 +853,7 @@ building_financial_district_lvl = {
 }
 
 
-building_railway_lvl_X = { #mee donnee si unn bbanntimeent lamhbda eest détennue à une part 
+building_railway_lvl_X = { #mee donnee si unn bbanntimeent lamhbda eest détennue à une part
     value = 0
 	if = {
 		limit = {
@@ -2013,13 +2075,13 @@ sell_ironclads_in_gold_market_panel = {
 price_bond = {
 	value = player.var:bond_quantity
 	multiply = bond_price
-	
+
 	# if = {
-	# 	limit = { 
+	# 	limit = {
 	# 		var:bond_in_on = 1
 	# 	}
 	# 	multiply = 0
-	# }	
+	# }
 }
 
 
@@ -2344,7 +2406,7 @@ gold_loaned_to_central_bank = {
 	# add = var:ai_central_bank_gold_loaned_9
 	# add = var:ai_central_bank_gold_loaned_10
 
-	#add = var:debt_interest 
+	#add = var:debt_interest
 }
 
 central_bank_interest_refund_per_year = {
@@ -2606,7 +2668,7 @@ bond_quantity_scripted_test = {
 	}
 }
 
-ai_interest_per_mounth = { 
+ai_interest_per_mounth = {
 	value = 0
 	add = var:ai_interest_per_mounth_calculated_1
 	add = var:ai_interest_per_mounth_calculated_2
