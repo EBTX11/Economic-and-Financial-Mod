@@ -4424,44 +4424,8 @@ gdp_view_on_action_fc = {
 #####################################################################################################################################################
 #####################################################################################################################################################
 
-destroy_building_not_allowed = {
-	every_scope_state = {
-		if = {
-			limit = {
-				and = {
-					has_building = building_bank
-					NOT = {
-						has_modifier = bank_central_place
-					}
-				}
-			}
-			remove_building = building_bank
-			reset_building = yes
-		}
-        if = {
-            limit = {
-                and = {
-                    has_building = building_financial_centre
-                    NOT = {
-                        has_modifier = financial_center_place
-                    }
-                }
-            }
-            remove_building = building_financial_centre
-        }
-        if = {
-            limit = {
-                and = {
-                    has_building = building_national_stockpile
-                    NOT = {
-                        has_modifier = national_stockpile_place
-                    }
-                }
-            }
-            remove_building = building_national_stockpile
-        }
-	}
-}
+
+
 reset_building = {
 	root  = {
 		remove_country_building_modifier = yes
@@ -4472,109 +4436,45 @@ reset_building = {
 		stockpiling_capital_state_transfert = yes
 	}
 }
-remove_country_building_modifier = {
-	if = {
-		limit = {
-			has_modifier = has_national_stockpile
-			any_scope_state = {
-				not = {
-					has_building = building_national_stockpile
-				}
-			}
-		}
-		remove_modifier = has_national_stockpile
-	}
-	if = {
-		limit = {
-			has_modifier = has_central_bank
-			any_scope_state = {
-				not = {
-					has_building = building_bank
-				}
-			}
-		}
-		remove_modifier = has_central_bank
-	}
-	if = {
-		limit = {
-			has_modifier = has_financial_center
-			any_scope_state = {
-				not = {
-					or = {
-						has_building = building_financial_centre
-						has_building = building_financial_centre_fra
-						has_building = building_financial_centre_gbr
-						has_building = building_financial_centre_usa
-						has_building = building_financial_centre_net
-						has_building = building_financial_centre_ger
-						has_building = building_financial_centre_aus
-						has_building = building_financial_centre_ita
-						has_building = building_financial_centre_chi
-						has_building = building_financial_centre_jap
-					}
-				}
-			}
-		}
-		remove_modifier = has_financial_center
-	}
-}
 
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
-# ██████╗  █████╗ ███╗   ██╗██╗  ██╗         ██████╗███████╗███╗   ██╗████████╗██████╗  █████╗ ██╗
-# ██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝        ██╔════╝██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██║
-# ██████╔╝███████║██╔██╗ ██║█████╔╝         ██║     █████╗  ██╔██╗ ██║   ██║   ██████╔╝███████║██║
-# ██╔══██╗██╔══██║██║╚██╗██║██╔═██╗         ██║     ██╔══╝  ██║╚██╗██║   ██║   ██╔══██╗██╔══██║██║
-# ██████╔╝██║  ██║██║ ╚████║██║  ██╗███████╗╚██████╗███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║███████╗
-# ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
+##################################
 central_bank_modifier = {
 	capital = {
 		save_scope_as = capital_scope
 	}
-	every_scope_state = {
+	every_scope_state = { #historic_place jamais netoyer
 		if = {
 			limit = {
-				has_modifier = bank_central_place
+				has_modifier = central_bank_place
 			}
-			remove_modifier = bank_central_place
+			remove_modifier = central_bank_place
 		}
 	}
-	scope:capital_scope = {
+	scope:capital_scope = { #actualisation capital
+		#place
 		if = {
 			limit = {
-				has_modifier = bank_central_place
+				not = {
+					has_modifier = central_bank_place
+				}
 			}
-			remove_modifier = bank_central_place
-		}
-		add_modifier = {
-			name = bank_central_place
-			#months = short_modifier_time
-		}
-		if = {
-			limit = {
-				has_modifier = bank_central_place
-				# not = {
-				# 	has_modifier = bank_central_historic_place
-				# }
-			}
-			remove_modifier = bank_central_historic_place
+			remove_modifier = central_bank_place
 			add_modifier = {
-				name = bank_central_historic_place
+				name = central_bank_place
+			}
+		}
+		#historic_place
+		if = {
+			limit = {
+				has_modifier = central_bank_place
+			}
+			remove_modifier = central_bank_historic_place
+			add_modifier = {
+				name = central_bank_historic_place
 			}
 		}
 	}
-	if = {
+	if = { #country - une seul fois
 		limit = {
 			any_scope_state = {
 				has_building = building_bank
@@ -4587,27 +4487,19 @@ central_bank_modifier = {
 			name = has_central_bank
 		}
 	}
+	if = { #country_already_central_bank
+		limit = {
+			has_building = building_central_bank
+			not  = {
+				var:country_already_central_bank = 1
+			}
+		}
+		set_variable  = {
+			name = country_already_central_bank
+			value = 1
+		}
+	}
 }
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
-# ███████╗██╗███╗   ██╗ █████╗ ███╗   ██╗ ██████╗██╗ █████╗ ██╗              ██████╗███████╗███╗   ██╗████████╗███████╗██████╗
-# ██╔════╝██║████╗  ██║██╔══██╗████╗  ██║██╔════╝██║██╔══██╗██║             ██╔════╝██╔════╝████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
-# █████╗  ██║██╔██╗ ██║███████║██╔██╗ ██║██║     ██║███████║██║             ██║     █████╗  ██╔██╗ ██║   ██║   █████╗  ██████╔╝
-# ██╔══╝  ██║██║╚██╗██║██╔══██║██║╚██╗██║██║     ██║██╔══██║██║             ██║     ██╔══╝  ██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
-# ██║     ██║██║ ╚████║██║  ██║██║ ╚████║╚██████╗██║██║  ██║███████╗███████╗╚██████╗███████╗██║ ╚████║   ██║   ███████╗██║  ██║
-# ╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝  ╚═╝╚══════╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
 financial_center_modifier = {
     every_scope_state = {
         if = {
@@ -4713,7 +4605,7 @@ financial_center_modifier = {
     }
 
 	#####################################################################################################################################################		
-	if = {
+	if = { #country - boucle pour les modificateur
 		limit = {
 			or = {
 				has_building = building_financial_centre
@@ -4734,75 +4626,180 @@ financial_center_modifier = {
 			multiplier = value_for_has_financial_center
         }
     }
+	if = { #country_already_financial_center
+		limit = {
+			or = {
+				has_building = building_financial_centre
+				has_building = building_financial_centre_fra
+				has_building = building_financial_centre_gbr
+				has_building = building_financial_centre_usa
+				has_building = building_financial_centre_net
+				has_building = building_financial_centre_ger
+				has_building = building_financial_centre_aus
+				has_building = building_financial_centre_ita
+				has_building = building_financial_centre_chi
+				has_building = building_financial_centre_jap
+			}
+			not = {
+				var:country_already_financial_center = 1
+			}
+		}
+		set_variable  = {
+			name = country_already_financial_center
+			value = 1
+		}
+	}
 }
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
-# ███╗   ██╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗             ███████╗████████╗ ██████╗  ██████╗██╗  ██╗██████╗ ██╗██╗     ███████╗
-# ████╗  ██║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔══██╗██║             ██╔════╝╚══██╔══╝██╔═══██╗██╔════╝██║ ██╔╝██╔══██╗██║██║     ██╔════╝
-# ██╔██╗ ██║███████║   ██║   ██║██║   ██║██╔██╗ ██║███████║██║             ███████╗   ██║   ██║   ██║██║     █████╔╝ ██████╔╝██║██║     █████╗
-# ██║╚██╗██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║██╔══██║██║             ╚════██║   ██║   ██║   ██║██║     ██╔═██╗ ██╔═══╝ ██║██║     ██╔══╝
-# ██║ ╚████║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║██║  ██║███████╗███████╗███████║   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║███████╗███████╗
-# ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝
-
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-#####################################################################################################################################################
-
 national_stockpile_modifier = {
-    capital = {
-        save_scope_as = capital_scope
-    }
-    every_scope_state = {
-        if = {
-            limit = {
-                has_modifier = national_stockpile_place
-            }
-            remove_modifier = national_stockpile_place
-        }
-    }
-    scope:capital_scope = {
-        if = {
-            limit = {
-                has_modifier = national_stockpile_place
-            }
-            remove_modifier = national_stockpile_place
-        }
-        add_modifier = {
-            name = national_stockpile_place
-        }
-        if = {
-            limit = {
-                has_modifier = national_stockpile_place
-                # not = {
-                #     has_modifier = national_stockpile_historic_place
-                # }
-            }
+	capital = {
+		save_scope_as = capital_scope
+	}
+	every_scope_state = { #historic_place jamais netoyer
+		if = {
+			limit = {
+				has_modifier = national_stockpile_place
+			}
+			remove_modifier = national_stockpile_place
+		}
+	}
+	scope:capital_scope = { #actualisation capital
+		#place
+		if = {
+			limit = {
+				not = {
+					has_modifier = national_stockpile_place
+				}
+			}
+			remove_modifier = national_stockpile_place
+			add_modifier = {
+				name = national_stockpile_place
+			}
+		}
+		#historic_place
+		if = {
+			limit = {
+				has_modifier = national_stockpile_place
+			}
 			remove_modifier = national_stockpile_historic_place
-            add_modifier = {
-                name = national_stockpile_historic_place
-            }
-        }
-    }
+			add_modifier = {
+				name = national_stockpile_historic_place
+			}
+		}
+	}
+	if = { #country - une seul fois
+		limit = {
+			any_scope_state = {
+				has_building = building_national_stockpile
+			}
+			not  = {
+				has_modifier = has_national_stockpile
+			}
+		}
+		add_modifier = {
+			name = has_national_stockpile
+		}
+	}
+	if = { #country_already_national_stockpile
+		limit = {
+			has_building = building_national_stockpile
+			not  = {
+				var:country_already_national_stockpile = 1
+			}
+		}
+		set_variable  = {
+			name = country_already_national_stockpile
+			value = 1
+		}
+	}
+}
+# remove_state_building_modifier = { #state 
+# }
+remove_country_building_modifier = { #country 
+
 	if = {
 		limit = {
-            any_scope_state = {
-                has_building = building_national_stockpile
-            }
-            not  = {
-                has_modifier = has_national_stockpile
-            }
+			has_modifier = has_central_bank
+			NOT = {
+				any_scope_state = {
+					has_building = building_bank
+				}
+			}
 		}
-        add_modifier = {
-            name = has_national_stockpile
+		remove_modifier = has_central_bank
+	}
+	if = {
+		limit = {
+			has_modifier = has_financial_center
+			NOT = {
+				any_scope_state = {
+					or = {
+						has_building = building_financial_centre
+						has_building = building_financial_centre_fra
+						has_building = building_financial_centre_gbr
+						has_building = building_financial_centre_usa
+						has_building = building_financial_centre_net
+						has_building = building_financial_centre_ger
+						has_building = building_financial_centre_aus
+						has_building = building_financial_centre_ita
+						has_building = building_financial_centre_chi
+						has_building = building_financial_centre_jap
+					}
+				}
+			}
+		}
+		remove_modifier = has_financial_center
+	}	
+	if = {
+		limit = {
+			has_modifier = has_national_stockpile
+			NOT = {
+				any_scope_state = {
+					has_building = building_national_stockpile
+				}
+			}
+		}
+		remove_modifier = has_national_stockpile
+	}
+}
+##################################
+
+destroy_building_not_allowed = {
+	every_scope_state = {
+		if = {
+			limit = {
+				and = {
+					has_building = building_bank
+					NOT = {
+						has_modifier = central_bank_place
+					}
+				}
+			}
+			remove_building = building_bank
+			reset_building = yes
+		}
+        if = {
+            limit = {
+                and = {
+                    has_building = building_financial_centre
+                    NOT = {
+                        has_modifier = financial_center_place
+                    }
+                }
+            }
+            remove_building = building_financial_centre
         }
-    }
+        if = {
+            limit = {
+                and = {
+                    has_building = building_national_stockpile
+                    NOT = {
+                        has_modifier = national_stockpile_place
+                    }
+                }
+            }
+            remove_building = building_national_stockpile
+        }
+	}
 }
 
 #####################################################################################################################################################
@@ -4845,10 +4842,10 @@ initialize_historic_special_macro_facilities = {
 			reserves = 1
 		}
 		add_modifier = {
-			name = bank_central_place
+			name = central_bank_place
 		}
 		add_modifier = {
-			name = bank_central_historic_place #bank_central_historic_place
+			name = central_bank_historic_place #central_bank_historic_place
 		}
 		owner = {
 			add_modifier = {
@@ -4870,7 +4867,7 @@ initialize_historic_special_macro_facilities = {
 			name = financial_center_place_spe #special
 		}
 		add_modifier = {
-			name = financial_center_historic_place #bank_central_historic_place
+			name = financial_center_historic_place #central_bank_historic_place
 		}
 		owner = {
 			add_modifier = {
@@ -4901,10 +4898,10 @@ initialize_historic_macro_facilities = {
 			reserves = 1
 		}
 		add_modifier = {
-			name = bank_central_place
+			name = central_bank_place
 		}
 		add_modifier = {
-			name = bank_central_historic_place #bank_central_historic_place
+			name = central_bank_historic_place #central_bank_historic_place
 		}
 		owner = {
 			add_modifier = {
@@ -4926,7 +4923,7 @@ initialize_historic_macro_facilities = {
 			name = financial_center_place
 		}
 		add_modifier = {
-			name = financial_center_historic_place #bank_central_historic_place
+			name = financial_center_historic_place #central_bank_historic_place
 		}
 		owner = {
 			add_modifier = {
@@ -4947,9 +4944,11 @@ initialize_historic_macro_facilities = {
 macro_facilities_on_action_bc = {
 	if = {
 		limit = { ### check to make sure we're ready and stable enough
+			has_technology_researched = central_banking
 			is_revolutionary =  no
 			or = {
 				is_valid_country = yes
+				country_already_central_bank = yes
 				gdp_view >= 1
 				is_player = yes
 			}
@@ -4961,6 +4960,22 @@ macro_facilities_on_action_bc = {
 	}
 }
 macro_facilities_bc = {
+	#for country witch is_valid_country = yes but GDP < 5M
+	if = {
+		limit = { 
+			has_technology_researched = central_banking 
+			var:gdp_view < 1
+		}
+		$CTRL_BANK_SITE$ = {
+			create_building = {
+				building = $BANK_BLDG_TYPE$
+				level    = 5
+				reserves=1
+			}
+		}
+	}
+
+	#general
 	switch = {
 		trigger = var:gdp_view
 		1 = {
@@ -7364,6 +7379,11 @@ macro_facilities_bc = {
 			}
 		}
 	}
+
+	central_bank_modifier = yes
+	trigger_event = {
+		id = correct_currency_circulation.1
+	}
 }
 
 #####################################################################################################################################################
@@ -7376,40 +7396,21 @@ has_tech_central_bank_but_no_building_central_bank = {
 	}
 	if = {
 		limit = { ### check to make sure we're ready and stable enough
+			has_technology_researched = central_banking
+			is_revolutionary =  no
 			or = {
 				is_valid_country = yes
+				country_already_central_bank = yes
 				gdp_view >= 1
 				is_player = yes
 			}
-			has_technology_researched = central_banking
-			is_revolutionary = no
 			not  = {
-				#has_modifier = has_central_bank #for the future replace all occurrences to the building for occurrences to the country modifier
 				any_scope_state = {
-					has_building = building_bank
+					has_building = building_bank #has_modifier = has_central_bank #for the future replace all occurrences to the building for occurrences to the country modifier
 				}
 			}
 		}
 		macro_facilities_on_action_bc = yes
-		# ### redundancy: treated in event central_bank_event.1
-		# scope:central_bank_site = {
-		# 	create_building = {
-		# 	   building = building_bank
-		# 	   level = 5
-		# 	   reserves=1
-		# 	}
-		# }
-        # add_modifier = {
-        #     name = has_central_bank
-        # }
-		# if = {
-		# 	limit = {
-		# 		has_law = law_type:law_no_market_liquidity
-		# 	}
-		# 	trigger_event = {
-		# 		id = central_bank_event.1
-		# 	}
-		# }
 	}
 }
 has_currency_law_but_no_building_central_bank = {
@@ -7420,16 +7421,16 @@ has_currency_law_but_no_building_central_bank = {
 	if = {
 		limit = { ### check to make sure we're ready and stable enough
 			has_technology_researched = central_banking
+			is_revolutionary =  no
 			or = {
 				is_valid_country = yes
+				country_already_central_bank = yes
 				gdp_view >= 1
 				is_player = yes
 			}
-			is_revolutionary = no
-			not = {
-				#has_modifier = has_central_bank #for the future replace all occurrences to the building for occurrences to the country modifier
+			not  = {
 				any_scope_state = {
-					has_building = building_bank
+					has_building = building_bank #has_modifier = has_central_bank #for the future replace all occurrences to the building for occurrences to the country modifier
 				}
 			}
 			or = {
@@ -7531,6 +7532,7 @@ has_currency_law_but_no_building_central_bank = {
 			}
 		}
 		macro_facilities_on_action_bc = yes
+
 		# capital = {
 		# 	save_scope_as = central_bank_site
 		# }
@@ -7542,22 +7544,22 @@ has_currency_law_but_no_building_central_bank = {
 		# 	}
 		# 	if = {
 		# 		limit = {
-		# 			has_modifier = bank_central_place
+		# 			has_modifier = central_bank_place
 		# 		}
-		# 		remove_modifier = bank_central_place
+		# 		remove_modifier = central_bank_place
 		# 	}
 		# 	add_modifier = {
-		# 		name = bank_central_place
+		# 		name = central_bank_place
 		# 	}
 		# 	if = {
 		# 		limit = {
-		# 			has_modifier = bank_central_place
+		# 			has_modifier = central_bank_place
 		# 			not = {
-		# 				has_modifier = bank_central_historic_place
+		# 				has_modifier = central_bank_historic_place
 		# 			}
 		# 		}
 		# 		add_modifier = {
-		# 			name = bank_central_historic_place
+		# 			name = central_bank_historic_place
 		# 		}
 		# 	}
 		# }
@@ -7584,6 +7586,7 @@ macro_facilities_on_action_fc = {
 			is_revolutionary =  no
 			or = {
 				is_valid_country = yes
+				country_already_financial_center = yes
 				gdp_view >= 1
 				is_player = yes
 			}
@@ -7816,6 +7819,7 @@ macro_facilities_fc = {
 			}
 		}
 	}
+	financial_center_modifier = yes
 
 	# switch = {
 	# 	trigger = var:gdp_view
@@ -10235,6 +10239,7 @@ has_tech_financial_center_but_no_building_financial_center = {
 			has_technology_researched = financial_center
 			or = {
 				is_valid_country = yes
+				country_already_financial_center = yes
 				gdp_view >= 1
 				is_player = yes
 			}
@@ -10300,7 +10305,7 @@ initialize_historic_stockpile = {
 			name = national_stockpile_place
 		}
 		add_modifier = {
-			name = national_stockpile_historic_place #bank_central_historic_place
+			name = national_stockpile_historic_place #central_bank_historic_place
 		}
 		owner = {
 			add_modifier = {
@@ -10317,28 +10322,34 @@ initialize_historic_stockpile = {
 #####################################################################################################################################################
 #reparation
 #####################################################################################################################################################
-national_stockpile_1 = {
-    capital = {
-        save_scope_as = national_stockpile_site
-    }
+macro_facilities_on_action_nc = {
 	if = {
-		limit = {
+		limit = { ### check to make sure we're ready and stable enough
+			has_technology_researched = national_stockpile
+			is_revolutionary =  no
 			or = {
 				is_valid_country = yes
+				country_already_national_stockpile = yes
 				gdp_view >= 1
 				is_player = yes
 			}
-			has_technology_researched = national_stockpile
-			not = {
-				has_modifier = has_national_stockpile
+		}
+		macro_facilities_ns = {
+			NATIO_STOCK_SITE = capital
+			NATIO_BLDG_TYPE = building_national_stockpile
+		}
+	}
+}
+macro_facilities_ns = {
+	if = {
+		limit = { has_technology_researched = national_stockpile }
+		$NATIO_STOCK_SITE$ = {
+			create_building = {
+				building = $NATIO_BLDG_TYPE$
+				level    = 1
+				reserves=1
 			}
 		}
-        scope:national_stockpile_site = {
-            create_building = {
-               building = building_national_stockpile
-               level = 1
-               reserves=1
-            }
-        }
-    }
+	}
+	national_stockpile_modifier = yes
 }
