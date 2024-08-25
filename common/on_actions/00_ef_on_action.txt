@@ -67,15 +67,33 @@ ef_on_monthly_pulse_country = {
 		#########################################
 		#inflation_modifier
 		inflation_modifier = yes
+
 		if = {
 			limit = {
 				is_player = yes
-				not = { 
-					has_law = law_type:law_no_monetary_policy
+				or = {
+					not = {
+						has_law = law_type:law_no_monetary_policy
+					}
+					var:devaluation_on = 1
+					var:revaluation_on = 1
 				}
 			}
 			monetary_policy_inflation = yes
 		}
+
+		if = {
+			limit = {
+				is_player = yes
+				has_law = law_type:law_no_monetary_policy
+				or = {
+					var:monetary_policy_inflation > 0
+					var:monetary_policy_inflation < 0
+				}
+			}
+			monetary_policy_inflation_reset = yes
+		}
+
 		#########################################
 		#########################################
 		#inflation_value
@@ -225,7 +243,7 @@ ef_on_half_yearly_pulse_country = {
 		buy_sell_currency_order = yes
 
 		check_central_bank_default = yes
-		
+
 		# every_country = {
 		# 	limit = {
 		# 		global_country_ranking = 1
@@ -259,7 +277,7 @@ ef_on_half_yearly_pulse_country = {
 
 ef_on_yearly_pulse_country = {
 	effect = {
-		
+
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -302,6 +320,15 @@ ef_on_yearly_pulse_country = {
 		fluctuations_1_annual_add = yes
 		fluctuations_2_annual_add = yes
 
+		if  = {
+			limit  = {
+				has_modifier = has_central_bank
+			}
+			cumulative_inflation_5_year = yes
+			cumulative_inflation_10_year = yes
+			cumulative_inflation_since_beginning = yes
+		}
+
 		#M.S.A
 		sell_limit_var_0 = yes
 
@@ -336,7 +363,7 @@ ef_on_yearly_pulse_country = {
 
 		#money_creation_destruction trop de bug pour le moment
 		# money_creation_destruction_in_foreign_exchange_reserve= yes
-		
+
 		#looting_1_year
 		if  = {
 			limit = {
@@ -461,7 +488,7 @@ ef_on_yearly_pulse_country = {
 		###########################################################################################################################################################################################
 		###########################################################################################################################################################################################
 		###########################################################################################################################################################################################
-		
+
 		if = {
 			limit = {
 				is_player = no
@@ -471,14 +498,14 @@ ef_on_yearly_pulse_country = {
 				# 	has_law = law_type:law_isolationism
 
 					# or = {
-					# 	is_subject = yes						 
+					# 	is_subject = yes
 					# 	has_law = law_type:law_isolationism
 					# }
 				# }
 			}
 		 	ai_buy_sell_currency = yes
 		}
-		
+
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -625,15 +652,15 @@ ef_on_yearly_pulse_country = {
 		############################################################################################################################################################
 
 		if  = {
-			limit = {			
+			limit = {
 				random_scope_state = {
 					has_potential_resource = bg_gold_mining
-				}				
+				}
 				is_ai = yes
 			}
 			ai_buy_building_gold_mine_1 = yes
 		}
-		
+
 		#building_construction
 		# if  = {
 		# 	limit  = {
@@ -806,7 +833,7 @@ ef_on_five_year_pulse_country = {
 				has_modifier = has_central_bank
 			}
 			trigger_event = { id = correct_currency_circulation.1 }
-			
+
 		}
 	}
 }
