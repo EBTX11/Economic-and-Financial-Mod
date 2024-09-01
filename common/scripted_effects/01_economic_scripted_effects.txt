@@ -4450,48 +4450,6 @@ money_destruction_in_foreign_exchange_reserve = {
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
-fluctuations_money_value_1_month = {
-	change_variable = {
-		name = money_value_fixe_var_1_1M
-		add = 1
-	}
-
-    if = {
-        limit = {
-            var:money_value_fixe_var_1_1M = 1
-        }
-        set_variable = {
-            name = money_value_var_month_1
-            value = money_value
-        }
-    }
-    if = {
-        limit = {
-            var:money_value_fixe_var_1_1M = 2
-        }
-        set_variable = {
-            name = money_value_var_month_2
-            value = money_value
-        }
-        set_variable = {
-            name = money_value_dif_01
-            value = 0
-        }
-        change_variable = {
-            name = money_value_dif_01
-            add = var:money_value_var_month_2
-        }
-        change_variable = {
-            name = money_value_dif_01
-            divide = var:money_value_var_month_1
-        }
-
-        set_variable = {
-            name = money_value_fixe_var_1_1M
-            value = 0
-        }
-    }
-}
 fluctuations_money_value_1_year = {
 	change_variable = {
 		name = money_value_fixe_var_1_1Y
@@ -4522,6 +4480,10 @@ fluctuations_money_value_1_year = {
         change_variable = {
             name = money_value_dif_1
             add = var:money_value_var_1_year
+        }
+        change_variable = { #test
+            name = money_value_dif_1
+            subtract = var:money_value_var_half_1_year
         }
         change_variable = {
             name = money_value_dif_1
@@ -4567,6 +4529,10 @@ fluctuations_money_value_5_year = {
         }
         change_variable = {
             name = money_value_dif_5
+            subtract = var:money_value_var_half_5_year
+        }
+        change_variable = {
+            name = money_value_dif_5
             divide = var:money_value_var_half_5_year
         }
 
@@ -4606,6 +4572,10 @@ fluctuations_money_value_10_year = {
         change_variable = {
             name = money_value_dif_10
             add = var:money_value_var_10_year
+        }
+        change_variable = {
+            name = money_value_dif_10
+            subtract = var:money_value_var_half_10_year
         }
         change_variable = {
             name = money_value_dif_10
@@ -4667,6 +4637,10 @@ fluctuations_gdp_1_year = {
             name = GDP_dif_1
             add = var:GDP_var_1_year
         }
+        change_variable = { #test
+            name = GDP_dif_1
+            subtract = var:GDP_var_half_1_year
+        }
         change_variable = {
             name = GDP_dif_1
             divide = var:GDP_var_half_1_year
@@ -4709,6 +4683,10 @@ fluctuations_gdp_5_year = {
             name = GDP_dif_5
             add = var:GDP_var_5_year
         }
+        change_variable = { #test
+            name = GDP_dif_5
+            subtract = var:GDP_var_half_5_year
+        }
         change_variable = {
             name = GDP_dif_5
             divide = var:GDP_var_half_5_year
@@ -4750,6 +4728,10 @@ fluctuations_gdp_10_year = {
         change_variable = {
             name = GDP_dif_10
             add = var:GDP_var_10_year
+        }
+        change_variable = { #test
+            name = GDP_dif_10
+            subtract = var:GDP_var_half_10_year
         }
         change_variable = {
             name = GDP_dif_10
@@ -52039,7 +52021,8 @@ central_bank_production_methods = {
 				production_method = pm_no_bond_production
 			}
 		}
-		#pm_gold_consuption and subject currency
+
+		# -> pm_no_gold_standard_bank_money_currency
 		if = {
 			limit = {
 				is_production_method_active = {
@@ -52066,6 +52049,8 @@ central_bank_production_methods = {
 				production_method = pm_no_subject_currency_type
 			}
 		}
+
+		# -> pm_no_gold_standard_bank_money_currency
 		if = {
 			limit = {
 				owner = {
@@ -52138,6 +52123,34 @@ central_bank_production_methods = {
 				production_method = pm_no_subject_currency_type
 			}
 		}		
+
+		# -> pm_gold_exchange_standard_bank_money_currency
+		if = {
+			limit = {
+				is_production_method_active = {
+					building_type = building_bank
+					production_method = pm_gold_exchange_standard_bank_money_currency
+				}
+				or = {
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_paper_gold_consuption
+					}
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_gold_consuption
+					}
+				}
+			}
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_no_gold_consuption
+			}
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_no_subject_currency_type
+			}
+		}
 	}
 }
 
@@ -54438,6 +54451,37 @@ central_bank_production_methods_2 = {
 	}
 }
 
+central_bank_production_methods_3 = {
+	every_scope_state = {
+		#pound_sterling
+		if = {
+			limit = {
+				owner = {
+					any_country = {
+						has_law = law_type:law_pound_sterling_currency
+						has_modifier = global_monetary_reference
+					}
+				}
+				not = {
+					is_production_method_active = {
+						building_type = building_bank
+						production_method = pm_subject_currency_pound_sterling_currency
+					}
+				}
+			}
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_subject_currency_pound_sterling_currency
+			}
+			activate_production_method = {
+				building_type = building_bank
+				production_method = pm_no_gold_consuption
+			}
+		}
+	}
+}
+
+
 #Bc production methode
 
 ###########################################################################################################################################################################################
@@ -54484,17 +54528,17 @@ regulation_law_gold_standard = {
 		}
 		activate_law = law_type:law_gold_standard
 	}
-	if = {
-		limit = {
-			has_technology_researched = gold_exchange_standard
-			not = {
-				or = {
-					has_law = law_type:law_isolationism
-					has_law = law_type:law_no_market_liquidity
-				}
-			}
-		}
-		activate_law = law_type:law_gold_exchange_standard
-	}
+	# if = {
+	# 	limit = {
+	# 		has_technology_researched = gold_exchange_standard
+	# 		not = {
+	# 			or = {
+	# 				has_law = law_type:law_isolationism
+	# 				has_law = law_type:law_no_market_liquidity
+	# 			}
+	# 		}
+	# 	}
+	# 	activate_law = law_type:law_gold_exchange_standard
+	# }
 }
 

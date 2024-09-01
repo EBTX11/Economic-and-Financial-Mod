@@ -7874,6 +7874,8 @@ clear_ironclads_contract_1_year = {
 
 financial_center_production_methods = {
 	every_scope_state = {
+		
+		#on bond
 		if = {
 			limit = {
 				owner  = {
@@ -8033,6 +8035,8 @@ financial_center_production_methods = {
 				}
 			}
 		}
+
+		#off bond
 		if = {
 			limit = {
 				owner  = {
@@ -9656,5 +9660,98 @@ private_ownership_production_stocks = {
 				production_method = pm_no_private_ownership_railroad_stock
 			}
 		}
+	}
+}
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+#
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+fluctuations_country_indice_value_year = {
+	change_variable = {
+		name = index_value_count
+		add = 1
+	}
+
+    if = {
+        limit = {
+            var:index_value_count = 1
+        }
+        set_variable = {
+            name = country_indice_value_1
+            value = country_indice
+        }
+    }
+    if = {
+        limit = {
+            var:index_value_count = 2
+        }
+        set_variable = {
+            name = country_indice_value_2
+            value = country_indice
+        }
+
+        set_variable = {
+            name = country_indice_value_dif_01
+            value = 0
+        }
+        change_variable = {
+            name = country_indice_value_dif_01
+            add = var:country_indice_value_2
+        }
+        change_variable = {
+            name = country_indice_value_dif_01
+            subtract = var:country_indice_value_1
+        }
+        change_variable = {
+            name = country_indice_value_dif_01
+            divide = var:country_indice_value_1
+        }
+
+		#change base_index_value
+		set_variable = {
+			name = base_index_value_dif
+			value = var:base_index_value 
+		}
+		change_variable = {
+			name = base_index_value_dif
+			multiply = var:country_indice_value_dif_01
+		}
+
+		if = {
+			limit = {
+				or = {
+					var:base_index_value < 100000
+					base_index_value_dif < 0
+				}
+			}
+			change_variable = {
+				name = base_index_value
+				add = var:base_index_value_dif
+			}
+		}
+
+        set_variable = {
+            name = index_value_count
+            value = 0
+        }
+    }
+}
+fluctuations_country_indice_value_year_clear = {
+	set_variable = {
+		name = country_indice_value_dif_01
+		value = 0
+	}
+	set_variable = {
+		name = base_index_value_dif
+		value = 0
 	}
 }
