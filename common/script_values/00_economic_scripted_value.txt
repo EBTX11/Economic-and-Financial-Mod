@@ -170,7 +170,7 @@ difference_with_average_gold_exchange_rate_currencies_revers_normalized = {
 }
 difference_with_average_gold_exchange_rate_currencies_revers_100 = {
 	value = difference_with_average_gold_exchange_rate_currencies_revers_normalized
-	multiply = 100
+	multiply = 50 #100
 }
 
 weighted_average_currency_value = {
@@ -1126,6 +1126,17 @@ stockpiling_central_bank_gold_reserves_var_0 = {
 	value = var:stockpiling_central_bank_gold_reserves_var_1
 }
 
+debt_in_gold_sc = {
+	value = var:debt_in_gold
+}
+excess_in_gold_sc = {
+	value = var:excess_in_gold
+}
+delta_in_gold_sc = {
+	value = excess_in_gold_sc
+	subtract = debt_in_gold_sc
+}
+
 ############
 total_import_trade_routes = {
 	every_country = {
@@ -1569,26 +1580,30 @@ export_value = {
 		multiply = difference_with_average_gold_exchange_rate_currencies_revers_100
 	}
 }
-export_value_in_currency_week = {
-	value = export_value
-}
-export_value_in_gold_week = {
-	value = export_value
-	multiply = money_value_target_real #money_value
-}
-export_value_in_currency = {
-	value = export_value_in_gold
-	divide = money_value_target_real #money_value
-}
-export_value_in_gold = {
-	value = var:export_value_in_gold
+export_value_in_gold_week = { #chaque quantité de devise ajouter doivent etre convertie en or pour avoir une idée de lor issu des export
+	# value = export_value
+	# multiply = money_value_target_real #money_value
+
+	value = excess_foreign_state_currency_in_gold_week #chaque valeur est deja divis& pae la valur de leur devise pour avoir de l'o en sorti
+	add = export_in_gold
 }
 
+export_value_in_gold = {
+	value = var:export_value_in_gold
+	#value = excess_foreign_state_currency_in_gold
+}
+# export_value_in_currency = {
+# 	value = export_value_in_gold
+# 	divide = money_value_target_real #money_value
+# }
+# export_value_in_currency_week = {
+# 	value = export_value
+# }
 ############
 
 #import
 import_value = {
-	value= {
+	value = {
 		add = {
 			add = {
 				add= 20
@@ -1991,59 +2006,44 @@ import_value = {
 	}
 	multiply = 4 #month
 }
-import_value_in_gold_week = {
-	value = import_value_in_currency_week
-	multiply = money_value_target_real
-}
-import_value_in_currency = {
-	value = var:import_value_in_currency
+import_value_in_gold_week = { #flux au mois en or
+	value = import_value_in_currency_week #cella est libelé dans ma devise 
+	multiply = money_value_target_real #pour avoir de l'or 
+	add = import_in_gold
 }
 import_value_in_gold = {
-	value = import_value_in_currency
-	multiply = money_value_target_real
+	value = debt_in_national_currency_in_gold
+}
+import_value_in_currency = {
+	value = debt_in_national_currency
 }
 
-#import revers
-import_value_in_currency_week_revers = {
-	value = import_value_in_currency_week
-	multiply = -1
-}
-import_value_in_gold_week_revers = {
-	value = import_value_in_gold_week
-	multiply = -1
-}
-import_value_in_currency_revers = {
-	value = import_value_in_currency
-	multiply = -1
-}
-import_value_in_gold_revers = {
-	value = import_value_in_gold
-	multiply = -1
-}
+# #import revers
+# import_value_in_currency_week_revers = {
+# 	value = import_value_in_currency_week
+# 	multiply = -1
+# }
+# import_value_in_gold_week_revers = {
+# 	value = import_value_in_gold_week
+# 	multiply = -1
+# }
+# import_value_in_currency_revers = {
+# 	value = import_value_in_currency
+# 	multiply = -1
+# }
+# import_value_in_gold_revers = {
+# 	value = import_value_in_gold
+# 	multiply = -1
+# }
 
 ############
 #trade_balance_synth
-trade_balance_in_currency = {
-	value = 0
-	add = export_value_in_currency
-	subtract = import_value_in_currency
-}
-trade_balance_in_currency_delta = {
-	value = 0
-	add = export_value_in_currency_week
-	subtract = import_value_in_currency_week
-
-	#6 mounth
-	multiply = 6
-}
 trade_balance_in_gold = {
-	value = 1
-	add = trade_balance_in_currency
-	multiply = money_value_target_real #money_value
+	value = delta_in_gold
 }
 trade_balance_in_gold_delta = {
-	value = trade_balance_in_currency_delta
-	multiply = money_value_target_real #money_value
+	value = export_value_in_gold_week
+	subtract = import_value_in_gold_week #import_value_in_currency_week
 }
 
 ############
@@ -3741,3 +3741,15 @@ private_bank_borrowings_year_var_2 = {
 		value = 20
 	}
 }
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
