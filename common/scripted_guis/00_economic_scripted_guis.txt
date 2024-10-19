@@ -2004,6 +2004,40 @@ looting_state_button = {
 	}
 }
 
+A_selection = {
+    effect = {
+		remove_variable = B_selection
+		remove_variable = C_selection
+		remove_variable = D_selection
+		set_variable = A_selection
+    }
+}
+B_selection = {
+    effect = {
+		remove_variable = A_selection
+		remove_variable = C_selection
+		remove_variable = D_selection
+		set_variable = B_selection
+    }
+}
+C_selection = {
+    effect = {
+		remove_variable = A_selection
+		remove_variable = B_selection
+		remove_variable = D_selection
+		set_variable = C_selection
+    }
+}
+D_selection = {
+    effect = {
+		remove_variable = A_selection
+		remove_variable = B_selection
+		remove_variable = C_selection
+		set_variable = D_selection
+    }
+}
+
+
 ################################################################################################################################################################
 ################################################################################################################################################################
 ################################################################################################################################################################
@@ -8734,22 +8768,49 @@ dinar_algerian_dinar_buy_in_gold = {
 			}
 			save_scope_as = player_country
 		}
-
-		every_scope_state = {
-			if = {
-				limit = {
-					has_modifier = central_bank_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_dinar_algerian_dinar_state_1
-					subtract = scope:player_country.var:dinar_algerian_dinar_quantity
-				}
-				change_variable = {
-					name = central_bank_gold_reserves_state_1
-					add = { #subtract
-						value = scope:player_country.var:dinar_algerian_dinar_quantity
-						multiply = owner.money_value_dinar_algerian_dinar
+		if = {
+			limit = {
+				var:stockpiling_dinar_algerian_dinar_c_in_reserve_currency > scope:player_country.var:dinar_algerian_dinar_quantity
+			}
+			change_variable = {
+				name = stockpiling_dinar_algerian_dinar_c_in_reserve_currency
+				subtract = scope:player_country.var:dinar_algerian_dinar_quantity
+			}
+		}
+		if = {
+			limit = {
+				var:stockpiling_dinar_algerian_dinar_c_in_reserve_currency < scope:player_country.var:dinar_algerian_dinar_quantity
+			}
+			change_variable = {
+				name = scope:player_country.var:dinar_algerian_dinar_quantity 
+				subtract = stockpiling_dinar_algerian_dinar_c_in_reserve_currency
+			}
+			set_variable = {
+				name = stockpiling_dinar_algerian_dinar_c_in_reserve_currency
+				value = 0
+			}
+		}
+		
+		if = {
+			limit = {
+				scope:player_country.var:dinar_algerian_dinar_quantity > 0
+			}
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					change_variable = {
+						name = stockpiling_dinar_algerian_dinar_state_1
+						subtract = scope:player_country.var:dinar_algerian_dinar_quantity
+					}
+					change_variable = {
+						name = central_bank_gold_reserves_state_1
+						add = { #subtract
+							value = scope:player_country.var:dinar_algerian_dinar_quantity
+							multiply = owner.money_value_dinar_algerian_dinar
+						}
 					}
 				}
 			}
@@ -36583,6 +36644,64 @@ franc_french_franc_sell_in_gold = {
 		}
 	}
 }
+# franc_french_franc_buy_in_gold = {
+# 	effect = {
+# 		root = {
+# 			save_scope_as = target
+# 		}
+# 		every_country = {
+# 			limit = {
+# 				is_player = yes
+# 			}
+# 			save_scope_as = player_country
+# 		}
+
+# 		every_scope_state = {
+# 			if = {
+# 				limit = {
+# 					has_modifier = central_bank_historic_place
+# 					is_capital = yes
+# 				}
+# 				change_variable = {
+# 					name = stockpiling_franc_french_franc_state_1
+# 					subtract = scope:player_country.var:franc_french_franc_quantity
+# 				}
+# 				change_variable = {
+# 					name = central_bank_gold_reserves_state_1
+# 					add = { #subtract
+# 						value = scope:player_country.var:franc_french_franc_quantity
+# 						multiply = owner.money_value_franc_french_franc
+# 					}
+# 				}
+# 			}
+# 		}
+# 		every_country = {
+# 			limit = {
+# 				is_player = yes
+# 			}
+# 			every_scope_state = {
+# 				if = {
+# 					limit = {
+# 						has_modifier = central_bank_historic_place
+# 						is_capital = yes
+# 					}
+# 					change_variable = {
+# 						name = stockpiling_franc_french_franc_state_1
+# 						add = owner.var:franc_french_franc_quantity
+# 					}
+# 					change_variable = {
+# 						name = central_bank_gold_reserves_state_1
+# 						subtract = { #subtract
+# 							value = scope:player_country.var:franc_french_franc_quantity
+# 							multiply = scope:target.money_value_franc_french_franc
+
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
+# }
 franc_french_franc_buy_in_gold = {
 	effect = {
 		root = {
@@ -36594,22 +36713,49 @@ franc_french_franc_buy_in_gold = {
 			}
 			save_scope_as = player_country
 		}
-
-		every_scope_state = {
-			if = {
-				limit = {
-					has_modifier = central_bank_historic_place
-					is_capital = yes
-				}
-				change_variable = {
-					name = stockpiling_franc_french_franc_state_1
-					subtract = scope:player_country.var:franc_french_franc_quantity
-				}
-				change_variable = {
-					name = central_bank_gold_reserves_state_1
-					add = { #subtract
-						value = scope:player_country.var:franc_french_franc_quantity
-						multiply = owner.money_value_franc_french_franc
+		if = {
+			limit = {
+				var:stockpiling_franc_french_franc_c_in_reserve_currency > scope:player_country.var:franc_french_franc_quantity
+			}
+			change_variable = {
+				name = stockpiling_franc_french_franc_c_in_reserve_currency
+				subtract = scope:player_country.var:franc_french_franc_quantity
+			}
+		}
+		if = {
+			limit = {
+				var:stockpiling_franc_french_franc_c_in_reserve_currency < scope:player_country.var:franc_french_franc_quantity
+			}
+			change_variable = {
+				name = franc_french_franc_quantity 
+				subtract = scope:player_country.var:stockpiling_franc_french_franc_c_in_reserve_currency
+			}
+			set_variable = {
+				name = stockpiling_franc_french_franc_c_in_reserve_currency
+				value = 0
+			}
+		}
+		
+		if = {
+			limit = {
+				scope:player_country.var:franc_french_franc_quantity > 0
+			}
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					change_variable = {
+						name = stockpiling_franc_french_franc_state_1
+						subtract = scope:player_country.var:franc_french_franc_quantity
+					}
+					change_variable = {
+						name = central_bank_gold_reserves_state_1
+						add = { #subtract
+							value = scope:player_country.var:franc_french_franc_quantity
+							multiply = owner.money_value_franc_french_franc
+						}
 					}
 				}
 			}
@@ -140345,7 +140491,7 @@ update_currency_liste = {
 		median_currency_value = yes
 		clear_global_variable_list = dropdown_menu_currency
 		
-		        #dinar
+	    #dinar
 		if = {
 			limit = {
 				#money_value_dinar > 0
