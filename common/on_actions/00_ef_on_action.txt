@@ -2,7 +2,7 @@
 
 on_monthly_pulse_country = {
 	on_actions = {
-    	ef_on_monthly_pulse_country
+    	#ef_on_monthly_pulse_country
     }
 }
 
@@ -30,24 +30,24 @@ on_decade_pulse_country = {
     }
 }
 
-on_production_method_changed = {
-	effect = {
-		# if = {
-		# 	limit = {
-		# 		has_building = building_national_stockpile
-		# 	}
-		owner = {
-			if = {
-				limit = {
-					has_modifier = has_national_stockpile
-				}
-				validate_national_stockpiles_production_methods_reset = yes
-				validate_national_stockpiles_production_methods_store_0 = yes
-				validate_national_stockpiles_production_methods_release_0 = yes
-			}
-		}
-	}
-}
+# on_production_method_changed = {
+# 	effect = {
+# 		# if = {
+# 		# 	limit = {
+# 		# 		has_building = building_national_stockpile
+# 		# 	}
+# 		owner = {
+# 			if = {
+# 				limit = {
+# 					has_modifier = has_national_stockpile
+# 				}
+# 				validate_national_stockpiles_production_methods_reset = yes
+# 				validate_national_stockpiles_production_methods_store_0 = yes
+# 				validate_national_stockpiles_production_methods_release_0 = yes
+# 			}
+# 		}
+# 	}
+# }
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -58,201 +58,201 @@ on_production_method_changed = {
 ############################################################################################################################################################
 ############################################################################################################################################################
 
-ef_on_monthly_pulse_country = {
-    effect = {
+# ef_on_monthly_pulse_country = {
+#     effect = {
 
-		if = {
-			limit = {
-				has_modifier = declared_bankruptcy
-			}
-			seller_bankrupt = yes
-		}
+# 		if = {
+# 			limit = {
+# 				has_modifier = declared_bankruptcy
+# 			}
+# 			seller_bankrupt = yes
+# 		}
 	
 
-		#########################################
-		#currency_strength_modifier
-		#currency_strength_modifier = yes = test 6mois
-		#########################################
-		#########################################
-		#inflation_modifier
-		inflation_modifier = yes
+# 		#########################################
+# 		#currency_strength_modifier
+# 		#currency_strength_modifier = yes = test 6mois
+# 		#########################################
+# 		#########################################
+# 		#inflation_modifier
+# 		inflation_modifier = yes
 
-		if = {
-			limit = {
-				is_player = yes
-				or = {
-					not = {
-						has_law = law_type:law_no_monetary_policy
-					}
-					var:devaluation_on = 1
-					var:revaluation_on = 1
-				}
-			}
-			monetary_policy_inflation = yes
-		}
+# 		if = {
+# 			limit = {
+# 				is_player = yes
+# 				or = {
+# 					not = {
+# 						has_law = law_type:law_no_monetary_policy
+# 					}
+# 					var:devaluation_on = 1
+# 					var:revaluation_on = 1
+# 				}
+# 			}
+# 			monetary_policy_inflation = yes
+# 		}
 
-		if = {
-			limit = {
-				is_player = yes
-				has_law = law_type:law_no_monetary_policy
-				or = {
-					var:monetary_policy_inflation > 0
-					var:monetary_policy_inflation < 0
-				}
-			}
-			monetary_policy_inflation_reset = yes
-		}
+# 		if = {
+# 			limit = {
+# 				is_player = yes
+# 				has_law = law_type:law_no_monetary_policy
+# 				or = {
+# 					var:monetary_policy_inflation > 0
+# 					var:monetary_policy_inflation < 0
+# 				}
+# 			}
+# 			monetary_policy_inflation_reset = yes
+# 		}
 
-		#########################################
-		#########################################
-		#inflation_value
-		inflation_on_consumer_goods_market_value_fluctuations = yes
-		inflation_on_energy_market_value_fluctuations = yes
-		inflation_on_raw_material_market_value_fluctuations = yes
-		inflation_on_manufactured_goods_market_value_fluctuations = yes
-		inflation_on_military_equipment_market_value_fluctuations = yes
-		money_value_dif_01_market_value_fluctuations = yes
-		#########################################
-		#########################################
-		#money_value
-		fluctuations_money_value_1_month = yes
-		#########################################
-		#########################################
-		#central_bank_interest_actual = yes  #à quiu cela  sert ?
-		central_bank_gold_reserves_state = yes #à modifier pour unee valeur scripté
-		#########################################
-		#update of modifier BC, FC, NS
-		update_modifiers_bc_fc_ns = yes
-		#########################################
-		#########################################
-		if  = {
-			limit  = {
-				has_modifier = has_financial_center
-				is_player = yes
-				current_order > 0
-			}
-			RMSA_MMSA_order_trigger = yes
-		}
-		#########################################
-		#########################################
-		# suject_currency
-		if  = {
-			limit = {
-				is_subject_custom_trigger = yes
-			}
-			subject_currency = yes
-		}
-		if  = {
-			limit = {
-				is_subject_custom_trigger = no
-				#or = {
-				#	has_law = law_type:law_protectora_limit_30
-				#	has_law = law_type:law_dominion_limit_50
-				#	has_law = law_type:law_puppet_limit_75
-				#}
-			}
-			remove_suject_currency = yes
-		}
-		#########################################
-		#########################################
-		#for new country by revolution
-		if = { #every_country ?
-			limit = {
-				is_revolutionary = yes
-				not  = {
-					has_variable = coal_release_quantity
-				}
-			}
-			add_journal_entry = {
-				type = for_new_country_je_2
-			}
-		}
-		#########################################
-		#########################################
-		#stockpiling_currency
-		if  = {
-			limit = {
-				has_modifier = has_central_bank
-				# not  = {
-				# 	is_subject_custom_trigger = yes
-				# }
-			}
-			stockpiling_currency_and_gold = yes
-			government_loan_month = yes
-		}
-		#########################################
-		#########################################
-		#stockpiling_goods
-		if  = {
-			limit = {
-				has_technology_researched = stockpiling_goods
-				market.owner = root
-				not  = {
-					is_subject_custom_trigger = yes
-				}
-			}
-			flow_storing_on_action = yes
-		}
-		if  = {
-			limit  = {
-				has_modifier = has_national_stockpile
-			}
-			storing_releasing_on_action = yes
-		}
-		#########################################
-		#########################################
-		#devaluation
-		if  = {
-			limit = {
-				has_modifier = foreign_exchange_controls
-				var:devaluation_on = 1
-			}
-			devaluation_on = yes
-		}
-		#revaluation
-		if  = {
-			limit = {
-				has_modifier = foreign_exchange_controls
-				var:revaluation_on = 1
-			}
-			revaluation_on = yes
-		}
-		#########################################
-		#########################################
-		#looting capital ai
-		# if  = {
-		# 	limit = {
-		# 		enemy_capital_is_occuped >= 1
-		# 		var:looting_1_year = 0
-		# 		is_revolutionary = no
-		# 		has_modifier = has_central_bank
-		# 		is_ai = yes
-		# 	}
-		# 	enemy_capital_is_occuped = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		is_at_war = no
-		# 		has_modifier = has_central_bank
-		# 		any_scope_building = {
-		# 			is_building_type = building_bank
-		# 			has_modifier = modifier_desactive_bank
-		# 		}
-		# 	}
-		# 	remove_modifier_desactive_bank = yes
-		# }
-		#########################################
-		#########################################
-		#transfer of gold to the central bank
-		# if  = {
-		# 	limit  = {
-		# 		gold_reserves_var >= 1000000000
-		# 	}
-		# 	gold_reserves_1B = yes
-		# }
-		#########################################
-	}
-}
+# 		#########################################
+# 		#########################################
+# 		#inflation_value
+# 		inflation_on_consumer_goods_market_value_fluctuations = yes
+# 		inflation_on_energy_market_value_fluctuations = yes
+# 		inflation_on_raw_material_market_value_fluctuations = yes
+# 		inflation_on_manufactured_goods_market_value_fluctuations = yes
+# 		inflation_on_military_equipment_market_value_fluctuations = yes
+# 		money_value_dif_01_market_value_fluctuations = yes
+# 		#########################################
+# 		#########################################
+# 		#money_value
+# 		fluctuations_money_value_1_month = yes
+# 		#########################################
+# 		#########################################
+# 		#central_bank_interest_actual = yes  #à quiu cela  sert ?
+# 		central_bank_gold_reserves_state = yes #à modifier pour unee valeur scripté
+# 		#########################################
+# 		#update of modifier BC, FC, NS
+# 		update_modifiers_bc_fc_ns = yes
+# 		#########################################
+# 		#########################################
+# 		if  = {
+# 			limit  = {
+# 				has_modifier = has_financial_center
+# 				is_player = yes
+# 				current_order > 0
+# 			}
+# 			RMSA_MMSA_order_trigger = yes
+# 		}
+# 		#########################################
+# 		#########################################
+# 		# suject_currency
+# 		if  = {
+# 			limit = {
+# 				is_subject_custom_trigger = yes
+# 			}
+# 			subject_currency = yes
+# 		}
+# 		if  = {
+# 			limit = {
+# 				is_subject_custom_trigger = no
+# 				#or = {
+# 				#	has_law = law_type:law_protectora_limit_30
+# 				#	has_law = law_type:law_dominion_limit_50
+# 				#	has_law = law_type:law_puppet_limit_75
+# 				#}
+# 			}
+# 			remove_suject_currency = yes
+# 		}
+# 		#########################################
+# 		#########################################
+# 		#for new country by revolution
+# 		if = { #every_country ?
+# 			limit = {
+# 				is_revolutionary = yes
+# 				not  = {
+# 					has_variable = coal_release_quantity
+# 				}
+# 			}
+# 			add_journal_entry = {
+# 				type = for_new_country_je_2
+# 			}
+# 		}
+# 		#########################################
+# 		#########################################
+# 		#stockpiling_currency
+# 		if  = {
+# 			limit = {
+# 				has_modifier = has_central_bank
+# 				# not  = {
+# 				# 	is_subject_custom_trigger = yes
+# 				# }
+# 			}
+# 			#stockpiling_currency_and_gold = yes
+# 			government_loan_month = yes
+# 		}
+# 		#########################################
+# 		#########################################
+# 		#stockpiling_goods
+# 		if  = {
+# 			limit = {
+# 				has_technology_researched = stockpiling_goods
+# 				market.owner = root
+# 				not  = {
+# 					is_subject_custom_trigger = yes
+# 				}
+# 			}
+# 			flow_storing_on_action = yes
+# 		}
+# 		if  = {
+# 			limit  = {
+# 				has_modifier = has_national_stockpile
+# 			}
+# 			storing_releasing_on_action = yes
+# 		}
+# 		#########################################
+# 		#########################################
+# 		#devaluation
+# 		if  = {
+# 			limit = {
+# 				has_modifier = foreign_exchange_controls
+# 				var:devaluation_on = 1
+# 			}
+# 			devaluation_on = yes
+# 		}
+# 		#revaluation
+# 		if  = {
+# 			limit = {
+# 				has_modifier = foreign_exchange_controls
+# 				var:revaluation_on = 1
+# 			}
+# 			revaluation_on = yes
+# 		}
+# 		#########################################
+# 		#########################################
+# 		#looting capital ai
+# 		# if  = {
+# 		# 	limit = {
+# 		# 		enemy_capital_is_occuped >= 1
+# 		# 		var:looting_1_year = 0
+# 		# 		is_revolutionary = no
+# 		# 		has_modifier = has_central_bank
+# 		# 		is_ai = yes
+# 		# 	}
+# 		# 	enemy_capital_is_occuped = yes
+# 		# }
+# 		# if  = {
+# 		# 	limit = {
+# 		# 		is_at_war = no
+# 		# 		has_modifier = has_central_bank
+# 		# 		any_scope_building = {
+# 		# 			is_building_type = building_bank
+# 		# 			has_modifier = modifier_desactive_bank
+# 		# 		}
+# 		# 	}
+# 		# 	remove_modifier_desactive_bank = yes
+# 		# }
+# 		#########################################
+# 		#########################################
+# 		#transfer of gold to the central bank
+# 		# if  = {
+# 		# 	limit  = {
+# 		# 		gold_reserves_var >= 1000000000
+# 		# 	}
+# 		# 	gold_reserves_1B = yes
+# 		# }
+# 		#########################################
+# 	}
+# }
 
 ef_on_half_yearly_pulse_country = {
 	effect = {
