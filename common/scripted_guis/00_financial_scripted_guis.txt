@@ -188,6 +188,10 @@ reduce_bond_quantity = {
 	}
 }
 
+#####################################################################################################################################################
+#bond in gold
+#####################################################################################################################################################
+
 #5Y
 buy_bond_5Y_market_panel_enabled = {
 	is_valid = {
@@ -1778,7 +1782,7 @@ buy_bond_market_panel_10Y = {
 		if = {
 			limit = {
 				scope:player  = {
-					var:bond_10Y_order = 5
+					var:bond_10Y_order > 5
 				}
 			}
 			scope:player  = {
@@ -1790,6 +1794,1556 @@ buy_bond_market_panel_10Y = {
 		}
 	}
 }
+
+
+#####################################################################################################################################################
+#bond in currrency
+#####################################################################################################################################################
+#price_bond_in_currency
+
+#5Y
+buy_bond_in_currency_5Y_market_panel_enabled = {
+	is_valid = {
+		enough_foreign_currrency > price_bond_in_currency 
+		price_bond < remaining_debt
+		has_modifier = has_financial_center
+		player  = {
+			has_modifier = has_financial_center
+		}
+		not = {
+			player.buy_bond_order_valid_5Y = 0
+		}
+	}
+	effect = {
+		custom_tooltip = {
+			text = buy_bond_5Y_custom_tooltip
+		}
+	}
+}
+buy_bond_in_currrency_market_panel_5Y = {
+	effect = {
+		every_country = {
+			if = {
+				limit = {
+					is_player = yes
+				}
+				save_scope_as = player
+			}
+		}
+
+		scope:player = {
+			change_variable = {
+				name = bond_5Y_order
+				add = 1
+			}
+		}
+		#_6
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order = 1
+					var:buy_bond_6_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_6
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_6
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_6
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_6
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_6
+						value = var:bond_quantity_6
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_6
+						value = scope:seller.interest_value_5Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_6
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_6
+						multiply = var:bond_quantity_6 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_6
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_6
+						value = var:total_bond_value_6
+					}
+					change_variable = {
+						name = interest_calculated_6
+						multiply = scope:seller.interest_value_5Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_6
+						value = var:interest_calculated_6
+					}
+					change_variable = {
+						name = interest_at_term_calculated_6
+						multiply = 5
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_6
+						value = var:interest_at_term_calculated_6
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_6
+						divide = 60
+					}
+					set_variable = {
+						name = maturity_time_6
+						value = 5
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_6_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_6
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_6
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_6
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_6
+					months = 60
+					multiplier = var:interest_per_mounth_calculated_6_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_6_on
+					value = 1
+				}
+			}
+		}
+		#_7
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order = 2
+					var:buy_bond_7_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_7
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_7
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_7
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_7
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_7
+						value = var:bond_quantity_7
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_7
+						value = scope:seller.interest_value_5Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_7
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_7
+						multiply = var:bond_quantity_7 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_7
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_7
+						value = var:total_bond_value_7
+					}
+					change_variable = {
+						name = interest_calculated_7
+						multiply = scope:seller.interest_value_5Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_7
+						value = var:interest_calculated_7
+					}
+					change_variable = {
+						name = interest_at_term_calculated_7
+						multiply = 5
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_7
+						value = var:interest_at_term_calculated_7
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_7
+						divide = 60
+					}
+					set_variable = {
+						name = maturity_time_7
+						value = 5
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_7_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_7
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_7
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_7
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_7
+					months = 60
+					multiplier = var:interest_per_mounth_calculated_7_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_7_on
+					value = 1
+				}
+			}
+		}
+		#_8
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order = 3
+					var:buy_bond_8_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_8
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_8
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_8
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_8
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_8
+						value = var:bond_quantity_8
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_8
+						value = scope:seller.interest_value_5Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_8
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_8
+						multiply = var:bond_quantity_8 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_8
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_8
+						value = var:total_bond_value_8
+					}
+					change_variable = {
+						name = interest_calculated_8
+						multiply = scope:seller.interest_value_5Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_8
+						value = var:interest_calculated_8
+					}
+					change_variable = {
+						name = interest_at_term_calculated_8
+						multiply = 5
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_8
+						value = var:interest_at_term_calculated_8
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_8
+						divide = 60
+					}
+					set_variable = {
+						name = maturity_time_8
+						value = 5
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_8_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_8
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_8
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_8
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_8
+					months = 60
+					multiplier = var:interest_per_mounth_calculated_8_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_8_on
+					value = 1
+				}
+			}
+		}
+		#_9
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order = 4
+					var:buy_bond_9_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_9
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_9
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_9
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_9
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_9
+						value = var:bond_quantity_9
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_9
+						value = scope:seller.interest_value_5Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_9
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_9
+						multiply = var:bond_quantity_9 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_9
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_9
+						value = var:total_bond_value_9
+					}
+					change_variable = {
+						name = interest_calculated_9
+						multiply = scope:seller.interest_value_5Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_9
+						value = var:interest_calculated_9
+					}
+					change_variable = {
+						name = interest_at_term_calculated_9
+						multiply = 5
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_9
+						value = var:interest_at_term_calculated_9
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_9
+						divide = 60
+					}
+					set_variable = {
+						name = maturity_time_9
+						value = 5
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_9_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_9
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_9
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_9
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_9
+					months = 60
+					multiplier = var:interest_per_mounth_calculated_9_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_9_on
+					value = 1
+				}
+			}
+		}
+		#_10
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order = 5
+					var:buy_bond_10_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_10
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_10
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_10
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_10
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_10
+						value = var:bond_quantity_10
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_10
+						value = scope:seller.interest_value_5Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_10
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_10
+						multiply = var:bond_quantity_10 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_10
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_10
+						value = var:total_bond_value_10
+					}
+					change_variable = {
+						name = interest_calculated_10
+						multiply = scope:seller.interest_value_5Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_10
+						value = var:interest_calculated_10
+					}
+					change_variable = {
+						name = interest_at_term_calculated_10
+						multiply = 5
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_10
+						value = var:interest_at_term_calculated_10
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_10
+						divide = 60
+					}
+					set_variable = {
+						name = maturity_time_10
+						value = 5
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_10_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_10
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_10
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_10
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_10
+					months = 60
+					multiplier = var:interest_per_mounth_calculated_10_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_10_on
+					value = 1
+				}
+			}
+		}
+
+		#reset
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_5Y_order > 5
+				}
+			}
+			scope:player  = {
+				set_variable = {
+					name = bond_5Y_order
+					value = 0
+				}
+			}
+		}
+
+	}
+}
+
+#10Y
+buy_bond_in_currency_10Y_market_panel_enabled = {
+	is_valid = {
+		enough_foreign_currrency > price_bond_in_currency 
+		price_bond < remaining_debt
+		has_modifier = has_financial_center
+		player  = {
+			has_modifier = has_financial_center
+		}
+		not = {
+			player.buy_bond_order_valid_10Y = 0
+		}
+	}
+	effect = {
+		custom_tooltip = {
+			text = buy_bond_5Y_custom_tooltip
+		}
+	}
+}
+buy_bond_in_currrency_market_panel_10Y = {
+	effect = {
+		every_country = {
+			if = {
+				limit = {
+					is_player = yes
+				}
+				save_scope_as = player
+			}
+		}
+
+		scope:player = {
+			change_variable = {
+				name = bond_10Y_order
+				add = 1
+			}
+		}
+		#_1
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order = 1
+					var:buy_bond_1_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_1
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_1
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_1
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_1
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_1
+						value = var:bond_quantity_1
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_1
+						value = scope:seller.interest_value_10Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_1
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_1
+						multiply = var:bond_quantity_1 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_1
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_1
+						value = var:total_bond_value_1
+					}
+					change_variable = {
+						name = interest_calculated_1
+						multiply = scope:seller.interest_value_10Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_1
+						value = var:interest_calculated_1
+					}
+					change_variable = {
+						name = interest_at_term_calculated_1
+						multiply = 10
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_1
+						value = var:interest_at_term_calculated_1
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_1
+						divide = 120
+					}
+					set_variable = {
+						name = maturity_time_1
+						value = 10
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_1_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_1
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_1
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_1
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_1
+					months = 120
+					multiplier = var:interest_per_mounth_calculated_1_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_1_on
+					value = 1
+				}
+			}
+		}
+		#_2
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order = 2
+					var:buy_bond_2_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_2
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_2
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_2
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_2
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_2
+						value = var:bond_quantity_2
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_2
+						value = scope:seller.interest_value_10Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_2
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_2
+						multiply = var:bond_quantity_2 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_2
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_2
+						value = var:total_bond_value_2
+					}
+					change_variable = {
+						name = interest_calculated_2
+						multiply = scope:seller.interest_value_10Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_2
+						value = var:interest_calculated_2
+					}
+					change_variable = {
+						name = interest_at_term_calculated_2
+						multiply = 10
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_2
+						value = var:interest_at_term_calculated_2
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_2
+						divide = 120
+					}
+					set_variable = {
+						name = maturity_time_2
+						value = 10
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_2_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_2
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_2
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_2
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_2
+					months = 120
+					multiplier = var:interest_per_mounth_calculated_2_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_2_on
+					value = 1
+				}
+			}
+		}
+		#_3
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order = 3
+					var:buy_bond_3_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_3
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_3
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_3
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_3
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_3
+						value = var:bond_quantity_3
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_3
+						value = scope:seller.interest_value_10Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_3
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_3
+						multiply = var:bond_quantity_3 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_3
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_3
+						value = var:total_bond_value_3
+					}
+					change_variable = {
+						name = interest_calculated_3
+						multiply = scope:seller.interest_value_10Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_3
+						value = var:interest_calculated_3
+					}
+					change_variable = {
+						name = interest_at_term_calculated_3
+						multiply = 10
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_3
+						value = var:interest_at_term_calculated_3
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_3
+						divide = 120
+					}
+					set_variable = {
+						name = maturity_time_3
+						value = 10
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_3_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_3
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_3
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_3
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_3
+					months = 120
+					multiplier = var:interest_per_mounth_calculated_3_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_3_on
+					value = 1
+				}
+			}
+		}
+		#_4
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order = 4
+					var:buy_bond_4_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_4
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_4
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_4
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_4
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_4
+						value = var:bond_quantity_4
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_4
+						value = scope:seller.interest_value_10Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_4
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_4
+						multiply = var:bond_quantity_4 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_4
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_4
+						value = var:total_bond_value_4
+					}
+					change_variable = {
+						name = interest_calculated_4
+						multiply = scope:seller.interest_value_10Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_4
+						value = var:interest_calculated_4
+					}
+					change_variable = {
+						name = interest_at_term_calculated_4
+						multiply = 10
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_4
+						value = var:interest_at_term_calculated_4
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_4
+						divide = 120
+					}
+					set_variable = {
+						name = maturity_time_4
+						value = 10
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_4_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_4
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_4
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_4
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_4
+					months = 120
+					multiplier = var:interest_per_mounth_calculated_4_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_4_on
+					value = 1
+				}
+			}
+		}
+		#_5
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order = 5
+					var:buy_bond_5_on = 0
+				}
+			}
+
+			market.owner = {
+				save_scope_as = seller
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_player = yes
+					}
+					save_scope_as = buyer
+				}
+			}
+
+			scope:seller = {
+				#### ajout à la liste
+				add_to_variable_list = {
+					name = central_bank_debt_buyer_list
+					target = scope:buyer
+				}
+
+				scope:buyer = {
+					# Pour les liste du vendeur
+					add_to_variable_list = {
+						name = buyer_country_5
+						target = prev
+					}
+					# add_to_variable_list = {
+					# 	name = seller_country_5
+					# 	target = scope:seller #prev
+					# }
+
+					add_to_variable_list = {
+						name = seller_country_general_in_currency_5
+						target = scope:seller #prev
+					}
+
+					#quantité
+					set_variable = {
+						name = bond_quantity_5
+						value = var:bond_quantity
+					}
+					set_variable = {
+						name = quantity_purchasing_5
+						value = var:bond_quantity_5
+					}
+
+					#interret lors de l'achat
+					set_variable = {
+						name = interest_purchasing_5
+						value = scope:seller.interest_value_10Y
+					}
+
+					#valeur de la quantité
+					set_variable = {
+						name = total_bond_value_5
+						value = 1
+					}
+					change_variable = {
+						name = total_bond_value_5
+						multiply = var:bond_quantity_5 #bond quantité
+					}
+					change_variable = {
+						name = total_bond_value_5
+						multiply = scope:seller.bond_price
+					}
+
+					#interet total
+					set_variable = {
+						name = interest_calculated_5
+						value = var:total_bond_value_5
+					}
+					change_variable = {
+						name = interest_calculated_5
+						multiply = scope:seller.interest_value_10Y
+					}
+
+					#interet total à terme
+					set_variable = {
+						name = interest_at_term_calculated_5
+						value = var:interest_calculated_5
+					}
+					change_variable = {
+						name = interest_at_term_calculated_5
+						multiply = 10
+					}
+
+					set_variable = {
+						name = interest_per_mounth_calculated_5
+						value = var:interest_at_term_calculated_5
+					}
+
+					change_variable = {
+						name = interest_per_mounth_calculated_5
+						divide = 120
+					}
+					set_variable = {
+						name = maturity_time_5
+						value = 10
+					}
+				}
+
+				set_variable = {
+					name = interest_per_mounth_calculated_5_for_player
+					value = scope:buyer.var:interest_per_mounth_calculated_5
+				}
+				#################
+				#or prété à la banque du pays vendeur
+				change_variable = {
+					name = gold_loaned_to_central_bank
+					add = scope:buyer.var:total_bond_value_5
+				}
+				#interet que la banque centrale pays à l'année
+				change_variable = {
+					name = central_bank_interest_refund_per_year
+					add = scope:buyer.var:interest_calculated_5
+				}
+			}
+			scope:buyer = {
+				buy_bond_in_currrency_var =  {
+					PBIC_1 = scope:seller.price_bond_in_currency_for_gui
+				}
+
+				###### ajout du modifier d'interet au pays qui vend
+				add_modifier = {
+					name = buy_bond_5
+					months = 120
+					multiplier = var:interest_per_mounth_calculated_5_for_player
+				}
+				#demare le on_action
+				set_variable = {
+					name = buy_bond_5_on
+					value = 1
+				}
+			}
+		}
+
+		#reset
+		if = {
+			limit = {
+				scope:player  = {
+					var:bond_10Y_order > 5
+				}
+			}
+			scope:player  = {
+				set_variable = {
+					name = bond_5Y_order
+					value = 0
+				}
+			}
+		}
+
+	}
+}
+
+
+
+
 
 #####################################################################################################################################################
 #####################################################################################################################################################

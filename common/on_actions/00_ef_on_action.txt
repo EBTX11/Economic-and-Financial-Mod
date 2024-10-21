@@ -60,6 +60,15 @@ on_production_method_changed = {
 
 ef_on_monthly_pulse_country = {
     effect = {
+
+		if = {
+			limit = {
+				has_modifier = declared_bankruptcy
+			}
+			seller_bankrupt = yes
+		}
+	
+
 		#########################################
 		#currency_strength_modifier
 		#currency_strength_modifier = yes = test 6mois
@@ -136,11 +145,11 @@ ef_on_monthly_pulse_country = {
 		if  = {
 			limit = {
 				is_subject_custom_trigger = no
-				or = {
-					has_law = law_type:law_protectora_limit_30
-					has_law = law_type:law_dominion_limit_50
-					has_law = law_type:law_puppet_limit_75
-				}
+				#or = {
+				#	has_law = law_type:law_protectora_limit_30
+				#	has_law = law_type:law_dominion_limit_50
+				#	has_law = law_type:law_puppet_limit_75
+				#}
 			}
 			remove_suject_currency = yes
 		}
@@ -169,6 +178,7 @@ ef_on_monthly_pulse_country = {
 				# }
 			}
 			stockpiling_currency_and_gold = yes
+			government_loan_month = yes
 		}
 		#########################################
 		#########################################
@@ -208,6 +218,29 @@ ef_on_monthly_pulse_country = {
 			revaluation_on = yes
 		}
 		#########################################
+		#########################################
+		#looting capital ai
+		# if  = {
+		# 	limit = {
+		# 		enemy_capital_is_occuped >= 1
+		# 		var:looting_1_year = 0
+		# 		is_revolutionary = no
+		# 		has_modifier = has_central_bank
+		# 		is_ai = yes
+		# 	}
+		# 	enemy_capital_is_occuped = yes
+		# }
+		# if  = {
+		# 	limit = {
+		# 		is_at_war = no
+		# 		has_modifier = has_central_bank
+		# 		any_scope_building = {
+		# 			is_building_type = building_bank
+		# 			has_modifier = modifier_desactive_bank
+		# 		}
+		# 	}
+		# 	remove_modifier_desactive_bank = yes
+		# }
 		#########################################
 		#########################################
 		#transfer of gold to the central bank
@@ -276,14 +309,14 @@ ef_on_half_yearly_pulse_country = {
 		if  = {
 			limit  = {
 				has_modifier = has_financial_center
-				country_indice > 50000000
+				country_indice > 10000000
 			}
 			fluctuations_country_indice_value_year = yes
 		}
 		if  = {
 			limit  = {
 				has_modifier = has_financial_center
-				country_indice < 50000000
+				country_indice < 10000000
 				NOT = {
 					stock_market_index = 1000
 				}
@@ -396,7 +429,7 @@ ef_on_yearly_pulse_country = {
 				has_modifier = has_central_bank
 				not = {
 					or = {
-						is_subject_custom_trigger = yes
+						#is_subject_custom_trigger = yes
 						has_law = law_type:law_isolationism
 					}
 				}
@@ -519,90 +552,15 @@ ef_on_yearly_pulse_country = {
 				is_player = no
 				has_modifier = has_central_bank
 				has_technology_researched = gold_standard
-				# not = {
-				# 	has_law = law_type:law_isolationism
-
-					# or = {
-					# 	is_subject = yes
-					# 	has_law = law_type:law_isolationism
-					# }
-				# }
+				not = {
+					has_law = law_type:law_isolationism
+				}
+				not = {
+					has_law = law_type:law_isolationism
+				}
 			}
 		 	ai_buy_sell_currency = yes
 		}
-
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-
-		#reset invest if country no longer exist
-
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-		############################################################################################################################################################
-
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_1_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_1 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_2_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_2 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_3_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_3 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_4_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_4 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_5_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_5 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_6_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_6 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_7_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_7 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_8_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_8 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_9_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_9 = yes
-		# }
-		# if  = {
-		# 	limit = {
-		# 		var:buy_bond_10_on = 1
-		# 	}
-		# 	clear_variable_list_seller_country_10 = yes
-		# }
 
 		############################################################################################################################################################
 		############################################################################################################################################################
@@ -840,7 +798,11 @@ ef_on_five_year_pulse_country = {
 			}
 			money_value_target_time_reset = yes
 		}
+	}
+}
 
+ef_on_decade_pulse_country = {
+	effect = {
 		if = {
 			limit = {
 				has_modifier = has_central_bank
@@ -851,19 +813,6 @@ ef_on_five_year_pulse_country = {
 			}
 			money_value_target_modification = yes
 		}
-
-		# #correction
-		# if = {
-		# 	limit = {
-		# 		has_modifier = has_central_bank
-		# 	}
-		# 	trigger_event = { id = central_bank_event.1 }
-		# }
-	}
-}
-
-ef_on_decade_pulse_country = {
-	effect = {
 	}
 }
 
