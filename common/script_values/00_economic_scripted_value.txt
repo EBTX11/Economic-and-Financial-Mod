@@ -1,5 +1,41 @@
-teest_var_12 = {
-	value = 1925
+highest_gdp = {
+	every_country = {
+		limit = {
+			has_global_highest_gdp =yes
+		}
+		add = gdp
+	}
+}
+ratio_with_highest_gdp = {
+	value = GDP  
+	divide = highest_gdp
+}
+loyalist_fraction_pop = {
+	value = loyalist_fraction
+}
+radical_fraction_pop = {
+	value = radical_fraction
+}
+var_global_country_ranking = {
+	value = country_rank
+}
+national_capacity_reference_currency = {
+	value = 1
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+		}
+		add = national_capacity
+	}
+}
+reference_currency_owned_by_the_country_in_gold = {
+	value = 0
+	add = reference_currency_owned_by_the_country
+	multiply = global_monetary_reference
+}
+ratio_with_national_capacity_reference_currency = {
+	value = national_capacity  
+	divide = national_capacity_reference_currency
 }
 
 ############################################################################################################################################################
@@ -77,20 +113,6 @@ GDP_dif_10_final = {
 	# subtract = 1
 }
 
-highest_gdp = {
-	every_country = {
-		limit = {
-			has_global_highest_gdp =yes
-		}
-		add = gdp
-	}
-}
-
-ratio_with_highest_gdp = {
-	value = GDP  
-	divide = highest_gdp
-}
-
 #gold_reserves_1B
 gold_reserves_1B  = {
 	#name = 00_ai_buy_building_construction_sector_test
@@ -163,16 +185,21 @@ enemy_capital_is_occuped = {
 		}
 	}
 }
-
-loyalist_fraction_pop = {
-	value = loyalist_fraction
-}
-
-radical_fraction_pop = {
-	value = radical_fraction
-}
-var_global_country_ranking = {
-	value = country_rank
+enemy_stats_is_occuped = {
+	every_country = {
+		limit = {
+			is_at_war = yes
+			has_war_with = ROOT
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					controller = ROOT
+				}
+				add = 1
+			}
+		}
+	}
 }
 
 ########################################################################################################################################################
@@ -274,14 +301,11 @@ money_supply_stockpile_by_other_country_reference_currency = {
 		value = money_supply_stockpile_by_other_country
 	}
 }
-national_capacity_reference_currency = {
-	value = 1
-	every_country = {
-		limit = {
-			has_modifier = global_monetary_reference
-		}
-		add = national_capacity
-	}
+
+reference_currency_owned_by_the_country_in_gold = {
+	value = 0
+	add = reference_currency_owned_by_the_country
+	multiply = global_monetary_reference
 }
 
 money_value_exchange_rate_with_reference_currency = {
@@ -294,7 +318,6 @@ amount_reference_currency_to_ensure_parity = {
 	multiply = var:money_value_target_with_the_reference_currency_2
 	multiply = hedging_rate_in_reference_currency
 }
-
 hedging_rate_in_reference_currency  = {
 	value = 0.25 #pourra etre modifier à l'avenir
 }
@@ -305,16 +328,6 @@ reference_currency_owned_by_the_country_equivalent_gold = {
 		value = global_monetary_reference
 		divide = var:money_value_target_1
 	}
-}
-
-reference_currency_owned_by_the_country_in_gold = {
-	value = 0
-	add = reference_currency_owned_by_the_country
-	multiply = global_monetary_reference
-}
-ratio_with_national_capacity_reference_currency = {
-	value = national_capacity  
-	divide = national_capacity_reference_currency
 }
 
 ############################################################################################################################################################
@@ -1146,6 +1159,22 @@ bond_producted = {
 	divide = bond_price
 }
 
+#debt at war 
+national_debt_allowed_in_gold_war = { #maximum 60% de dette en pib et minimum 16%
+	value = gold_reserves_15 #15% en plus
+	add = { #difference à 15%
+		add = gold_reserves_15
+		subtract = gold_reserves_var
+	}
+}
+national_debt_allowed_in_currency_war = {
+	value = national_debt_allowed_in_gold_war
+	divide = money_value_rapported_inflation
+}
+bond_producted_war = {
+	value = national_debt_allowed_in_gold_war
+	divide = bond_price
+}
 
 credit_at_central_bank_interest_per_week_by_inflation = {
 	value = credit_at_central_bank_interest_per_month_by_inflation
@@ -2334,6 +2363,10 @@ gold_reserves_10 = {
 	value = gold_reserves_limit
 	multiply = 0.10
 }
+gold_reserves_15 = {
+	value = gold_reserves_limit
+	multiply = 0.15
+}
 gold_reserves_20 = {
 	value = gold_reserves_limit
 	multiply = 0.20
@@ -2378,7 +2411,14 @@ gold_reserves_rest = {
 	value = gold_reserves_limit
 	subtract = gold_reserves
 }
-
+gold_reserves_rest = {
+	value = gold_reserves_limit
+	subtract = gold_reserves
+}
+gold_reserve_compared_gold_reserves_limit = {
+	value = gold_reserves 
+	divide = gold_reserves_limit
+}
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -3752,7 +3792,6 @@ pool_growth_rate_thanks_credit_score = {
 		add = 0.02
 	}
 }
-
 private_bank_borrowings_year = {
 	value = private_bank_funds
 	multiply = pool_growth_rate_thanks_to_borrowing
@@ -3782,7 +3821,6 @@ private_bank_borrowings_year_var_1 = {
 		multiply = 2
 	}
 }
-
 base_rate_percentage_revers = {
 	value = 1
 	subtract = {
@@ -3791,7 +3829,6 @@ base_rate_percentage_revers = {
 
 	}
 }
-
 private_bank_borrowings_year_var_2 = {
 	if  = {
 		limit  = {
@@ -3921,28 +3958,3 @@ private_bank_borrowings_year_var_2 = {
 		value = 20
 	}
 }
-
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-#test var
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-test_has_pop_radical_fractiony  = {
-	#VALUE
-	if  = {
-		limit  = {
-			has_diplomatic_play = no
-		}
-		add = 1
-	}
-}
-
-

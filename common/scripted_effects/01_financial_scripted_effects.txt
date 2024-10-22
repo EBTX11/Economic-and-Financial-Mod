@@ -25,12 +25,12 @@
 country_credit_rating = {
 	set_variable = {
 		name = country_credit_note_fixe
-		value = country_credit_note
+		value = country_credit_pondered_mean
 	}
 	if = {
 		limit  = {			
-			country_credit_note_fixe = 20
-			country_credit_note_fixe >= 18
+			var:country_credit_note_fixe = 10
+			var:country_credit_note_fixe >= 9
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -48,8 +48,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 18
-			country_credit_note_fixe >= 16
+			var:country_credit_note_fixe < 9
+			var:country_credit_note_fixe >= 8
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -67,8 +67,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 16
-			country_credit_note_fixe >= 14
+			var:country_credit_note_fixe < 8
+			var:country_credit_note_fixe >= 7
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -86,8 +86,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 14
-			country_credit_note_fixe >= 12
+			var:country_credit_note_fixe < 7
+			var:country_credit_note_fixe >= 6
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -105,8 +105,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 12
-			country_credit_note_fixe >= 10
+			var:country_credit_note_fixe < 6
+			var:country_credit_note_fixe >= 5
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -124,8 +124,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 10
-			country_credit_note_fixe >= 8
+			var:country_credit_note_fixe < 5
+			var:country_credit_note_fixe >= 4
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -143,8 +143,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 8
-			country_credit_note_fixe >= 6
+			var:country_credit_note_fixe < 4
+			var:country_credit_note_fixe >= 3
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -162,8 +162,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 6
-			country_credit_note_fixe >= 4
+			var:country_credit_note_fixe < 3
+			var:country_credit_note_fixe >= 2
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -181,8 +181,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 4
-			country_credit_note_fixe >= 2
+			var:country_credit_note_fixe < 2
+			var:country_credit_note_fixe >= 1
 
 		}
 		remove_modifier = country_credit_rating_AAA
@@ -201,8 +201,8 @@ country_credit_rating = {
 	}
 	if = {
 		limit  = {
-			country_credit_note_fixe < 2
-			country_credit_note_fixe >= 0
+			var:country_credit_note_fixe < 1
+			var:country_credit_note_fixe >= 0
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -355,9 +355,11 @@ credit_at_central_bank_interest_per_week_off = {
 
 ai_credit_at_central_bank = {
 	if  = {
-		limit  = {
+		limit = { #pays avec tresorerie faible or de la guerre donc strategie d'endettement constant et roulement de la dette
 			credit_at_central_bank_interest_per_week_by_inflation < part_budget_authorized_debt_interest
 			national_debt_compared_gdp < national_debt_allowed_relative_gdp
+			gold_reserve_compared_gold_reserves_limit < 0.1
+			is_at_war = no
 		}
 		add_treasury = {
 			add = national_debt_allowed_in_gold
@@ -381,6 +383,46 @@ ai_credit_at_central_bank = {
 			name = credit_at_central_bank
 			add = national_debt_allowed_in_gold
 		}
+		set_variable = {
+			name = test_credit
+			value = 0
+		}
+		change_variable = {
+			name = test_credit
+			add = 1
+		}
+	}
+	if  = {
+		limit  = { #pays en guerre avec reserve inf à 25%, a bessoin d'un coup de mains equivalent la dif pour atteindre 25% + 25% -> pas de limite donc possibilité de faire des 100ain% de dette
+			gold_reserve_compared_gold_reserves_limit < 0.15
+			is_at_war = yes
+		}
+		add_treasury = {
+			add = national_debt_allowed_in_gold_war
+		}
+		every_scope_state = {
+			if = {
+				limit = {
+					has_modifier = financial_center_historic_place
+				}
+				change_variable = {
+					name = stockpiling_bond_var_state_1
+					add = owner.bond_producted_war
+				}
+			}
+		}
+		change_variable = {
+			name = government_loan
+			add = national_debt_allowed_in_currency_war
+		}
+		change_variable = {
+			name = credit_at_central_bank
+			add = national_debt_allowed_in_gold_war
+		}
+		set_variable = {
+			name = test_credit
+			value = 500
+		}
 	}
 }
 
@@ -390,6 +432,7 @@ ai_refund_central_bank = {
 			gold_reserves_var > 0
 			national_debt_unauthorized < gold_reserves_var
 			var:credit_at_central_bank > national_debt_allowed_in_gold
+			is_at_war = no
 		}
 		add_treasury = {
 			subtract = national_debt_unauthorized
@@ -414,7 +457,11 @@ ai_refund_central_bank = {
 		limit  = {
 			credit_at_central_bank_interest_per_week_by_inflation > part_budget_authorized_debt_interest
 			national_debt_refund_more_25_at_refund > 0
+			is_at_war = no
 		}
+		# add_treasury = {
+		# 	subtract = national_debt_unauthorized
+		# }
 		every_scope_state = {
 			if = {
 				limit = {
@@ -1344,14 +1391,15 @@ ai_buy_bond_1 = {
 								subtract = var:ai_total_bond_value_1
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_1
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_1
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_1
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_1
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_1
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -1471,14 +1519,15 @@ ai_buy_bond_1 = {
 								subtract = var:ai_total_bond_value_1
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_1
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_1
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_1
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_1
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_1
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -1654,14 +1703,15 @@ ai_buy_bond_2 = {
 								subtract = var:ai_total_bond_value_2
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_2
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_2
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_2
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_2
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_2
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -1781,14 +1831,15 @@ ai_buy_bond_2 = {
 								subtract = var:ai_total_bond_value_2
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_2
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_2
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_2
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_2
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_2
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -1964,14 +2015,15 @@ ai_buy_bond_3 = {
 								subtract = var:ai_total_bond_value_3
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_3
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_3
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_3
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_3
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_3
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2091,14 +2143,15 @@ ai_buy_bond_3 = {
 								subtract = var:ai_total_bond_value_3
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_3
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_3
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_3
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_3
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_3
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2274,14 +2327,15 @@ ai_buy_bond_4 = {
 								subtract = var:ai_total_bond_value_4
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_4
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_4
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_4
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_4
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_4
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2401,14 +2455,15 @@ ai_buy_bond_4 = {
 								subtract = var:ai_total_bond_value_4
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_4
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_4
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_4
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_4
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_4
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2584,14 +2639,15 @@ ai_buy_bond_5 = {
 								subtract = var:ai_total_bond_value_5
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_5
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_5
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_5
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_5
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_5
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2711,14 +2767,15 @@ ai_buy_bond_5 = {
 								subtract = var:ai_total_bond_value_5
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_5
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_5
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_5
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_5
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_5
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -2894,14 +2951,15 @@ ai_buy_bond_6 = {
 								subtract = var:ai_total_bond_value_6
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_6
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_6
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_6
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_6
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_6
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3021,14 +3079,15 @@ ai_buy_bond_6 = {
 								subtract = var:ai_total_bond_value_6
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_6
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_6
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_6
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_6
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_6
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3204,14 +3263,15 @@ ai_buy_bond_7 = {
 								subtract = var:ai_total_bond_value_7
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_7
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_7
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_7
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_7
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_7
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3331,14 +3391,15 @@ ai_buy_bond_7 = {
 								subtract = var:ai_total_bond_value_7
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_7
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_7
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_7
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_7
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_7
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3514,14 +3575,15 @@ ai_buy_bond_8 = {
 								subtract = var:ai_total_bond_value_8
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_8
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_8
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_8
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_8
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_8
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3641,14 +3703,15 @@ ai_buy_bond_8 = {
 								subtract = var:ai_total_bond_value_8
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_8
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_8
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_8
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_8
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_8
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3824,14 +3887,15 @@ ai_buy_bond_9 = {
 								subtract = var:ai_total_bond_value_9
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_9
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_9
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_9
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_9
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_9
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -3951,14 +4015,15 @@ ai_buy_bond_9 = {
 								subtract = var:ai_total_bond_value_9
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_9
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_9
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_9
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_9
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_9
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -4134,14 +4199,15 @@ ai_buy_bond_10 = {
 								subtract = var:ai_total_bond_value_10
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_10
-								months = 60
-								multiplier = var:ai_interest_per_month_calculated_10
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_10
+							# 	months = 60
+							# 	multiplier = var:ai_interest_per_month_calculated_10
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_10
-								value = 5
+								value = 5 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -4261,14 +4327,15 @@ ai_buy_bond_10 = {
 								subtract = var:ai_total_bond_value_10
 							}
 
-							add_modifier = {
-								name = ai_buy_bond_10
-								months = 120
-								multiplier = var:ai_interest_per_month_calculated_10
-							}
+							# add_modifier = {
+							# 	name = ai_buy_bond_10
+							# 	months = 120
+							# 	multiplier = var:ai_interest_per_month_calculated_10
+							# }
+							interest_per_month_from_foreign_debt_investment = yes
 							set_variable = {
 								name = ai_maturity_time_10
-								value = 10
+								value = 10 #test
 							}
 							#demare le on_action
 							set_variable = {
@@ -4399,8 +4466,6 @@ bond_maturity_1 = {
 					}
 				}
 
-				remove_modifier = buy_bond_1
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_1_on
@@ -4457,6 +4522,8 @@ bond_maturity_1 = {
 
 				clear_variable_list = seller_country_general_1
 				clear_variable_list = buyer_country_general_1
+				
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -4539,7 +4606,6 @@ bond_maturity_2 = {
 				# 	}
 				# 	post_notification = notification_seller_bond_no_longer_exists_2_message
 				# }
-				remove_modifier = buy_bond_2
 
 				#Reset variable
 				set_variable = {
@@ -4597,6 +4663,7 @@ bond_maturity_2 = {
 
 				clear_variable_list = seller_country_general_2
 				clear_variable_list = buyer_country_general_2
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -4674,8 +4741,6 @@ bond_maturity_3 = {
 					}
 				}
 
-				remove_modifier = buy_bond_3
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_3_on
@@ -4732,6 +4797,7 @@ bond_maturity_3 = {
 
 				clear_variable_list = seller_country_general_3
 				clear_variable_list = buyer_country_general_3
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -4809,8 +4875,6 @@ bond_maturity_4 = {
 					}
 				}
 
-				remove_modifier = buy_bond_4
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_4_on
@@ -4867,6 +4931,7 @@ bond_maturity_4 = {
 
 				clear_variable_list = seller_country_general_4
 				clear_variable_list = buyer_country_general_4
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -4944,8 +5009,6 @@ bond_maturity_5 = {
 					}
 				}
 
-				remove_modifier = buy_bond_5
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_5_on
@@ -5002,6 +5065,7 @@ bond_maturity_5 = {
 
 				clear_variable_list = seller_country_general_5
 				clear_variable_list = buyer_country_general_5
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5079,8 +5143,6 @@ bond_maturity_6 = {
 					}
 				}
 
-				remove_modifier = buy_bond_6
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_6_on
@@ -5137,6 +5199,7 @@ bond_maturity_6 = {
 
 				clear_variable_list = seller_country_general_6
 				clear_variable_list = buyer_country_general_6
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5214,8 +5277,6 @@ bond_maturity_7 = {
 					}
 				}
 
-				remove_modifier = buy_bond_7
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_7_on
@@ -5272,6 +5333,7 @@ bond_maturity_7 = {
 
 				clear_variable_list = seller_country_general_7
 				clear_variable_list = buyer_country_general_7
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5349,8 +5411,6 @@ bond_maturity_8 = {
 					}
 				}
 
-				remove_modifier = buy_bond_8
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_8_on
@@ -5407,6 +5467,7 @@ bond_maturity_8 = {
 
 				clear_variable_list = seller_country_general_8
 				clear_variable_list = buyer_country_general_8
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5484,8 +5545,6 @@ bond_maturity_9 = {
 					}
 				}
 
-				remove_modifier = buy_bond_9
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_9_on
@@ -5542,6 +5601,7 @@ bond_maturity_9 = {
 
 				clear_variable_list = seller_country_general_9
 				clear_variable_list = buyer_country_general_9
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5619,8 +5679,6 @@ bond_maturity_10 = {
 					}
 				}
 
-				remove_modifier = buy_bond_10
-
 				#Reset variable
 				set_variable = {
 					name = buy_bond_10_on
@@ -5677,6 +5735,7 @@ bond_maturity_10 = {
 
 				clear_variable_list = seller_country_general_10
 				clear_variable_list = buyer_country_general_10
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5726,7 +5785,7 @@ ai_bond_maturity_1 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_1 > var:maturity_time_1
+				var:ai_selle_bond_maturity_yers_1 = var:ai_maturity_time_1
 				var:ai_no_longer_exists_1 = 1
 			}
 		}
@@ -5760,8 +5819,6 @@ ai_bond_maturity_1 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_1
 				}
-				remove_modifier = ai_buy_bond_1
-
 				#Reset variable
 				set_variable = {
 					name = ai_buy_bond_1_on
@@ -5809,7 +5866,7 @@ ai_bond_maturity_1 = {
 				}
 				set_variable = {
 					name = ai_no_longer_exists_1
-					value = 0
+					value = 777
 				}
 
 				#Reset list
@@ -5818,6 +5875,7 @@ ai_bond_maturity_1 = {
 
 				clear_variable_list = ai_seller_country_general_1
 				clear_variable_list = ai_buyer_country_general_1
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5854,7 +5912,7 @@ ai_bond_maturity_2 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_2 > var:maturity_time_2
+				var:ai_selle_bond_maturity_yers_2 = var:ai_maturity_time_2
 				var:ai_no_longer_exists_2 = 1
 			}
 		}
@@ -5888,7 +5946,6 @@ ai_bond_maturity_2 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_2
 				}
-				remove_modifier = ai_buy_bond_2
 
 				#Reset variable
 				set_variable = {
@@ -5937,7 +5994,7 @@ ai_bond_maturity_2 = {
 				}
 				set_variable = {
 					name = ai_no_longer_exists_2
-					value = 999
+					value = 0
 				}
 
 				#Reset list
@@ -5946,6 +6003,7 @@ ai_bond_maturity_2 = {
 
 				clear_variable_list = ai_seller_country_general_2
 				clear_variable_list = ai_buyer_country_general_2
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -5982,7 +6040,7 @@ ai_bond_maturity_3 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_3 > var:maturity_time_3
+				var:ai_selle_bond_maturity_yers_3 = var:ai_maturity_time_3
 				var:ai_no_longer_exists_3 = 1
 			}
 		}
@@ -6016,7 +6074,6 @@ ai_bond_maturity_3 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_3
 				}
-				remove_modifier = ai_buy_bond_3
 
 				#Reset variable
 				set_variable = {
@@ -6074,6 +6131,7 @@ ai_bond_maturity_3 = {
 
 				clear_variable_list = ai_seller_country_general_3
 				clear_variable_list = ai_buyer_country_general_3
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6110,7 +6168,7 @@ ai_bond_maturity_4 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_4 > var:maturity_time_4
+				var:ai_selle_bond_maturity_yers_4 = var:ai_maturity_time_4
 				var:ai_no_longer_exists_4 = 1
 			}
 		}
@@ -6144,7 +6202,6 @@ ai_bond_maturity_4 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_4
 				}
-				remove_modifier = ai_buy_bond_4
 
 				#Reset variable
 				set_variable = {
@@ -6202,6 +6259,7 @@ ai_bond_maturity_4 = {
 
 				clear_variable_list = ai_seller_country_general_4
 				clear_variable_list = ai_buyer_country_general_4
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6238,7 +6296,7 @@ ai_bond_maturity_5 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_5 > var:maturity_time_5
+				var:ai_selle_bond_maturity_yers_5 = var:ai_maturity_time_5
 				var:ai_no_longer_exists_5 = 1
 			}
 		}
@@ -6272,7 +6330,6 @@ ai_bond_maturity_5 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_5
 				}
-				remove_modifier = ai_buy_bond_5
 
 				#Reset variable
 				set_variable = {
@@ -6330,6 +6387,7 @@ ai_bond_maturity_5 = {
 
 				clear_variable_list = ai_seller_country_general_5
 				clear_variable_list = ai_buyer_country_general_5
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6366,7 +6424,7 @@ ai_bond_maturity_6 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_6 > var:maturity_time_6
+				var:ai_selle_bond_maturity_yers_6 = var:ai_maturity_time_6
 				var:ai_no_longer_exists_6 = 1
 			}
 		}
@@ -6400,7 +6458,6 @@ ai_bond_maturity_6 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_6
 				}
-				remove_modifier = ai_buy_bond_6
 
 				#Reset variable
 				set_variable = {
@@ -6458,6 +6515,7 @@ ai_bond_maturity_6 = {
 
 				clear_variable_list = ai_seller_country_general_6
 				clear_variable_list = ai_buyer_country_general_6
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6494,7 +6552,7 @@ ai_bond_maturity_7 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_7 > var:maturity_time_7
+				var:ai_selle_bond_maturity_yers_7 = var:ai_maturity_time_7
 				var:ai_no_longer_exists_7 = 1
 			}
 		}
@@ -6528,7 +6586,6 @@ ai_bond_maturity_7 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_7
 				}
-				remove_modifier = ai_buy_bond_7
 
 				#Reset variable
 				set_variable = {
@@ -6586,6 +6643,7 @@ ai_bond_maturity_7 = {
 
 				clear_variable_list = ai_seller_country_general_7
 				clear_variable_list = ai_buyer_country_general_7
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6622,7 +6680,7 @@ ai_bond_maturity_8 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_8 > var:maturity_time_8
+				var:ai_selle_bond_maturity_yers_8 = var:ai_maturity_time_8
 				var:ai_no_longer_exists_8 = 1
 			}
 		}
@@ -6656,7 +6714,6 @@ ai_bond_maturity_8 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_8
 				}
-				remove_modifier = ai_buy_bond_8
 
 				#Reset variable
 				set_variable = {
@@ -6714,6 +6771,7 @@ ai_bond_maturity_8 = {
 
 				clear_variable_list = ai_seller_country_general_8
 				clear_variable_list = ai_buyer_country_general_8
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6750,7 +6808,7 @@ ai_bond_maturity_9 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_9 > var:maturity_time_9
+				var:ai_selle_bond_maturity_yers_9 = var:ai_maturity_time_9
 				var:ai_no_longer_exists_9 = 1
 			}
 		}
@@ -6784,7 +6842,6 @@ ai_bond_maturity_9 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_9
 				}
-				remove_modifier = ai_buy_bond_9
 
 				#Reset variable
 				set_variable = {
@@ -6842,6 +6899,7 @@ ai_bond_maturity_9 = {
 
 				clear_variable_list = ai_seller_country_general_9
 				clear_variable_list = ai_buyer_country_general_9
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -6878,7 +6936,7 @@ ai_bond_maturity_10 = {
 	if = {
 		limit = {
 			or = {
-				var:ai_selle_bond_maturity_yers_10 > var:maturity_time_10
+				var:ai_selle_bond_maturity_yers_10 = var:ai_maturity_time_10
 				var:ai_no_longer_exists_10 = 1
 			}
 		}
@@ -6912,7 +6970,6 @@ ai_bond_maturity_10 = {
 				add_treasury = {
 					add = var:ai_total_bond_value_10
 				}
-				remove_modifier = ai_buy_bond_10
 
 				#Reset variable
 				set_variable = {
@@ -6970,6 +7027,7 @@ ai_bond_maturity_10 = {
 
 				clear_variable_list = ai_seller_country_general_10
 				clear_variable_list = ai_buyer_country_general_10
+				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
 	}
@@ -7017,6 +7075,14 @@ central_bank_interest_refund_per_year_in_gold = {
 			}
 		}
 		clear_variable_list = central_bank_debt_buyer_list
+	}
+}
+
+interest_per_month_from_foreign_debt_investment = {
+	remove_modifier = interest_from_foreign_debt_investment
+	add_modifier = {
+		name = interest_from_foreign_debt_investment
+		multiplier = interest_per_month_from_foreign_debt_investment
 	}
 }
 
@@ -7159,332 +7225,332 @@ clear_ironclads_contract_1_year = {
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
 
-financial_center_production_methods = {
-	every_scope_state = {
+# financial_center_production_methods = { 
+# 	every_scope_state = {
 
-		#on bond
-		if = {
-			limit = {
-				owner  = {
-					national_debt_compared_gdp >= 0.05
-				}
-				or = {
-					is_production_method_active = {
-						building_type = building_financial_centre
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_fra
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_gbr
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_usa
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_net
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_ger
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_aus
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_ita
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_chi
-						production_method = pm_no_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_jap
-						production_method = pm_no_bond_exchange
-					}
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_fra
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_fra
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_gbr
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_gbr
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_usa
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_usa
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_net
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_net
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_ger
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_ger
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_aus
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_aus
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_ita
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_ita
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_chi
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_chi
-					production_method = pm_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_jap
-					}
-				}
-				activate_production_method = {
-					building_tfinancial_centre_jappe = building_financial_centre_jap
-					production_method = pm_bond_exchange
-				}
-			}
-		}
+# 		#on bond
+# 		if = {
+# 			limit = {
+# 				owner  = {
+# 					national_debt_compared_gdp >= 0.05
+# 				}
+# 				or = {
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_fra
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_gbr
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_usa
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_net
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_ger
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_aus
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_ita
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_chi
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_jap
+# 						production_method = pm_no_bond_exchange
+# 					}
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_fra
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_fra
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_gbr
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_gbr
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_usa
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_usa
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_net
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_net
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_ger
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_ger
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_aus
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_aus
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_ita
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_ita
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_chi
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_chi
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_jap
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_tfinancial_centre_jappe = building_financial_centre_jap
+# 					production_method = pm_bond_exchange
+# 				}
+# 			}
+# 		}
 
-		#off bond
-		if = {
-			limit = {
-				owner  = {
-					national_debt_compared_gdp < 0.05
-				}
-				or = {
-					is_production_method_active = {
-						building_type = building_financial_centre
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_fra
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_gbr
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_usa
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_net
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_ger
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_aus
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_ita
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_chi
-						production_method = pm_bond_exchange
-					}
-					is_production_method_active = {
-						building_type = building_financial_centre_jap
-						production_method = pm_bond_exchange
-					}
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_fra
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_fra
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_gbr
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_gbr
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_usa
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_usa
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_net
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_net
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_ger
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_ger
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_aus
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_aus
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_ita
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_ita
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_chi
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_chi
-					production_method = pm_no_bond_exchange
-				}
-			}
-			if = {
-				limit = {
-					owner  = {
-						has_building = building_financial_centre_jap
-					}
-				}
-				activate_production_method = {
-					building_type = building_financial_centre_jap
-					production_method = pm_no_bond_exchange
-				}
-			}
-		}
-	}
-}
+# 		#off bond
+# 		if = {
+# 			limit = {
+# 				owner  = {
+# 					national_debt_compared_gdp < 0.05
+# 				}
+# 				or = {
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_fra
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_gbr
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_usa
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_net
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_ger
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_aus
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_ita
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_chi
+# 						production_method = pm_bond_exchange
+# 					}
+# 					is_production_method_active = {
+# 						building_type = building_financial_centre_jap
+# 						production_method = pm_bond_exchange
+# 					}
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_fra
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_fra
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_gbr
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_gbr
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_usa
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_usa
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_net
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_net
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_ger
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_ger
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_aus
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_aus
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_ita
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_ita
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_chi
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_chi
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 			if = {
+# 				limit = {
+# 					owner  = {
+# 						has_building = building_financial_centre_jap
+# 					}
+# 				}
+# 				activate_production_method = {
+# 					building_type = building_financial_centre_jap
+# 					production_method = pm_no_bond_exchange
+# 				}
+# 			}
+# 		}
+# 	}
+# }
 private_ownership_production_stocks = {
 	every_scope_state = {
 
@@ -9065,138 +9131,138 @@ seller_bankrupt = {
 		value = 14
 	}
 
-	scope:buyer = {
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_1
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_1
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_2
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_2
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_3
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_3
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_4
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_4
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_5
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_5
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_6
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_6
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_7
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_7
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_8
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_8
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_9
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_9
-				add = 1
-			}
-		}
-		if = {
-			limit = {
-				every_in_list = {
-					variable = ai_seller_country_general_10
-					save_scope_as = seller
-				}
-				scope:seller = root
-			}
-			change_variable = {
-				name = ai_no_longer_exists_10
-				add = 1
-			}
-		}
-	}
+	# scope:buyer = {
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_1
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_1
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_2
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_2
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_3
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_3
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_4
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_4
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_5
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_5
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_6
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_6
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_7
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_7
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_8
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_8
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_9
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_9
+	# 			add = 1
+	# 		}
+	# 	}
+	# 	if = {
+	# 		limit = {
+	# 			every_in_list = {
+	# 				variable = ai_seller_country_general_10
+	# 				save_scope_as = seller
+	# 			}
+	# 			scope:seller = root
+	# 		}
+	# 		change_variable = {
+	# 			name = ai_no_longer_exists_10
+	# 			add = 1
+	# 		}
+	# 	}
+	# }
 }
 
 #########################################################################################################################################################################################
