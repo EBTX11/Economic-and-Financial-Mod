@@ -1,0 +1,58 @@
+namespace = law_event_peso_sol_de_oro
+
+#peso_sol_de_oro
+law_event_peso_sol_de_oro.1 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - peso_sol_de_oro"
+
+	duration = 1
+
+	immediate = {                                     
+		capital = {
+			save_scope_as = central_bank_site
+		}
+		
+		set_variable = {
+			name = money_value_target_1
+			value = { 0.1 1 }
+		}
+		change_variable = {
+			name = circulating_peso_sol_de_oro_c_var_1
+			add = { 50000009 100000009 }
+		}
+		scope:central_bank_site = {
+			change_variable = {
+				name = stockpiling_peso_sol_de_oro_state_1
+				add  = {
+					value = owner.var:circulating_peso_sol_de_oro_c_var_1
+					multiply = 0.1
+				}
+			}
+			change_variable = {
+				name = central_bank_gold_reserves_state_1
+				add = {
+					value = owner.var:circulating_peso_sol_de_oro_c_var_1
+					add = var:stockpiling_peso_sol_de_oro_state_1
+					multiply = owner.var:money_value_target_1
+				}
+			}
+		}
+		activate_law = law_type:law_peso_sol_de_oro_currency
+	}
+}
+law_event_peso_sol_de_oro.2 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - peso_sol_de_oro"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_peso_sol_de_oro_currency
+	}
+}

@@ -31,6 +31,9 @@ country_credit_rating = {
 		limit  = {			
 			var:country_credit_note_fixe = 10
 			var:country_credit_note_fixe >= 9
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -46,10 +49,13 @@ country_credit_rating = {
 			name = country_credit_rating_AAA
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 9
 			var:country_credit_note_fixe >= 8
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -65,10 +71,13 @@ country_credit_rating = {
 			name = country_credit_rating_AA
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 8
 			var:country_credit_note_fixe >= 7
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -84,10 +93,13 @@ country_credit_rating = {
 			name = country_credit_rating_A
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 7
 			var:country_credit_note_fixe >= 6
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -103,10 +115,13 @@ country_credit_rating = {
 			name = country_credit_rating_BBB
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 6
 			var:country_credit_note_fixe >= 5
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -122,10 +137,13 @@ country_credit_rating = {
 			name = country_credit_rating_BB
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 5
 			var:country_credit_note_fixe >= 4
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -141,10 +159,13 @@ country_credit_rating = {
 			name = country_credit_rating_B
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 4
 			var:country_credit_note_fixe >= 3
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -160,10 +181,13 @@ country_credit_rating = {
 			name = country_credit_rating_CCC
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 3
 			var:country_credit_note_fixe >= 2
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -179,11 +203,13 @@ country_credit_rating = {
 			name = country_credit_rating_CC
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 2
 			var:country_credit_note_fixe >= 1
-
+			not  = {
+				has_modifier = economic_instability
+			}
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -199,10 +225,33 @@ country_credit_rating = {
 			name = country_credit_rating_C
 		}
 	}
-	if = {
+	else_if = {
 		limit  = {
 			var:country_credit_note_fixe < 1
 			var:country_credit_note_fixe >= 0
+			not  = {
+				has_modifier = economic_instability
+			}
+		}
+		remove_modifier = country_credit_rating_AAA
+		remove_modifier = country_credit_rating_AA
+		remove_modifier = country_credit_rating_A
+		remove_modifier = country_credit_rating_BBB
+		remove_modifier = country_credit_rating_BB
+		remove_modifier = country_credit_rating_B
+		remove_modifier = country_credit_rating_CCC
+		remove_modifier = country_credit_rating_CC
+		remove_modifier = country_credit_rating_C
+		remove_modifier = country_credit_rating_D
+		add_modifier = {
+			name = country_credit_rating_D
+		}
+	}
+
+	#economic_instability
+	else_if = {
+		limit  = {
+			has_modifier = economic_instability
 		}
 		remove_modifier = country_credit_rating_AAA
 		remove_modifier = country_credit_rating_AA
@@ -382,10 +431,6 @@ ai_credit_at_central_bank = {
 		change_variable = {
 			name = credit_at_central_bank
 			add = national_debt_allowed_in_gold
-		}
-		set_variable = {
-			name = test_credit
-			value = 0
 		}
 		change_variable = {
 			name = test_credit
@@ -4426,7 +4471,7 @@ bond_maturity_1 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_1 > var:maturity_time_1
-				var:no_longer_exists_1 = 1
+				no_longer_exists_1 = 0
 			}
 		}
 
@@ -4457,14 +4502,20 @@ bond_maturity_1 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_1 = 1
-						}
+						no_longer_exists_1 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_1
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_1 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_1_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -4511,18 +4562,13 @@ bond_maturity_1 = {
 					name = selle_bond_maturity_on_action_1
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_1
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_1
 				clear_variable_list = seller_country_1
 
 				clear_variable_list = seller_country_general_1
 				clear_variable_list = buyer_country_general_1
-				
 				interest_per_month_from_foreign_debt_investment = yes
 			}
 		}
@@ -4561,7 +4607,7 @@ bond_maturity_2 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_2 > var:maturity_time_2
-				var:no_longer_exists_2 = 1
+				no_longer_exists_2 = 0
 			}
 		}
 
@@ -4592,9 +4638,7 @@ bond_maturity_2 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_2 = 1
-						}
+						no_longer_exists_2 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_2
@@ -4602,8 +4646,10 @@ bond_maturity_2 = {
 				}
 				# if = {
 				# 	limit = {
-				# 		var:no_longer_exists_2 = 1
-				# 	}
+				#		not = {
+				#			no_longer_exists_2 = 1
+				#		}
+				#	}
 				# 	post_notification = notification_seller_bond_no_longer_exists_2_message
 				# }
 
@@ -4652,11 +4698,7 @@ bond_maturity_2 = {
 					name = selle_bond_maturity_on_action_2
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_2
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_2
 				clear_variable_list = seller_country_2
@@ -4701,7 +4743,7 @@ bond_maturity_3 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_3 > var:maturity_time_3
-				var:no_longer_exists_3 = 1
+				no_longer_exists_3 = 0
 			}
 		}
 
@@ -4732,14 +4774,20 @@ bond_maturity_3 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_3 = 1
-						}
+						no_longer_exists_3 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_3
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_3 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_3_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -4786,11 +4834,7 @@ bond_maturity_3 = {
 					name = selle_bond_maturity_on_action_3
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_3
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_3
 				clear_variable_list = seller_country_3
@@ -4835,7 +4879,7 @@ bond_maturity_4 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_4 > var:maturity_time_4
-				var:no_longer_exists_4 = 1
+				no_longer_exists_4 = 0
 			}
 		}
 
@@ -4866,14 +4910,20 @@ bond_maturity_4 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_4 = 1
-						}
+						no_longer_exists_4 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_4
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_4 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_4_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -4920,11 +4970,7 @@ bond_maturity_4 = {
 					name = selle_bond_maturity_on_action_4
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_4
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_4
 				clear_variable_list = seller_country_4
@@ -4969,7 +5015,7 @@ bond_maturity_5 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_5 > var:maturity_time_5
-				var:no_longer_exists_5 = 1
+				no_longer_exists_5 = 0
 			}
 		}
 
@@ -5000,14 +5046,20 @@ bond_maturity_5 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_5 = 1
-						}
+						no_longer_exists_5 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_5
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_5 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_5_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5054,11 +5106,7 @@ bond_maturity_5 = {
 					name = selle_bond_maturity_on_action_5
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_5
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_5
 				clear_variable_list = seller_country_5
@@ -5103,7 +5151,7 @@ bond_maturity_6 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_6 > var:maturity_time_6
-				var:no_longer_exists_6 = 1
+				no_longer_exists_6 = 0
 			}
 		}
 
@@ -5134,14 +5182,20 @@ bond_maturity_6 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_6 = 1
-						}
+						no_longer_exists_6 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_6
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_6 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_6_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5188,11 +5242,7 @@ bond_maturity_6 = {
 					name = selle_bond_maturity_on_action_6
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_6
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_6
 				clear_variable_list = seller_country_6
@@ -5237,7 +5287,7 @@ bond_maturity_7 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_7 > var:maturity_time_7
-				var:no_longer_exists_7 = 1
+				no_longer_exists_7 = 0
 			}
 		}
 
@@ -5268,14 +5318,20 @@ bond_maturity_7 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_7 = 1
-						}
+						no_longer_exists_7 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_7
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_7 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_7_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5322,11 +5378,7 @@ bond_maturity_7 = {
 					name = selle_bond_maturity_on_action_7
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_7
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_7
 				clear_variable_list = seller_country_7
@@ -5371,7 +5423,7 @@ bond_maturity_8 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_8 > var:maturity_time_8
-				var:no_longer_exists_8 = 1
+				no_longer_exists_8 = 0
 			}
 		}
 
@@ -5402,14 +5454,20 @@ bond_maturity_8 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_8 = 1
-						}
+						no_longer_exists_8 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_8
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_8 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_8_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5456,11 +5514,7 @@ bond_maturity_8 = {
 					name = selle_bond_maturity_on_action_8
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_8
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_8
 				clear_variable_list = seller_country_8
@@ -5505,7 +5559,7 @@ bond_maturity_9 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_9 > var:maturity_time_9
-				var:no_longer_exists_9 = 1
+				no_longer_exists_9 = 0
 			}
 		}
 
@@ -5536,14 +5590,20 @@ bond_maturity_9 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_9 = 1
-						}
+						no_longer_exists_9 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_9
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_9 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_9_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5590,11 +5650,7 @@ bond_maturity_9 = {
 					name = selle_bond_maturity_on_action_9
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_9
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_9
 				clear_variable_list = seller_country_9
@@ -5639,7 +5695,7 @@ bond_maturity_10 = {
 		limit = {
 			or = {
 				var:selle_bond_maturity_yers_10 > var:maturity_time_10
-				var:no_longer_exists_10 = 1
+				no_longer_exists_10 = 0
 			}
 		}
 
@@ -5670,14 +5726,20 @@ bond_maturity_10 = {
 				
 				if = {
 					limit = {
-						not = {
-							var:no_longer_exists_10 = 1
-						}
+						no_longer_exists_10 = 1
 					}
 					add_treasury = {
 						add = var:total_bond_value_10
 					}
 				}
+				# if = {
+				# 	limit = {
+				#		not = {
+				#			no_longer_exists_10 = 1
+				#		}
+				#	}
+				# 	post_notification = notification_seller_bond_no_longer_exists_10_message
+				# }
 
 				#Reset variable
 				set_variable = {
@@ -5724,11 +5786,7 @@ bond_maturity_10 = {
 					name = selle_bond_maturity_on_action_10
 					value = 0
 				}
-				set_variable = {
-					name = no_longer_exists_10
-					value = 0
-				}
-
+				
 				#Reset list
 				clear_variable_list = buyer_country_10
 				clear_variable_list = seller_country_10
@@ -5759,24 +5817,6 @@ ai_bond_maturity_1 = {
 		name = ai_selle_bond_maturity_yers_time_1
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_1
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_1
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_1
@@ -5786,7 +5826,7 @@ ai_bond_maturity_1 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_1 = var:ai_maturity_time_1
-				var:ai_no_longer_exists_1 = 1
+				ai_no_longer_exists_1 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -5816,9 +5856,15 @@ ai_bond_maturity_1 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_1
+				if = {
+					limit = {
+						ai_no_longer_exists_1 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_1
+					}
 				}
+
 				#Reset variable
 				set_variable = {
 					name = ai_buy_bond_1_on
@@ -5864,10 +5910,6 @@ ai_bond_maturity_1 = {
 					name = ai_selle_bond_maturity_on_action_1
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_1
-					value = 777
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_1
@@ -5886,24 +5928,6 @@ ai_bond_maturity_2 = {
 		name = ai_selle_bond_maturity_yers_time_2
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_2
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_2
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_2
@@ -5913,7 +5937,7 @@ ai_bond_maturity_2 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_2 = var:ai_maturity_time_2
-				var:ai_no_longer_exists_2 = 1
+				ai_no_longer_exists_2 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -5943,8 +5967,13 @@ ai_bond_maturity_2 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_2
+				if = {
+					limit = {
+						ai_no_longer_exists_2 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_2
+					}
 				}
 
 				#Reset variable
@@ -5992,10 +6021,6 @@ ai_bond_maturity_2 = {
 					name = ai_selle_bond_maturity_on_action_2
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_2
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_2
@@ -6014,24 +6039,6 @@ ai_bond_maturity_3 = {
 		name = ai_selle_bond_maturity_yers_time_3
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_3
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_3
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_3
@@ -6041,7 +6048,7 @@ ai_bond_maturity_3 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_3 = var:ai_maturity_time_3
-				var:ai_no_longer_exists_3 = 1
+				ai_no_longer_exists_3 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6071,8 +6078,13 @@ ai_bond_maturity_3 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_3
+				if = {
+					limit = {
+						ai_no_longer_exists_3 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_3
+					}
 				}
 
 				#Reset variable
@@ -6120,10 +6132,6 @@ ai_bond_maturity_3 = {
 					name = ai_selle_bond_maturity_on_action_3
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_3
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_3
@@ -6142,24 +6150,6 @@ ai_bond_maturity_4 = {
 		name = ai_selle_bond_maturity_yers_time_4
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_4
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_4
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_4
@@ -6169,7 +6159,7 @@ ai_bond_maturity_4 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_4 = var:ai_maturity_time_4
-				var:ai_no_longer_exists_4 = 1
+				ai_no_longer_exists_4 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6199,8 +6189,13 @@ ai_bond_maturity_4 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_4
+				if = {
+					limit = {
+						ai_no_longer_exists_4 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_4
+					}
 				}
 
 				#Reset variable
@@ -6248,10 +6243,6 @@ ai_bond_maturity_4 = {
 					name = ai_selle_bond_maturity_on_action_4
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_4
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_4
@@ -6270,24 +6261,6 @@ ai_bond_maturity_5 = {
 		name = ai_selle_bond_maturity_yers_time_5
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_5
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_5
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_5
@@ -6297,7 +6270,7 @@ ai_bond_maturity_5 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_5 = var:ai_maturity_time_5
-				var:ai_no_longer_exists_5 = 1
+				ai_no_longer_exists_5 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6327,8 +6300,13 @@ ai_bond_maturity_5 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_5
+				if = {
+					limit = {
+						ai_no_longer_exists_5 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_5
+					}
 				}
 
 				#Reset variable
@@ -6376,10 +6354,6 @@ ai_bond_maturity_5 = {
 					name = ai_selle_bond_maturity_on_action_5
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_5
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_5
@@ -6398,24 +6372,6 @@ ai_bond_maturity_6 = {
 		name = ai_selle_bond_maturity_yers_time_6
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_6
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_6
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_6
@@ -6425,7 +6381,7 @@ ai_bond_maturity_6 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_6 = var:ai_maturity_time_6
-				var:ai_no_longer_exists_6 = 1
+				ai_no_longer_exists_6 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6455,8 +6411,13 @@ ai_bond_maturity_6 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_6
+				if = {
+					limit = {
+						ai_no_longer_exists_6 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_6
+					}
 				}
 
 				#Reset variable
@@ -6504,10 +6465,6 @@ ai_bond_maturity_6 = {
 					name = ai_selle_bond_maturity_on_action_6
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_6
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_6
@@ -6526,24 +6483,6 @@ ai_bond_maturity_7 = {
 		name = ai_selle_bond_maturity_yers_time_7
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_7
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_7
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_7
@@ -6553,7 +6492,7 @@ ai_bond_maturity_7 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_7 = var:ai_maturity_time_7
-				var:ai_no_longer_exists_7 = 1
+				ai_no_longer_exists_7 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6583,8 +6522,13 @@ ai_bond_maturity_7 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_7
+				if = {
+					limit = {
+						ai_no_longer_exists_7 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_7
+					}
 				}
 
 				#Reset variable
@@ -6632,10 +6576,6 @@ ai_bond_maturity_7 = {
 					name = ai_selle_bond_maturity_on_action_7
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_7
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_7
@@ -6654,24 +6594,6 @@ ai_bond_maturity_8 = {
 		name = ai_selle_bond_maturity_yers_time_8
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_8
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_8
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_8
@@ -6681,7 +6603,7 @@ ai_bond_maturity_8 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_8 = var:ai_maturity_time_8
-				var:ai_no_longer_exists_8 = 1
+				ai_no_longer_exists_8 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6711,8 +6633,13 @@ ai_bond_maturity_8 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_8
+				if = {
+					limit = {
+						ai_no_longer_exists_8 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_8
+					}
 				}
 
 				#Reset variable
@@ -6760,10 +6687,6 @@ ai_bond_maturity_8 = {
 					name = ai_selle_bond_maturity_on_action_8
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_8
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_8
@@ -6782,24 +6705,6 @@ ai_bond_maturity_9 = {
 		name = ai_selle_bond_maturity_yers_time_9
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_9
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_9
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_9
@@ -6809,7 +6714,7 @@ ai_bond_maturity_9 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_9 = var:ai_maturity_time_9
-				var:ai_no_longer_exists_9 = 1
+				ai_no_longer_exists_9 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6839,8 +6744,13 @@ ai_bond_maturity_9 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_9
+				if = {
+					limit = {
+						ai_no_longer_exists_9 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_9
+					}
 				}
 
 				#Reset variable
@@ -6888,10 +6798,6 @@ ai_bond_maturity_9 = {
 					name = ai_selle_bond_maturity_on_action_9
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_9
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_9
@@ -6910,24 +6816,6 @@ ai_bond_maturity_10 = {
 		name = ai_selle_bond_maturity_yers_time_10
 		add = 1
 	}
-	#no_longer_exists
-	if = {
-		every_in_list = {
-			variable = ai_seller_country_general_10
-			save_scope_as = seller
-		}
-		limit = {
-			not = {
-				scope:seller = {
-					exists = prev
-				}
-			}
-		}
-		change_variable = {
-			name = ai_no_longer_exists_10
-			add = 1
-		}
-	}
 	#maturity
 	change_variable = {
 		name = ai_selle_bond_maturity_yers_10
@@ -6937,7 +6825,7 @@ ai_bond_maturity_10 = {
 		limit = {
 			or = {
 				var:ai_selle_bond_maturity_yers_10 = var:ai_maturity_time_10
-				var:ai_no_longer_exists_10 = 1
+				ai_no_longer_exists_10 = 0 #no_longer_exists 
 			}
 		}
 		root = {
@@ -6967,8 +6855,13 @@ ai_bond_maturity_10 = {
 				}
 			}
 			root = {
-				add_treasury = {
-					add = var:ai_total_bond_value_10
+				if = {
+					limit = {
+						ai_no_longer_exists_10 = 1
+					}
+					add_treasury = {
+						add = var:ai_total_bond_value_10
+					}
 				}
 
 				#Reset variable
@@ -7016,10 +6909,6 @@ ai_bond_maturity_10 = {
 					name = ai_selle_bond_maturity_on_action_10
 					value = 0
 				}
-				set_variable = {
-					name = ai_no_longer_exists_10
-					value = 0
-				}
 
 				#Reset list
 				clear_variable_list = ai_buyer_country_10
@@ -7032,6 +6921,20 @@ ai_bond_maturity_10 = {
 		}
 	}
 }
+
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+#econimic_krach
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
 
 #########################################################################################################################################################################################
 #########################################################################################################################################################################################
@@ -9082,7 +8985,7 @@ fluctuations_country_indice_value_year = {
 		if = {
 			limit = {
 				or = {
-					var:base_index_value < 100000
+					var:base_index_value < 1000000 #point
 					base_index_value_dif < 0
 				}
 			}
@@ -9096,6 +8999,13 @@ fluctuations_country_indice_value_year = {
             name = index_value_count
             value = 0
         }
+
+		if = {
+			limit = {
+				var:country_indice_value_dif_01 < -0.5
+			}
+			financial_crash = yes
+		}
     }
 }
 fluctuations_country_indice_value_year_clear = {
@@ -9107,162 +9017,6 @@ fluctuations_country_indice_value_year_clear = {
 		name = base_index_value_dif
 		value = 0
 	}
-}
-
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-
-#ai_bond_maturity
-
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-#########################################################################################################################################################################################
-
-seller_bankrupt = {
-	every_in_list = {
-		variable = central_bank_debt_buyer_list
-		save_scope_as = buyer
-	}
-	set_variable = {
-		name = ai_no_longer_exists_2
-		value = 14
-	}
-
-	# scope:buyer = {
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_1
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_1
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_2
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_2
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_3
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_3
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_4
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_4
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_5
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_5
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_6
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_6
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_7
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_7
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_8
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_8
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_9
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_9
-	# 			add = 1
-	# 		}
-	# 	}
-	# 	if = {
-	# 		limit = {
-	# 			every_in_list = {
-	# 				variable = ai_seller_country_general_10
-	# 				save_scope_as = seller
-	# 			}
-	# 			scope:seller = root
-	# 		}
-	# 		change_variable = {
-	# 			name = ai_no_longer_exists_10
-	# 			add = 1
-	# 		}
-	# 	}
-	# }
 }
 
 #########################################################################################################################################################################################
@@ -10526,3 +10280,292 @@ buy_bond_in_currrency_var = {
 		}
 	}
 }
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+#economic_instability
+
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+#########################################################################################################################################################################################
+
+
+#is_subject_custom_trigger = no
+#
+# 				has_modifier = has_central_bank
+# has_modifier = has_financial_center
+# var:country_indice_value_dif_01 < -0.5
+
+
+# has_modifier = economic_instability
+
+# is_subject_custom_trigger = no
+# has_modifier = has_financial_center
+# not = {
+# 	has_modifier = economic_instability
+# }
+
+# global_country_ranking < 50
+
+#cumulative_inflation_5_year > 0.5 # à changer pour 1ans 
+
+economic_instability = {
+	#Country Bankrupt - ok
+
+	#event: ? si déclanche grace au trigger 
+
+	#Bank central Bankrupt = weak currency - ok 
+	#Crise monetaire = currency crisis (diminution de la valeur de la devise de plus de 50%/) -> délock l'inflation -> création d'inflation dans le monetary policy -> crise inflationniste du a la dette à vopitr 
+	#Crise économique =  Economic crisis (diminution de la valeur du PIB de plus de 50%)
+	#Crash financier = Financial crash (diminution de la valeur de l'index des marché de plus de 50%)
+
+	remove_modifier = country_credit_rating_AAA
+	remove_modifier = country_credit_rating_AA
+	remove_modifier = country_credit_rating_A
+	remove_modifier = country_credit_rating_BBB
+	remove_modifier = country_credit_rating_BB
+	remove_modifier = country_credit_rating_B
+	remove_modifier = country_credit_rating_CCC
+	remove_modifier = country_credit_rating_CC
+	remove_modifier = country_credit_rating_C
+	remove_modifier = country_credit_rating_D
+	add_modifier = {
+		name = country_credit_rating_D
+	}
+	remove_modifier = foreign_exchange_controls
+	add_modifier = {
+		name = foreign_exchange_controls
+		months = 24
+	}
+	remove_modifier = economic_instability
+	add_modifier = {
+		name = economic_instability
+		months = 24
+	}
+
+
+	#perte de prestige 25% voir plus
+	#malus diplomatique avec tout les pays uniquement si default sur dette 
+
+
+
+
+
+	#vente massife de la devise si : weak currency/currency crisis 
+	# set_variable = {
+	# 	name = economic_instability_var
+	# 	value = 0
+	# }
+}
+
+########################################################################################
+currency_crisis = {
+	#objectif:
+	# - la devise baisse de 50% -> les pays étranger perde la confiance -> revente massive de la devise -> inflation scripter qui calcule la différence excte de valeur etre les 2 extreme de valeur
+	# - revente integrale de la devise possedé par les pays étranger 
+	# - control des change pour ne pas etre acheter 
+	# - 
+
+
+	capital= {
+		save_scope_as = capital_state
+	}	
+	save_scope_as = target_country
+
+
+	set_variable = {
+		name = currency_crisis
+		value = 1
+	}
+	# set_variable = {
+	# 	name = economic_instability_var
+	# 	value = -1
+	# }
+
+	#event for player
+	if = {
+		limit  = {
+			is_subject_custom_trigger = no
+			has_modifier = has_central_bank
+			not = {
+				has_modifier = economic_instability
+			}
+		}
+		every_country = {
+			limit = {
+				is_player = yes
+			}
+			trigger_event = {
+				id = 00_ef_economic_instability_event.1
+				days = 0
+				popup = no
+			}
+		}
+	}
+	all_currency_resold = yes
+	economic_instability = yes
+}
+economic_crisis = {
+	#objectif:
+	#idem currency_crisis
+
+	capital= {
+		save_scope_as = capital_state
+	}	
+	save_scope_as = target_country
+
+	set_variable = {
+		name = economic_crisis
+		value = 1
+	}
+
+	#event for player
+	if = {
+		limit  = {
+			#is_subject_custom_trigger = no
+			global_country_ranking < 100  #all pays
+			not = {
+				has_modifier = economic_instability
+			}
+		}
+		every_country = {
+			limit = {
+				is_player = yes
+			}
+			trigger_event = {
+				id = 00_ef_economic_instability_event.2
+				days = 0
+				popup = no
+			}
+		}
+	}
+	if = {
+		limit  = {
+			has_modifier = has_central_bank
+		}
+		all_currency_resold = yes
+	}
+	economic_instability = yes
+} #-> revante devise en mass + pas de rachat si foreign_exchange_controls
+financial_crash = {
+	capital= {
+		save_scope_as = capital_state
+	}	
+	save_scope_as = target_country
+
+	set_variable = {
+		name = financial_crash
+		value = 1
+	}
+	# set_variable = {
+	# 	name = economic_instability_var
+	# 	value = -1
+	# }
+
+	#event for player
+	if = {
+		limit  = {
+			is_subject_custom_trigger = no
+			has_modifier = has_financial_center
+			not = {
+				has_modifier = economic_instability
+			}
+		}
+		every_country = {
+			limit = {
+				is_player = yes
+			}
+			trigger_event = {
+				id = 00_ef_economic_instability_event.3
+				days = 0
+				popup = no
+			}
+		}
+	}
+	economic_instability = yes
+}
+central_bank_bankruptcy = {
+	#objectif:
+	#idem currency_crisis
+
+	capital= {
+		save_scope_as = capital_state
+	}	
+	save_scope_as = target_country
+
+	set_variable = {
+		name = central_bank_bankruptcy
+		value = 1
+	}
+	# set_variable = {
+	# 	name = economic_instability_var
+	# 	value = -1
+	# }
+
+	#event for player
+	if = {
+		limit  = {
+			is_subject_custom_trigger = no
+			has_modifier = has_central_bank
+			not = {
+				has_modifier = economic_instability
+			}
+		}
+		every_country = {
+			limit = {
+				is_player = yes
+			}
+			trigger_event = {
+				id = 00_ef_economic_instability_event.4
+				days = 0
+				popup = no
+			}
+		}
+	}
+	all_currency_resold = yes
+	economic_instability = yes
+} #-> revante devise en mass + pas de rachat si foreign_exchange_controls
+country_bankruptcy = {
+	capital= {
+		save_scope_as = capital_state
+	}	
+	save_scope_as = target_country
+
+	set_variable = {
+		name = country_bankruptcy
+		value = 1
+	}
+	# set_variable = {
+	# 	name = economic_instability_var
+	# 	value = -1
+	# }
+
+	
+	#event for player
+	if = {
+		limit  = {
+			is_subject_custom_trigger = no
+			global_country_ranking < 50 #all pays
+			not = {
+				has_modifier = economic_instability
+			}
+		}
+		every_country = {
+			limit = {
+				is_player = yes
+			}
+			trigger_event = {
+				id = 00_ef_economic_instability_event.5
+				days = 0
+				popup = no
+			}
+		}
+	}
+	economic_instability = yes
+}
+########################################################################################
+
