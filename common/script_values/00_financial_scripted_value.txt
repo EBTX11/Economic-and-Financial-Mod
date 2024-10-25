@@ -21,39 +21,56 @@ country_indice_reference_currency = {
 }
 
 ratio_with_country_indice_reference_currency = {
-	value = country_indice  
+	value = country_indice
 	divide = country_indice_reference_currency
 }
 ratio_with_country_indice_reference_currency = {
-	value = country_indice  
+	value = country_indice
 	divide = country_indice_reference_currency
 }
 
-
-
 num_company = {
-	value = 0  
+	value = 0
 	every_company = {
 		add = 1
 	}
 }
 prosperity_company = {
-	value = 0  
+	value = 0
 	every_company = {
 		add = prosperity
 	}
 }
 
 prosperity_by_company = {
-	value = prosperity_company  
-	divide = num_company	
-	divide = 8
-
+	value = prosperity_company
+	divide = num_company
+	divide = 8 #rapporter sur 25
 }
 
-#Company.GetProductivity
-#remove_company
+investor_massive_capital_loss = {
+	value = 0
+	if = {
+		limit  = {
+			var:financial_crash = 1
+			var:country_indice_value_dif_01 < 0
+		}
+		add = investment_pool
+		multiply = var:country_indice_value_dif_01
+	}
+}
 
+pop_capital_loss = {
+	value = 0
+	if = {
+		limit  = {
+			var:economic_crisis = 1
+			var:country_indice_value_dif_01 < 0
+		}
+		add = pop_savings
+		multiply = var:country_indice_value_dif_01
+	}
+}
 
 ########################################################################################################################################
 ########################################################################################################################################
@@ -78,7 +95,7 @@ prosperity_by_company = {
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
-#25 categorie de 10 point chacune 
+#25 categorie de 10 point chacune
 
 # country_credit_note = {
 # 	value = country_credit_mean
@@ -102,7 +119,7 @@ prosperity_by_company = {
 # }
 country_credit_pondered_mean = {
 	value = 0
-	#<50 and no Bc 
+	#<50 and no Bc
 	if = {
 		limit = {
 			global_country_ranking = 1
@@ -152,7 +169,7 @@ country_credit_pondered_mean = {
 		}
 	}
 
-	#<50 and no Bc 
+	#<50 and no Bc
 	if = {
 		limit = {
 			global_country_ranking < 50
@@ -258,7 +275,7 @@ country_credit_score = {
 		add = country_credit_rating_government_wage_level_value #10
 		add = country_credit_rating_military_wage_level_value #10
 		add = country_credit_rating_tax_level_value #10
-		
+
 		add = country_credit_rating_radical_fraction #10
 		add = country_credit_rating_loyalist_fraction #10
 	}
@@ -703,7 +720,7 @@ country_credit_rating_national_debt_compared_gdp = {
 		}
 		add = 0
 	}
-	
+
 	if = {
 		limit  = {
 			national_debt_compared_gdp <= 0.90
@@ -912,7 +929,7 @@ country_credit_rating_inflation = {
 		}
 		add = 0
 	}
-	
+
 	if = {
 		limit  = {
 			cumulative_inflation_10_year <= 0.90
@@ -1115,7 +1132,7 @@ country_credit_rating_infamy = {
 		}
 		add = 0
 	}
-	
+
 	if = {
 		limit  = {
 			infamy <= 90
@@ -1795,7 +1812,7 @@ stockpiling_mining_stock_var_state = {
 country_indice = {
 	add = bond_market_index
 	add = manufacture_stock_index
-	add = agricultural_stock	
+	add = agricultural_stock
 	add = mining_stock_index
 	add = railroad_stock_index
 }
@@ -1806,19 +1823,25 @@ stock_market_index = {
 }
 
 # bond_indice
-bond_price = {
-	value = 100
+bond_price_0 = {
+	value = 50
 	subtract = {
-		value = 100
+		value = 50
 		multiply = {
 			value = 0
 			subtract = {
 				value = market.mg:bond.market_goods_pricier
-				multiply = 100
+				multiply = 50
 			}
-			divide = 100
+			divide = 50
 		}
 	}
+	multiply = 0.33 #30%
+}
+bond_price = {
+	add = bond_price_0
+	add = bond_demand_factor
+	add = bond_money_value_factor
 }
 
 bond_by_price = {
@@ -1834,7 +1857,6 @@ bond_interest_rate_payable = {
 
 bond_market_index = {
 	value = bond_by_price
-	#multiply = money_value #money_value_exchange_rate_with_reference_currency 
 }
 
 total_debt = {
@@ -1846,6 +1868,32 @@ remaining_debt = {
 	value = total_debt
 	subtract = gold_loaned_to_central_bank
 }
+
+bond_demand_factor = {
+	value = 33
+	multiply = ratio_with_highest_prestige
+
+	max = 33
+}
+
+highest_prestige = {
+	every_country = {
+		limit = {
+			global_country_ranking = 1
+		}
+		add = prestige
+	}
+}
+
+bond_money_value_factor = {
+	value = 33
+	multiply = money_value
+
+	max = 33
+}
+
+
+
 
 # manufacture_stock_index
 
@@ -1869,7 +1917,7 @@ manufacture_stock_index = {
 	value = stockpiling_manufacture_stock_var_state
 	multiply = manufacture_stock_price
 
-	#multiply = money_value #money_value_exchange_rate_with_reference_currency 
+	#multiply = money_value #money_value_exchange_rate_with_reference_currency
 }
 
 # agricultural_stock_index
@@ -1894,7 +1942,7 @@ agricultural_stock_index = {
 	value = stockpiling_agricultural_stock_var_state
 	multiply = agricultural_stock_price
 
-	#multiply = money_value #money_value_exchange_rate_with_reference_currency 
+	#multiply = money_value #money_value_exchange_rate_with_reference_currency
 }
 
 # mining_stock_index
@@ -1919,7 +1967,7 @@ mining_stock_index = {
 	value = stockpiling_mining_stock_var_state
 	multiply = mining_stock_price
 
-	#multiply = money_value #money_value_exchange_rate_with_reference_currency 
+	#multiply = money_value #money_value_exchange_rate_with_reference_currency
 }
 
 # railroad_stock_index
@@ -1944,7 +1992,7 @@ railroad_stock_index = {
 	value = stockpiling_railroad_stock_var_state
 	multiply = railroad_stock_price
 
-	#multiply = money_value #money_value_exchange_rate_with_reference_currency 
+	#multiply = money_value #money_value_exchange_rate_with_reference_currency
 }
 
 ###########################################################################################################################################################################################
@@ -4912,7 +4960,7 @@ enough_foreign_currrency = {
 					}
 				}
 			}
-		}	
+		}
 	}
 }
 
@@ -5057,7 +5105,6 @@ no_longer_exists_1 = {
 		}
 	}
 }
-
 no_longer_exists_2 = {
 	value = 0
 	if = {
@@ -5069,7 +5116,6 @@ no_longer_exists_2 = {
 		}
 	}
 }
-
 no_longer_exists_3 = {
 	value = 0
 	if = {
@@ -5081,7 +5127,6 @@ no_longer_exists_3 = {
 		}
 	}
 }
-
 no_longer_exists_4 = {
 	value = 0
 	if = {
@@ -5093,7 +5138,6 @@ no_longer_exists_4 = {
 		}
 	}
 }
-
 no_longer_exists_5 = {
 	value = 0
 	if = {
@@ -5105,7 +5149,6 @@ no_longer_exists_5 = {
 		}
 	}
 }
-
 no_longer_exists_6 = {
 	value = 0
 	if = {
@@ -5117,7 +5160,6 @@ no_longer_exists_6 = {
 		}
 	}
 }
-
 no_longer_exists_7 = {
 	value = 0
 	if = {
@@ -5129,7 +5171,6 @@ no_longer_exists_7 = {
 		}
 	}
 }
-
 no_longer_exists_8 = {
 	value = 0
 	if = {
@@ -5141,7 +5182,6 @@ no_longer_exists_8 = {
 		}
 	}
 }
-
 no_longer_exists_9 = {
 	value = 0
 	if = {
@@ -5153,7 +5193,6 @@ no_longer_exists_9 = {
 		}
 	}
 }
-
 no_longer_exists_10 = {
 	value = 0
 	if = {
@@ -5186,7 +5225,7 @@ ai_no_longer_exists_2 = {
 			exists = prev
 			add = 1
 			add = economic_instability_var_sc
-		}			
+		}
 	}
 }
 ai_no_longer_exists_3 = {
@@ -5301,140 +5340,140 @@ gold_lent_to_other = { #buy
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_1
-			has_modifier = buy_bond_1
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_1
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_2
-			has_modifier = buy_bond_2
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_2
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_3
-			has_modifier = buy_bond_3
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_3
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_4
-			has_modifier = buy_bond_4
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_4
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_5
-			has_modifier = buy_bond_5
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_5
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_6
-			has_modifier = buy_bond_6
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_6
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_7
-			has_modifier = buy_bond_7
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_7
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_8
-			has_modifier = buy_bond_8
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_8
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_9
-			has_modifier = buy_bond_9
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_9
 	}
 	if  = {
 		limit  = {
 			is_set = var:total_bond_value_10
-			has_modifier = buy_bond_10
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:total_bond_value_10
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_1
-			has_modifier = ai_buy_bond_1
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_1
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_2
-			has_modifier = ai_buy_bond_2
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_2
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_3
-			has_modifier = ai_buy_bond_3
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_3
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_4
-			has_modifier = ai_buy_bond_4
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_4
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_5
-			has_modifier = ai_buy_bond_5
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_5
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_6
-			has_modifier = ai_buy_bond_6
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_6
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_7
-			has_modifier = ai_buy_bond_7
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_7
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_8
-			has_modifier = ai_buy_bond_8
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_8
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_9
-			has_modifier = ai_buy_bond_9
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_9
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_total_bond_value_10
-			has_modifier = ai_buy_bond_10
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_total_bond_value_10
 	}
@@ -5445,140 +5484,140 @@ total_interest_calculated = {
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_1
-			has_modifier = buy_bond_1
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_1
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_2
-			has_modifier = buy_bond_2
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_2
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_3
-			has_modifier = buy_bond_3
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_3
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_4
-			has_modifier = buy_bond_4
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_4
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_5
-			has_modifier = buy_bond_5
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_5
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_6
-			has_modifier = buy_bond_6
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_6
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_7
-			has_modifier = buy_bond_7
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_7
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_8
-			has_modifier = buy_bond_8
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_8
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_9
-			has_modifier = buy_bond_9
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_9
 	}
 	if  = {
 		limit  = {
 			is_set = var:interest_calculated_10
-			has_modifier = buy_bond_10
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:interest_calculated_10
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_1
-			has_modifier = ai_buy_bond_1
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_1
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_2
-			has_modifier = ai_buy_bond_2
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_2
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_3
-			has_modifier = ai_buy_bond_3
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_3
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_4
-			has_modifier = ai_buy_bond_4
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_4
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_5
-			has_modifier = ai_buy_bond_5
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_5
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_6
-			has_modifier = ai_buy_bond_6
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_6
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_7
-			has_modifier = ai_buy_bond_7
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_7
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_8
-			has_modifier = ai_buy_bond_8
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_8
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_9
-			has_modifier = ai_buy_bond_9
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_9
 	}
 	if  = {
 		limit  = {
 			is_set = var:ai_interest_calculated_10
-			has_modifier = ai_buy_bond_10
+			has_modifier = interest_from_foreign_debt_investment
 		}
 		add = var:ai_interest_calculated_10
 	}
@@ -5894,16 +5933,16 @@ ai_interest_per_month = {
 interest_per_month_from_foreign_debt_investment = {
 	value = 0
 
-	add = var:interest_per_month_calculated_1_for_player
-	add = var:interest_per_month_calculated_2_for_player
-	add = var:interest_per_month_calculated_3_for_player
-	add = var:interest_per_month_calculated_4_for_player
-	add = var:interest_per_month_calculated_5_for_player
-	add = var:interest_per_month_calculated_6_for_player
-	add = var:interest_per_month_calculated_7_for_player
-	add = var:interest_per_month_calculated_8_for_player
-	add = var:interest_per_month_calculated_9_for_player
-	add = var:interest_per_month_calculated_10_for_player
+	add = var:interest_per_month_calculated_1
+	add = var:interest_per_month_calculated_2
+	add = var:interest_per_month_calculated_3
+	add = var:interest_per_month_calculated_4
+	add = var:interest_per_month_calculated_5
+	add = var:interest_per_month_calculated_6
+	add = var:interest_per_month_calculated_7
+	add = var:interest_per_month_calculated_8
+	add = var:interest_per_month_calculated_9
+	add = var:interest_per_month_calculated_10
 
 	add = var:ai_interest_per_month_calculated_1
 	add = var:ai_interest_per_month_calculated_2
@@ -6004,12 +6043,11 @@ buy_bond_order_valid_5Y = {
 economic_instability_var_sc = {
 	value = 0
 	#add = var:economic_instability_var
-	
+
 	if = {
 		limit  = {
 			has_modifier = economic_instability
-		} 
+		}
 		add = -1
-	} 
+	}
 }
-
