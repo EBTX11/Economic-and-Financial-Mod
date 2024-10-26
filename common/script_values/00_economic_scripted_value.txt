@@ -365,6 +365,15 @@ every_subject_gold = {
 	}
 }
 
+subject_overlord_gdp_ratio = {
+	value = gdp 
+	divide = overlord.gdp
+}
+subject_overlord_gdp_ratio_revers = {
+	value = 1
+	subtract = subject_overlord_gdp_ratio
+}
+
 ########################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -736,23 +745,34 @@ money_value = {
 	}
 	if = {
 		limit = {
-			or = {
-				is_subject = yes
-
-			}
+			is_subject = yes
 			overlord = {
 				has_modifier = has_central_bank
 			}
 		}
 		value = overlord.money_value #overlord.money_value_0
-		divide = overlord.var:parity_scaled_by_the_overlord
+		if = {
+			limit = {
+				is_subject = yes
+				overlord = {
+					is_player = no
+				}
+			}
+			multiply = subject_overlord_gdp_ratio_revers
+		}
+		if = {
+			limit = {
+				is_subject = yes
+				overlord = {
+					is_player = yes
+				}
+			}
+			divide = overlord.var:parity_scaled_by_the_overlord
+		}
 	}
 	if = {
 		limit = {
-			or = {
-				is_subject = yes
-
-			}
+			is_subject = yes
 			overlord = {
 				not = {
 					has_modifier = has_central_bank

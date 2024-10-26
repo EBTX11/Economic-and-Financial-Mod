@@ -476,6 +476,7 @@ gold_by_trade_route = {
 		}
 	}
 }
+
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
@@ -489,6 +490,8 @@ gold_by_trade_route = {
 ###########################################################################################################################################################################################
 
 stockpiling_capital_state_transfert = {
+	financial_center_modifier = yes
+
 	every_scope_state = {
 		if = {
 			limit = {
@@ -2775,21 +2778,8 @@ stockpiling_capital_state_transfert = {
 				remove_modifier = national_stockpile_historic_place
 
 				add_modifier = {
-					name = central_bank_place
-					months = 1
-				}
-				add_modifier = {
-					name = central_bank_historic_place
-					months = 1
-				}
-
-				add_modifier = {
-					name = national_stockpile_place
-					months = 1
-				}
-				add_modifier = {
-					name = national_stockpile_historic_place
-					months = 1
+					name = looted_state
+					months = 3
 				}
 			}
 		}
@@ -2798,61 +2788,50 @@ stockpiling_capital_state_transfert = {
 	if = {
 		limit = {
 			any_scope_state = {
-				has_building = building_financial_centre
-
+				var:financial_center_site_var = 0  
+				or = {
+					var:stockpiling_bond_var_state_1 > 0
+					var:stockpiling_manufacture_stock_var_state_1 > 0
+					var:stockpiling_agricultural_stock_var_state_1 > 0
+					var:stockpiling_mining_stock_var_state_1 > 0
+					var:stockpiling_railroad_stock_var_state_1 > 0
+				}
 			}
 		}
 		stockpiling_capital_state_transfert_financial_center_place = yes
 	}
-	# if = {
-	# 	limit = {
-	# 		any_scope_state = {
-	# 			or = {
-	# 				has_building = building_financial_centre_fra
-	# 				has_building = building_financial_centre_gbr
-	# 				has_building = building_financial_centre_usa
-	# 				has_building = building_financial_centre_net
-	# 				has_building = building_financial_centre_ger
-	# 				has_building = building_financial_centre_aus
-	# 				has_building = building_financial_centre_ita
-	# 				has_building = building_financial_centre_chi
-	# 				has_building = building_financial_centre_jap
-	# 			}
-	# 		}
-	# 	}
-	# 	stockpiling_capital_state_transfert_financial_center_place_spe = yes
-	# }
 }
 stockpiling_capital_state_transfert_financial_center_place = {
-	set_variable = {
-		name = stockpiling_capital_state_transfert_financial_center_place
-		value = 1
-	}
-
 	every_scope_state = {
 		if = {
 			limit = {
-				has_modifier = financial_center_historic_place
-				is_capital = yes
+				var:financial_center_site_var =  1
 			}
-			save_scope_as = financial_center_site_capital
+			save_scope_as = financial_center_site_capital #non nécessairement la capital
 		}
 		if = {
 			limit = {
-				has_modifier = financial_center_historic_place
-				is_capital = no
+				var:financial_center_site_var = 0  
+				not = {
+					var:looted_state = 1
+				}
 			}
-			save_scope_as = financial_center_site_no_capital
+			save_scope_as = financial_center_site_no_capital #non nécessairement la capital
 		}
 	}
-
 	if  = {
 		limit  = {
 			exists = scope:financial_center_site_no_capital
+			#exists = scope:financial_center_site_capital
 		}
 
 		#actual Capital
 		scope:financial_center_site_capital = {
+			
+			change_variable = {
+				name = test_var_1
+				add = 1
+			}
 
 			#####################
 			#financial product
@@ -2861,7 +2840,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			change_variable = {
 				name = stockpiling_bond_var_state_1
 				add = {
-					scope:central_bank_site_no_capital = {
+					scope:financial_center_site_no_capital = {
 						add = var:stockpiling_bond_var_state_1
 					}
 				}
@@ -2869,7 +2848,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			change_variable = {
 				name = stockpiling_manufacture_stock_var_state_1
 				add = {
-					scope:central_bank_site_no_capital = {
+					scope:financial_center_site_no_capital = {
 						add = var:stockpiling_manufacture_stock_var_state_1
 					}
 				}
@@ -2877,7 +2856,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			change_variable = {
 				name = stockpiling_agricultural_stock_var_state_1
 				add = {
-					scope:central_bank_site_no_capital = {
+					scope:financial_center_site_no_capital = {
 						add = var:stockpiling_agricultural_stock_var_state_1
 					}
 				}
@@ -2885,7 +2864,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			change_variable = {
 				name = stockpiling_mining_stock_var_state_1
 				add = {
-					scope:central_bank_site_no_capital = {
+					scope:financial_center_site_no_capital = {
 						add = var:stockpiling_mining_stock_var_state_1
 					}
 				}
@@ -2893,7 +2872,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			change_variable = {
 				name = stockpiling_railroad_stock_var_state_1
 				add = {
-					scope:central_bank_site_no_capital = {
+					scope:financial_center_site_no_capital = {
 						add = var:stockpiling_railroad_stock_var_state_1
 					}
 				}
@@ -2905,6 +2884,15 @@ stockpiling_capital_state_transfert_financial_center_place = {
 			if  = {
 				limit  = {
 					exists = scope:financial_center_site_no_capital
+				}
+				set_variable = {
+					name = looted_state
+					value = 1
+				}
+
+				change_variable = {
+					name = test_var_1
+					add = 1
 				}
 
 				#####################
@@ -2935,6 +2923,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 		}
 	}
 }
+
 enemy_capital_is_occuped = {
 	set_variable  = {
 		name = looting_1_year
@@ -2968,13 +2957,15 @@ enemy_capital_is_occuped = {
 	}
 
 	if  = {
-
 		limit = {
 			exists = scope:occupied_capital
 		}
 
-		#actual Capital
 		scope:central_bank_site_capital = {
+
+			owner  = {
+				change_infamy = 50
+			}
 
 			#####################
 			#gold
@@ -4058,7 +4049,6 @@ enemy_capital_is_occuped = {
 				}
 			}
 		}
-
 		scope:occupied_capital = {
 			if  = {
 				limit = {
@@ -4574,6 +4564,7 @@ enemy_capital_is_occuped = {
 			}
 		}
 	}
+
 	# scope:occupied_capital = {
 	# 	owner = {
 	# 		remove_modifier = foreign_exchange_controls
@@ -71992,25 +71983,6 @@ reset_debt_in_national_currency = {
 		}
 	}
 }
-
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-
-#  ██████╗ ██╗      ██████╗ ██████╗  █████╗ ██╗         ██╗   ██╗ █████╗ ██████╗
-# ██╔════╝ ██║     ██╔═══██╗██╔══██╗██╔══██╗██║         ██║   ██║██╔══██╗██╔══██╗
-# ██║  ███╗██║     ██║   ██║██████╔╝███████║██║         ██║   ██║███████║██████╔╝
-# ██║   ██║██║     ██║   ██║██╔══██╗██╔══██║██║         ╚██╗ ██╔╝██╔══██║██╔══██╗
-# ╚██████╔╝███████╗╚██████╔╝██████╔╝██║  ██║███████╗     ╚████╔╝ ██║  ██║██║  ██║
-#  ╚═════╝ ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝      ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝
-
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
-###########################################################################################################################################################################################
 
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################

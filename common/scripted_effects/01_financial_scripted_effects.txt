@@ -1155,7 +1155,6 @@ stockpiling_bond_1 = {
             name = stockpiling_bond_var_2
             multiply = 4
         }
-		#stockpiling_bond_2 = yes
 		stockpiling_bond_2_state = yes
     }
 }
@@ -1199,13 +1198,12 @@ stockpiling_manufacture_stock_1 = {
         change_variable = {
             name = stockpiling_manufacture_stock_var_2
 			add = manufacture_stock_market_goods_buy_orders
-#            add = manufacture_stock_market_goods_delta
+            #add = manufacture_stock_market_goods_delta
         }
         change_variable = {
             name = stockpiling_manufacture_stock_var_2
             multiply = 4
         }
-		#stockpiling_manufacture_stock_2 = yes
 		stockpiling_manufacture_stock_2_state = yes
     }
 }
@@ -1249,13 +1247,11 @@ stockpiling_agricultural_stock_1 = {
         change_variable = {
             name = stockpiling_agricultural_stock_var_2
 			add = agricultural_stock_market_goods_buy_orders
-#            add = agricultural_stock_market_goods_delta
         }
         change_variable = {
             name = stockpiling_agricultural_stock_var_2
             multiply = 4
         }
-		#stockpiling_agricultural_stock_2 = yes
 		stockpiling_agricultural_stock_2_state = yes
     }
 }
@@ -1299,13 +1295,11 @@ stockpiling_mining_stock_1 = {
         change_variable = {
             name = stockpiling_mining_stock_var_2
 			add = mining_stock_market_goods_buy_orders
-			#add = mining_stock_market_goods_delta
         }
         change_variable = {
             name = stockpiling_mining_stock_var_2
             multiply = 4
         }
-		#stockpiling_mining_stock_2 = yes
 		stockpiling_mining_stock_2_state = yes
     }
 }
@@ -1349,13 +1343,11 @@ stockpiling_railroad_stock_1 = {
         change_variable = {
             name = stockpiling_railroad_stock_var_2
 			add = railroad_stock_market_goods_buy_orders
-		#add = railroad_stock_market_goods_delta
         }
         change_variable = {
             name = stockpiling_railroad_stock_var_2
             multiply = 4
         }
-		#stockpiling_railroad_stock_2 = yes
 		stockpiling_railroad_stock_2_state = yes
     }
 }
@@ -10772,7 +10764,16 @@ country_bankruptcy = {
 }
 ########################################################################################
 
-economic_instability = {  #currency_crisis/economic_crisis
+economic_instability = {
+
+	########################################################################################
+	# #test
+	# set_variable = {
+	# 	name = country_indice_value_dif_01
+	# 	value = -0.6
+	# }
+	########################################################################################
+
 	root = {
 		save_scope_as = target_country
 	}
@@ -10854,6 +10855,26 @@ economic_instability = {  #currency_crisis/economic_crisis
 			name = economic_instability
 			months = 24
 		}
+		if = {
+			limit  = {
+				var:central_bank_bankruptcy = 1
+			}
+			remove_modifier = central_bank_bankruptcy_country
+			add_modifier = {
+				name = central_bank_bankruptcy_country
+				months = 24
+			}
+		}
+		if = {
+			limit  = {
+				var:currency_crisis = 1
+			}
+			remove_modifier = currency_crisis_country
+			add_modifier = {
+				name = currency_crisis_country
+				months = 24
+			}
+		}
 	}
 
 	#financial_crash
@@ -10870,7 +10891,7 @@ economic_instability = {  #currency_crisis/economic_crisis
 				has_modifier = has_central_bank
 				has_modifier = has_financial_center
 			}				
-			#financial_crash_consequences = yes
+			financial_crash_consequences = yes
 		}
 
 		remove_modifier = country_credit_rating_AAA
@@ -10890,6 +10911,12 @@ economic_instability = {  #currency_crisis/economic_crisis
 		remove_modifier = economic_instability
 		add_modifier = {
 			name = economic_instability #bloc l'achat de  la devise et favorrise sa vente / bloc le base ratre à 10%
+			months = 24
+		}
+		remove_modifier = financial_crash_country
+		add_modifier = {
+			name = financial_crash_country
+			multiplier = var:country_indice_value_dif_01
 			months = 24
 		}
 	}
@@ -10930,14 +10957,16 @@ economic_instability = {  #currency_crisis/economic_crisis
 			name = economic_instability #bloc l'achat de  la devise et favorrise sa vente / bloc le base ratre à 10%
 			months = 24
 		}
-
+		remove_modifier = economic_crisis_country
+		add_modifier = {
+			name = economic_crisis_country
+			months = 24
+		}
 	}
 }
 financial_crash_consequences = {
 
-	#futur: 
-	# - destruction de la moitier des niveau du fiancial center (niveau de la chute)
-	# - nationalisation rendome
+	financial_crash_destroy_financial_center = yes 
 
 	#perte de capital du privé 
 	change_variable = {
@@ -10947,7 +10976,7 @@ financial_crash_consequences = {
 	add_investment_pool = investor_massive_capital_loss
 
 	#faillite des entreprise
-	bankrupt_company = yes 
+	bankrupt_company = yes #-> à revoir
 
 	#faillite batiment privé
 	every_scope_building = {
@@ -11028,10 +11057,9 @@ financial_crash_consequences = {
 	}
 }
 economic_crisis_consequences = {
-	
-	#futur: 
-	# - destruction de la moitier des niveau de la bank central (niveau de la chute)
-	
+
+	economic_crisis_destroy_central_bank = yes 
+
 	#perte de capital des pop 
 	change_variable = {
 		name = government_loan
@@ -11043,7 +11071,7 @@ economic_crisis_consequences = {
 	}
 
 	#faillite des entreprise
-	bankrupt_company = yes 
+	bankrupt_company = yes #-> à revoir
 
 	#faillite batiment privé et publique
 	every_scope_building = {
@@ -11138,18 +11166,8331 @@ economic_crisis_consequences = {
 ########################################################################################
 
 bankrupt_company = { 
-	#company - favorise le financial_crash
-	every_company = { #random_company = {
-		# limit = {
-		# 	prosperity < 100
-		# }
-		save_scope_as = bankrupt_company
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_agriculture_1
+		}
+		if = {
+			limit = { 
+				company:company_basic_agriculture_1.prosperity < 100
+			}
+			remove_company = company_type:company_basic_agriculture_1
+		}
 	}
-	remove_company = scope:bankrupt_company
-
-
-
-
-
-
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_agriculture_2
+		}
+		if = {
+			limit = { 
+				company:company_basic_agriculture_2.prosperity < 100
+			}
+			remove_company = company_type:company_basic_agriculture_2
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_fabrics
+		}
+		if = {
+			limit = { 
+				company:company_basic_fabrics.prosperity < 100
+			}
+			remove_company = company_type:company_basic_fabrics
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_colonial_plantations_1
+		}
+		if = {
+			limit = { 
+				company:company_basic_colonial_plantations_1.prosperity < 100
+			}
+			remove_company = company_type:company_basic_colonial_plantations_1
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_colonial_plantations_2 
+		}
+		if = {
+			limit = { 
+				company:company_basic_colonial_plantations_2 .prosperity < 100
+			}
+			remove_company = company_type:company_basic_colonial_plantations_2 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_silk_and_dye
+		}
+		if = {
+			limit = { 
+				company:company_basic_silk_and_dye.prosperity < 100
+			}
+			remove_company = company_type:company_basic_silk_and_dye
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_wine_and_fruit
+		}
+		if = {
+			limit = { 
+				company:company_basic_wine_and_fruit.prosperity < 100
+			}
+			remove_company = company_type:company_basic_wine_and_fruit
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_fishing
+		}
+		if = {
+			limit = { 
+				company:company_basic_fishing.prosperity < 100
+			}
+			remove_company = company_type:company_basic_fishing
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_forestry
+		}
+		if = {
+			limit = { 
+				company:company_basic_forestry.prosperity < 100
+			}
+			remove_company = company_type:company_basic_forestry
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_oil
+		}
+		if = {
+			limit = { 
+				company:company_basic_oil.prosperity < 100
+			}
+			remove_company = company_type:company_basic_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_gold_mining
+		}
+		if = {
+			limit = { 
+				company:company_basic_gold_mining.prosperity < 100
+			}
+			remove_company = company_type:company_basic_gold_mining
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_metal_mining
+		}
+		if = {
+			limit = { 
+				company:company_basic_metal_mining.prosperity < 100
+			}
+			remove_company = company_type:company_basic_metal_mining
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_mineral_mining
+		}
+		if = {
+			limit = { 
+				company:company_basic_mineral_mining.prosperity < 100
+			}
+			remove_company = company_type:company_basic_mineral_mining
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_food 
+		}
+		if = {
+			limit = { 
+				company:company_basic_food .prosperity < 100
+			}
+			remove_company = company_type:company_basic_food 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_paper
+		}
+		if = {
+			limit = { 
+				company:company_basic_paper.prosperity < 100
+			}
+			remove_company = company_type:company_basic_paper
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_home_goods
+		}
+		if = {
+			limit = { 
+				company:company_basic_home_goods.prosperity < 100
+			}
+			remove_company = company_type:company_basic_home_goods
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_textiles
+		}
+		if = {
+			limit = { 
+				company:company_basic_textiles.prosperity < 100
+			}
+			remove_company = company_type:company_basic_textiles
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_steel
+		}
+		if = {
+			limit = { 
+				company:company_basic_steel.prosperity < 100
+			}
+			remove_company = company_type:company_basic_steel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_metalworks
+		}
+		if = {
+			limit = { 
+				company:company_basic_metalworks.prosperity < 100
+			}
+			remove_company = company_type:company_basic_metalworks
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_shipyards 
+		}
+		if = {
+			limit = { 
+				company:company_basic_shipyards .prosperity < 100
+			}
+			remove_company = company_type:company_basic_shipyards 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_chemicals 
+		}
+		if = {
+			limit = { 
+				company:company_basic_chemicals .prosperity < 100
+			}
+			remove_company = company_type:company_basic_chemicals 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_motors 
+		}
+		if = {
+			limit = { 
+				company:company_basic_motors .prosperity < 100
+			}
+			remove_company = company_type:company_basic_motors 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_munitions 
+		}
+		if = {
+			limit = { 
+				company:company_basic_munitions .prosperity < 100
+			}
+			remove_company = company_type:company_basic_munitions 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basic_electrics 
+		}
+		if = {
+			limit = { 
+				company:company_basic_electrics .prosperity < 100
+			}
+			remove_company = company_type:company_basic_electrics 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_construction_power_bloc
+		}
+		if = {
+			limit = { 
+				company:company_construction_power_bloc.prosperity < 100
+			}
+			remove_company = company_type:company_construction_power_bloc
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_standard_oil
+		}
+		if = {
+			limit = { 
+				company:company_standard_oil.prosperity < 100
+			}
+			remove_company = company_type:company_standard_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_united_fruit
+		}
+		if = {
+			limit = { 
+				company:company_united_fruit.prosperity < 100
+			}
+			remove_company = company_type:company_united_fruit
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_us_steel 
+		}
+		if = {
+			limit = { 
+				company:company_us_steel .prosperity < 100
+			}
+			remove_company = company_type:company_us_steel 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_general_electric 
+		}
+		if = {
+			limit = { 
+				company:company_general_electric .prosperity < 100
+			}
+			remove_company = company_type:company_general_electric 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_william_cramp 
+		}
+		if = {
+			limit = { 
+				company:company_william_cramp .prosperity < 100
+			}
+			remove_company = company_type:company_william_cramp 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ford_motor 
+		}
+		if = {
+			limit = { 
+				company:company_ford_motor .prosperity < 100
+			}
+			remove_company = company_type:company_ford_motor 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_da_afghan_nassaji_sherkat 
+		}
+		if = {
+			limit = { 
+				company:company_da_afghan_nassaji_sherkat .prosperity < 100
+			}
+			remove_company = company_type:company_da_afghan_nassaji_sherkat 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_iranian_state_railway 
+		}
+		if = {
+			limit = { 
+				company:company_iranian_state_railway .prosperity < 100
+			}
+			remove_company = company_type:company_iranian_state_railway 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_tashkent_railroad 
+		}
+		if = {
+			limit = { 
+				company:company_tashkent_railroad .prosperity < 100
+			}
+			remove_company = company_type:company_tashkent_railroad 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_west_ural_petroleum 
+		}
+		if = {
+			limit = { 
+				company:company_west_ural_petroleum .prosperity < 100
+			}
+			remove_company = company_type:company_west_ural_petroleum 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sherkat_shemali 
+		}
+		if = {
+			limit = { 
+				company:company_sherkat_shemali .prosperity < 100
+			}
+			remove_company = company_type:company_sherkat_shemali 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_opium_export_monopoly 
+		}
+		if = {
+			limit = { 
+				company:company_opium_export_monopoly .prosperity < 100
+			}
+			remove_company = company_type:company_opium_export_monopoly 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sherkate_eslamiya 
+		}
+		if = {
+			limit = { 
+				company:company_sherkate_eslamiya .prosperity < 100
+			}
+			remove_company = company_type:company_sherkate_eslamiya 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nicolas_portalis 
+		}
+		if = {
+			limit = { 
+				company:company_nicolas_portalis .prosperity < 100
+			}
+			remove_company = company_type:company_nicolas_portalis 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hanseong_jeongi_hoesa
+		}
+		if = {
+			limit = { 
+				company:company_hanseong_jeongi_hoesa.prosperity < 100
+			}
+			remove_company = company_type:company_hanseong_jeongi_hoesa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kirgizian_mining_company
+		}
+		if = {
+			limit = { 
+				company:company_kirgizian_mining_company.prosperity < 100
+			}
+			remove_company = company_type:company_kirgizian_mining_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_persshelk 
+		}
+		if = {
+			limit = { 
+				company:company_persshelk .prosperity < 100
+			}
+			remove_company = company_type:company_persshelk 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_perskhlopok 
+		}
+		if = {
+			limit = { 
+				company:company_perskhlopok .prosperity < 100
+			}
+			remove_company = company_type:company_perskhlopok 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_moscow_irrigation_company
+		}
+		if = {
+			limit = { 
+				company:company_moscow_irrigation_company.prosperity < 100
+			}
+			remove_company = company_type:company_moscow_irrigation_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_guinness 
+		}
+		if = {
+			limit = { 
+				company:company_guinness .prosperity < 100
+			}
+			remove_company = company_type:company_guinness 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_oriental_development_company 
+		}
+		if = {
+			limit = { 
+				company:company_oriental_development_company .prosperity < 100
+			}
+			remove_company = company_type:company_oriental_development_company 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_turkish_petroleum 
+		}
+		if = {
+			limit = { 
+				company:company_turkish_petroleum .prosperity < 100
+			}
+			remove_company = company_type:company_turkish_petroleum 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_anglo_persian_oil 
+		}
+		if = {
+			limit = { 
+				company:company_anglo_persian_oil .prosperity < 100
+			}
+			remove_company = company_type:company_anglo_persian_oil 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_national_iranian_oil 
+		}
+		if = {
+			limit = { 
+				company:company_national_iranian_oil .prosperity < 100
+			}
+			remove_company = company_type:company_national_iranian_oil 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_vodka_monopoly 
+		}
+		if = {
+			limit = { 
+				company:company_vodka_monopoly .prosperity < 100
+			}
+			remove_company = company_type:company_vodka_monopoly 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_putilov_company 
+		}
+		if = {
+			limit = { 
+				company:company_putilov_company .prosperity < 100
+			}
+			remove_company = company_type:company_putilov_company 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_branobel 
+		}
+		if = {
+			limit = { 
+				company:company_branobel .prosperity < 100
+			}
+			remove_company = company_type:company_branobel 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_izhevsk_arms_plant 
+		}
+		if = {
+			limit = { 
+				company:company_izhevsk_arms_plant .prosperity < 100
+			}
+			remove_company = company_type:company_izhevsk_arms_plant 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_savva_morozov
+		}
+		if = {
+			limit = { 
+				company:company_savva_morozov.prosperity < 100
+			}
+			remove_company = company_type:company_savva_morozov
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_john_hughes 
+		}
+		if = {
+			limit = { 
+				company:company_john_hughes .prosperity < 100
+			}
+			remove_company = company_type:company_john_hughes 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mitsui
+		}
+		if = {
+			limit = { 
+				company:company_mitsui.prosperity < 100
+			}
+			remove_company = company_type:company_mitsui
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mantetsu
+		}
+		if = {
+			limit = { 
+				company:company_mantetsu.prosperity < 100
+			}
+			remove_company = company_type:company_mantetsu
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mitsubishi  
+		}
+		if = {
+			limit = { 
+				company:company_mitsubishi  .prosperity < 100
+			}
+			remove_company = company_type:company_mitsubishi  
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ansaldo 
+		}
+		if = {
+			limit = { 
+				company:company_ansaldo .prosperity < 100
+			}
+			remove_company = company_type:company_ansaldo 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ricordi
+		}
+		if = {
+			limit = { 
+				company:company_ricordi.prosperity < 100
+			}
+			remove_company = company_type:company_ricordi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fiat
+		}
+		if = {
+			limit = { 
+				company:company_fiat.prosperity < 100
+			}
+			remove_company = company_type:company_fiat
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_stt 
+		}
+		if = {
+			limit = { 
+				company:company_stt .prosperity < 100
+			}
+			remove_company = company_type:company_stt 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ilva 
+		}
+		if = {
+			limit = { 
+				company:company_ilva .prosperity < 100
+			}
+			remove_company = company_type:company_ilva 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ansaldo 
+		}
+		if = {
+			limit = { 
+				company:company_ansaldo .prosperity < 100
+			}
+			remove_company = company_type:company_ansaldo 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ricordi 
+		}
+		if = {
+			limit = { 
+				company:company_ricordi .prosperity < 100
+			}
+			remove_company = company_type:company_ricordi 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fiat 
+		}
+		if = {
+			limit = { 
+				company:company_fiat .prosperity < 100
+			}
+			remove_company = company_type:company_fiat 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_stt 
+		}
+		if = {
+			limit = { 
+				company:company_stt .prosperity < 100
+			}
+			remove_company = company_type:company_stt 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_krupp 
+		}
+		if = {
+			limit = { 
+				company:company_krupp .prosperity < 100
+			}
+			remove_company = company_type:company_krupp 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_rheinmetall
+		}
+		if = {
+			limit = { 
+				company:company_rheinmetall.prosperity < 100
+			}
+			remove_company = company_type:company_rheinmetall
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_schichau 
+		}
+		if = {
+			limit = { 
+				company:company_schichau .prosperity < 100
+			}
+			remove_company = company_type:company_schichau 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_siemens_and_halske
+		}
+		if = {
+			limit = { 
+				company:company_siemens_and_halske.prosperity < 100
+			}
+			remove_company = company_type:company_siemens_and_halske
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_prussian_state_railways 
+		}
+		if = {
+			limit = { 
+				company:company_prussian_state_railways .prosperity < 100
+			}
+			remove_company = company_type:company_prussian_state_railways 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basf
+		}
+		if = {
+			limit = { 
+				company:company_basf.prosperity < 100
+			}
+			remove_company = company_type:company_basf
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_societe_mokta_el_hadid 
+		}
+		if = {
+			limit = { 
+				company:company_societe_mokta_el_hadid .prosperity < 100
+			}
+			remove_company = company_type:company_societe_mokta_el_hadid 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_schneider_creusot 
+		}
+		if = {
+			limit = { 
+				company:company_schneider_creusot .prosperity < 100
+			}
+			remove_company = company_type:company_schneider_creusot 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_dmc 
+		}
+		if = {
+			limit = { 
+				company:company_dmc .prosperity < 100
+			}
+			remove_company = company_type:company_dmc 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cgv
+		}
+		if = {
+			limit = { 
+				company:company_cgv.prosperity < 100
+			}
+			remove_company = company_type:company_cgv
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_saint_etienne
+		}
+		if = {
+			limit = { 
+				company:company_saint_etienne.prosperity < 100
+			}
+			remove_company = company_type:company_saint_etienne
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fcm 
+		}
+		if = {
+			limit = { 
+				company:company_fcm .prosperity < 100
+			}
+			remove_company = company_type:company_fcm 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mines_anzin 
+		}
+		if = {
+			limit = { 
+				company:company_mines_anzin .prosperity < 100
+			}
+			remove_company = company_type:company_mines_anzin 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_societe_mokta_el_hadid 
+		}
+		if = {
+			limit = { 
+				company:company_societe_mokta_el_hadid .prosperity < 100
+			}
+			remove_company = company_type:company_societe_mokta_el_hadid 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_schneider_creusot
+		}
+		if = {
+			limit = { 
+				company:company_schneider_creusot.prosperity < 100
+			}
+			remove_company = company_type:company_schneider_creusot
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_dmc 
+		}
+		if = {
+			limit = { 
+				company:company_dmc .prosperity < 100
+			}
+			remove_company = company_type:company_dmc 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cgv 
+		}
+		if = {
+			limit = { 
+				company:company_cgv .prosperity < 100
+			}
+			remove_company = company_type:company_cgv 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_saint_etienne 
+		}
+		if = {
+			limit = { 
+				company:company_saint_etienne .prosperity < 100
+			}
+			remove_company = company_type:company_saint_etienne 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fcm 
+		}
+		if = {
+			limit = { 
+				company:company_fcm .prosperity < 100
+			}
+			remove_company = company_type:company_fcm 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mines_anzin 
+		}
+		if = {
+			limit = { 
+				company:company_mines_anzin .prosperity < 100
+			}
+			remove_company = company_type:company_mines_anzin 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sao_paulo_railway 
+		}
+		if = {
+			limit = { 
+				company:company_sao_paulo_railway .prosperity < 100
+			}
+			remove_company = company_type:company_sao_paulo_railway 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_estaleiro_maua 
+		}
+		if = {
+			limit = { 
+				company:company_estaleiro_maua .prosperity < 100
+			}
+			remove_company = company_type:company_estaleiro_maua 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_pernambuco_textiles 
+		}
+		if = {
+			limit = { 
+				company:company_pernambuco_textiles .prosperity < 100
+			}
+			remove_company = company_type:company_pernambuco_textiles 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fundicao_ipanema
+		}
+		if = {
+			limit = { 
+				company:company_fundicao_ipanema.prosperity < 100
+			}
+			remove_company = company_type:company_fundicao_ipanema
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_rossi 
+		}
+		if = {
+			limit = { 
+				company:company_rossi .prosperity < 100
+			}
+			remove_company = company_type:company_rossi 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_estanifera_llallagua 
+		}
+		if = {
+			limit = { 
+				company:company_estanifera_llallagua .prosperity < 100
+			}
+			remove_company = company_type:company_estanifera_llallagua 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_argentinian_wine
+		}
+		if = {
+			limit = { 
+				company:company_argentinian_wine.prosperity < 100
+			}
+			remove_company = company_type:company_argentinian_wine
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sudamericana_de_vapores
+		}
+		if = {
+			limit = { 
+				company:company_sudamericana_de_vapores.prosperity < 100
+			}
+			remove_company = company_type:company_sudamericana_de_vapores
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_electricidad_de_caracas 
+		}
+		if = {
+			limit = { 
+				company:company_electricidad_de_caracas .prosperity < 100
+			}
+			remove_company = company_type:company_electricidad_de_caracas 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cordoba_railway
+		}
+		if = {
+			limit = { 
+				company:company_cordoba_railway.prosperity < 100
+			}
+			remove_company = company_type:company_cordoba_railway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_eea 
+		}
+		if = {
+			limit = { 
+				company:company_eea .prosperity < 100
+			}
+			remove_company = company_type:company_eea 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kaiping_mining 
+		}
+		if = {
+			limit = { 
+				company:company_kaiping_mining .prosperity < 100
+			}
+			remove_company = company_type:company_kaiping_mining 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hanyang_arsenal 
+		}
+		if = {
+			limit = { 
+				company:company_hanyang_arsenal .prosperity < 100
+			}
+			remove_company = company_type:company_hanyang_arsenal 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_foochow_arsenal
+		}
+		if = {
+			limit = { 
+				company:company_foochow_arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_foochow_arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_jingdezhen
+		}
+		if = {
+			limit = { 
+				company:company_jingdezhen.prosperity < 100
+			}
+			remove_company = company_type:company_jingdezhen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_skoda 
+		}
+		if = {
+			limit = { 
+				company:company_skoda .prosperity < 100
+			}
+			remove_company = company_type:company_skoda 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mav 
+		}
+		if = {
+			limit = { 
+				company:company_mav .prosperity < 100
+			}
+			remove_company = company_type:company_mav 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_manfred_weiss 
+		}
+		if = {
+			limit = { 
+				company:company_manfred_weiss .prosperity < 100
+			}
+			remove_company = company_type:company_manfred_weiss 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_galician_carpathian_oil 
+		}
+		if = {
+			limit = { 
+				company:company_galician_carpathian_oil .prosperity < 100
+			}
+			remove_company = company_type:company_galician_carpathian_oil 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_oevg 
+		}
+		if = {
+			limit = { 
+				company:company_oevg .prosperity < 100
+			}
+			remove_company = company_type:company_oevg 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_east_india_company 
+		}
+		if = {
+			limit = { 
+				company:company_east_india_company .prosperity < 100
+			}
+			remove_company = company_type:company_east_india_company 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_imperial_arsenal 
+		}
+		if = {
+			limit = { 
+				company:company_imperial_arsenal .prosperity < 100
+			}
+			remove_company = company_type:company_imperial_arsenal 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ottoman_tobacco_regie 
+		}
+		if = {
+			limit = { 
+				company:company_ottoman_tobacco_regie .prosperity < 100
+			}
+			remove_company = company_type:company_ottoman_tobacco_regie 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_allatini_mills 
+		}
+		if = {
+			limit = { 
+				company:company_allatini_mills .prosperity < 100
+			}
+			remove_company = company_type:company_allatini_mills 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_orient_express 
+		}
+		if = {
+			limit = { 
+				company:company_orient_express .prosperity < 100
+			}
+			remove_company = company_type:company_orient_express 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_great_indian_railway 
+		}
+		if = {
+			limit = { 
+				company:company_great_indian_railway .prosperity < 100
+			}
+			remove_company = company_type:company_great_indian_railway 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_tata 
+		}
+		if = {
+			limit = { 
+				company:company_tata .prosperity < 100
+			}
+			remove_company = company_type:company_tata 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sunhwaguk
+		}
+		if = {
+			limit = { 
+				company:company_sunhwaguk.prosperity < 100
+			}
+			remove_company = company_type:company_sunhwaguk
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nam_dinh 
+		}
+		if = {
+			limit = { 
+				company:company_nam_dinh .prosperity < 100
+			}
+			remove_company = company_type:company_nam_dinh 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_imperial_tobacco
+		}
+		if = {
+			limit = { 
+				company:company_imperial_tobacco.prosperity < 100
+			}
+			remove_company = company_type:company_imperial_tobacco
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_san_miguel 
+		}
+		if = {
+			limit = { 
+				company:company_san_miguel .prosperity < 100
+			}
+			remove_company = company_type:company_san_miguel 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_william_sandford 
+		}
+		if = {
+			limit = { 
+				company:company_william_sandford .prosperity < 100
+			}
+			remove_company = company_type:company_william_sandford 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_b_grimm
+		}
+		if = {
+			limit = { 
+				company:company_b_grimm.prosperity < 100
+			}
+			remove_company = company_type:company_b_grimm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fundidora_monterrey 
+		}
+		if = {
+			limit = { 
+				company:company_fundidora_monterrey .prosperity < 100
+			}
+			remove_company = company_type:company_fundidora_monterrey 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_el_aguila 
+		}
+		if = {
+			limit = { 
+				company:company_el_aguila .prosperity < 100
+			}
+			remove_company = company_type:company_el_aguila 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_csfa 
+		}
+		if = {
+			limit = { 
+				company:company_csfa .prosperity < 100
+			}
+			remove_company = company_type:company_csfa 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_caribbean_petroleum 
+		}
+		if = {
+			limit = { 
+				company:company_caribbean_petroleum .prosperity < 100
+			}
+			remove_company = company_type:company_caribbean_petroleum 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bunge_born 
+		}
+		if = {
+			limit = { 
+				company:company_bunge_born .prosperity < 100
+			}
+			remove_company = company_type:company_bunge_born 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_la_rosada 
+		}
+		if = {
+			limit = { 
+				company:company_la_rosada .prosperity < 100
+			}
+			remove_company = company_type:company_la_rosada 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_famae
+		}
+		if = {
+			limit = { 
+				company:company_famae.prosperity < 100
+			}
+			remove_company = company_type:company_famae
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_peruvian_amazon 
+		}
+		if = {
+			limit = { 
+				company:company_peruvian_amazon .prosperity < 100
+			}
+			remove_company = company_type:company_peruvian_amazon 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kablin
+		}
+		if = {
+			limit = { 
+				company:company_kablin.prosperity < 100
+			}
+			remove_company = company_type:company_kablin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hbc 
+		}
+		if = {
+			limit = { 
+				company:company_hbc .prosperity < 100
+			}
+			remove_company = company_type:company_hbc 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_panama_company 
+		}
+		if = {
+			limit = { 
+				company:company_panama_company .prosperity < 100
+			}
+			remove_company = company_type:company_panama_company 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_misr 
+		}
+		if = {
+			limit = { 
+				company:company_misr .prosperity < 100
+			}
+			remove_company = company_type:company_misr 
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_egyptian_rail
+		}
+		if = {
+			limit = { 
+				company:company_egyptian_rail.prosperity < 100
+			}
+			remove_company = company_type:company_egyptian_rail
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_suez_company
+		}
+		if = {
+			limit = { 
+				company:company_suez_company.prosperity < 100
+			}
+			remove_company = company_type:company_suez_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_LNPA
+		}
+		if = {
+			limit = { 
+				company:company_LNPA.prosperity < 100
+			}
+			remove_company = company_type:company_LNPA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JohnHolt
+		}
+		if = {
+			limit = { 
+				company:company_JohnHolt.prosperity < 100
+			}
+			remove_company = company_type:company_JohnHolt
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nam_dinh
+		}
+		if = {
+			limit = { 
+				company:company_nam_dinh.prosperity < 100
+			}
+			remove_company = company_type:company_nam_dinh
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VRailways
+		}
+		if = {
+			limit = { 
+				company:company_VRailways.prosperity < 100
+			}
+			remove_company = company_type:company_VRailways
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Habeco
+		}
+		if = {
+			limit = { 
+				company:company_Habeco.prosperity < 100
+			}
+			remove_company = company_type:company_Habeco
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_saigon_iron
+		}
+		if = {
+			limit = { 
+				company:company_saigon_iron.prosperity < 100
+			}
+			remove_company = company_type:company_saigon_iron
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_standard_oil
+		}
+		if = {
+			limit = { 
+				company:company_standard_oil.prosperity < 100
+			}
+			remove_company = company_type:company_standard_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_united_fruit
+		}
+		if = {
+			limit = { 
+				company:company_united_fruit.prosperity < 100
+			}
+			remove_company = company_type:company_united_fruit
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_us_steel
+		}
+		if = {
+			limit = { 
+				company:company_us_steel.prosperity < 100
+			}
+			remove_company = company_type:company_us_steel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_general_electric
+		}
+		if = {
+			limit = { 
+				company:company_general_electric.prosperity < 100
+			}
+			remove_company = company_type:company_general_electric
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_william_cramp
+		}
+		if = {
+			limit = { 
+				company:company_william_cramp.prosperity < 100
+			}
+			remove_company = company_type:company_william_cramp
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ford_motor
+		}
+		if = {
+			limit = { 
+				company:company_ford_motor.prosperity < 100
+			}
+			remove_company = company_type:company_ford_motor
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CocaCola
+		}
+		if = {
+			limit = { 
+				company:company_CocaCola.prosperity < 100
+			}
+			remove_company = company_type:company_CocaCola
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JohnDeere
+		}
+		if = {
+			limit = { 
+				company:company_JohnDeere.prosperity < 100
+			}
+			remove_company = company_type:company_JohnDeere
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JackDaniels
+		}
+		if = {
+			limit = { 
+				company:company_JackDaniels.prosperity < 100
+			}
+			remove_company = company_type:company_JackDaniels
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Remington
+		}
+		if = {
+			limit = { 
+				company:company_Remington.prosperity < 100
+			}
+			remove_company = company_type:company_Remington
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DuPont
+		}
+		if = {
+			limit = { 
+				company:company_DuPont.prosperity < 100
+			}
+			remove_company = company_type:company_DuPont
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_IPC
+		}
+		if = {
+			limit = { 
+				company:company_IPC.prosperity < 100
+			}
+			remove_company = company_type:company_IPC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Levi
+		}
+		if = {
+			limit = { 
+				company:company_Levi.prosperity < 100
+			}
+			remove_company = company_type:company_Levi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ASARCO
+		}
+		if = {
+			limit = { 
+				company:company_ASARCO.prosperity < 100
+			}
+			remove_company = company_type:company_ASARCO
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ClearMountain
+		}
+		if = {
+			limit = { 
+				company:company_ClearMountain.prosperity < 100
+			}
+			remove_company = company_type:company_ClearMountain
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ball
+		}
+		if = {
+			limit = { 
+				company:company_Ball.prosperity < 100
+			}
+			remove_company = company_type:company_Ball
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Coors
+		}
+		if = {
+			limit = { 
+				company:company_Coors.prosperity < 100
+			}
+			remove_company = company_type:company_Coors
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VFC
+		}
+		if = {
+			limit = { 
+				company:company_VFC.prosperity < 100
+			}
+			remove_company = company_type:company_VFC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_McIlhenny
+		}
+		if = {
+			limit = { 
+				company:company_McIlhenny.prosperity < 100
+			}
+			remove_company = company_type:company_McIlhenny
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_3M
+		}
+		if = {
+			limit = { 
+				company:company_3M.prosperity < 100
+			}
+			remove_company = company_type:company_3M
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Leggett
+		}
+		if = {
+			limit = { 
+				company:company_Leggett.prosperity < 100
+			}
+			remove_company = company_type:company_Leggett
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Disney
+		}
+		if = {
+			limit = { 
+				company:company_Disney.prosperity < 100
+			}
+			remove_company = company_type:company_Disney
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Hasbro
+		}
+		if = {
+			limit = { 
+				company:company_Hasbro.prosperity < 100
+			}
+			remove_company = company_type:company_Hasbro
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ziegler_company
+		}
+		if = {
+			limit = { 
+				company:company_Ziegler_company.prosperity < 100
+			}
+			remove_company = company_type:company_Ziegler_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dow
+		}
+		if = {
+			limit = { 
+				company:company_Dow.prosperity < 100
+			}
+			remove_company = company_type:company_Dow
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bechtel
+		}
+		if = {
+			limit = { 
+				company:company_Bechtel.prosperity < 100
+			}
+			remove_company = company_type:company_Bechtel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_TurnerConstruction
+		}
+		if = {
+			limit = { 
+				company:company_TurnerConstruction.prosperity < 100
+			}
+			remove_company = company_type:company_TurnerConstruction
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CooperCompany
+		}
+		if = {
+			limit = { 
+				company:company_CooperCompany.prosperity < 100
+			}
+			remove_company = company_type:company_CooperCompany
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ImperialSugar
+		}
+		if = {
+			limit = { 
+				company:company_ImperialSugar.prosperity < 100
+			}
+			remove_company = company_type:company_ImperialSugar
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KimberlyClark
+		}
+		if = {
+			limit = { 
+				company:company_KimberlyClark.prosperity < 100
+			}
+			remove_company = company_type:company_KimberlyClark
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HamiltonShirts
+		}
+		if = {
+			limit = { 
+				company:company_HamiltonShirts.prosperity < 100
+			}
+			remove_company = company_type:company_HamiltonShirts
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BuffaloForge
+		}
+		if = {
+			limit = { 
+				company:company_BuffaloForge.prosperity < 100
+			}
+			remove_company = company_type:company_BuffaloForge
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CarrierEng
+		}
+		if = {
+			limit = { 
+				company:company_CarrierEng.prosperity < 100
+			}
+			remove_company = company_type:company_CarrierEng
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SmithAndSons
+		}
+		if = {
+			limit = { 
+				company:company_SmithAndSons.prosperity < 100
+			}
+			remove_company = company_type:company_SmithAndSons
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Abbott
+		}
+		if = {
+			limit = { 
+				company:company_Abbott.prosperity < 100
+			}
+			remove_company = company_type:company_Abbott
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Boeing
+		}
+		if = {
+			limit = { 
+				company:company_Boeing.prosperity < 100
+			}
+			remove_company = company_type:company_Boeing
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_JP_Morgan
+		}
+		if = {
+			limit = { 
+				company:company_Bank_JP_Morgan.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_JP_Morgan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Singer_MC
+		}
+		if = {
+			limit = { 
+				company:company_Singer_MC.prosperity < 100
+			}
+			remove_company = company_type:company_Singer_MC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Lackawanna_IaCC
+		}
+		if = {
+			limit = { 
+				company:company_Lackawanna_IaCC.prosperity < 100
+			}
+			remove_company = company_type:company_Lackawanna_IaCC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Heinz_Company
+		}
+		if = {
+			limit = { 
+				company:company_Heinz_Company.prosperity < 100
+			}
+			remove_company = company_type:company_Heinz_Company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Westinghouse_conglomerate
+		}
+		if = {
+			limit = { 
+				company:company_Westinghouse_conglomerate.prosperity < 100
+			}
+			remove_company = company_type:company_Westinghouse_conglomerate
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Chase_Bank
+		}
+		if = {
+			limit = { 
+				company:company_Chase_Bank.prosperity < 100
+			}
+			remove_company = company_type:company_Chase_Bank
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_americanbanknote
+		}
+		if = {
+			limit = { 
+				company:company_americanbanknote.prosperity < 100
+			}
+			remove_company = company_type:company_americanbanknote
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_Goldman_Sachs
+		}
+		if = {
+			limit = { 
+				company:company_Bank_Goldman_Sachs.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_Goldman_Sachs
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_Wells_Fargo
+		}
+		if = {
+			limit = { 
+				company:company_Bank_Wells_Fargo.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_Wells_Fargo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_American_Express
+		}
+		if = {
+			limit = { 
+				company:company_Bank_American_Express.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_American_Express
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NationalBellTelephone
+		}
+		if = {
+			limit = { 
+				company:company_NationalBellTelephone.prosperity < 100
+			}
+			remove_company = company_type:company_NationalBellTelephone
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ANCAP
+		}
+		if = {
+			limit = { 
+				company:company_ANCAP.prosperity < 100
+			}
+			remove_company = company_type:company_ANCAP
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_phosphat_Gafsa
+		}
+		if = {
+			limit = { 
+				company:company_phosphat_Gafsa.prosperity < 100
+			}
+			remove_company = company_type:company_phosphat_Gafsa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Maggi
+		}
+		if = {
+			limit = { 
+				company:company_Maggi.prosperity < 100
+			}
+			remove_company = company_type:company_Maggi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Geigy
+		}
+		if = {
+			limit = { 
+				company:company_Geigy.prosperity < 100
+			}
+			remove_company = company_type:company_Geigy
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BrownB
+		}
+		if = {
+			limit = { 
+				company:company_BrownB.prosperity < 100
+			}
+			remove_company = company_type:company_BrownB
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_LonzaGroup
+		}
+		if = {
+			limit = { 
+				company:company_LonzaGroup.prosperity < 100
+			}
+			remove_company = company_type:company_LonzaGroup
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ZVSM
+		}
+		if = {
+			limit = { 
+				company:company_ZVSM.prosperity < 100
+			}
+			remove_company = company_type:company_ZVSM
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Nestle
+		}
+		if = {
+			limit = { 
+				company:company_Nestle.prosperity < 100
+			}
+			remove_company = company_type:company_Nestle
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rieter
+		}
+		if = {
+			limit = { 
+				company:company_Rieter.prosperity < 100
+			}
+			remove_company = company_type:company_Rieter
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VonRoll
+		}
+		if = {
+			limit = { 
+				company:company_VonRoll.prosperity < 100
+			}
+			remove_company = company_type:company_VonRoll
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sulzer
+		}
+		if = {
+			limit = { 
+				company:company_Sulzer.prosperity < 100
+			}
+			remove_company = company_type:company_Sulzer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Lindt
+		}
+		if = {
+			limit = { 
+				company:company_Lindt.prosperity < 100
+			}
+			remove_company = company_type:company_Lindt
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MasFab_Oerlikon
+		}
+		if = {
+			limit = { 
+				company:company_MasFab_Oerlikon.prosperity < 100
+			}
+			remove_company = company_type:company_MasFab_Oerlikon
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_WerkMasFab_Oerlikon
+		}
+		if = {
+			limit = { 
+				company:company_WerkMasFab_Oerlikon.prosperity < 100
+			}
+			remove_company = company_type:company_WerkMasFab_Oerlikon
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bankenverein
+		}
+		if = {
+			limit = { 
+				company:company_Bankenverein.prosperity < 100
+			}
+			remove_company = company_type:company_Bankenverein
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ericsson
+		}
+		if = {
+			limit = { 
+				company:company_ericsson.prosperity < 100
+			}
+			remove_company = company_type:company_ericsson
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_lkab
+		}
+		if = {
+			limit = { 
+				company:company_lkab.prosperity < 100
+			}
+			remove_company = company_type:company_lkab
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_gotaverken
+		}
+		if = {
+			limit = { 
+				company:company_gotaverken.prosperity < 100
+			}
+			remove_company = company_type:company_gotaverken
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Hastens
+		}
+		if = {
+			limit = { 
+				company:company_Hastens.prosperity < 100
+			}
+			remove_company = company_type:company_Hastens
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Gevalia
+		}
+		if = {
+			limit = { 
+				company:company_Gevalia.prosperity < 100
+			}
+			remove_company = company_type:company_Gevalia
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VolvoPenta
+		}
+		if = {
+			limit = { 
+				company:company_VolvoPenta.prosperity < 100
+			}
+			remove_company = company_type:company_VolvoPenta
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ABAtlas
+		}
+		if = {
+			limit = { 
+				company:company_ABAtlas.prosperity < 100
+			}
+			remove_company = company_type:company_ABAtlas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Skanska
+		}
+		if = {
+			limit = { 
+				company:company_Skanska.prosperity < 100
+			}
+			remove_company = company_type:company_Skanska
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Boliden
+		}
+		if = {
+			limit = { 
+				company:company_Boliden.prosperity < 100
+			}
+			remove_company = company_type:company_Boliden
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ABSkell
+		}
+		if = {
+			limit = { 
+				company:company_ABSkell.prosperity < 100
+			}
+			remove_company = company_type:company_ABSkell
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Nydq
+		}
+		if = {
+			limit = { 
+				company:company_Nydq.prosperity < 100
+			}
+			remove_company = company_type:company_Nydq
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bofors
+		}
+		if = {
+			limit = { 
+				company:company_Bofors.prosperity < 100
+			}
+			remove_company = company_type:company_Bofors
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Husqvarna
+		}
+		if = {
+			limit = { 
+				company:company_Husqvarna.prosperity < 100
+			}
+			remove_company = company_type:company_Husqvarna
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HandelsBanken
+		}
+		if = {
+			limit = { 
+				company:company_HandelsBanken.prosperity < 100
+			}
+			remove_company = company_type:company_HandelsBanken
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_altos_hornos_de_vizcaya
+		}
+		if = {
+			limit = { 
+				company:company_altos_hornos_de_vizcaya.prosperity < 100
+			}
+			remove_company = company_type:company_altos_hornos_de_vizcaya
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_duro_y_compania
+		}
+		if = {
+			limit = { 
+				company:company_duro_y_compania.prosperity < 100
+			}
+			remove_company = company_type:company_duro_y_compania
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_espana_industrial
+		}
+		if = {
+			limit = { 
+				company:company_espana_industrial.prosperity < 100
+			}
+			remove_company = company_type:company_espana_industrial
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_trubia
+		}
+		if = {
+			limit = { 
+				company:company_trubia.prosperity < 100
+			}
+			remove_company = company_type:company_trubia
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ECOMAgroindustrial
+		}
+		if = {
+			limit = { 
+				company:company_ECOMAgroindustrial.prosperity < 100
+			}
+			remove_company = company_type:company_ECOMAgroindustrial
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Lacasa
+		}
+		if = {
+			limit = { 
+				company:company_Lacasa.prosperity < 100
+			}
+			remove_company = company_type:company_Lacasa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BodegasTorres
+		}
+		if = {
+			limit = { 
+				company:company_BodegasTorres.prosperity < 100
+			}
+			remove_company = company_type:company_BodegasTorres
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RioTinto
+		}
+		if = {
+			limit = { 
+				company:company_RioTinto.prosperity < 100
+			}
+			remove_company = company_type:company_RioTinto
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bassols
+		}
+		if = {
+			limit = { 
+				company:company_Bassols.prosperity < 100
+			}
+			remove_company = company_type:company_Bassols
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tendam
+		}
+		if = {
+			limit = { 
+				company:company_Tendam.prosperity < 100
+			}
+			remove_company = company_type:company_Tendam
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FCC
+		}
+		if = {
+			limit = { 
+				company:company_FCC.prosperity < 100
+			}
+			remove_company = company_type:company_FCC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Irizar
+		}
+		if = {
+			limit = { 
+				company:company_Irizar.prosperity < 100
+			}
+			remove_company = company_type:company_Irizar
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CdGdZ
+		}
+		if = {
+			limit = { 
+				company:company_CdGdZ.prosperity < 100
+			}
+			remove_company = company_type:company_CdGdZ
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Granda_Company
+		}
+		if = {
+			limit = { 
+				company:company_Granda_Company.prosperity < 100
+			}
+			remove_company = company_type:company_Granda_Company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_of_Spain
+		}
+		if = {
+			limit = { 
+				company:company_Bank_of_Spain.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_of_Spain
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_peruvian_amazon
+		}
+		if = {
+			limit = { 
+				company:company_peruvian_amazon.prosperity < 100
+			}
+			remove_company = company_type:company_peruvian_amazon
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_estanifera_llallagua
+		}
+		if = {
+			limit = { 
+				company:company_estanifera_llallagua.prosperity < 100
+			}
+			remove_company = company_type:company_estanifera_llallagua
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_eea
+		}
+		if = {
+			limit = { 
+				company:company_eea.prosperity < 100
+			}
+			remove_company = company_type:company_eea
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_csfa
+		}
+		if = {
+			limit = { 
+				company:company_csfa.prosperity < 100
+			}
+			remove_company = company_type:company_csfa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_famae
+		}
+		if = {
+			limit = { 
+				company:company_famae.prosperity < 100
+			}
+			remove_company = company_type:company_famae
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Grieve
+		}
+		if = {
+			limit = { 
+				company:company_Grieve.prosperity < 100
+			}
+			remove_company = company_type:company_Grieve
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Caracoles
+		}
+		if = {
+			limit = { 
+				company:company_Caracoles.prosperity < 100
+			}
+			remove_company = company_type:company_Caracoles
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VinaO
+		}
+		if = {
+			limit = { 
+				company:company_VinaO.prosperity < 100
+			}
+			remove_company = company_type:company_VinaO
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Iberica
+		}
+		if = {
+			limit = { 
+				company:company_Iberica.prosperity < 100
+			}
+			remove_company = company_type:company_Iberica
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NRC
+		}
+		if = {
+			limit = { 
+				company:company_NRC.prosperity < 100
+			}
+			remove_company = company_type:company_NRC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Anglovaal
+		}
+		if = {
+			limit = { 
+				company:company_Anglovaal.prosperity < 100
+			}
+			remove_company = company_type:company_Anglovaal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_OudeMolen
+		}
+		if = {
+			limit = { 
+				company:company_OudeMolen.prosperity < 100
+			}
+			remove_company = company_type:company_OudeMolen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ImperialCC
+		}
+		if = {
+			limit = { 
+				company:company_ImperialCC.prosperity < 100
+			}
+			remove_company = company_type:company_ImperialCC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Johannesburg
+		}
+		if = {
+			limit = { 
+				company:company_Johannesburg.prosperity < 100
+			}
+			remove_company = company_type:company_Johannesburg
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_WGMC
+		}
+		if = {
+			limit = { 
+				company:company_WGMC.prosperity < 100
+			}
+			remove_company = company_type:company_WGMC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_SBoBSA
+		}
+		if = {
+			limit = { 
+				company:company_Bank_SBoBSA.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_SBoBSA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_b_grimm
+		}
+		if = {
+			limit = { 
+				company:company_b_grimm.prosperity < 100
+			}
+			remove_company = company_type:company_b_grimm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SiamCement
+		}
+		if = {
+			limit = { 
+				company:company_SiamCement.prosperity < 100
+			}
+			remove_company = company_type:company_SiamCement
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Charoen
+		}
+		if = {
+			limit = { 
+				company:company_Charoen.prosperity < 100
+			}
+			remove_company = company_type:company_Charoen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bangkok_dock
+		}
+		if = {
+			limit = { 
+				company:company_bangkok_dock.prosperity < 100
+			}
+			remove_company = company_type:company_bangkok_dock
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_siam_elec
+		}
+		if = {
+			limit = { 
+				company:company_siam_elec.prosperity < 100
+			}
+			remove_company = company_type:company_siam_elec
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_min_sae
+		}
+		if = {
+			limit = { 
+				company:company_min_sae.prosperity < 100
+			}
+			remove_company = company_type:company_min_sae
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_zastava
+		}
+		if = {
+			limit = { 
+				company:company_zastava.prosperity < 100
+			}
+			remove_company = company_type:company_zastava
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SerbianRailway
+		}
+		if = {
+			limit = { 
+				company:company_SerbianRailway.prosperity < 100
+			}
+			remove_company = company_type:company_SerbianRailway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MIN
+		}
+		if = {
+			limit = { 
+				company:company_MIN.prosperity < 100
+			}
+			remove_company = company_type:company_MIN
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ser_Imperial_Brewery
+		}
+		if = {
+			limit = { 
+				company:company_Ser_Imperial_Brewery.prosperity < 100
+			}
+			remove_company = company_type:company_Ser_Imperial_Brewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_vodka_monopoly
+		}
+		if = {
+			limit = { 
+				company:company_vodka_monopoly.prosperity < 100
+			}
+			remove_company = company_type:company_vodka_monopoly
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_putilov_company
+		}
+		if = {
+			limit = { 
+				company:company_putilov_company.prosperity < 100
+			}
+			remove_company = company_type:company_putilov_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_branobel
+		}
+		if = {
+			limit = { 
+				company:company_branobel.prosperity < 100
+			}
+			remove_company = company_type:company_branobel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_izhevsk_arms_plant
+		}
+		if = {
+			limit = { 
+				company:company_izhevsk_arms_plant.prosperity < 100
+			}
+			remove_company = company_type:company_izhevsk_arms_plant
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_savva_morozov
+		}
+		if = {
+			limit = { 
+				company:company_savva_morozov.prosperity < 100
+			}
+			remove_company = company_type:company_savva_morozov
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_john_hughes
+		}
+		if = {
+			limit = { 
+				company:company_john_hughes.prosperity < 100
+			}
+			remove_company = company_type:company_john_hughes
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_west_ural_petroleum
+		}
+		if = {
+			limit = { 
+				company:company_west_ural_petroleum.prosperity < 100
+			}
+			remove_company = company_type:company_west_ural_petroleum
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kirgizian_mining_company=
+		}
+		if = {
+			limit = { 
+				company:company_kirgizian_mining_company=.prosperity < 100
+			}
+			remove_company = company_type:company_kirgizian_mining_company=
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_moscow_irrigation_company
+		}
+		if = {
+			limit = { 
+				company:company_moscow_irrigation_company.prosperity < 100
+			}
+			remove_company = company_type:company_moscow_irrigation_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rosneft
+		}
+		if = {
+			limit = { 
+				company:company_Rosneft.prosperity < 100
+			}
+			remove_company = company_type:company_Rosneft
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_TCaM
+		}
+		if = {
+			limit = { 
+				company:company_TCaM.prosperity < 100
+			}
+			remove_company = company_type:company_TCaM
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Alivaria
+		}
+		if = {
+			limit = { 
+				company:company_Alivaria.prosperity < 100
+			}
+			remove_company = company_type:company_Alivaria
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Izhorskiye_Zavody
+		}
+		if = {
+			limit = { 
+				company:company_Izhorskiye_Zavody.prosperity < 100
+			}
+			remove_company = company_type:company_Izhorskiye_Zavody
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_SBRE
+		}
+		if = {
+			limit = { 
+				company:company_Bank_SBRE.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_SBRE
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cfr
+		}
+		if = {
+			limit = { 
+				company:company_cfr.prosperity < 100
+			}
+			remove_company = company_type:company_cfr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_romanian_star
+		}
+		if = {
+			limit = { 
+				company:company_romanian_star.prosperity < 100
+			}
+			remove_company = company_type:company_romanian_star
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AV
+		}
+		if = {
+			limit = { 
+				company:company_AV.prosperity < 100
+			}
+			remove_company = company_type:company_AV
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RLaWF
+		}
+		if = {
+			limit = { 
+				company:company_RLaWF.prosperity < 100
+			}
+			remove_company = company_type:company_RLaWF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FabricaTimi
+		}
+		if = {
+			limit = { 
+				company:company_FabricaTimi.prosperity < 100
+			}
+			remove_company = company_type:company_FabricaTimi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FdbG
+		}
+		if = {
+			limit = { 
+				company:company_FdbG.prosperity < 100
+			}
+			remove_company = company_type:company_FdbG
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mozambique_company
+		}
+		if = {
+			limit = { 
+				company:company_mozambique_company.prosperity < 100
+			}
+			remove_company = company_type:company_mozambique_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VistaAlegre
+		}
+		if = {
+			limit = { 
+				company:company_VistaAlegre.prosperity < 100
+			}
+			remove_company = company_type:company_VistaAlegre
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ConservasRamirez
+		}
+		if = {
+			limit = { 
+				company:company_ConservasRamirez.prosperity < 100
+			}
+			remove_company = company_type:company_ConservasRamirez
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CUF
+		}
+		if = {
+			limit = { 
+				company:company_CUF.prosperity < 100
+			}
+			remove_company = company_type:company_CUF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CdTd
+		}
+		if = {
+			limit = { 
+				company:company_CdTd.prosperity < 100
+			}
+			remove_company = company_type:company_CdTd
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CNN
+		}
+		if = {
+			limit = { 
+				company:company_CNN.prosperity < 100
+			}
+			remove_company = company_type:company_CNN
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Arsenal_Alfeite
+		}
+		if = {
+			limit = { 
+				company:company_Arsenal_Alfeite.prosperity < 100
+			}
+			remove_company = company_type:company_Arsenal_Alfeite
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_Ultramarino
+		}
+		if = {
+			limit = { 
+				company:company_Bank_Ultramarino.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_Ultramarino
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CTT
+		}
+		if = {
+			limit = { 
+				company:company_CTT.prosperity < 100
+			}
+			remove_company = company_type:company_CTT
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ursus
+		}
+		if = {
+			limit = { 
+				company:company_ursus.prosperity < 100
+			}
+			remove_company = company_type:company_ursus
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_lilpop
+		}
+		if = {
+			limit = { 
+				company:company_lilpop.prosperity < 100
+			}
+			remove_company = company_type:company_lilpop
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Pudliszki
+		}
+		if = {
+			limit = { 
+				company:company_Pudliszki.prosperity < 100
+			}
+			remove_company = company_type:company_Pudliszki
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KRudzki
+		}
+		if = {
+			limit = { 
+				company:company_KRudzki.prosperity < 100
+			}
+			remove_company = company_type:company_KRudzki
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Cegielski
+		}
+		if = {
+			limit = { 
+				company:company_Cegielski.prosperity < 100
+			}
+			remove_company = company_type:company_Cegielski
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Arcelor
+		}
+		if = {
+			limit = { 
+				company:company_Arcelor.prosperity < 100
+			}
+			remove_company = company_type:company_Arcelor
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_OSM
+		}
+		if = {
+			limit = { 
+				company:company_OSM.prosperity < 100
+			}
+			remove_company = company_type:company_OSM
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FBLR
+		}
+		if = {
+			limit = { 
+				company:company_FBLR.prosperity < 100
+			}
+			remove_company = company_type:company_FBLR
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Haberbusch
+		}
+		if = {
+			limit = { 
+				company:company_Haberbusch.prosperity < 100
+			}
+			remove_company = company_type:company_Haberbusch
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_san_miguel
+		}
+		if = {
+			limit = { 
+				company:company_san_miguel.prosperity < 100
+			}
+			remove_company = company_type:company_san_miguel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Meralco
+		}
+		if = {
+			limit = { 
+				company:company_Meralco.prosperity < 100
+			}
+			remove_company = company_type:company_Meralco
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Destileria_Lim
+		}
+		if = {
+			limit = { 
+				company:company_Destileria_Lim.prosperity < 100
+			}
+			remove_company = company_type:company_Destileria_Lim
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_imperial_tobacco
+		}
+		if = {
+			limit = { 
+				company:company_imperial_tobacco.prosperity < 100
+			}
+			remove_company = company_type:company_imperial_tobacco
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_da_afghan_nassaji_sherkat
+		}
+		if = {
+			limit = { 
+				company:company_da_afghan_nassaji_sherkat.prosperity < 100
+			}
+			remove_company = company_type:company_da_afghan_nassaji_sherkat
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_iranian_state_railway
+		}
+		if = {
+			limit = { 
+				company:company_iranian_state_railway.prosperity < 100
+			}
+			remove_company = company_type:company_iranian_state_railway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_tashkent_railroad
+		}
+		if = {
+			limit = { 
+				company:company_tashkent_railroad.prosperity < 100
+			}
+			remove_company = company_type:company_tashkent_railroad
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sherkat_shemali
+		}
+		if = {
+			limit = { 
+				company:company_sherkat_shemali.prosperity < 100
+			}
+			remove_company = company_type:company_sherkat_shemali
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_opium_export_monopoly
+		}
+		if = {
+			limit = { 
+				company:company_opium_export_monopoly.prosperity < 100
+			}
+			remove_company = company_type:company_opium_export_monopoly
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sherkate_eslamiya
+		}
+		if = {
+			limit = { 
+				company:company_sherkate_eslamiya.prosperity < 100
+			}
+			remove_company = company_type:company_sherkate_eslamiya
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_persshelk
+		}
+		if = {
+			limit = { 
+				company:company_persshelk.prosperity < 100
+			}
+			remove_company = company_type:company_persshelk
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_perskhlopok
+		}
+		if = {
+			limit = { 
+				company:company_perskhlopok.prosperity < 100
+			}
+			remove_company = company_type:company_perskhlopok
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_anglo_persian_oil
+		}
+		if = {
+			limit = { 
+				company:company_anglo_persian_oil.prosperity < 100
+			}
+			remove_company = company_type:company_anglo_persian_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_national_iranian_oil
+		}
+		if = {
+			limit = { 
+				company:company_national_iranian_oil.prosperity < 100
+			}
+			remove_company = company_type:company_national_iranian_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Darogar
+		}
+		if = {
+			limit = { 
+				company:company_Darogar.prosperity < 100
+			}
+			remove_company = company_type:company_Darogar
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tavakoli
+		}
+		if = {
+			limit = { 
+				company:company_Tavakoli.prosperity < 100
+			}
+			remove_company = company_type:company_Tavakoli
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Oghab
+		}
+		if = {
+			limit = { 
+				company:company_Oghab.prosperity < 100
+			}
+			remove_company = company_type:company_Oghab
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kahrizak
+		}
+		if = {
+			limit = { 
+				company:company_Kahrizak.prosperity < 100
+			}
+			remove_company = company_type:company_Kahrizak
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Naseri
+		}
+		if = {
+			limit = { 
+				company:company_Naseri.prosperity < 100
+			}
+			remove_company = company_type:company_Naseri
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_IBP
+		}
+		if = {
+			limit = { 
+				company:company_Bank_IBP.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_IBP
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_imperial_arsenal
+		}
+		if = {
+			limit = { 
+				company:company_imperial_arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_imperial_arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ottoman_tobacco_regie
+		}
+		if = {
+			limit = { 
+				company:company_ottoman_tobacco_regie.prosperity < 100
+			}
+			remove_company = company_type:company_ottoman_tobacco_regie
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_allatini_mills
+		}
+		if = {
+			limit = { 
+				company:company_allatini_mills.prosperity < 100
+			}
+			remove_company = company_type:company_allatini_mills
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_orient_express
+		}
+		if = {
+			limit = { 
+				company:company_orient_express.prosperity < 100
+			}
+			remove_company = company_type:company_orient_express
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_turkish_petroleum
+		}
+		if = {
+			limit = { 
+				company:company_turkish_petroleum.prosperity < 100
+			}
+			remove_company = company_type:company_turkish_petroleum
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_zeytinburnu
+		}
+		if = {
+			limit = { 
+				company:company_zeytinburnu.prosperity < 100
+			}
+			remove_company = company_type:company_zeytinburnu
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bakiroy
+		}
+		if = {
+			limit = { 
+				company:company_bakiroy.prosperity < 100
+			}
+			remove_company = company_type:company_bakiroy
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kuzguncuk
+		}
+		if = {
+			limit = { 
+				company:company_Kuzguncuk.prosperity < 100
+			}
+			remove_company = company_type:company_Kuzguncuk
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SarsilmazArms
+		}
+		if = {
+			limit = { 
+				company:company_SarsilmazArms.prosperity < 100
+			}
+			remove_company = company_type:company_SarsilmazArms
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BasakTraktor
+		}
+		if = {
+			limit = { 
+				company:company_BasakTraktor.prosperity < 100
+			}
+			remove_company = company_type:company_BasakTraktor
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_IETT
+		}
+		if = {
+			limit = { 
+				company:company_IETT.prosperity < 100
+			}
+			remove_company = company_type:company_IETT
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_OIHS
+		}
+		if = {
+			limit = { 
+				company:company_OIHS.prosperity < 100
+			}
+			remove_company = company_type:company_OIHS
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Saraj
+		}
+		if = {
+			limit = { 
+				company:company_Saraj.prosperity < 100
+			}
+			remove_company = company_type:company_Saraj
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tutunski_Prilep
+		}
+		if = {
+			limit = { 
+				company:company_Tutunski_Prilep.prosperity < 100
+			}
+			remove_company = company_type:company_Tutunski_Prilep
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sursock
+		}
+		if = {
+			limit = { 
+				company:company_Sursock.prosperity < 100
+			}
+			remove_company = company_type:company_Sursock
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_BIO
+		}
+		if = {
+			limit = { 
+				company:company_Bank_BIO.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_BIO
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_aker_mek
+		}
+		if = {
+			limit = { 
+				company:company_aker_mek.prosperity < 100
+			}
+			remove_company = company_type:company_aker_mek
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Nydalens
+		}
+		if = {
+			limit = { 
+				company:company_Nydalens.prosperity < 100
+			}
+			remove_company = company_type:company_Nydalens
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Nobel
+		}
+		if = {
+			limit = { 
+				company:company_Nobel.prosperity < 100
+			}
+			remove_company = company_type:company_Nobel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AlbertC
+		}
+		if = {
+			limit = { 
+				company:company_AlbertC.prosperity < 100
+			}
+			remove_company = company_type:company_AlbertC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HOFF
+		}
+		if = {
+			limit = { 
+				company:company_HOFF.prosperity < 100
+			}
+			remove_company = company_type:company_HOFF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kosmos
+		}
+		if = {
+			limit = { 
+				company:company_Kosmos.prosperity < 100
+			}
+			remove_company = company_type:company_Kosmos
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NorskHydro
+		}
+		if = {
+			limit = { 
+				company:company_NorskHydro.prosperity < 100
+			}
+			remove_company = company_type:company_NorskHydro
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sulit
+		}
+		if = {
+			limit = { 
+				company:company_Sulit.prosperity < 100
+			}
+			remove_company = company_type:company_Sulit
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kongsberg
+		}
+		if = {
+			limit = { 
+				company:company_Kongsberg.prosperity < 100
+			}
+			remove_company = company_type:company_Kongsberg
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Orkla
+		}
+		if = {
+			limit = { 
+				company:company_Orkla.prosperity < 100
+			}
+			remove_company = company_type:company_Orkla
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Raufoss
+		}
+		if = {
+			limit = { 
+				company:company_Raufoss.prosperity < 100
+			}
+			remove_company = company_type:company_Raufoss
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_caribbean_petroleum
+		}
+		if = {
+			limit = { 
+				company:company_caribbean_petroleum.prosperity < 100
+			}
+			remove_company = company_type:company_caribbean_petroleum
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_electricidad_de_caracas
+		}
+		if = {
+			limit = { 
+				company:company_electricidad_de_caracas.prosperity < 100
+			}
+			remove_company = company_type:company_electricidad_de_caracas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NFCGC
+		}
+		if = {
+			limit = { 
+				company:company_NFCGC.prosperity < 100
+			}
+			remove_company = company_type:company_NFCGC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HouseOfAngo
+		}
+		if = {
+			limit = { 
+				company:company_HouseOfAngo.prosperity < 100
+			}
+			remove_company = company_type:company_HouseOfAngo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Manuelita
+		}
+		if = {
+			limit = { 
+				company:company_Manuelita.prosperity < 100
+			}
+			remove_company = company_type:company_Manuelita
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SCADTA
+		}
+		if = {
+			limit = { 
+				company:company_SCADTA.prosperity < 100
+			}
+			remove_company = company_type:company_SCADTA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BavariaBrewery
+		}
+		if = {
+			limit = { 
+				company:company_BavariaBrewery.prosperity < 100
+			}
+			remove_company = company_type:company_BavariaBrewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Maravillas
+		}
+		if = {
+			limit = { 
+				company:company_Maravillas.prosperity < 100
+			}
+			remove_company = company_type:company_Maravillas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nederlandse_petroleum
+		}
+		if = {
+			limit = { 
+				company:company_nederlandse_petroleum.prosperity < 100
+			}
+			remove_company = company_type:company_nederlandse_petroleum
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_philips
+		}
+		if = {
+			limit = { 
+				company:company_philips.prosperity < 100
+			}
+			remove_company = company_type:company_philips
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KNSM
+		}
+		if = {
+			limit = { 
+				company:company_KNSM.prosperity < 100
+			}
+			remove_company = company_type:company_KNSM
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Heineken
+		}
+		if = {
+			limit = { 
+				company:company_Heineken.prosperity < 100
+			}
+			remove_company = company_type:company_Heineken
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ahold
+		}
+		if = {
+			limit = { 
+				company:company_Ahold.prosperity < 100
+			}
+			remove_company = company_type:company_Ahold
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KLMR
+		}
+		if = {
+			limit = { 
+				company:company_KLMR.prosperity < 100
+			}
+			remove_company = company_type:company_KLMR
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KNHS
+		}
+		if = {
+			limit = { 
+				company:company_KNHS.prosperity < 100
+			}
+			remove_company = company_type:company_KNHS
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KNP
+		}
+		if = {
+			limit = { 
+				company:company_KNP.prosperity < 100
+			}
+			remove_company = company_type:company_KNP
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NeSp
+		}
+		if = {
+			limit = { 
+				company:company_NeSp.prosperity < 100
+			}
+			remove_company = company_type:company_NeSp
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_johenschede
+		}
+		if = {
+			limit = { 
+				company:company_johenschede.prosperity < 100
+			}
+			remove_company = company_type:company_johenschede
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fijenoord
+		}
+		if = {
+			limit = { 
+				company:company_fijenoord.prosperity < 100
+			}
+			remove_company = company_type:company_fijenoord
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_werkspoor
+		}
+		if = {
+			limit = { 
+				company:company_werkspoor.prosperity < 100
+			}
+			remove_company = company_type:company_werkspoor
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_staatsmijnen
+		}
+		if = {
+			limit = { 
+				company:company_staatsmijnen.prosperity < 100
+			}
+			remove_company = company_type:company_staatsmijnen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_vannelle
+		}
+		if = {
+			limit = { 
+				company:company_vannelle.prosperity < 100
+			}
+			remove_company = company_type:company_vannelle
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_douweegberts
+		}
+		if = {
+			limit = { 
+				company:company_douweegberts.prosperity < 100
+			}
+			remove_company = company_type:company_douweegberts
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nhm
+		}
+		if = {
+			limit = { 
+				company:company_nhm.prosperity < 100
+			}
+			remove_company = company_type:company_nhm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_jurgens
+		}
+		if = {
+			limit = { 
+				company:company_jurgens.prosperity < 100
+			}
+			remove_company = company_type:company_jurgens
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_OfficeCh
+		}
+		if = {
+			limit = { 
+				company:company_OfficeCh.prosperity < 100
+			}
+			remove_company = company_type:company_OfficeCh
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Maroc
+		}
+		if = {
+			limit = { 
+				company:company_Maroc.prosperity < 100
+			}
+			remove_company = company_type:company_Maroc
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_el_aguila
+		}
+		if = {
+			limit = { 
+				company:company_el_aguila.prosperity < 100
+			}
+			remove_company = company_type:company_el_aguila
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fundidora_monterrey
+		}
+		if = {
+			limit = { 
+				company:company_fundidora_monterrey.prosperity < 100
+			}
+			remove_company = company_type:company_fundidora_monterrey
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MexicanRailway
+		}
+		if = {
+			limit = { 
+				company:company_MexicanRailway.prosperity < 100
+			}
+			remove_company = company_type:company_MexicanRailway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_TequilaHerrandura
+		}
+		if = {
+			limit = { 
+				company:company_TequilaHerrandura.prosperity < 100
+			}
+			remove_company = company_type:company_TequilaHerrandura
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Penoles
+		}
+		if = {
+			limit = { 
+				company:company_Penoles.prosperity < 100
+			}
+			remove_company = company_type:company_Penoles
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kumpulan_Guthrie
+		}
+		if = {
+			limit = { 
+				company:company_Kumpulan_Guthrie.prosperity < 100
+			}
+			remove_company = company_type:company_Kumpulan_Guthrie
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_boustead
+		}
+		if = {
+			limit = { 
+				company:company_boustead.prosperity < 100
+			}
+			remove_company = company_type:company_boustead
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Arbed
+		}
+		if = {
+			limit = { 
+				company:company_Arbed.prosperity < 100
+			}
+			remove_company = company_type:company_Arbed
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Stumbras
+		}
+		if = {
+			limit = { 
+				company:company_Stumbras.prosperity < 100
+			}
+			remove_company = company_type:company_Stumbras
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dvarc_keramika
+		}
+		if = {
+			limit = { 
+				company:company_Dvarc_keramika.prosperity < 100
+			}
+			remove_company = company_type:company_Dvarc_keramika
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sanitas
+		}
+		if = {
+			limit = { 
+				company:company_Sanitas.prosperity < 100
+			}
+			remove_company = company_type:company_Sanitas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ligatne_Paper
+		}
+		if = {
+			limit = { 
+				company:company_Ligatne_Paper.prosperity < 100
+			}
+			remove_company = company_type:company_Ligatne_Paper
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_VEF
+		}
+		if = {
+			limit = { 
+				company:company_VEF.prosperity < 100
+			}
+			remove_company = company_type:company_VEF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Russo_Baltic_Wagon
+		}
+		if = {
+			limit = { 
+				company:company_Russo_Baltic_Wagon.prosperity < 100
+			}
+			remove_company = company_type:company_Russo_Baltic_Wagon
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Laima
+		}
+		if = {
+			limit = { 
+				company:company_Laima.prosperity < 100
+			}
+			remove_company = company_type:company_Laima
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Cesu_Alus
+		}
+		if = {
+			limit = { 
+				company:company_Cesu_Alus.prosperity < 100
+			}
+			remove_company = company_type:company_Cesu_Alus
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sunhwaguk
+		}
+		if = {
+			limit = { 
+				company:company_sunhwaguk.prosperity < 100
+			}
+			remove_company = company_type:company_sunhwaguk
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hanseong_jeongi_hoesa
+		}
+		if = {
+			limit = { 
+				company:company_hanseong_jeongi_hoesa.prosperity < 100
+			}
+			remove_company = company_type:company_hanseong_jeongi_hoesa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_oriental_development_company
+		}
+		if = {
+			limit = { 
+				company:company_oriental_development_company.prosperity < 100
+			}
+			remove_company = company_type:company_oriental_development_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Doosan
+		}
+		if = {
+			limit = { 
+				company:company_Doosan.prosperity < 100
+			}
+			remove_company = company_type:company_Doosan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KTC
+		}
+		if = {
+			limit = { 
+				company:company_KTC.prosperity < 100
+			}
+			remove_company = company_type:company_KTC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DongIlbo
+		}
+		if = {
+			limit = { 
+				company:company_DongIlbo.prosperity < 100
+			}
+			remove_company = company_type:company_DongIlbo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Hanguk
+		}
+		if = {
+			limit = { 
+				company:company_Hanguk.prosperity < 100
+			}
+			remove_company = company_type:company_Hanguk
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Yuhan
+		}
+		if = {
+			limit = { 
+				company:company_Yuhan.prosperity < 100
+			}
+			remove_company = company_type:company_Yuhan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Chohung_Bank
+		}
+		if = {
+			limit = { 
+				company:company_Chohung_Bank.prosperity < 100
+			}
+			remove_company = company_type:company_Chohung_Bank
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Joseon_Enterprise
+		}
+		if = {
+			limit = { 
+				company:company_Joseon_Enterprise.prosperity < 100
+			}
+			remove_company = company_type:company_Joseon_Enterprise
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Joseon_Smelting
+		}
+		if = {
+			limit = { 
+				company:company_Joseon_Smelting.prosperity < 100
+			}
+			remove_company = company_type:company_Joseon_Smelting
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kyungseong
+		}
+		if = {
+			limit = { 
+				company:company_Kyungseong.prosperity < 100
+			}
+			remove_company = company_type:company_Kyungseong
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jipyeong
+		}
+		if = {
+			limit = { 
+				company:company_Jipyeong.prosperity < 100
+			}
+			remove_company = company_type:company_Jipyeong
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mitsui
+		}
+		if = {
+			limit = { 
+				company:company_mitsui.prosperity < 100
+			}
+			remove_company = company_type:company_mitsui
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mantetsu
+		}
+		if = {
+			limit = { 
+				company:company_mantetsu.prosperity < 100
+			}
+			remove_company = company_type:company_mantetsu
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mitsubishi
+		}
+		if = {
+			limit = { 
+				company:company_mitsubishi.prosperity < 100
+			}
+			remove_company = company_type:company_mitsubishi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kajima
+		}
+		if = {
+			limit = { 
+				company:company_Kajima.prosperity < 100
+			}
+			remove_company = company_type:company_Kajima
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Marukome
+		}
+		if = {
+			limit = { 
+				company:company_Marukome.prosperity < 100
+			}
+			remove_company = company_type:company_Marukome
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_UragaDockCompany
+		}
+		if = {
+			limit = { 
+				company:company_UragaDockCompany.prosperity < 100
+			}
+			remove_company = company_type:company_UragaDockCompany
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tomioka
+		}
+		if = {
+			limit = { 
+				company:company_Tomioka.prosperity < 100
+			}
+			remove_company = company_type:company_Tomioka
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Oji
+		}
+		if = {
+			limit = { 
+				company:company_Oji.prosperity < 100
+			}
+			remove_company = company_type:company_Oji
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sumitomo
+		}
+		if = {
+			limit = { 
+				company:company_Sumitomo.prosperity < 100
+			}
+			remove_company = company_type:company_Sumitomo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Furukawa
+		}
+		if = {
+			limit = { 
+				company:company_Furukawa.prosperity < 100
+			}
+			remove_company = company_type:company_Furukawa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kawasaki
+		}
+		if = {
+			limit = { 
+				company:company_Kawasaki.prosperity < 100
+			}
+			remove_company = company_type:company_Kawasaki
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kabushiki
+		}
+		if = {
+			limit = { 
+				company:company_Kabushiki.prosperity < 100
+			}
+			remove_company = company_type:company_Kabushiki
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_OrientalB
+		}
+		if = {
+			limit = { 
+				company:company_OrientalB.prosperity < 100
+			}
+			remove_company = company_type:company_OrientalB
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kirin
+		}
+		if = {
+			limit = { 
+				company:company_Kirin.prosperity < 100
+			}
+			remove_company = company_type:company_Kirin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Osaka_Shosen
+		}
+		if = {
+			limit = { 
+				company:company_Osaka_Shosen.prosperity < 100
+			}
+			remove_company = company_type:company_Osaka_Shosen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SomaCo
+		}
+		if = {
+			limit = { 
+				company:company_SomaCo.prosperity < 100
+			}
+			remove_company = company_type:company_SomaCo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Nintendo
+		}
+		if = {
+			limit = { 
+				company:company_Nintendo.prosperity < 100
+			}
+			remove_company = company_type:company_Nintendo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tanaka-Iga_Butsugu
+		}
+		if = {
+			limit = { 
+				company:company_Tanaka-Iga_Butsugu.prosperity < 100
+			}
+			remove_company = company_type:company_Tanaka-Iga_Butsugu
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Shibaura_Seisaku_sho
+		}
+		if = {
+			limit = { 
+				company:company_Shibaura_Seisaku_sho.prosperity < 100
+			}
+			remove_company = company_type:company_Shibaura_Seisaku_sho
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_yamaha
+		}
+		if = {
+			limit = { 
+				company:company_yamaha.prosperity < 100
+			}
+			remove_company = company_type:company_yamaha
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_asahi
+		}
+		if = {
+			limit = { 
+				company:company_asahi.prosperity < 100
+			}
+			remove_company = company_type:company_asahi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Mitsubishi_exchange_house_bank
+		}
+		if = {
+			limit = { 
+				company:company_Mitsubishi_exchange_house_bank.prosperity < 100
+			}
+			remove_company = company_type:company_Mitsubishi_exchange_house_bank
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bank_of_Japan
+		}
+		if = {
+			limit = { 
+				company:company_bank_of_Japan.prosperity < 100
+			}
+			remove_company = company_type:company_bank_of_Japan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Yahata
+		}
+		if = {
+			limit = { 
+				company:company_Yahata.prosperity < 100
+			}
+			remove_company = company_type:company_Yahata
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kure_naval_arsenal
+		}
+		if = {
+			limit = { 
+				company:company_Kure_naval_arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_Kure_naval_arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JWray
+		}
+		if = {
+			limit = { 
+				company:company_JWray.prosperity < 100
+			}
+			remove_company = company_type:company_JWray
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ilva
+		}
+		if = {
+			limit = { 
+				company:company_ilva.prosperity < 100
+			}
+			remove_company = company_type:company_ilva
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ansaldo
+		}
+		if = {
+			limit = { 
+				company:company_ansaldo.prosperity < 100
+			}
+			remove_company = company_type:company_ansaldo
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ricordi
+		}
+		if = {
+			limit = { 
+				company:company_ricordi.prosperity < 100
+			}
+			remove_company = company_type:company_ricordi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fiat
+		}
+		if = {
+			limit = { 
+				company:company_fiat.prosperity < 100
+			}
+			remove_company = company_type:company_fiat
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_stt
+		}
+		if = {
+			limit = { 
+				company:company_stt.prosperity < 100
+			}
+			remove_company = company_type:company_stt
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Gancia
+		}
+		if = {
+			limit = { 
+				company:company_Gancia.prosperity < 100
+			}
+			remove_company = company_type:company_Gancia
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Majello
+		}
+		if = {
+			limit = { 
+				company:company_Majello.prosperity < 100
+			}
+			remove_company = company_type:company_Majello
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Beretta
+		}
+		if = {
+			limit = { 
+				company:company_Beretta.prosperity < 100
+			}
+			remove_company = company_type:company_Beretta
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Fedrigoni
+		}
+		if = {
+			limit = { 
+				company:company_Fedrigoni.prosperity < 100
+			}
+			remove_company = company_type:company_Fedrigoni
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Montecatini
+		}
+		if = {
+			limit = { 
+				company:company_Montecatini.prosperity < 100
+			}
+			remove_company = company_type:company_Montecatini
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Pirelli
+		}
+		if = {
+			limit = { 
+				company:company_Pirelli.prosperity < 100
+			}
+			remove_company = company_type:company_Pirelli
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Olivetti
+		}
+		if = {
+			limit = { 
+				company:company_Olivetti.prosperity < 100
+			}
+			remove_company = company_type:company_Olivetti
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_EdisonSpA
+		}
+		if = {
+			limit = { 
+				company:company_EdisonSpA.prosperity < 100
+			}
+			remove_company = company_type:company_EdisonSpA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Barilla
+		}
+		if = {
+			limit = { 
+				company:company_Barilla.prosperity < 100
+			}
+			remove_company = company_type:company_Barilla
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Cantiere
+		}
+		if = {
+			limit = { 
+				company:company_Cantiere.prosperity < 100
+			}
+			remove_company = company_type:company_Cantiere
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Lavazza
+		}
+		if = {
+			limit = { 
+				company:company_Lavazza.prosperity < 100
+			}
+			remove_company = company_type:company_Lavazza
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Menarini
+		}
+		if = {
+			limit = { 
+				company:company_Menarini.prosperity < 100
+			}
+			remove_company = company_type:company_Menarini
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RIV
+		}
+		if = {
+			limit = { 
+				company:company_RIV.prosperity < 100
+			}
+			remove_company = company_type:company_RIV
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Pontifical_Bell_Foundry
+		}
+		if = {
+			limit = { 
+				company:company_Pontifical_Bell_Foundry.prosperity < 100
+			}
+			remove_company = company_type:company_Pontifical_Bell_Foundry
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Peroni
+		}
+		if = {
+			limit = { 
+				company:company_Peroni.prosperity < 100
+			}
+			remove_company = company_type:company_Peroni
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Grivel
+		}
+		if = {
+			limit = { 
+				company:company_Grivel.prosperity < 100
+			}
+			remove_company = company_type:company_Grivel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bank_italy
+		}
+		if = {
+			limit = { 
+				company:company_bank_italy.prosperity < 100
+			}
+			remove_company = company_type:company_bank_italy
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_guinness
+		}
+		if = {
+			limit = { 
+				company:company_guinness.prosperity < 100
+			}
+			remove_company = company_type:company_guinness
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jacob
+		}
+		if = {
+			limit = { 
+				company:company_Jacob.prosperity < 100
+			}
+			remove_company = company_type:company_Jacob
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Waterford
+		}
+		if = {
+			limit = { 
+				company:company_Waterford.prosperity < 100
+			}
+			remove_company = company_type:company_Waterford
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ewart
+		}
+		if = {
+			limit = { 
+				company:company_Ewart.prosperity < 100
+			}
+			remove_company = company_type:company_Ewart
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Powers_Whiskey
+		}
+		if = {
+			limit = { 
+				company:company_Powers_Whiskey.prosperity < 100
+			}
+			remove_company = company_type:company_Powers_Whiskey
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_IAOC
+		}
+		if = {
+			limit = { 
+				company:company_IAOC.prosperity < 100
+			}
+			remove_company = company_type:company_IAOC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Irish_Press
+		}
+		if = {
+			limit = { 
+				company:company_Irish_Press.prosperity < 100
+			}
+			remove_company = company_type:company_Irish_Press
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_guinness
+		}
+		if = {
+			limit = { 
+				company:company_guinness.prosperity < 100
+			}
+			remove_company = company_type:company_guinness
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jacob
+		}
+		if = {
+			limit = { 
+				company:company_Jacob.prosperity < 100
+			}
+			remove_company = company_type:company_Jacob
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Waterford
+		}
+		if = {
+			limit = { 
+				company:company_Waterford.prosperity < 100
+			}
+			remove_company = company_type:company_Waterford
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ewart
+		}
+		if = {
+			limit = { 
+				company:company_Ewart.prosperity < 100
+			}
+			remove_company = company_type:company_Ewart
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Powers_Whiskey
+		}
+		if = {
+			limit = { 
+				company:company_Powers_Whiskey.prosperity < 100
+			}
+			remove_company = company_type:company_Powers_Whiskey
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_IAOC
+		}
+		if = {
+			limit = { 
+				company:company_IAOC.prosperity < 100
+			}
+			remove_company = company_type:company_IAOC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Irish_Press
+		}
+		if = {
+			limit = { 
+				company:company_Irish_Press.prosperity < 100
+			}
+			remove_company = company_type:company_Irish_Press
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RhumBarbancourt
+		}
+		if = {
+			limit = { 
+				company:company_RhumBarbancourt.prosperity < 100
+			}
+			remove_company = company_type:company_RhumBarbancourt
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RhumVieuxLabbe
+		}
+		if = {
+			limit = { 
+				company:company_RhumVieuxLabbe.prosperity < 100
+			}
+			remove_company = company_type:company_RhumVieuxLabbe
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basileiades
+		}
+		if = {
+			limit = { 
+				company:company_basileiades.prosperity < 100
+			}
+			remove_company = company_type:company_basileiades
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kouppas
+		}
+		if = {
+			limit = { 
+				company:company_kouppas.prosperity < 100
+			}
+			remove_company = company_type:company_kouppas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Neorion
+		}
+		if = {
+			limit = { 
+				company:company_Neorion.prosperity < 100
+			}
+			remove_company = company_type:company_Neorion
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KareliaTobacco
+		}
+		if = {
+			limit = { 
+				company:company_KareliaTobacco.prosperity < 100
+			}
+			remove_company = company_type:company_KareliaTobacco
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Metaxa
+		}
+		if = {
+			limit = { 
+				company:company_Metaxa.prosperity < 100
+			}
+			remove_company = company_type:company_Metaxa
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Prapopoulos
+		}
+		if = {
+			limit = { 
+				company:company_Prapopoulos.prosperity < 100
+			}
+			remove_company = company_type:company_Prapopoulos
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AchaiaClauss
+		}
+		if = {
+			limit = { 
+				company:company_AchaiaClauss.prosperity < 100
+			}
+			remove_company = company_type:company_AchaiaClauss
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_krupp
+		}
+		if = {
+			limit = { 
+				company:company_krupp.prosperity < 100
+			}
+			remove_company = company_type:company_krupp
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_rheinmetall
+		}
+		if = {
+			limit = { 
+				company:company_rheinmetall.prosperity < 100
+			}
+			remove_company = company_type:company_rheinmetall
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_schichau
+		}
+		if = {
+			limit = { 
+				company:company_schichau.prosperity < 100
+			}
+			remove_company = company_type:company_schichau
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_siemens_and_halske
+		}
+		if = {
+			limit = { 
+				company:company_siemens_and_halske.prosperity < 100
+			}
+			remove_company = company_type:company_siemens_and_halske
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_prussian_state_railways
+		}
+		if = {
+			limit = { 
+				company:company_prussian_state_railways.prosperity < 100
+			}
+			remove_company = company_type:company_prussian_state_railways
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_basf
+		}
+		if = {
+			limit = { 
+				company:company_basf.prosperity < 100
+			}
+			remove_company = company_type:company_basf
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Weihenstephan
+		}
+		if = {
+			limit = { 
+				company:company_Weihenstephan.prosperity < 100
+			}
+			remove_company = company_type:company_Weihenstephan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SteamshipCompany
+		}
+		if = {
+			limit = { 
+				company:company_SteamshipCompany.prosperity < 100
+			}
+			remove_company = company_type:company_SteamshipCompany
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HannoverWaggonfabrik
+		}
+		if = {
+			limit = { 
+				company:company_HannoverWaggonfabrik.prosperity < 100
+			}
+			remove_company = company_type:company_HannoverWaggonfabrik
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RoyalPorcelainFactory
+		}
+		if = {
+			limit = { 
+				company:company_RoyalPorcelainFactory.prosperity < 100
+			}
+			remove_company = company_type:company_RoyalPorcelainFactory
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FelixS
+		}
+		if = {
+			limit = { 
+				company:company_FelixS.prosperity < 100
+			}
+			remove_company = company_type:company_FelixS
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HDW
+		}
+		if = {
+			limit = { 
+				company:company_HDW.prosperity < 100
+			}
+			remove_company = company_type:company_HDW
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Knorr
+		}
+		if = {
+			limit = { 
+				company:company_Knorr.prosperity < 100
+			}
+			remove_company = company_type:company_Knorr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Fissler
+		}
+		if = {
+			limit = { 
+				company:company_Fissler.prosperity < 100
+			}
+			remove_company = company_type:company_Fissler
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ALange
+		}
+		if = {
+			limit = { 
+				company:company_ALange.prosperity < 100
+			}
+			remove_company = company_type:company_ALange
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Meindl
+		}
+		if = {
+			limit = { 
+				company:company_Meindl.prosperity < 100
+			}
+			remove_company = company_type:company_Meindl
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MAN
+		}
+		if = {
+			limit = { 
+				company:company_MAN.prosperity < 100
+			}
+			remove_company = company_type:company_MAN
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Faber
+		}
+		if = {
+			limit = { 
+				company:company_Faber.prosperity < 100
+			}
+			remove_company = company_type:company_Faber
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MeyerWerft
+		}
+		if = {
+			limit = { 
+				company:company_MeyerWerft.prosperity < 100
+			}
+			remove_company = company_type:company_MeyerWerft
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Heraeus
+		}
+		if = {
+			limit = { 
+				company:company_Heraeus.prosperity < 100
+			}
+			remove_company = company_type:company_Heraeus
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bayer
+		}
+		if = {
+			limit = { 
+				company:company_Bayer.prosperity < 100
+			}
+			remove_company = company_type:company_Bayer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Opel
+		}
+		if = {
+			limit = { 
+				company:company_Opel.prosperity < 100
+			}
+			remove_company = company_type:company_Opel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DTA
+		}
+		if = {
+			limit = { 
+				company:company_DTA.prosperity < 100
+			}
+			remove_company = company_type:company_DTA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DaimlerMG
+		}
+		if = {
+			limit = { 
+				company:company_DaimlerMG.prosperity < 100
+			}
+			remove_company = company_type:company_DaimlerMG
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DeEdison
+		}
+		if = {
+			limit = { 
+				company:company_DeEdison.prosperity < 100
+			}
+			remove_company = company_type:company_DeEdison
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CarlZeiss
+		}
+		if = {
+			limit = { 
+				company:company_CarlZeiss.prosperity < 100
+			}
+			remove_company = company_type:company_CarlZeiss
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Mannesmann
+		}
+		if = {
+			limit = { 
+				company:company_Mannesmann.prosperity < 100
+			}
+			remove_company = company_type:company_Mannesmann
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Meissener
+		}
+		if = {
+			limit = { 
+				company:company_Meissener.prosperity < 100
+			}
+			remove_company = company_type:company_Meissener
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AGFA
+		}
+		if = {
+			limit = { 
+				company:company_AGFA.prosperity < 100
+			}
+			remove_company = company_type:company_AGFA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Henkel
+		}
+		if = {
+			limit = { 
+				company:company_Henkel.prosperity < 100
+			}
+			remove_company = company_type:company_Henkel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Blohm
+		}
+		if = {
+			limit = { 
+				company:company_Blohm.prosperity < 100
+			}
+			remove_company = company_type:company_Blohm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HugoS
+		}
+		if = {
+			limit = { 
+				company:company_HugoS.prosperity < 100
+			}
+			remove_company = company_type:company_HugoS
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kraus_Maffei
+		}
+		if = {
+			limit = { 
+				company:company_Kraus_Maffei.prosperity < 100
+			}
+			remove_company = company_type:company_Kraus_Maffei
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AugustK
+		}
+		if = {
+			limit = { 
+				company:company_AugustK.prosperity < 100
+			}
+			remove_company = company_type:company_AugustK
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HarzerBergbau
+		}
+		if = {
+			limit = { 
+				company:company_HarzerBergbau.prosperity < 100
+			}
+			remove_company = company_type:company_HarzerBergbau
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GermanNobel
+		}
+		if = {
+			limit = { 
+				company:company_GermanNobel.prosperity < 100
+			}
+			remove_company = company_type:company_GermanNobel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Seeberger
+		}
+		if = {
+			limit = { 
+				company:company_Seeberger.prosperity < 100
+			}
+			remove_company = company_type:company_Seeberger
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Niederegger
+		}
+		if = {
+			limit = { 
+				company:company_Niederegger.prosperity < 100
+			}
+			remove_company = company_type:company_Niederegger
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bosch
+		}
+		if = {
+			limit = { 
+				company:company_Bosch.prosperity < 100
+			}
+			remove_company = company_type:company_Bosch
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_KPG
+		}
+		if = {
+			limit = { 
+				company:company_KPG.prosperity < 100
+			}
+			remove_company = company_type:company_KPG
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mauser
+		}
+		if = {
+			limit = { 
+				company:company_mauser.prosperity < 100
+			}
+			remove_company = company_type:company_mauser
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Glockengiesserei_Claren
+		}
+		if = {
+			limit = { 
+				company:company_Glockengiesserei_Claren.prosperity < 100
+			}
+			remove_company = company_type:company_Glockengiesserei_Claren
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Elbwerft
+		}
+		if = {
+			limit = { 
+				company:company_Elbwerft.prosperity < 100
+			}
+			remove_company = company_type:company_Elbwerft
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JohannBollhagen
+		}
+		if = {
+			limit = { 
+				company:company_JohannBollhagen.prosperity < 100
+			}
+			remove_company = company_type:company_JohannBollhagen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Neptun
+		}
+		if = {
+			limit = { 
+				company:company_Neptun.prosperity < 100
+			}
+			remove_company = company_type:company_Neptun
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Roehm
+		}
+		if = {
+			limit = { 
+				company:company_Roehm.prosperity < 100
+			}
+			remove_company = company_type:company_Roehm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rothschild_Bank_Europe
+		}
+		if = {
+			limit = { 
+				company:company_Rothschild_Bank_Europe.prosperity < 100
+			}
+			remove_company = company_type:company_Rothschild_Bank_Europe
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Deutsche_Bank
+		}
+		if = {
+			limit = { 
+				company:company_Deutsche_Bank.prosperity < 100
+			}
+			remove_company = company_type:company_Deutsche_Bank
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_reichsdruckerei
+		}
+		if = {
+			limit = { 
+				company:company_reichsdruckerei.prosperity < 100
+			}
+			remove_company = company_type:company_reichsdruckerei
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Volkswagen
+		}
+		if = {
+			limit = { 
+				company:company_Volkswagen.prosperity < 100
+			}
+			remove_company = company_type:company_Volkswagen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Porsche
+		}
+		if = {
+			limit = { 
+				company:company_Porsche.prosperity < 100
+			}
+			remove_company = company_type:company_Porsche
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Audi
+		}
+		if = {
+			limit = { 
+				company:company_Audi.prosperity < 100
+			}
+			remove_company = company_type:company_Audi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BMW
+		}
+		if = {
+			limit = { 
+				company:company_BMW.prosperity < 100
+			}
+			remove_company = company_type:company_BMW
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Benz
+		}
+		if = {
+			limit = { 
+				company:company_Benz.prosperity < 100
+			}
+			remove_company = company_type:company_Benz
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_j_p_coats
+		}
+		if = {
+			limit = { 
+				company:company_j_p_coats.prosperity < 100
+			}
+			remove_company = company_type:company_j_p_coats
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_armstrong_whitworth
+		}
+		if = {
+			limit = { 
+				company:company_armstrong_whitworth.prosperity < 100
+			}
+			remove_company = company_type:company_armstrong_whitworth
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_john_brown
+		}
+		if = {
+			limit = { 
+				company:company_john_brown.prosperity < 100
+			}
+			remove_company = company_type:company_john_brown
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_gwr
+		}
+		if = {
+			limit = { 
+				company:company_gwr.prosperity < 100
+			}
+			remove_company = company_type:company_gwr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bolckow_vaughan
+		}
+		if = {
+			limit = { 
+				company:company_bolckow_vaughan.prosperity < 100
+			}
+			remove_company = company_type:company_bolckow_vaughan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_east_india_company
+		}
+		if = {
+			limit = { 
+				company:company_east_india_company.prosperity < 100
+			}
+			remove_company = company_type:company_east_india_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Wedgewood
+		}
+		if = {
+			limit = { 
+				company:company_Wedgewood.prosperity < 100
+			}
+			remove_company = company_type:company_Wedgewood
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BritishGas
+		}
+		if = {
+			limit = { 
+				company:company_BritishGas.prosperity < 100
+			}
+			remove_company = company_type:company_BritishGas
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Cadbury
+		}
+		if = {
+			limit = { 
+				company:company_Cadbury.prosperity < 100
+			}
+			remove_company = company_type:company_Cadbury
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RollsRoyce
+		}
+		if = {
+			limit = { 
+				company:company_RollsRoyce.prosperity < 100
+			}
+			remove_company = company_type:company_RollsRoyce
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ICI
+		}
+		if = {
+			limit = { 
+				company:company_ICI.prosperity < 100
+			}
+			remove_company = company_type:company_ICI
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Unilever
+		}
+		if = {
+			limit = { 
+				company:company_Unilever.prosperity < 100
+			}
+			remove_company = company_type:company_Unilever
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_PandO
+		}
+		if = {
+			limit = { 
+				company:company_PandO.prosperity < 100
+			}
+			remove_company = company_type:company_PandO
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Carr
+		}
+		if = {
+			limit = { 
+				company:company_Carr.prosperity < 100
+			}
+			remove_company = company_type:company_Carr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Courta
+		}
+		if = {
+			limit = { 
+				company:company_Courta.prosperity < 100
+			}
+			remove_company = company_type:company_Courta
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Carron_Company
+		}
+		if = {
+			limit = { 
+				company:company_Carron_Company.prosperity < 100
+			}
+			remove_company = company_type:company_Carron_Company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Vesuvius
+		}
+		if = {
+			limit = { 
+				company:company_Vesuvius.prosperity < 100
+			}
+			remove_company = company_type:company_Vesuvius
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_George_Steuart_G
+		}
+		if = {
+			limit = { 
+				company:company_George_Steuart_G.prosperity < 100
+			}
+			remove_company = company_type:company_George_Steuart_G
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Vanpoulles_Limited
+		}
+		if = {
+			limit = { 
+				company:company_Vanpoulles_Limited.prosperity < 100
+			}
+			remove_company = company_type:company_Vanpoulles_Limited
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_of_England
+		}
+		if = {
+			limit = { 
+				company:company_Bank_of_England.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_of_England
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Vickers
+		}
+		if = {
+			limit = { 
+				company:company_Vickers.prosperity < 100
+			}
+			remove_company = company_type:company_Vickers
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_delarue
+		}
+		if = {
+			limit = { 
+				company:company_delarue.prosperity < 100
+			}
+			remove_company = company_type:company_delarue
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_societe_mokta_el_hadid
+		}
+		if = {
+			limit = { 
+				company:company_societe_mokta_el_hadid.prosperity < 100
+			}
+			remove_company = company_type:company_societe_mokta_el_hadid
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_schneider_creusot
+		}
+		if = {
+			limit = { 
+				company:company_schneider_creusot.prosperity < 100
+			}
+			remove_company = company_type:company_schneider_creusot
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_dmc
+		}
+		if = {
+			limit = { 
+				company:company_dmc.prosperity < 100
+			}
+			remove_company = company_type:company_dmc
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cgv
+		}
+		if = {
+			limit = { 
+				company:company_cgv.prosperity < 100
+			}
+			remove_company = company_type:company_cgv
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_saint_etienne
+		}
+		if = {
+			limit = { 
+				company:company_saint_etienne.prosperity < 100
+			}
+			remove_company = company_type:company_saint_etienne
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fcm
+		}
+		if = {
+			limit = { 
+				company:company_fcm.prosperity < 100
+			}
+			remove_company = company_type:company_fcm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mines_anzin
+		}
+		if = {
+			limit = { 
+				company:company_mines_anzin.prosperity < 100
+			}
+			remove_company = company_type:company_mines_anzin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CompagnieFraissinet
+		}
+		if = {
+			limit = { 
+				company:company_CompagnieFraissinet.prosperity < 100
+			}
+			remove_company = company_type:company_CompagnieFraissinet
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HermesFreres
+		}
+		if = {
+			limit = { 
+				company:company_HermesFreres.prosperity < 100
+			}
+			remove_company = company_type:company_HermesFreres
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SocieteJF
+		}
+		if = {
+			limit = { 
+				company:company_SocieteJF.prosperity < 100
+			}
+			remove_company = company_type:company_SocieteJF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_LouisVuitton
+		}
+		if = {
+			limit = { 
+				company:company_LouisVuitton.prosperity < 100
+			}
+			remove_company = company_type:company_LouisVuitton
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Peugeot
+		}
+		if = {
+			limit = { 
+				company:company_Peugeot.prosperity < 100
+			}
+			remove_company = company_type:company_Peugeot
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bonduelle
+		}
+		if = {
+			limit = { 
+				company:company_Bonduelle.prosperity < 100
+			}
+			remove_company = company_type:company_Bonduelle
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_EJB
+		}
+		if = {
+			limit = { 
+				company:company_EJB.prosperity < 100
+			}
+			remove_company = company_type:company_EJB
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ThomsonCSF
+		}
+		if = {
+			limit = { 
+				company:company_ThomsonCSF.prosperity < 100
+			}
+			remove_company = company_type:company_ThomsonCSF
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Montagut
+		}
+		if = {
+			limit = { 
+				company:company_Montagut.prosperity < 100
+			}
+			remove_company = company_type:company_Montagut
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NavalGroup
+		}
+		if = {
+			limit = { 
+				company:company_NavalGroup.prosperity < 100
+			}
+			remove_company = company_type:company_NavalGroup
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SaintGobain
+		}
+		if = {
+			limit = { 
+				company:company_SaintGobain.prosperity < 100
+			}
+			remove_company = company_type:company_SaintGobain
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Baccarat
+		}
+		if = {
+			limit = { 
+				company:company_Baccarat.prosperity < 100
+			}
+			remove_company = company_type:company_Baccarat
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Vinci
+		}
+		if = {
+			limit = { 
+				company:company_Vinci.prosperity < 100
+			}
+			remove_company = company_type:company_Vinci
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Pernord_Ricard
+		}
+		if = {
+			limit = { 
+				company:company_Pernord_Ricard.prosperity < 100
+			}
+			remove_company = company_type:company_Pernord_Ricard
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bouasse_Lebel
+		}
+		if = {
+			limit = { 
+				company:company_Bouasse_Lebel.prosperity < 100
+			}
+			remove_company = company_type:company_Bouasse_Lebel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bank_of_france
+		}
+		if = {
+			limit = { 
+				company:company_bank_of_france.prosperity < 100
+			}
+			remove_company = company_type:company_bank_of_france
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_Credit_Lyonnais
+		}
+		if = {
+			limit = { 
+				company:company_Bank_Credit_Lyonnais.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_Credit_Lyonnais
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Renault
+		}
+		if = {
+			limit = { 
+				company:company_Renault.prosperity < 100
+			}
+			remove_company = company_type:company_Renault
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Panhard
+		}
+		if = {
+			limit = { 
+				company:company_Panhard.prosperity < 100
+			}
+			remove_company = company_type:company_Panhard
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Duveen_Brothers
+		}
+		if = {
+			limit = { 
+				company:company_Duveen_Brothers.prosperity < 100
+			}
+			remove_company = company_type:company_Duveen_Brothers
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bugatti
+		}
+		if = {
+			limit = { 
+				company:company_Bugatti.prosperity < 100
+			}
+			remove_company = company_type:company_Bugatti
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nokia
+		}
+		if = {
+			limit = { 
+				company:company_nokia.prosperity < 100
+			}
+			remove_company = company_type:company_nokia
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Wartsila
+		}
+		if = {
+			limit = { 
+				company:company_Wartsila.prosperity < 100
+			}
+			remove_company = company_type:company_Wartsila
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Paulig
+		}
+		if = {
+			limit = { 
+				company:company_Paulig.prosperity < 100
+			}
+			remove_company = company_type:company_Paulig
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Iittala
+		}
+		if = {
+			limit = { 
+				company:company_Iittala.prosperity < 100
+			}
+			remove_company = company_type:company_Iittala
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Fazer
+		}
+		if = {
+			limit = { 
+				company:company_Fazer.prosperity < 100
+			}
+			remove_company = company_type:company_Fazer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Fiskars
+		}
+		if = {
+			limit = { 
+				company:company_Fiskars.prosperity < 100
+			}
+			remove_company = company_type:company_Fiskars
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tampella
+		}
+		if = {
+			limit = { 
+				company:company_Tampella.prosperity < 100
+			}
+			remove_company = company_type:company_Tampella
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Finlayson
+		}
+		if = {
+			limit = { 
+				company:company_Finlayson.prosperity < 100
+			}
+			remove_company = company_type:company_Finlayson
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rotermanni
+		}
+		if = {
+			limit = { 
+				company:company_Rotermanni.prosperity < 100
+			}
+			remove_company = company_type:company_Rotermanni
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Clayhills_and_Son
+		}
+		if = {
+			limit = { 
+				company:company_Clayhills_and_Son.prosperity < 100
+			}
+			remove_company = company_type:company_Clayhills_and_Son
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BLRT_Grupp
+		}
+		if = {
+			limit = { 
+				company:company_BLRT_Grupp.prosperity < 100
+			}
+			remove_company = company_type:company_BLRT_Grupp
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kreeholm
+		}
+		if = {
+			limit = { 
+				company:company_Kreeholm.prosperity < 100
+			}
+			remove_company = company_type:company_Kreeholm
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_great_indian_railway
+		}
+		if = {
+			limit = { 
+				company:company_great_indian_railway.prosperity < 100
+			}
+			remove_company = company_type:company_great_indian_railway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_tata
+		}
+		if = {
+			limit = { 
+				company:company_tata.prosperity < 100
+			}
+			remove_company = company_type:company_tata
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CaBSNC
+		}
+		if = {
+			limit = { 
+				company:company_CaBSNC.prosperity < 100
+			}
+			remove_company = company_type:company_CaBSNC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BIC
+		}
+		if = {
+			limit = { 
+				company:company_BIC.prosperity < 100
+			}
+			remove_company = company_type:company_BIC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GreavesCotton
+		}
+		if = {
+			limit = { 
+				company:company_GreavesCotton.prosperity < 100
+			}
+			remove_company = company_type:company_GreavesCotton
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_JTC
+		}
+		if = {
+			limit = { 
+				company:company_JTC.prosperity < 100
+			}
+			remove_company = company_type:company_JTC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_tata_power
+		}
+		if = {
+			limit = { 
+				company:company_tata_power.prosperity < 100
+			}
+			remove_company = company_type:company_tata_power
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CTC
+		}
+		if = {
+			limit = { 
+				company:company_CTC.prosperity < 100
+			}
+			remove_company = company_type:company_CTC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dabur
+		}
+		if = {
+			limit = { 
+				company:company_Dabur.prosperity < 100
+			}
+			remove_company = company_type:company_Dabur
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Parvathy
+		}
+		if = {
+			limit = { 
+				company:company_Parvathy.prosperity < 100
+			}
+			remove_company = company_type:company_Parvathy
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DelhiCloth
+		}
+		if = {
+			limit = { 
+				company:company_DelhiCloth.prosperity < 100
+			}
+			remove_company = company_type:company_DelhiCloth
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BengalChemicals
+		}
+		if = {
+			limit = { 
+				company:company_BengalChemicals.prosperity < 100
+			}
+			remove_company = company_type:company_BengalChemicals
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Aurora
+		}
+		if = {
+			limit = { 
+				company:company_Aurora.prosperity < 100
+			}
+			remove_company = company_type:company_Aurora
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GitaPress
+		}
+		if = {
+			limit = { 
+				company:company_GitaPress.prosperity < 100
+			}
+			remove_company = company_type:company_GitaPress
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_MTR
+		}
+		if = {
+			limit = { 
+				company:company_MTR.prosperity < 100
+			}
+			remove_company = company_type:company_MTR
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bombay_Dyeing
+		}
+		if = {
+			limit = { 
+				company:company_Bombay_Dyeing.prosperity < 100
+			}
+			remove_company = company_type:company_Bombay_Dyeing
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Khoja
+		}
+		if = {
+			limit = { 
+				company:company_Khoja.prosperity < 100
+			}
+			remove_company = company_type:company_Khoja
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Imperial_Bank_of_India
+		}
+		if = {
+			limit = { 
+				company:company_Imperial_Bank_of_India.prosperity < 100
+			}
+			remove_company = company_type:company_Imperial_Bank_of_India
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_misr
+		}
+		if = {
+			limit = { 
+				company:company_misr.prosperity < 100
+			}
+			remove_company = company_type:company_misr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_egyptian_rail
+		}
+		if = {
+			limit = { 
+				company:company_egyptian_rail.prosperity < 100
+			}
+			remove_company = company_type:company_egyptian_rail
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_suez_company
+		}
+		if = {
+			limit = { 
+				company:company_suez_company.prosperity < 100
+			}
+			remove_company = company_type:company_suez_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_nicolas_portalis
+		}
+		if = {
+			limit = { 
+				company:company_nicolas_portalis.prosperity < 100
+			}
+			remove_company = company_type:company_nicolas_portalis
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RCWoE
+		}
+		if = {
+			limit = { 
+				company:company_RCWoE.prosperity < 100
+			}
+			remove_company = company_type:company_RCWoE
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Alireza
+		}
+		if = {
+			limit = { 
+				company:company_Alireza.prosperity < 100
+			}
+			remove_company = company_type:company_Alireza
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Pindad
+		}
+		if = {
+			limit = { 
+				company:company_Pindad.prosperity < 100
+			}
+			remove_company = company_type:company_Pindad
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Sampoerna
+		}
+		if = {
+			limit = { 
+				company:company_Sampoerna.prosperity < 100
+			}
+			remove_company = company_type:company_Sampoerna
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_chr_hansens
+		}
+		if = {
+			limit = { 
+				company:company_chr_hansens.prosperity < 100
+			}
+			remove_company = company_type:company_chr_hansens
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ap_moller
+		}
+		if = {
+			limit = { 
+				company:company_ap_moller.prosperity < 100
+			}
+			remove_company = company_type:company_ap_moller
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SimonsenWeel
+		}
+		if = {
+			limit = { 
+				company:company_SimonsenWeel.prosperity < 100
+			}
+			remove_company = company_type:company_SimonsenWeel
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_RPFD
+		}
+		if = {
+			limit = { 
+				company:company_RPFD.prosperity < 100
+			}
+			remove_company = company_type:company_RPFD
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Stevns
+		}
+		if = {
+			limit = { 
+				company:company_Stevns.prosperity < 100
+			}
+			remove_company = company_type:company_Stevns
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Carlsberg
+		}
+		if = {
+			limit = { 
+				company:company_Carlsberg.prosperity < 100
+			}
+			remove_company = company_type:company_Carlsberg
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DISA
+		}
+		if = {
+			limit = { 
+				company:company_DISA.prosperity < 100
+			}
+			remove_company = company_type:company_DISA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DDS
+		}
+		if = {
+			limit = { 
+				company:company_DDS.prosperity < 100
+			}
+			remove_company = company_type:company_DDS
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DDB
+		}
+		if = {
+			limit = { 
+				company:company_DDB.prosperity < 100
+			}
+			remove_company = company_type:company_DDB
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Munke_Molle
+		}
+		if = {
+			limit = { 
+				company:company_Munke_Molle.prosperity < 100
+			}
+			remove_company = company_type:company_Munke_Molle
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bacardi
+		}
+		if = {
+			limit = { 
+				company:company_Bacardi.prosperity < 100
+			}
+			remove_company = company_type:company_Bacardi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Manati
+		}
+		if = {
+			limit = { 
+				company:company_Manati.prosperity < 100
+			}
+			remove_company = company_type:company_Manati
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Vizcaya
+		}
+		if = {
+			limit = { 
+				company:company_Vizcaya.prosperity < 100
+			}
+			remove_company = company_type:company_Vizcaya
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kaiping_mining
+		}
+		if = {
+			limit = { 
+				company:company_kaiping_mining.prosperity < 100
+			}
+			remove_company = company_type:company_kaiping_mining
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hanyang_arsenal
+		}
+		if = {
+			limit = { 
+				company:company_hanyang_arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_hanyang_arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_foochow_arsenal
+		}
+		if = {
+			limit = { 
+				company:company_foochow_arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_foochow_arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_jingdezhen
+		}
+		if = {
+			limit = { 
+				company:company_jingdezhen.prosperity < 100
+			}
+			remove_company = company_type:company_jingdezhen
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bianyifang
+		}
+		if = {
+			limit = { 
+				company:company_Bianyifang.prosperity < 100
+			}
+			remove_company = company_type:company_Bianyifang
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Changan
+		}
+		if = {
+			limit = { 
+				company:company_Changan.prosperity < 100
+			}
+			remove_company = company_type:company_Changan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Arnhold
+		}
+		if = {
+			limit = { 
+				company:company_Arnhold.prosperity < 100
+			}
+			remove_company = company_type:company_Arnhold
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Chongqing
+		}
+		if = {
+			limit = { 
+				company:company_Chongqing.prosperity < 100
+			}
+			remove_company = company_type:company_Chongqing
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dalian
+		}
+		if = {
+			limit = { 
+				company:company_Dalian.prosperity < 100
+			}
+			remove_company = company_type:company_Dalian
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DuoYunXuan
+		}
+		if = {
+			limit = { 
+				company:company_DuoYunXuan.prosperity < 100
+			}
+			remove_company = company_type:company_DuoYunXuan
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Li
+		}
+		if = {
+			limit = { 
+				company:company_Li.prosperity < 100
+			}
+			remove_company = company_type:company_Li
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Xie_Zhi
+		}
+		if = {
+			limit = { 
+				company:company_Xie_Zhi.prosperity < 100
+			}
+			remove_company = company_type:company_Xie_Zhi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jian_Hsin
+		}
+		if = {
+			limit = { 
+				company:company_Jian_Hsin.prosperity < 100
+			}
+			remove_company = company_type:company_Jian_Hsin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ITA
+		}
+		if = {
+			limit = { 
+				company:company_ITA.prosperity < 100
+			}
+			remove_company = company_type:company_ITA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jiangnan_Arsenal
+		}
+		if = {
+			limit = { 
+				company:company_Jiangnan_Arsenal.prosperity < 100
+			}
+			remove_company = company_type:company_Jiangnan_Arsenal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CEaMC
+		}
+		if = {
+			limit = { 
+				company:company_CEaMC.prosperity < 100
+			}
+			remove_company = company_type:company_CEaMC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CMSNC
+		}
+		if = {
+			limit = { 
+				company:company_CMSNC.prosperity < 100
+			}
+			remove_company = company_type:company_CMSNC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Jardine
+		}
+		if = {
+			limit = { 
+				company:company_Jardine.prosperity < 100
+			}
+			remove_company = company_type:company_Jardine
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Honkong_Electric
+		}
+		if = {
+			limit = { 
+				company:company_Honkong_Electric.prosperity < 100
+			}
+			remove_company = company_type:company_Honkong_Electric
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Commercial_Press
+		}
+		if = {
+			limit = { 
+				company:company_Commercial_Press.prosperity < 100
+			}
+			remove_company = company_type:company_Commercial_Press
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ta_Kung_Pao
+		}
+		if = {
+			limit = { 
+				company:company_Ta_Kung_Pao.prosperity < 100
+			}
+			remove_company = company_type:company_Ta_Kung_Pao
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ShenBao
+		}
+		if = {
+			limit = { 
+				company:company_ShenBao.prosperity < 100
+			}
+			remove_company = company_type:company_ShenBao
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Zhonghua
+		}
+		if = {
+			limit = { 
+				company:company_Zhonghua.prosperity < 100
+			}
+			remove_company = company_type:company_Zhonghua
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rong_Bao_Zhai
+		}
+		if = {
+			limit = { 
+				company:company_Rong_Bao_Zhai.prosperity < 100
+			}
+			remove_company = company_type:company_Rong_Bao_Zhai
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Churin
+		}
+		if = {
+			limit = { 
+				company:company_Churin.prosperity < 100
+			}
+			remove_company = company_type:company_Churin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_LeeKumKee
+		}
+		if = {
+			limit = { 
+				company:company_LeeKumKee.prosperity < 100
+			}
+			remove_company = company_type:company_LeeKumKee
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ASWatson
+		}
+		if = {
+			limit = { 
+				company:company_ASWatson.prosperity < 100
+			}
+			remove_company = company_type:company_ASWatson
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tsingtao
+		}
+		if = {
+			limit = { 
+				company:company_Tsingtao.prosperity < 100
+			}
+			remove_company = company_type:company_Tsingtao
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_TongRenTang
+		}
+		if = {
+			limit = { 
+				company:company_TongRenTang.prosperity < 100
+			}
+			remove_company = company_type:company_TongRenTang
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Yanchang
+		}
+		if = {
+			limit = { 
+				company:company_Yanchang.prosperity < 100
+			}
+			remove_company = company_type:company_Yanchang
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_HSBC
+		}
+		if = {
+			limit = { 
+				company:company_Bank_HSBC.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_HSBC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tangshan_LRSW
+		}
+		if = {
+			limit = { 
+				company:company_Tangshan_LRSW.prosperity < 100
+			}
+			remove_company = company_type:company_Tangshan_LRSW
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_IBC
+		}
+		if = {
+			limit = { 
+				company:company_Bank_IBC.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_IBC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_BOCOM
+		}
+		if = {
+			limit = { 
+				company:company_Bank_BOCOM.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_BOCOM
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Da_Qing_Bank
+		}
+		if = {
+			limit = { 
+				company:company_Da_Qing_Bank.prosperity < 100
+			}
+			remove_company = company_type:company_Da_Qing_Bank
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ma_Yu_Ching
+		}
+		if = {
+			limit = { 
+				company:company_Ma_Yu_Ching.prosperity < 100
+			}
+			remove_company = company_type:company_Ma_Yu_Ching
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Rui_Fu_Xiang
+		}
+		if = {
+			limit = { 
+				company:company_Rui_Fu_Xiang.prosperity < 100
+			}
+			remove_company = company_type:company_Rui_Fu_Xiang
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Harbin_Brewery
+		}
+		if = {
+			limit = { 
+				company:company_Harbin_Brewery.prosperity < 100
+			}
+			remove_company = company_type:company_Harbin_Brewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_panama_company
+		}
+		if = {
+			limit = { 
+				company:company_panama_company.prosperity < 100
+			}
+			remove_company = company_type:company_panama_company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FlordeCana
+		}
+		if = {
+			limit = { 
+				company:company_FlordeCana.prosperity < 100
+			}
+			remove_company = company_type:company_FlordeCana
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CCN
+		}
+		if = {
+			limit = { 
+				company:company_CCN.prosperity < 100
+			}
+			remove_company = company_type:company_CCN
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SIMAN
+		}
+		if = {
+			limit = { 
+				company:company_SIMAN.prosperity < 100
+			}
+			remove_company = company_type:company_SIMAN
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_hbc
+		}
+		if = {
+			limit = { 
+				company:company_hbc.prosperity < 100
+			}
+			remove_company = company_type:company_hbc
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BTCC
+		}
+		if = {
+			limit = { 
+				company:company_BTCC.prosperity < 100
+			}
+			remove_company = company_type:company_BTCC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Labatt
+		}
+		if = {
+			limit = { 
+				company:company_Labatt.prosperity < 100
+			}
+			remove_company = company_type:company_Labatt
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GTR
+		}
+		if = {
+			limit = { 
+				company:company_GTR.prosperity < 100
+			}
+			remove_company = company_type:company_GTR
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GrayDort
+		}
+		if = {
+			limit = { 
+				company:company_GrayDort.prosperity < 100
+			}
+			remove_company = company_type:company_GrayDort
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Farr
+		}
+		if = {
+			limit = { 
+				company:company_Farr.prosperity < 100
+			}
+			remove_company = company_type:company_Farr
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_McLaughlin
+		}
+		if = {
+			limit = { 
+				company:company_McLaughlin.prosperity < 100
+			}
+			remove_company = company_type:company_McLaughlin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Royal_Bank_of_Canada
+		}
+		if = {
+			limit = { 
+				company:company_Royal_Bank_of_Canada.prosperity < 100
+			}
+			remove_company = company_type:company_Royal_Bank_of_Canada
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_LaMCoML
+		}
+		if = {
+			limit = { 
+				company:company_LaMCoML.prosperity < 100
+			}
+			remove_company = company_type:company_LaMCoML
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_of_Montreal
+		}
+		if = {
+			limit = { 
+				company:company_Bank_of_Montreal.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_of_Montreal
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Molson_Brewery
+		}
+		if = {
+			limit = { 
+				company:company_Molson_Brewery.prosperity < 100
+			}
+			remove_company = company_type:company_Molson_Brewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_John_Booth_lumber_mills
+		}
+		if = {
+			limit = { 
+				company:company_John_Booth_lumber_mills.prosperity < 100
+			}
+			remove_company = company_type:company_John_Booth_lumber_mills
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_William_Davies_Company
+		}
+		if = {
+			limit = { 
+				company:company_William_Davies_Company.prosperity < 100
+			}
+			remove_company = company_type:company_William_Davies_Company
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Montreal_RMC
+		}
+		if = {
+			limit = { 
+				company:company_Montreal_RMC.prosperity < 100
+			}
+			remove_company = company_type:company_Montreal_RMC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Davie_Shipbuilding
+		}
+		if = {
+			limit = { 
+				company:company_Davie_Shipbuilding.prosperity < 100
+			}
+			remove_company = company_type:company_Davie_Shipbuilding
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Montmorency_CMC
+		}
+		if = {
+			limit = { 
+				company:company_Montmorency_CMC.prosperity < 100
+			}
+			remove_company = company_type:company_Montmorency_CMC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Montreal_LHPC
+		}
+		if = {
+			limit = { 
+				company:company_Montreal_LHPC.prosperity < 100
+			}
+			remove_company = company_type:company_Montreal_LHPC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_DOSCO
+		}
+		if = {
+			limit = { 
+				company:company_DOSCO.prosperity < 100
+			}
+			remove_company = company_type:company_DOSCO
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Price_BaC
+		}
+		if = {
+			limit = { 
+				company:company_Price_BaC.prosperity < 100
+			}
+			remove_company = company_type:company_Price_BaC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Redpath_Sugar
+		}
+		if = {
+			limit = { 
+				company:company_Redpath_Sugar.prosperity < 100
+			}
+			remove_company = company_type:company_Redpath_Sugar
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Seagram
+		}
+		if = {
+			limit = { 
+				company:company_Seagram.prosperity < 100
+			}
+			remove_company = company_type:company_Seagram
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Boswell_Brewery
+		}
+		if = {
+			limit = { 
+				company:company_Boswell_Brewery.prosperity < 100
+			}
+			remove_company = company_type:company_Boswell_Brewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Canadian_Vickers
+		}
+		if = {
+			limit = { 
+				company:company_Canadian_Vickers.prosperity < 100
+			}
+			remove_company = company_type:company_Canadian_Vickers
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Irving
+		}
+		if = {
+			limit = { 
+				company:company_Irving.prosperity < 100
+			}
+			remove_company = company_type:company_Irving
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Massey_MC
+		}
+		if = {
+			limit = { 
+				company:company_Massey_MC.prosperity < 100
+			}
+			remove_company = company_type:company_Massey_MC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ford_motor_canada
+		}
+		if = {
+			limit = { 
+				company:company_ford_motor_canada.prosperity < 100
+			}
+			remove_company = company_type:company_ford_motor_canada
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_Desjardins
+		}
+		if = {
+			limit = { 
+				company:company_Bank_Desjardins.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_Desjardins
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dunsmuir
+		}
+		if = {
+			limit = { 
+				company:company_Dunsmuir.prosperity < 100
+			}
+			remove_company = company_type:company_Dunsmuir
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_kablin
+		}
+		if = {
+			limit = { 
+				company:company_kablin.prosperity < 100
+			}
+			remove_company = company_type:company_kablin
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sao_paulo_railway
+		}
+		if = {
+			limit = { 
+				company:company_sao_paulo_railway.prosperity < 100
+			}
+			remove_company = company_type:company_sao_paulo_railway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_estaleiro_maua
+		}
+		if = {
+			limit = { 
+				company:company_estaleiro_maua.prosperity < 100
+			}
+			remove_company = company_type:company_estaleiro_maua
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_pernambuco_textiles
+		}
+		if = {
+			limit = { 
+				company:company_pernambuco_textiles.prosperity < 100
+			}
+			remove_company = company_type:company_pernambuco_textiles
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_fundicao_ipanema
+		}
+		if = {
+			limit = { 
+				company:company_fundicao_ipanema.prosperity < 100
+			}
+			remove_company = company_type:company_fundicao_ipanema
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_rossi
+		}
+		if = {
+			limit = { 
+				company:company_rossi.prosperity < 100
+			}
+			remove_company = company_type:company_rossi
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Elekeiroz
+		}
+		if = {
+			limit = { 
+				company:company_Elekeiroz.prosperity < 100
+			}
+			remove_company = company_type:company_Elekeiroz
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Light
+		}
+		if = {
+			limit = { 
+				company:company_Light.prosperity < 100
+			}
+			remove_company = company_type:company_Light
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Gerdau
+		}
+		if = {
+			limit = { 
+				company:company_Gerdau.prosperity < 100
+			}
+			remove_company = company_type:company_Gerdau
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ArsenalRio
+		}
+		if = {
+			limit = { 
+				company:company_ArsenalRio.prosperity < 100
+			}
+			remove_company = company_type:company_ArsenalRio
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Neugebauer
+		}
+		if = {
+			limit = { 
+				company:company_Neugebauer.prosperity < 100
+			}
+			remove_company = company_type:company_Neugebauer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tramontina
+		}
+		if = {
+			limit = { 
+				company:company_Tramontina.prosperity < 100
+			}
+			remove_company = company_type:company_Tramontina
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_of_Brazil
+		}
+		if = {
+			limit = { 
+				company:company_Bank_of_Brazil.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_of_Brazil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_ccci
+		}
+		if = {
+			limit = { 
+				company:company_ccci.prosperity < 100
+			}
+			remove_company = company_type:company_ccci
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_franco_belge
+		}
+		if = {
+			limit = { 
+				company:company_franco_belge.prosperity < 100
+			}
+			remove_company = company_type:company_franco_belge
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_john_cockerill
+		}
+		if = {
+			limit = { 
+				company:company_john_cockerill.prosperity < 100
+			}
+			remove_company = company_type:company_john_cockerill
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BellTelephone
+		}
+		if = {
+			limit = { 
+				company:company_BellTelephone.prosperity < 100
+			}
+			remove_company = company_type:company_BellTelephone
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_SgdB
+		}
+		if = {
+			limit = { 
+				company:company_SgdB.prosperity < 100
+			}
+			remove_company = company_type:company_SgdB
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Solvay
+		}
+		if = {
+			limit = { 
+				company:company_Solvay.prosperity < 100
+			}
+			remove_company = company_type:company_Solvay
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AdCE
+		}
+		if = {
+			limit = { 
+				company:company_AdCE.prosperity < 100
+			}
+			remove_company = company_type:company_AdCE
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_skoda
+		}
+		if = {
+			limit = { 
+				company:company_skoda.prosperity < 100
+			}
+			remove_company = company_type:company_skoda
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_mav
+		}
+		if = {
+			limit = { 
+				company:company_mav.prosperity < 100
+			}
+			remove_company = company_type:company_mav
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_manfred_weiss
+		}
+		if = {
+			limit = { 
+				company:company_manfred_weiss.prosperity < 100
+			}
+			remove_company = company_type:company_manfred_weiss
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_galician_carpathian_oil
+		}
+		if = {
+			limit = { 
+				company:company_galician_carpathian_oil.prosperity < 100
+			}
+			remove_company = company_type:company_galician_carpathian_oil
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_oevg
+		}
+		if = {
+			limit = { 
+				company:company_oevg.prosperity < 100
+			}
+			remove_company = company_type:company_oevg
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GanzWorks
+		}
+		if = {
+			limit = { 
+				company:company_GanzWorks.prosperity < 100
+			}
+			remove_company = company_type:company_GanzWorks
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_HoenigsbergDeutsch
+		}
+		if = {
+			limit = { 
+				company:company_HoenigsbergDeutsch.prosperity < 100
+			}
+			remove_company = company_type:company_HoenigsbergDeutsch
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_GebruederThonet
+		}
+		if = {
+			limit = { 
+				company:company_GebruederThonet.prosperity < 100
+			}
+			remove_company = company_type:company_GebruederThonet
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BeneAG
+		}
+		if = {
+			limit = { 
+				company:company_BeneAG.prosperity < 100
+			}
+			remove_company = company_type:company_BeneAG
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Andritz
+		}
+		if = {
+			limit = { 
+				company:company_Andritz.prosperity < 100
+			}
+			remove_company = company_type:company_Andritz
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Dorotheum
+		}
+		if = {
+			limit = { 
+				company:company_Dorotheum.prosperity < 100
+			}
+			remove_company = company_type:company_Dorotheum
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Ottakringer
+		}
+		if = {
+			limit = { 
+				company:company_Ottakringer.prosperity < 100
+			}
+			remove_company = company_type:company_Ottakringer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Boehler
+		}
+		if = {
+			limit = { 
+				company:company_Boehler.prosperity < 100
+			}
+			remove_company = company_type:company_Boehler
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Steyrer
+		}
+		if = {
+			limit = { 
+				company:company_Steyrer.prosperity < 100
+			}
+			remove_company = company_type:company_Steyrer
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Raba
+		}
+		if = {
+			limit = { 
+				company:company_Raba.prosperity < 100
+			}
+			remove_company = company_type:company_Raba
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FEG
+		}
+		if = {
+			limit = { 
+				company:company_FEG.prosperity < 100
+			}
+			remove_company = company_type:company_FEG
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_CFef
+		}
+		if = {
+			limit = { 
+				company:company_CFef.prosperity < 100
+			}
+			remove_company = company_type:company_CFef
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Zwack
+		}
+		if = {
+			limit = { 
+				company:company_Zwack.prosperity < 100
+			}
+			remove_company = company_type:company_Zwack
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_CA
+		}
+		if = {
+			limit = { 
+				company:company_Bank_CA.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_CA
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_william_sandford
+		}
+		if = {
+			limit = { 
+				company:company_william_sandford.prosperity < 100
+			}
+			remove_company = company_type:company_william_sandford
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_AGL
+		}
+		if = {
+			limit = { 
+				company:company_AGL.prosperity < 100
+			}
+			remove_company = company_type:company_AGL
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Elders
+		}
+		if = {
+			limit = { 
+				company:company_Elders.prosperity < 100
+			}
+			remove_company = company_type:company_Elders
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Penfolds
+		}
+		if = {
+			limit = { 
+				company:company_Penfolds.prosperity < 100
+			}
+			remove_company = company_type:company_Penfolds
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Gunns
+		}
+		if = {
+			limit = { 
+				company:company_Gunns.prosperity < 100
+			}
+			remove_company = company_type:company_Gunns
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NeradaTea
+		}
+		if = {
+			limit = { 
+				company:company_NeradaTea.prosperity < 100
+			}
+			remove_company = company_type:company_NeradaTea
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_BHP
+		}
+		if = {
+			limit = { 
+				company:company_BHP.prosperity < 100
+			}
+			remove_company = company_type:company_BHP
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Col_Sug_Ref
+		}
+		if = {
+			limit = { 
+				company:company_Col_Sug_Ref.prosperity < 100
+			}
+			remove_company = company_type:company_Col_Sug_Ref
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Howard_Smith
+		}
+		if = {
+			limit = { 
+				company:company_Howard_Smith.prosperity < 100
+			}
+			remove_company = company_type:company_Howard_Smith
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tooheys_Brewery
+		}
+		if = {
+			limit = { 
+				company:company_Tooheys_Brewery.prosperity < 100
+			}
+			remove_company = company_type:company_Tooheys_Brewery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bendigo_Pottery
+		}
+		if = {
+			limit = { 
+				company:company_Bendigo_Pottery.prosperity < 100
+			}
+			remove_company = company_type:company_Bendigo_Pottery
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Consolidated_Zinc
+		}
+		if = {
+			limit = { 
+				company:company_Consolidated_Zinc.prosperity < 100
+			}
+			remove_company = company_type:company_Consolidated_Zinc
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_UnionSSC
+		}
+		if = {
+			limit = { 
+				company:company_UnionSSC.prosperity < 100
+			}
+			remove_company = company_type:company_UnionSSC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_FletcherC
+		}
+		if = {
+			limit = { 
+				company:company_FletcherC.prosperity < 100
+			}
+			remove_company = company_type:company_FletcherC
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_NZH
+		}
+		if = {
+			limit = { 
+				company:company_NZH.prosperity < 100
+			}
+			remove_company = company_type:company_NZH
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Kauri
+		}
+		if = {
+			limit = { 
+				company:company_Kauri.prosperity < 100
+			}
+			remove_company = company_type:company_Kauri
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Bank_BNSW
+		}
+		if = {
+			limit = { 
+				company:company_Bank_BNSW.prosperity < 100
+			}
+			remove_company = company_type:company_Bank_BNSW
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_bunge_born
+		}
+		if = {
+			limit = { 
+				company:company_bunge_born.prosperity < 100
+			}
+			remove_company = company_type:company_bunge_born
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_la_rosada
+		}
+		if = {
+			limit = { 
+				company:company_la_rosada.prosperity < 100
+			}
+			remove_company = company_type:company_la_rosada
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_argentinian_wine
+		}
+		if = {
+			limit = { 
+				company:company_argentinian_wine.prosperity < 100
+			}
+			remove_company = company_type:company_argentinian_wine
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_sudamericana_de_vapores
+		}
+		if = {
+			limit = { 
+				company:company_sudamericana_de_vapores.prosperity < 100
+			}
+			remove_company = company_type:company_sudamericana_de_vapores
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_cordoba_railway
+		}
+		if = {
+			limit = { 
+				company:company_cordoba_railway.prosperity < 100
+			}
+			remove_company = company_type:company_cordoba_railway
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Tandanor
+		}
+		if = {
+			limit = { 
+				company:company_Tandanor.prosperity < 100
+			}
+			remove_company = company_type:company_Tandanor
+		}
+	}
+    if = {
+		limit = { 
+			has_company = company_type:company_Trapiche
+		}
+		if = {
+			limit = { 
+				company:company_Trapiche.prosperity < 100
+			}
+			remove_company = company_type:company_Trapiche
+		}
+	}
 }
