@@ -1,3 +1,3339 @@
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+#  ██╗    ███╗   ███╗ ██████╗ ███╗   ██╗████████╗██╗  ██╗
+# ███║    ████╗ ████║██╔═══██╗████╗  ██║╚══██╔══╝██║  ██║
+# ╚██║    ██╔████╔██║██║   ██║██╔██╗ ██║   ██║   ███████║
+#  ██║    ██║╚██╔╝██║██║   ██║██║╚██╗██║   ██║   ██╔══██║
+#  ██║    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║   ██║   ██║  ██║
+#  ╚═╝    ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+ef_on_monthly_pulse_recurence = {
+	update_modifiers_bc_fc_ns = yes
+
+	if  = {
+		limit = {
+			is_subject_custom_trigger = no
+		}
+		remove_suject_currency = yes
+	}
+
+	#for new country by revolution
+	if = {
+		limit = {
+			is_revolutionary = yes
+			not  = {
+				has_variable = coal_release_quantity
+			}
+		}
+		add_journal_entry = {
+			type = for_new_country_je_2
+		}
+	}
+}
+
+# ef_on_monthly_pulse_reset = {
+# }
+
+central_bank_ef_on_monthly_pulse_country = {
+	#central_bank_interest_actual = yes  #à quiu cela  sert ?
+	#central_bank_gold_reserves_state = yes #à modifier pour unee valeur scripté
+
+	fluctuations_money_value_1_month = yes
+	government_loan_month = yes
+
+	#inflation_value & modifier
+	inflation_modifier = yes
+	inflation_on_consumer_goods_market_value_fluctuations = yes
+	inflation_on_energy_market_value_fluctuations = yes
+	inflation_on_raw_material_market_value_fluctuations = yes
+	inflation_on_manufactured_goods_market_value_fluctuations = yes
+	inflation_on_military_equipment_market_value_fluctuations = yes
+	money_value_dif_01_market_value_fluctuations = yes
+
+	#monetary_policy_player
+	if = {
+		limit = {
+			is_player = yes
+		}
+		if = {
+			limit = {
+				or = {
+					not = {
+						has_law = law_type:law_no_monetary_policy
+					}
+					var:devaluation_on = 1
+					var:revaluation_on = 1
+				}
+			}
+			monetary_policy_inflation = yes
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_no_monetary_policy
+				or = {
+					var:monetary_policy_inflation > 0
+					var:monetary_policy_inflation < 0
+				}
+			}
+			monetary_policy_inflation_reset = yes
+		}
+	}
+
+	#stockpiling_currency_and_gold
+	if  = {
+		limit = {
+			market.owner = root
+			not  = {
+				is_subject_custom_trigger = yes
+			}
+		}
+		stockpiling_currency_and_gold = yes
+	}
+
+	if  = {
+		limit = {
+			has_modifier = foreign_exchange_controls
+		}
+		if  = {
+			limit = {
+				var:devaluation_on = 1
+			}
+			devaluation_on = yes
+		}
+		if  = {
+			limit = {
+				var:revaluation_on = 1
+			}
+			revaluation_on = yes
+		}
+	}
+}
+
+financial_center_ef_on_monthly_pulse_country = {
+
+	if  = {
+		limit  = {
+			is_player = yes
+			current_order > 0
+		}
+		RMSA_MMSA_order_trigger = yes
+	}
+}
+
+national_stockpile_ef_on_monthly_pulse_country = {
+	flow_storing_on_action = yes
+
+	if  = {
+		limit  = {
+			has_modifier = has_national_stockpile
+		}
+		storing_releasing_on_action = yes
+	}
+}
+
+stockpiling_currency_and_gold = {
+	#stockpiling_financial_product_and_gold
+	stockpiling_central_bank_gold_reserves_state = yes
+	gold_by_trade_route = yes
+	
+	#stockpile finacial product
+	stockpiling_bond_1 = yes
+	stockpiling_manufacture_stock_1 = yes
+	stockpiling_agricultural_stock_1 = yes
+	stockpiling_mining_stock_1 = yes
+	stockpiling_railroad_stock_1 = yes
+
+	if  = {
+		limit  = {
+			money_value_dinar > 0
+		}
+		stockpiling_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_algerian_dinar > 0
+		}
+		stockpiling_dinar_algerian_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_iraqi_dinar > 0
+		}
+		stockpiling_dinar_iraqi_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_libyan_dinar > 0
+		}
+		stockpiling_dinar_libyan_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_moroccan_dirham > 0
+		}
+		stockpiling_dinar_moroccan_dirham_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_omanian_rial > 0
+		}
+		stockpiling_dinar_omanian_rial_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_qiran > 0
+		}
+		stockpiling_dinar_qiran_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_saudi_riyal > 0
+		}
+		stockpiling_dinar_saudi_riyal_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_serbian_dinar > 0
+		}
+		stockpiling_dinar_serbian_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_tunisian_dinar > 0
+		}
+		stockpiling_dinar_tunisian_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dinar_yugoslav_dinar > 0
+		}
+		stockpiling_dinar_yugoslav_dinar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_australian_dollar > 0
+		}
+		stockpiling_dollar_australian_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_canadian_dollar > 0
+		}
+		stockpiling_dollar_canadian_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_caribbean_dollar > 0
+		}
+		stockpiling_dollar_caribbean_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_confederate_states_dollar > 0
+		}
+		stockpiling_dollar_confederate_states_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_liberian_dollar > 0
+		}
+		stockpiling_dollar_liberian_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_new_zealand_dollar > 0
+		}
+		stockpiling_dollar_new_zealand_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_sierra_leonean_dollar > 0
+		}
+		stockpiling_dollar_sierra_leonean_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_dollar_united_states_dollar > 0
+		}
+		stockpiling_dollar_united_states_dollar_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_ariary > 0
+		}
+		stockpiling_eco_ariary_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_central_african_eco > 0
+		}
+		stockpiling_eco_central_african_eco_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_east_african_eco > 0
+		}
+		stockpiling_eco_east_african_eco_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_ethiopian_birr > 0
+		}
+		stockpiling_eco_ethiopian_birr_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_ghanaian_pound > 0
+		}
+		stockpiling_eco_ghanaian_pound_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_nigerian_naira > 0
+		}
+		stockpiling_eco_nigerian_naira_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_south_african_rand > 0
+		}
+		stockpiling_eco_south_african_rand_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_tuareg_ouguiya > 0
+		}
+		stockpiling_eco_tuareg_ouguiya_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_eco_west_african_eco > 0
+		}
+		stockpiling_eco_west_african_eco_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_franc_belgian_franc > 0
+		}
+		stockpiling_franc_belgian_franc_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_franc_french_franc > 0
+		}
+		stockpiling_franc_french_franc_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_franc_luxembourgish_franc > 0
+		}
+		stockpiling_franc_luxembourgish_franc_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_franc_swiss_franc > 0
+		}
+		stockpiling_franc_swiss_franc_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden > 0
+		}
+		stockpiling_gulden_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden_bavarian_gulden > 0
+		}
+		stockpiling_gulden_bavarian_gulden_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden_florin > 0
+		}
+		stockpiling_gulden_florin_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden_hungarian_forint > 0
+		}
+		stockpiling_gulden_hungarian_forint_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden_indies_guilder > 0
+		}
+		stockpiling_gulden_indies_guilder_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_gulden_south_german_gulden > 0
+		}
+		stockpiling_gulden_south_german_gulden_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_czech_koruna > 0
+		}
+		stockpiling_krone_czech_koruna_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_danish_krone > 0
+		}
+		stockpiling_krone_danish_krone_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_estonian_kroon > 0
+		}
+		stockpiling_krone_estonian_kroon_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_icelandic_krona > 0
+		}
+		stockpiling_krone_icelandic_krona_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_norwegian_krone > 0
+		}
+		stockpiling_krone_norwegian_krone_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_slovak_koruna > 0
+		}
+		stockpiling_krone_slovak_koruna_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_krone_swedish_krona > 0
+		}
+		stockpiling_krone_swedish_krona_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_leon_leu > 0
+		}
+		stockpiling_leon_leu_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_leon_lev > 0
+		}
+		stockpiling_leon_lev_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira > 0
+		}
+		stockpiling_lira_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira_ducato > 0
+		}
+		stockpiling_lira_ducato_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira_ottoman_lira > 0
+		}
+		stockpiling_lira_ottoman_lira_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira_scudo_pontificio > 0
+		}
+		stockpiling_lira_scudo_pontificio_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira_scudo_sardo > 0
+		}
+		stockpiling_lira_scudo_sardo_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_lira_toscane_lira > 0
+		}
+		stockpiling_lira_toscane_lira_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_mark > 0
+		}
+		stockpiling_mark_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_mark_finnish_markka > 0
+		}
+		stockpiling_mark_finnish_markka_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso > 0
+		}
+		stockpiling_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_argentine_peso > 0
+		}
+		stockpiling_peso_argentine_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_bolivien_peso > 0
+		}
+		stockpiling_peso_bolivien_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_chilean_peso > 0
+		}
+		stockpiling_peso_chilean_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_colombian_peso > 0
+		}
+		stockpiling_peso_colombian_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_costa_rican_colon > 0
+		}
+		stockpiling_peso_costa_rican_colon_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_cuban_peso > 0
+		}
+		stockpiling_peso_cuban_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_ecuadorian_peso > 0
+		}
+		stockpiling_peso_ecuadorian_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_el_salvador_colon > 0
+		}
+		stockpiling_peso_el_salvador_colon_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_guatemalan_quetzal > 0
+		}
+		stockpiling_peso_guatemalan_quetzal_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_honduran_lempira > 0
+		}
+		stockpiling_peso_honduran_lempira_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_mexican_peso > 0
+		}
+		stockpiling_peso_mexican_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_nicaraguan_cordoba > 0
+		}
+		stockpiling_peso_nicaraguan_cordoba_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_paraguayan_peso > 0
+		}
+		stockpiling_peso_paraguayan_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_philippine_peso > 0
+		}
+		stockpiling_peso_philippine_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_sol_de_oro > 0
+		}
+		stockpiling_peso_sol_de_oro_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_uruguayan_peso > 0
+		}
+		stockpiling_peso_uruguayan_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_peso_venezuelan_peso > 0
+		}
+		stockpiling_peso_venezuelan_peso_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_pound_egyptian_pound > 0
+		}
+		stockpiling_pound_egyptian_pound_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_pound_irish_pound > 0
+		}
+		stockpiling_pound_irish_pound_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_pound_sterling > 0
+		}
+		stockpiling_pound_sterling_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_real > 0
+		}
+		stockpiling_real_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_real_brazilian_real > 0
+		}
+		stockpiling_real_brazilian_real_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_rupee_indian_rupee > 0
+		}
+		stockpiling_rupee_indian_rupee_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_rupee_indonesian_rupiah > 0
+		}
+		stockpiling_rupee_indonesian_rupiah_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_baht > 0
+		}
+		stockpiling_spe_baht_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_dong > 0
+		}
+		stockpiling_spe_dong_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_drachma > 0
+		}
+		stockpiling_spe_drachma_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_korean_won > 0
+		}
+		stockpiling_spe_korean_won_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_latvian_lats > 0
+		}
+		stockpiling_spe_latvian_lats_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_lithuanian_litas > 0
+		}
+		stockpiling_spe_lithuanian_litas_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_peseta > 0
+		}
+		stockpiling_spe_peseta_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_ruble > 0
+		}
+		stockpiling_spe_ruble_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_uni > 0
+		}
+		stockpiling_spe_uni_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_yen > 0
+		}
+		stockpiling_spe_yen_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_yuan > 0
+		}
+		stockpiling_spe_yuan_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_spe_zloti > 0
+		}
+		stockpiling_spe_zloti_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_thaler_hannoveraner_thaler > 0
+		}
+		stockpiling_thaler_hannoveraner_thaler_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_thaler_prussian_thaler > 0
+		}
+		stockpiling_thaler_prussian_thaler_c_1 = yes
+	}
+	if  = {
+		limit  = {
+			money_value_thaler_saxon_thaler > 0
+		}
+		stockpiling_thaler_saxon_thaler_c_1 = yes
+	}
+}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+#  ██████╗     ███╗   ███╗ ██████╗ ███╗   ██╗████████╗██╗  ██╗███████╗
+# ██╔════╝     ████╗ ████║██╔═══██╗████╗  ██║╚══██╔══╝██║  ██║██╔════╝
+# ███████╗     ██╔████╔██║██║   ██║██╔██╗ ██║   ██║   ███████║███████╗
+# ██╔═══██╗    ██║╚██╔╝██║██║   ██║██║╚██╗██║   ██║   ██╔══██║╚════██║
+# ╚██████╔╝    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║   ██║   ██║  ██║███████║
+#  ╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+ef_on_half_yearly_pulse_recurence = {
+	currency_strength_modifier = yes
+
+	#########################################
+	#ai strategy
+	#########################################
+	ai_building_strategy = yes
+	fluctuations_gdp_1_year = yes
+
+	if = {
+		limit = {
+			market.owner = root
+		}
+		trade_balance = yes
+	}
+}
+
+# ef_on_half_yearly_pulse_reset = {
+# }
+
+central_bank_ef_on_half_yearly_pulse_country = {
+
+	fluctuations_money_value_1_year = yes
+	buy_sell_currency_order = yes
+	#check_central_bank_default = yes #?
+
+	if  = {
+		limit  = {
+			is_ai = yes
+		}
+		ai_credit_at_central_bank = yes
+		ai_refund_central_bank = yes
+		ai_currency_deflation_inflation = yes
+	}
+	if  = {
+		limit  = {
+			has_law = law_type:law_gold_exchange_standard
+		}
+		reference_currency_in_gold_fixe = yes
+	}
+}
+
+financial_center_ef_on_half_yearly_pulse_country = {
+
+	if  = {
+		limit  = {
+			country_indice > 5000000
+		}
+		fluctuations_country_indice_value_year = yes
+	}
+	if  = {
+		limit  = {
+			country_indice < 5000000
+			NOT = {
+				stock_market_index = 100
+			}
+		}
+		fluctuations_country_indice_value_year_clear = yes
+	}
+	if  = {
+		limit  = {
+			interest_per_month_from_foreign_debt_investment > 0
+		}
+		interest_per_month_from_foreign_debt_investment = yes
+	}
+}
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+#  ██╗    ██╗   ██╗███████╗ █████╗ ██████╗
+# ███║    ╚██╗ ██╔╝██╔════╝██╔══██╗██╔══██╗
+# ╚██║     ╚████╔╝ █████╗  ███████║██████╔╝
+#  ██║      ╚██╔╝  ██╔══╝  ██╔══██║██╔══██╗
+#  ██║       ██║   ███████╗██║  ██║██║  ██║
+#  ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+ef_on_yearly_pulse_recurence = {
+
+	#GDP var -> limité ? 100 premier pays uniquement
+	fluctuations_gdp_5_year = yes
+	fluctuations_gdp_10_year = yes
+
+	#gold_reserve_unlimited
+	country_gold_reserve_unlimited = yes
+
+	#central_bank_interest
+	central_bank_interest_refund_per_year_in_gold = yes
+}
+
+ef_on_yearly_pulse_reset = {
+
+	#sell_limit_var_0
+	if  = {
+		limit = {
+			not = {
+				var:sell_limit_var_1 = 0 #?
+			}
+		}
+		#sell_limit_var_0 = yes
+		set_variable = {
+			name = sell_limit_var_1
+			value = 0
+		}
+	}
+
+	#forex limite
+	if  = {
+		limit = {
+			not = {
+				var:sell_limit_currency_var_1 = 0 #?
+			}
+		}
+		#sell_limit_currency_var_0 = yes
+		set_variable = {
+			name = sell_limit_currency_var_1
+			value = 0
+		}
+	}
+
+	#looting_1_year
+	if  = {
+		limit = {
+			var:looting_1_year = 1
+		}
+		looting_1_year_on_action = yes
+	}
+
+	#goods_contract
+	if  = {
+		limit = {
+			is_player = yes
+		}
+		
+		#grain
+		if = {
+			limit = {
+				var:grain_contract_1_year = 1
+			}
+			clear_grain_contract_1_year = yes
+		}
+		#wood
+		if = {
+			limit = {
+				var:wood_contract_1_year = 1
+			}
+			clear_wood_contract_1_year = yes
+		}
+		#coal
+		if = {
+			limit = {
+				var:coal_contract_1_year = 1
+			}
+			clear_coal_contract_1_year = yes
+		}
+		#iron
+		if = {
+			limit = {
+				var:iron_contract_1_year = 1
+			}
+			clear_iron_contract_1_year = yes
+		}
+		#sulfur
+		if = {
+			limit = {
+				var:sulfur_contract_1_year = 1
+			}
+			clear_sulfur_contract_1_year = yes
+		}
+		#lead
+		if = {
+			limit = {
+				var:lead_contract_1_year = 1
+			}
+			clear_lead_contract_1_year = yes
+		}
+		#oil
+		if = {
+			limit = {
+				var:oil_contract_1_year = 1
+			}
+			clear_oil_contract_1_year = yes
+		}
+		#dye
+		if = {
+			limit = {
+				var:dye_contract_1_year = 1
+			}
+			clear_dye_contract_1_year = yes
+		}
+		#silk
+		if = {
+			limit = {
+				var:silk_contract_1_year = 1
+			}
+			clear_silk_contract_1_year = yes
+		}
+		#rubber
+		if = {
+			limit = {
+				var:rubber_contract_1_year = 1
+			}
+			clear_rubber_contract_1_year = yes
+		}
+		#ammunition
+		if = {
+			limit = {
+				var:ammunition_contract_1_year = 1
+			}
+			clear_ammunition_contract_1_year = yes
+		}
+		#small_arms
+		if = {
+			limit = {
+				var:small_arms_contract_1_year = 1
+			}
+			clear_small_arms_contract_1_year = yes
+		}
+		#artillery
+		if = {
+			limit = {
+				var:artillery_contract_1_year = 1
+			}
+			clear_artillery_contract_1_year = yes
+		}
+		#tanks
+		if = {
+			limit = {
+				var:tanks_contract_1_year = 1
+			}
+			clear_tanks_contract_1_year = yes
+		}
+		#aeroplanes
+		if = {
+			limit = {
+				var:aeroplanes_contract_1_year = 1
+			}
+			clear_aeroplanes_contract_1_year = yes
+		}
+		#manowars
+		if = {
+			limit = {
+				var:manowars_contract_1_year = 1
+			}
+			clear_manowars_contract_1_year = yes
+		}
+		#ironclads
+		if = {
+			limit = {
+				var:ironclads_contract_1_year = 1
+			}
+			clear_ironclads_contract_1_year = yes
+		}
+	}
+}
+
+central_bank_ef_on_yearly_pulse_country = {
+
+	cumulative_inflation_5_year = yes
+	cumulative_inflation_10_year = yes
+	cumulative_inflation_since_beginning = yes
+
+	fluctuations_money_value_5_year = yes
+	fluctuations_money_value_10_year = yes
+
+	if = {
+		limit = {
+			is_ai = yes
+			has_technology_researched = gold_standard
+			not = {
+				has_law = law_type:law_isolationism
+				#is_subject_custom_trigger = yes #?
+			}
+		}
+		ai_buy_sell_currency = yes
+	}
+
+	#credit_at_central
+	if = {
+		limit = {
+			credit_at_central_bank_interest_per_month > 5
+		}
+		credit_at_central_bank_interest_per_week = yes
+	}
+	if = {
+		limit = {
+			has_modifier = interest_at_the_central_bank
+			credit_at_central_bank_interest_per_month < 5
+		}
+		credit_at_central_bank_interest_per_week_off = yes
+	}
+
+	#production_methods
+	investement_pool_borrowing = yes
+	central_bank_production_methods = yes
+	if = {
+		limit = {
+			is_subject_custom_trigger = yes
+		}
+		central_bank_production_methods_2 = yes
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_gold_exchange_standard
+		}
+		central_bank_production_methods_3 = yes
+	}
+}
+
+financial_center_ef_on_yearly_pulse_country = {
+	private_ownership_production_stocks = yes
+	financial_center_production_methods = yes
+	
+	ai_buy_central_bank_debt = yes #verif -> 
+
+	sovereign_bond_yields = yes #verif
+	bond_maturity_on_action = yes #attention ordre avec ai_buy_central_bank_debt
+	if = {
+		not = {
+			var:gold_loaned_to_central_bank_fix = gold_loaned_to_central_bank
+		}
+		gold_loaned_to_central_bank_fix = yes #attention ordre avec ai_buy_central_bank_debt
+		 
+	}
+}
+
+# money_creation_destruction_in_foreign_exchange_reserve = {
+# 	if  = {
+# 		limit = {
+# 			has_modifier = has_central_bank
+# 			not = {
+# 				is_subject_custom_trigger = yes
+# 			}
+# 		}
+# 		#annual correction
+# 		if = {
+# 			limit = {
+# 				#percentage_money_supply_abroad < 0.5
+# 				money_supply < money_value_target
+# 			}
+# 			money_creation_in_foreign_exchange_reserve = yes
+# 		}
+# 		if = {
+# 			limit = {
+# 				money_supply > money_value_target
+# 			}
+# 			money_destruction_in_foreign_exchange_reserve = yes
+# 		}
+# 	}
+# }
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+
+ai_building_strategy = {
+	# limit = {
+	# 	XXXXXXXXX
+	# }
+
+	#A chaque boucle 
+	# - construction au niveau du pays 
+	# - verifit si l'infrastructure est correct et l'ajoute
+	# - Financial center maintenue au niveau maximum à voir 5 niveau max par boucle 
+
+	# matière premiere dans tout les etat possible minimum 3 
+	# 
+	# - en fct des strategie du pays developpement de secteur 
+
+
+
+
+	#idée coode
+		#num_queued_private_constructions
+	# construction_queue_num_queued_private_levels
+	#construction_queue_private_duration
+
+
+
+
+
+	#building_ef_private_construction
+	if  = { #construit la difference de bd 
+		limit  = {
+			building_ef_private_construction_lvl_to_build > 0
+		}
+
+		#initialisation
+		# while = {
+		# 	count = building_ef_private_construction_lvl_to_build
+		# 	random_scope_state = {
+		# 		start_privately_funded_building_construction = building_ef_private_construction
+		# 	}
+		# }
+
+		# random_scope_state = {
+		# 	save_scope_as = state_target
+		# }
+		# scope:state_target = {
+
+		#brut
+		switch = {
+			trigger = building_ef_private_construction_lvl_to_build
+			1 = {
+				random_scope_state = {
+					limit ={
+						or ={							
+							not = {
+								has_building = building_ef_private_construction
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 1
+					}
+				}
+			}
+			2 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 2
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 2
+					}
+				}
+			}
+			3 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 3
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 3
+					}
+				}
+			}
+			4 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 4
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 4
+					}
+				}
+			}
+			5 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 5
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 5
+					}
+				}
+			}
+			6 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 6
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 6
+					}
+				}
+			}
+			7 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 7
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 7
+					}
+				}
+			}
+			8 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 8
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 8
+					}
+				}
+			}
+			9 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 9
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 9
+					}
+				}
+			}
+			10 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 10
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 10
+					}
+				}
+			}
+			11 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 11
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 11
+					}
+				}
+			}
+			12 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 12
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 12
+					}
+				}
+			}
+			13 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 13
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 13
+					}
+				}
+			}
+			14 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 14
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 14
+					}
+				}
+			}
+			15 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 15
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 15
+					}
+				}
+			}
+			16 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 16
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 16
+					}
+				}
+			}
+			17 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 17
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 17
+					}
+				}
+			}
+			18 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 18
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 18
+					}
+				}
+			}
+			19 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 19
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 19
+					}
+				}
+			}
+			20 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 20
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 20
+					}
+				}
+			}
+			21 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 21
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 21
+					}
+				}
+			}
+			22 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 22
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 22
+					}
+				}
+			}
+			23 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 23
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 23
+					}
+				}
+			}
+			24 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 24
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 24
+					}
+				}
+			}
+			25 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 25
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 25
+					}
+				}
+			}
+			26 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 26
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 26
+					}
+				}
+			}
+			27 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 27
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 27
+					}
+				}
+			}
+			28 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 28
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 28
+					}
+				}
+			}
+			29 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 29
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 29
+					}
+				}
+			}
+			30 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 30
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 30
+					}
+				}
+			}
+			31 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 31
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 31
+					}
+				}
+			}
+			32 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 32
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 32
+					}
+				}
+			}
+			33 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 33
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 33
+					}
+				}
+			}
+			34 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 34
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 34
+					}
+				}
+			}
+			35 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 35
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 35
+					}
+				}
+			}
+			36 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 36
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 36
+					}
+				}
+			}
+			37 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 37
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 37
+					}
+				}
+			}
+			38 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 38
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 38
+					}
+				}
+			}
+			39 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 39
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 39
+					}
+				}
+			}
+			40 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 40
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 40
+					}
+				}
+			}
+			41 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 41
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 41
+					}
+				}
+			}
+			42 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 42
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 42
+					}
+				}
+			}
+			43 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 43
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 43
+					}
+				}
+			}
+			44 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 44
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 44
+					}
+				}
+			}
+			45 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 45
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 45
+					}
+				}
+			}
+			46 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 46
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 46
+					}
+				}
+			}
+			47 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 47
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 47
+					}
+				}
+			}
+			48 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 48
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 48
+					}
+				}
+			}
+			49 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 49
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 49
+					}
+				}
+			}
+			50 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 50
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 50
+					}
+				}
+			}
+			51 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 51
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 51
+					}
+				}
+			}
+			52 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 52
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 52
+					}
+				}
+			}
+			53 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 53
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 53
+					}
+				}
+			}
+			54 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 54
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 54
+					}
+				}
+			}
+			55 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 55
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 55
+					}
+				}
+			}
+			56 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 56
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 56
+					}
+				}
+			}
+			57 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 57
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 57
+					}
+				}
+			}
+			58 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 58
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 58
+					}
+				}
+			}
+			59 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 59
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 59
+					}
+				}
+			}
+			60 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 60
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 60
+					}
+				}
+			}
+			61 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 61
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 61
+					}
+				}
+			}
+			62 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 62
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 62
+					}
+				}
+			}
+			63 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 63
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 63
+					}
+				}
+			}
+			64 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 64
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 64
+					}
+				}
+			}
+			65 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 65
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 65
+					}
+				}
+			}
+			66 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 66
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 66
+					}
+				}
+			}
+			67 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 67
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 67
+					}
+				}
+			}
+			68 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 68
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 68
+					}
+				}
+			}
+			69 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 69
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 69
+					}
+				}
+			}
+			70 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 70
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 70
+					}
+				}
+			}
+			71 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 71
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 71
+					}
+				}
+			}
+			72 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 72
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 72
+					}
+				}
+			}
+			73 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 73
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 73
+					}
+				}
+			}
+			74 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 74
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 74
+					}
+				}
+			}
+			75 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 75
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 75
+					}
+				}
+			}
+			76 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 76
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 76
+					}
+				}
+			}
+			77 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 77
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 77
+					}
+				}
+			}
+			78 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 78
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 78
+					}
+				}
+			}
+			79 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 79
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 79
+					}
+				}
+			}
+			80 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 80
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 80
+					}
+				}
+			}
+			81 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 81
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 81
+					}
+				}
+			}
+			82 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 82
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 82
+					}
+				}
+			}
+			83 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 83
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 83
+					}
+				}
+			}
+			84 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 84
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 84
+					}
+				}
+			}
+			85 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 85
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 85
+					}
+				}
+			}
+			86 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 86
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 86
+					}
+				}
+			}
+			87 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 87
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 87
+					}
+				}
+			}
+			88 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 88
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 88
+					}
+				}
+			}
+			89 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 89
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 89
+					}
+				}
+			}
+			90 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 90
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 90
+					}
+				}
+			}
+			91 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 91
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 91
+					}
+				}
+			}
+			92 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 92
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 92
+					}
+				}
+			}
+			93 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 93
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 93
+					}
+				}
+			}
+			94 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 94
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 94
+					}
+				}
+			}
+			95 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 95
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 95
+					}
+				}
+			}
+			96 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 96
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 96
+					}
+				}
+			}
+			97 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 97
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 97
+					}
+				}
+			}
+			98 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 98
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 98
+					}
+				}
+			}
+			99 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 99
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 99
+					}
+				}
+			}
+			100 = {
+				random_scope_state = {
+					limit ={
+						or ={
+							any_scope_building = {
+								is_building_type = building_ef_private_construction
+								level < 100
+							}
+							gdp > owner.gdp_05
+							#gdp > owner.gdp_03
+							#gdp > owner.gdp_04
+						} 
+					} 
+					create_building = {
+						building = building_ef_private_construction
+						level = 100
+					}
+				}
+			}
+		}
+
+		#developpement -> en fonction du % de pib de la capital possibilité pour le pays d'augmenter sont secteru de la construction privé
+		# while = {
+		# 	count = building_ef_private_construction_lvl_to_build
+		# 	random_scope_state = {
+		# 		start_privately_funded_building_construction = building_ef_private_construction
+		# 	}
+		# }
+	}
+
+	#building_railway
+	if  = {
+		limit  = {
+			has_technology_researched = railways
+			#is_ai = yes
+			#has_strategy = ai_strategy_resource_expansion
+			# ai_buy_resource_buildings_coast < gold_reserves_var_25 # to see
+		}
+		# ai_buy_building_fishing_wharf = yes
+		# ai_buy_building_logging_camp = yes
+
+		# #initialisation
+		# every_scope_state = {
+		# 	limit = {
+		# 		not = {
+		# 			has_building = building_railway
+		# 			any_scope_building = {
+		# 				is_building_type = building_railway
+		# 				is_under_construction = yes 
+		# 			}	
+		# 		}
+		# 	}
+		# 	start_privately_funded_building_construction = building_railway
+		# }
+
+		#infrastructure scale
+		every_scope_state = {
+			limit = {
+				not = {
+					#has_building = building_railway
+					any_scope_building = {
+						is_building_type = building_railway
+						is_under_construction = yes 
+					}	
+				}
+				state_market_access < 0.80
+				#probleme les colononie et terrictoire outre mere sur produiser des chemin de fer il doive etre exclu de la selection d'etat 
+				is_incorporated = yes #aide l'ia n'incorpore jamais dees terrictoire hors de le terrictoire initiale
+			}
+			start_privately_funded_building_construction = building_railway
+		}
+
+	}
+
+	# #building_financial_centre
+	# if  = {
+	# 	limit  = {
+	# 		has_technology_researched = railways
+			
+			
+	# 	}
+
+
+	# 	#infrastructure scale
+	# 	any_scope_state = {
+	# 		limit = {
+	# 			or = {
+	# 				has_building = building_financial_centre_fra
+	# 				has_building = building_financial_centre_gbr
+	# 				has_building = building_financial_centre_usa
+	# 				has_building = building_financial_centre_net
+	# 				has_building = building_financial_centre_ger
+	# 				has_building = building_financial_centre_aus
+	# 				has_building = building_financial_centre_ita
+	# 				has_building = building_financial_centre_chi
+	# 				has_building = building_financial_centre_jap
+	# 			}
+	# 		}
+	# 		start_privately_funded_building_construction = building_railway
+	# 	}
+
+	# 	#infrastructure scale
+	# 	every_scope_state = {
+	# 		limit = {
+	# 			state_market_access < 0.80
+	# 		}
+	# 		start_privately_funded_building_construction = building_railway
+	# 	}
+
+	# }
+
+	#mine
+	if  = {
+		limit  = {
+			#has_strategy = ai_strategy_resource_expansion
+			# ai_buy_resource_buildings_coast < gold_reserves_var_25 # to see
+			# is_ai = yes
+		}
+		# ai_buy_building_fishing_wharf = yes
+		# ai_buy_building_logging_camp = yes
+
+		if  = {
+			limit = {
+				has_technology_researched = shaft_mining
+			}
+			#ai_buy_building_coal_mine = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = shaft_mining
+			}
+			#ai_buy_building_iron_mine = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = shaft_mining
+			}
+			#ai_buy_building_lead_mine = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = shaft_mining
+			}
+			#ai_buy_building_sulfur_mine = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = shaft_mining
+				bg_gold_mining_potential_lvl_to_build > 0
+			}
+			ai_build_privat_building_gold_mining = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = navigation
+			}
+			#ai_buy_building_whaling_station = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = rubber_mastication
+			}
+			#ai_buy_building_rubber_plantation = yes
+		}
+		if  = {
+			limit = {
+				has_technology_researched = pumpjacks
+			}
+			#ai_buy_building_oil_rig = yes
+		}
+	}
+}
+
 #Balance of the currency list (AI)
 currency_law_list = {
 	#begin_tag_1
@@ -10252,6 +13588,27 @@ RMSA_MMSA_order_trigger = {
 	}
 }
 
+ai_set_stockpile_reserve_limit = {
+	ef_ai_set_grain_reserve = yes
+	ef_ai_set_wood_reserve = yes
+	ef_ai_set_coal_reserve = yes
+	ef_ai_set_iron_reserve = yes
+	ef_ai_set_sulfur_reserve = yes
+	ef_ai_set_lead_reserve = yes
+	ef_ai_set_oil_reserve = yes
+	ef_ai_set_dye_reserve = yes
+	ef_ai_set_silk_reserve = yes
+	ef_ai_set_rubber_reserve = yes
+	ef_ai_set_ammunition_reserve = yes
+	ef_ai_set_small_arms_reserve = yes
+	ef_ai_set_artillery_reserve = yes
+	ef_ai_set_tanks_reserve = yes
+	ef_ai_set_aeroplanes_reserve = yes
+	ef_ai_set_manowars_reserve = yes
+	ef_ai_set_ironclads_reserve = yes
+}
+
+
 ############################
 
 ai_buy_central_bank_debt = {
@@ -10475,21 +13832,6 @@ bond_maturity_on_action = {
 		ai_bond_maturity_10 = yes
 	}
 }
-
-############################
-
-# check_central_bank_default = {
-# 	clear_variable_list_seller_country_1 = yes
-# 	clear_variable_list_seller_country_2 = yes
-# 	clear_variable_list_seller_country_3 = yes
-# 	clear_variable_list_seller_country_4 = yes
-# 	clear_variable_list_seller_country_5 = yes
-# 	clear_variable_list_seller_country_6 = yes
-# 	clear_variable_list_seller_country_7 = yes
-# 	clear_variable_list_seller_country_8 = yes
-# 	clear_variable_list_seller_country_9 = yes
-# 	clear_variable_list_seller_country_10 = yes
-# }
 
 ############################
 
@@ -10727,6 +14069,8 @@ update_modifiers_bc_fc_ns = {
 		}
 		central_bank_modifier = yes
 		regulation_law_gold_standard = yes
+
+		stockpiling_capital_state_transfert = yes
 	}
 	if = {
 		limit = {
@@ -10746,6 +14090,8 @@ update_modifiers_bc_fc_ns = {
 			}
 		}
 		financial_center_modifier = yes
+
+		stockpiling_capital_state_transfert = yes
 	}
 	if = {
 		limit = {
@@ -10754,6 +14100,8 @@ update_modifiers_bc_fc_ns = {
 			}
 		}
 		national_stockpile_modifier = yes
+
+		stockpiling_capital_state_transfert = yes
 	}
 
 	#si il n'a pas ou si il a. il déclanche
@@ -10773,676 +14121,6 @@ update_modifiers_bc_fc_ns = {
 	}
 
 	#test 
-	stockpiling_capital_state_transfert = yes
-}
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-#  ██╗    ███╗   ███╗ ██████╗ ███╗   ██╗████████╗██╗  ██╗
-# ███║    ████╗ ████║██╔═══██╗████╗  ██║╚══██╔══╝██║  ██║
-# ╚██║    ██╔████╔██║██║   ██║██╔██╗ ██║   ██║   ███████║
-#  ██║    ██║╚██╔╝██║██║   ██║██║╚██╗██║   ██║   ██╔══██║
-#  ██║    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║   ██║   ██║  ██║
-#  ╚═╝    ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-stockpiling_currency_and_gold = {
-	if  = {
-		limit = {
-			market.owner = root
-		}
-		#stockpiling_financial_product_and_gold
-
-		stockpiling_central_bank_gold_reserves_state = yes
-		gold_by_trade_route = yes
-		
-		#stockpile finacial product
-		stockpiling_bond_1 = yes
-		stockpiling_manufacture_stock_1 = yes
-		stockpiling_agricultural_stock_1 = yes
-		stockpiling_mining_stock_1 = yes
-		stockpiling_railroad_stock_1 = yes
-	}
-
-	if  = {
-		limit  = {
-			money_value_dinar > 0
-		}
-		stockpiling_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_algerian_dinar > 0
-		}
-		stockpiling_dinar_algerian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_iraqi_dinar > 0
-		}
-		stockpiling_dinar_iraqi_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_libyan_dinar > 0
-		}
-		stockpiling_dinar_libyan_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_moroccan_dirham > 0
-		}
-		stockpiling_dinar_moroccan_dirham_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_omanian_rial > 0
-		}
-		stockpiling_dinar_omanian_rial_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_qiran > 0
-		}
-		stockpiling_dinar_qiran_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_saudi_riyal > 0
-		}
-		stockpiling_dinar_saudi_riyal_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_serbian_dinar > 0
-		}
-		stockpiling_dinar_serbian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_tunisian_dinar > 0
-		}
-		stockpiling_dinar_tunisian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_yugoslav_dinar > 0
-		}
-		stockpiling_dinar_yugoslav_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_australian_dollar > 0
-		}
-		stockpiling_dollar_australian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_canadian_dollar > 0
-		}
-		stockpiling_dollar_canadian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_caribbean_dollar > 0
-		}
-		stockpiling_dollar_caribbean_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_confederate_states_dollar > 0
-		}
-		stockpiling_dollar_confederate_states_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_liberian_dollar > 0
-		}
-		stockpiling_dollar_liberian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_new_zealand_dollar > 0
-		}
-		stockpiling_dollar_new_zealand_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_sierra_leonean_dollar > 0
-		}
-		stockpiling_dollar_sierra_leonean_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_united_states_dollar > 0
-		}
-		stockpiling_dollar_united_states_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ariary > 0
-		}
-		stockpiling_eco_ariary_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_central_african_eco > 0
-		}
-		stockpiling_eco_central_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_east_african_eco > 0
-		}
-		stockpiling_eco_east_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ethiopian_birr > 0
-		}
-		stockpiling_eco_ethiopian_birr_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ghanaian_pound > 0
-		}
-		stockpiling_eco_ghanaian_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_nigerian_naira > 0
-		}
-		stockpiling_eco_nigerian_naira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_south_african_rand > 0
-		}
-		stockpiling_eco_south_african_rand_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_tuareg_ouguiya > 0
-		}
-		stockpiling_eco_tuareg_ouguiya_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_west_african_eco > 0
-		}
-		stockpiling_eco_west_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_belgian_franc > 0
-		}
-		stockpiling_franc_belgian_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_french_franc > 0
-		}
-		stockpiling_franc_french_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_luxembourgish_franc > 0
-		}
-		stockpiling_franc_luxembourgish_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_swiss_franc > 0
-		}
-		stockpiling_franc_swiss_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden > 0
-		}
-		stockpiling_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_bavarian_gulden > 0
-		}
-		stockpiling_gulden_bavarian_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_florin > 0
-		}
-		stockpiling_gulden_florin_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_hungarian_forint > 0
-		}
-		stockpiling_gulden_hungarian_forint_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_indies_guilder > 0
-		}
-		stockpiling_gulden_indies_guilder_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_south_german_gulden > 0
-		}
-		stockpiling_gulden_south_german_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_czech_koruna > 0
-		}
-		stockpiling_krone_czech_koruna_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_danish_krone > 0
-		}
-		stockpiling_krone_danish_krone_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_estonian_kroon > 0
-		}
-		stockpiling_krone_estonian_kroon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_icelandic_krona > 0
-		}
-		stockpiling_krone_icelandic_krona_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_norwegian_krone > 0
-		}
-		stockpiling_krone_norwegian_krone_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_slovak_koruna > 0
-		}
-		stockpiling_krone_slovak_koruna_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_swedish_krona > 0
-		}
-		stockpiling_krone_swedish_krona_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_leon_leu > 0
-		}
-		stockpiling_leon_leu_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_leon_lev > 0
-		}
-		stockpiling_leon_lev_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira > 0
-		}
-		stockpiling_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_ducato > 0
-		}
-		stockpiling_lira_ducato_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_ottoman_lira > 0
-		}
-		stockpiling_lira_ottoman_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_scudo_pontificio > 0
-		}
-		stockpiling_lira_scudo_pontificio_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_scudo_sardo > 0
-		}
-		stockpiling_lira_scudo_sardo_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_toscane_lira > 0
-		}
-		stockpiling_lira_toscane_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_mark > 0
-		}
-		stockpiling_mark_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_mark_finnish_markka > 0
-		}
-		stockpiling_mark_finnish_markka_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso > 0
-		}
-		stockpiling_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_argentine_peso > 0
-		}
-		stockpiling_peso_argentine_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_bolivien_peso > 0
-		}
-		stockpiling_peso_bolivien_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_chilean_peso > 0
-		}
-		stockpiling_peso_chilean_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_colombian_peso > 0
-		}
-		stockpiling_peso_colombian_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_costa_rican_colon > 0
-		}
-		stockpiling_peso_costa_rican_colon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_cuban_peso > 0
-		}
-		stockpiling_peso_cuban_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_ecuadorian_peso > 0
-		}
-		stockpiling_peso_ecuadorian_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_el_salvador_colon > 0
-		}
-		stockpiling_peso_el_salvador_colon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_guatemalan_quetzal > 0
-		}
-		stockpiling_peso_guatemalan_quetzal_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_honduran_lempira > 0
-		}
-		stockpiling_peso_honduran_lempira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_mexican_peso > 0
-		}
-		stockpiling_peso_mexican_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_nicaraguan_cordoba > 0
-		}
-		stockpiling_peso_nicaraguan_cordoba_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_paraguayan_peso > 0
-		}
-		stockpiling_peso_paraguayan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_philippine_peso > 0
-		}
-		stockpiling_peso_philippine_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_sol_de_oro > 0
-		}
-		stockpiling_peso_sol_de_oro_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_uruguayan_peso > 0
-		}
-		stockpiling_peso_uruguayan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_venezuelan_peso > 0
-		}
-		stockpiling_peso_venezuelan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_egyptian_pound > 0
-		}
-		stockpiling_pound_egyptian_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_irish_pound > 0
-		}
-		stockpiling_pound_irish_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_sterling > 0
-		}
-		stockpiling_pound_sterling_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_real > 0
-		}
-		stockpiling_real_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_real_brazilian_real > 0
-		}
-		stockpiling_real_brazilian_real_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_rupee_indian_rupee > 0
-		}
-		stockpiling_rupee_indian_rupee_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_rupee_indonesian_rupiah > 0
-		}
-		stockpiling_rupee_indonesian_rupiah_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_baht > 0
-		}
-		stockpiling_spe_baht_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_dong > 0
-		}
-		stockpiling_spe_dong_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_drachma > 0
-		}
-		stockpiling_spe_drachma_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_korean_won > 0
-		}
-		stockpiling_spe_korean_won_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_latvian_lats > 0
-		}
-		stockpiling_spe_latvian_lats_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_lithuanian_litas > 0
-		}
-		stockpiling_spe_lithuanian_litas_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_peseta > 0
-		}
-		stockpiling_spe_peseta_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_ruble > 0
-		}
-		stockpiling_spe_ruble_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_uni > 0
-		}
-		stockpiling_spe_uni_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_yen > 0
-		}
-		stockpiling_spe_yen_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_yuan > 0
-		}
-		stockpiling_spe_yuan_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_zloti > 0
-		}
-		stockpiling_spe_zloti_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_hannoveraner_thaler > 0
-		}
-		stockpiling_thaler_hannoveraner_thaler_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_prussian_thaler > 0
-		}
-		stockpiling_thaler_prussian_thaler_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_saxon_thaler > 0
-		}
-		stockpiling_thaler_saxon_thaler_c_1 = yes
-	}
+	#stockpiling_capital_state_transfert = yes
 }
 
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-#  ██████╗     ███╗   ███╗ ██████╗ ███╗   ██╗████████╗██╗  ██╗███████╗
-# ██╔════╝     ████╗ ████║██╔═══██╗████╗  ██║╚══██╔══╝██║  ██║██╔════╝
-# ███████╗     ██╔████╔██║██║   ██║██╔██╗ ██║   ██║   ███████║███████╗
-# ██╔═══██╗    ██║╚██╔╝██║██║   ██║██║╚██╗██║   ██║   ██╔══██║╚════██║
-# ╚██████╔╝    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║   ██║   ██║  ██║███████║
-#  ╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-#  ██╗    ██╗   ██╗███████╗ █████╗ ██████╗
-# ███║    ╚██╗ ██╔╝██╔════╝██╔══██╗██╔══██╗
-# ╚██║     ╚████╔╝ █████╗  ███████║██████╔╝
-#  ██║      ╚██╔╝  ██╔══╝  ██╔══██║██╔══██╗
-#  ██║       ██║   ███████╗██║  ██║██║  ██║
-#  ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
-
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-
-money_creation_destruction_in_foreign_exchange_reserve = {
-	if  = {
-		limit = {
-			has_modifier = has_central_bank
-			not = {
-				is_subject_custom_trigger = yes
-			}
-		}
-		#annual correction
-		if = {
-			limit = {
-				#percentage_money_supply_abroad < 0.5
-				money_supply < money_value_target
-			}
-			money_creation_in_foreign_exchange_reserve = yes
-		}
-		if = {
-			limit = {
-				money_supply > money_value_target
-			}
-			money_destruction_in_foreign_exchange_reserve = yes
-		}
-	}
-}

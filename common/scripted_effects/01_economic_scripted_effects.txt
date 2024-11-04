@@ -1,3 +1,4 @@
+
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
@@ -15,12 +16,6 @@
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
-sell_limit_currency_var_0 = {
-	set_variable = {
-		name = sell_limit_currency_var_1
-		value = 0
-	}
-}
 money_value_target_time_reset = {
 	set_variable = {
 		name = money_value_target_time
@@ -2788,7 +2783,7 @@ stockpiling_capital_state_transfert = {
 	if = {
 		limit = {
 			any_scope_state = {
-				var:financial_center_site_var = 0  
+				var:financial_center_site_var = 0
 				or = {
 					var:stockpiling_bond_var_state_1 > 0
 					var:stockpiling_manufacture_stock_var_state_1 > 0
@@ -2811,7 +2806,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 		}
 		if = {
 			limit = {
-				var:financial_center_site_var = 0  
+				var:financial_center_site_var = 0
 				not = {
 					var:looted_state = 1
 				}
@@ -2827,7 +2822,7 @@ stockpiling_capital_state_transfert_financial_center_place = {
 
 		#actual Capital
 		scope:financial_center_site_capital = {
-			
+
 			change_variable = {
 				name = test_var_1
 				add = 1
@@ -10013,10 +10008,14 @@ currency_strength_modifier = {
 			has_modifier = has_central_bank
             has_modifier = global_monetary_reference
 			money_value > global_var:money_value_median
+			not = {
+                has_modifier = global_monetary_reference
+				is_subject = yes
+            }
 		}
 		add_modifier = {
 			name = reference_currency
-			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
+			#multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
 		}
 	}
 	if = {
@@ -10048,6 +10047,7 @@ currency_strength_modifier = {
 			has_modifier = has_central_bank
 			not = {
                 has_modifier = global_monetary_reference
+				is_subject = yes
             }
 		}
 		add_modifier = {
@@ -10069,6 +10069,7 @@ currency_strength_modifier = {
 			money_value > 0.01
 			not = {
                 has_modifier = global_monetary_reference
+				is_subject = yes
             }
 		}
 		add_modifier = {
@@ -10077,7 +10078,7 @@ currency_strength_modifier = {
 		}
 
 	}
-	#extreme_weak_currency
+	#extreme_weak_currency -> central_bank_bankruptcy/country_bankruptcy
 	if = {
 		limit = {
 			has_modifier = extreme_weak_currency
@@ -10090,6 +10091,7 @@ currency_strength_modifier = {
 			money_value <= 0.01
 			not = {
                 has_modifier = global_monetary_reference
+				is_subject = yes
             }
 		}
 		add_modifier = {
@@ -10097,6 +10099,15 @@ currency_strength_modifier = {
 			multiplier = difference_with_average_gold_exchange_rate_currencies_revers_100
 		}
 		central_bank_bankruptcy = yes
+	}
+	if = {
+		limit  = {
+			has_modifier = declared_bankruptcy
+			not  = {
+				has_modifier = economic_instability
+			}
+		}
+		country_bankruptcy = yes
 	}
 }
 inflation_modifier = {
@@ -10713,22 +10724,6 @@ government_loan_month = {
 }
 
 trade_balance = {
-	# change_variable = {
-	# 	name =  export_value_in_gold
-	# 	add  = {
-	# 		value = export_value_in_gold_week
-	# 		multiply = 6
-	# 	}
-	# }
-	# change_variable = {
-	# 	name = import_value_in_currency
-	# 	add  = {
-	# 		value = import_value_in_currency_week
-	# 		multiply = 6
-	# 	}
-	# }
-
-	#autre
 	set_variable = {
 		name = trade_balance_in_gold_fixe #c'est une valeur fixe pour calculer le central_bank_reserves sans créer de boucle de calcule qui crer des crash
 		value = trade_balance_in_gold
@@ -76844,6 +76839,7 @@ central_bank_production_methods = {
 						central_bank_gold_reserves_market_goods_sell_orders = 0
 						country_rank < rank_value:great_power
 						is_not_market_owner = yes
+						has_law = law_type:law_currency_standard
 					}
 					is_subject_custom_trigger = no
 				}

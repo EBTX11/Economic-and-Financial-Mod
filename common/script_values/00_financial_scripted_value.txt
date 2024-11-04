@@ -1,3 +1,50 @@
+building_construction_sector_lvl = {
+	value = 0
+	every_scope_building = {
+		limit = {
+			is_building_type = building_construction_sector
+		}
+		add = level
+	}
+}
+building_ef_private_construction_lvl = {
+	value = 0
+	every_scope_building = {
+		limit = {
+			is_building_type = building_ef_private_construction
+		}
+		add = level
+	}
+}
+building_ef_private_construction_lvl_to_build = {
+	value = building_construction_sector_lvl
+	subtract = building_ef_private_construction_lvl
+	min = 0
+}
+bg_gold_mining_potential_lvl_to_build = {
+	every_scope_state = {
+		limit = {
+			has_potential_resource = bg_gold_mining
+		}
+		add = 1
+	}
+}
+
+state_infrastructure = {
+	value = 0
+	add = infrastructure
+}
+
+state_market_access = {
+	value = 0
+	add = market_access
+}
+
+
+
+
+
+
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
@@ -30,7 +77,7 @@ ratio_with_country_indice_reference_currency = {
 }
 
 num_company = {
-	value = 0
+	value = 0.1
 	every_company = {
 		add = 1
 	}
@@ -181,9 +228,9 @@ country_credit_pondered_mean = {
 			not = {
 				has_modifier = has_central_bank
 			}
-			not = {
-				is_player = yes
-			}
+			# not = {
+			# 	is_player = yes
+			# }
 			not = {
 				has_modifier = declared_bankruptcy
 			}
@@ -1843,6 +1890,20 @@ bond_price_0 = {
 	}
 	multiply = 0.33 #30%
 }
+bond_price_brut = {
+	value = 50
+	subtract = {
+		value = 50
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:bond.market_goods_pricier
+				multiply = 50
+			}
+			divide = 50
+		}
+	}
+}
 bond_price = {
 	add = bond_price_0
 	add = bond_demand_factor
@@ -1917,6 +1978,20 @@ manufacture_stock_price = {
 	}
 	add = prosperity_by_company
 }
+manufacture_stock_price_brut = {
+	value = 25
+	subtract = {
+		value = 25
+		multiply = {
+			value = 0
+			subtract = {
+				value = capita.market.mg:manufacture_stock.market_goods_pricier
+				multiply = 25
+			}
+			divide = 25
+		}
+	}
+}
 
 manufacture_stock_index = {
 	value = stockpiling_manufacture_stock_var_state
@@ -1941,6 +2016,20 @@ agricultural_stock_price = {
 		}
 	}
 	add = prosperity_by_company
+}
+agricultural_stock_price_brut = {
+	value = 25
+	subtract = {
+		value = 25
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:agricultural_stock.market_goods_pricier
+				multiply = 25
+			}
+			divide = 25
+		}
+	}
 }
 
 agricultural_stock_index = {
@@ -1967,6 +2056,20 @@ mining_stock_price = {
 	}
 	add = prosperity_by_company
 }
+mining_stock_price_brut = {
+	value = 25
+	subtract = {
+		value = 25
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:mining_stock.market_goods_pricier
+				multiply = 25
+			}
+			divide = 25
+		}
+	}
+}
 
 mining_stock_index = {
 	value = stockpiling_mining_stock_var_state
@@ -1992,6 +2095,21 @@ railroad_stock_price = {
 	}
 	add = prosperity_by_company
 }
+railroad_stock_price_brut = {
+	value = 25
+	subtract = {
+		value = 25
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:railroad_stock.market_goods_pricier
+				multiply = 25
+			}
+			divide = 25
+		}
+	}
+}
+
 
 railroad_stock_index = {
 	value = stockpiling_railroad_stock_var_state
@@ -2004,6 +2122,332 @@ railroad_stock_index = {
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
+
+#building - # supply demand for financial product
+
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+
+bg_financial_centre_lvl_on_market = {
+	value = 0
+	every_country = {
+		limit = {
+		    market.owner = root
+			has_modifier = has_financial_center
+		}
+		add = 1
+	}
+}
+
+
+test_var_sc_1 = {
+	value = capital.gdp
+}
+test_var_sc_2 = { #production
+	value = gdp_var
+}
+test_var_sc_3 = { #demand -> doit etre 25% superieur à production
+	value = market.mg:manufacture_stock.market_goods_imports
+}
+
+#pdt de 1/FP/N
+
+# manufacture_stock
+# agricultural_stock
+# mining_stock
+# railroad_stock
+bg_financial_centre_occupancy = {
+	value = 0
+	every_scope_building = {
+		limit = {
+			is_building_group = bg_financial_centre
+		}
+		add = occupancy
+	}
+}
+bg_financial_centre_occupancy_reverse = {
+	value = 1
+	if = {
+		limit = {
+			bg_financial_centre_occupancy < 0.9
+			bg_financial_centre_occupancy > 0.1  #à  voire
+		}
+		add  = {
+			add = bg_financial_centre_occupancy
+			subtract = 1
+			multiply = -1
+		}
+	}	
+}
+
+bg_financial_centre_modifier = {
+	value = 0
+	every_scope_building = {
+		limit = {
+			is_building_group = bg_financial_centre
+		}
+		add = country_company_throughput_bonus
+	}
+}
+#################
+#mutual_fund
+############
+bond_price_by_demand_fc = {
+	value = 0
+	add = target_demand_bond_ajusted
+	multiply = bond_price_brut
+}
+manufacture_stock_price_by_demand_fc = {
+	value = 0
+	add = target_demand_manufacture_stock_ajusted
+	multiply = manufacture_stock_price_brut
+}
+agricultural_stock_price_by_demand_fc = {
+	value = 0
+	add = target_demand_agricultural_stock_ajusted
+	multiply = agricultural_stock_price_brut
+}
+mining_stock_price_by_demand_fc = {
+	value = 0
+	add = target_demand_mining_stock_ajusted
+	multiply = mining_stock_price_brut
+}
+railroad_stock_price_by_demand_fc = {
+	value = 0
+	add = target_demand_railroad_stock_ajusted
+	multiply = railroad_stock_price_brut
+}
+total_cost_fcc = {
+	value = 0
+	add = bond_price_by_demand_fc
+	add = manufacture_stock_price_by_demand_fc
+	add = agricultural_stock_price_by_demand_fc
+	add = mining_stock_price_by_demand_fc
+	add = railroad_stock_price_by_demand_fc
+}
+base_supply_mutual_fund = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+collateral_quantity_mutual_fund = {
+    value = total_cost_fcc
+    divide = 250
+}
+target_supply_mutual_fund = {
+    value = collateral_quantity_mutual_fund #quantité à avoir pour assurer le cout des bien
+    multiply = 1.5 ##ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_supply_mutual_fund_for_modifier = {
+    value = target_supply_mutual_fund
+    subtract = base_supply_mutual_fund
+    divide = base_supply_mutual_fund
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}
+		}
+		multiply = 0.1
+	}
+}
+#################
+#bond
+############
+base_demande_bond = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+target_demand_bond = {
+    value = bond_market_goods_sell_orders
+    multiply = 1 #ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_demand_bond_ajusted = {
+    value = target_demand_bond
+    subtract = market.mg:bond.market_goods_exports   
+	min = 0
+}
+target_demand_bond_for_modifier = {
+    value = target_demand_bond_ajusted
+    subtract = base_demande_bond
+    divide = base_demande_bond
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}
+		}
+		multiply = 0.1
+	}
+}
+bond_market_goods_sell_orders_25 = {
+    value = bond_market_goods_sell_orders
+	multiply = 0.25
+}
+#################
+#manufacture_stock
+############
+base_demande_manufacture_stock = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+target_demand_manufacture_stock = {
+    value = manufacture_stock_market_goods_sell_orders
+    multiply = 1 #ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_demand_manufacture_stock_ajusted = {
+    value = target_demand_manufacture_stock
+    subtract = market.mg:manufacture_stock.market_goods_exports   
+	min = 0
+}
+target_demand_manufacture_stock_for_modifier = {
+    value = target_demand_manufacture_stock_ajusted
+    subtract = base_demande_manufacture_stock
+    divide = base_demande_manufacture_stock
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}
+		}
+		multiply = 0.1
+	}
+}
+manufacture_stock_market_goods_sell_orders_25 = {
+    value = manufacture_stock_market_goods_sell_orders
+	multiply = 0.25
+}
+#################
+#agricultural_stock
+############
+base_demande_agricultural_stock = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+target_demand_agricultural_stock = {
+    value = agricultural_stock_market_goods_sell_orders
+    multiply = 1 #ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_demand_agricultural_stock_ajusted = {
+    value = target_demand_agricultural_stock
+    subtract = market.mg:agricultural_stock.market_goods_exports   
+	min = 0
+}
+target_demand_agricultural_stock_for_modifier = {
+    value = target_demand_agricultural_stock_ajusted
+    subtract = base_demande_agricultural_stock
+    divide = base_demande_agricultural_stock
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}		
+		}
+		multiply = 0.1
+	}
+}
+agricultural_stock_market_goods_sell_orders_25 = {
+    value = agricultural_stock_market_goods_sell_orders
+	multiply = 0.25
+}
+#################
+#mining_stock
+############
+base_demande_mining_stock = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+target_demand_mining_stock = {
+    value = mining_stock_market_goods_sell_orders
+    multiply = 1 #ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_demand_mining_stock_ajusted = {
+    value = target_demand_mining_stock
+    subtract = market.mg:mining_stock.market_goods_exports   
+	min = 0
+}
+target_demand_mining_stock_for_modifier = {
+    value = target_demand_mining_stock_ajusted
+    subtract = base_demande_mining_stock
+    divide = base_demande_mining_stock
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}	
+		}
+		multiply = 0.1
+	}
+}
+mining_stock_market_goods_sell_orders_25 = {
+    value = mining_stock_market_goods_sell_orders
+	multiply = 0.25
+}
+#################
+#railroad_stock
+############
+base_demande_railroad_stock = {
+    value = bg_financial_centre_lvl
+    multiply = 1
+}
+target_demand_railroad_stock = {
+    value = railroad_stock_market_goods_sell_orders
+    multiply = 1 #ajuster cette vvaleur pour augmenter prix du bien au dessus de neutralité
+}
+target_demand_railroad_stock_ajusted = {
+    value = target_demand_railroad_stock
+    subtract = market.mg:railroad_stock.market_goods_exports   
+	min = 0
+}
+target_demand_railroad_stock_for_modifier = {
+    value = target_demand_railroad_stock_ajusted
+    subtract = base_demande_railroad_stock
+    divide = base_demande_railroad_stock
+    multiply = 100
+	multiply = bg_financial_centre_occupancy_reverse #compensation pour faible occupency
+	if = {
+		limit = {
+			or = {
+				is_subject = yes 	
+				not = {
+					market.owner = root
+				}
+			}	
+		}
+		multiply = 0.1
+	}
+}
+railroad_stock_market_goods_sell_orders_25 = {
+    value = railroad_stock_market_goods_sell_orders
+	multiply = 0.25
+}
 
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
@@ -2048,6 +2492,7 @@ building_trade_center_lvl = {
 
     }
 }
+
 # any_scope_building = {
 # 	filter = {
 # 		is_building_type = building_financial_district
@@ -2073,10 +2518,6 @@ building_trade_center_lvl = {
 # 	}
 # }
 
-
-
-
-
 # country_ownership_fraction
 # private_ownership_fraction
 # building_trade_center_lvl = {
@@ -2089,7 +2530,6 @@ building_trade_center_lvl = {
 #     }
 # }
 
-
 building_financial_district_lvl = {
     value = 0
     every_scope_building = {
@@ -2099,7 +2539,6 @@ building_financial_district_lvl = {
         add = level
     }
 }
-
 
 building_railway_lvl_X = { #mee donnee si unn bbanntimeent lamhbda eest détennue à une part
     value = 0
@@ -2114,8 +2553,6 @@ building_railway_lvl_X = { #mee donnee si unn bbanntimeent lamhbda eest détennu
 		add = 1
 	}
 }
-
-
 
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
@@ -5322,6 +5759,34 @@ ai_no_longer_exists_10 = {
 	}
 }
 
+interconnected_crises = {
+	value = 0
+	if = {
+		limit  = {
+			var:currency_crisis = 1
+		}
+		add = 1
+	}
+	if = {
+		limit  = {
+			var:economic_crisis = 1
+		}
+		add = 1
+	}
+	if = {
+		limit  = {
+			var:financial_crash = 1
+		}
+		add = 1
+	}
+	if = {
+		limit  = {
+			var:country_bankruptcy = 1
+		}
+		add = 1
+	}
+}
+
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -5632,59 +6097,289 @@ gold_loaned_to_central_bank = {
 	value = 0
 	add = var:gold_loaned_to_central_bank
 
-	#add = var:central_bank_gold_loaned
-	# add = var:central_bank_gold_loaned_1
-	# add = var:central_bank_gold_loaned_2
-	# add = var:central_bank_gold_loaned_3
-	# add = var:central_bank_gold_loaned_4
-	# add = var:central_bank_gold_loaned_5
-	# add = var:central_bank_gold_loaned_6
-	# add = var:central_bank_gold_loaned_7
-	# add = var:central_bank_gold_loaned_8
-	# add = var:central_bank_gold_loaned_9
-	# add = var:central_bank_gold_loaned_10
+	add = ai_central_bank_gold_loaned_1
+	add = ai_central_bank_gold_loaned_2
+	add = ai_central_bank_gold_loaned_3
+	add = ai_central_bank_gold_loaned_4
+	add = ai_central_bank_gold_loaned_5
+	add = ai_central_bank_gold_loaned_6
+	add = ai_central_bank_gold_loaned_7
+	add = ai_central_bank_gold_loaned_8
+	add = ai_central_bank_gold_loaned_9
+	add = ai_central_bank_gold_loaned_10
+}
 
-	#add = var:ai_central_bank_gold_loaned
-	# add = var:ai_central_bank_gold_loaned_1
-	# add = var:ai_central_bank_gold_loaned_2
-	# add = var:ai_central_bank_gold_loaned_3
-	# add = var:ai_central_bank_gold_loaned_4
-	# add = var:ai_central_bank_gold_loaned_5
-	# add = var:ai_central_bank_gold_loaned_6
-	# add = var:ai_central_bank_gold_loaned_7
-	# add = var:ai_central_bank_gold_loaned_8
-	# add = var:ai_central_bank_gold_loaned_9
-	# add = var:ai_central_bank_gold_loaned_10
+gold_loaned_to_central_bank_no_interest = {
+	value = 0
 
-	#add = var:debt_interest
+	add = ai_central_bank_gold_loaned_1
+	add = ai_central_bank_gold_loaned_2
+	add = ai_central_bank_gold_loaned_3
+	add = ai_central_bank_gold_loaned_4
+	add = ai_central_bank_gold_loaned_5
+	add = ai_central_bank_gold_loaned_6
+	add = ai_central_bank_gold_loaned_7
+	add = ai_central_bank_gold_loaned_8
+	add = ai_central_bank_gold_loaned_9
+	add = ai_central_bank_gold_loaned_10
 }
 
 central_bank_interest_refund_per_year = {
 	value = 0
-	add = var:central_bank_interest_refund_per_year
 
-	# # add = var:central_bank_interest_refund_per_year_1
-	# # add = var:central_bank_interest_refund_per_year_2
-	# # add = var:central_bank_interest_refund_per_year_3
-	# # add = var:central_bank_interest_refund_per_year_4
-	# # add = var:central_bank_interest_refund_per_year_5
-	# # add = var:central_bank_interest_refund_per_year_6
-	# # add = var:central_bank_interest_refund_per_year_7
-	# # add = var:central_bank_interest_refund_per_year_8
-	# # add = var:central_bank_interest_refund_per_year_9
-	# # add = var:central_bank_interest_refund_per_year_10
+	add = ai_central_bank_interest_refund_per_year_1
+	add = ai_central_bank_interest_refund_per_year_2
+	add = ai_central_bank_interest_refund_per_year_3
+	add = ai_central_bank_interest_refund_per_year_4
+	add = ai_central_bank_interest_refund_per_year_5
+	add = ai_central_bank_interest_refund_per_year_6
+	add = ai_central_bank_interest_refund_per_year_7
+	add = ai_central_bank_interest_refund_per_year_8
+	add = ai_central_bank_interest_refund_per_year_9
+	add = ai_central_bank_interest_refund_per_year_10
+}
 
-	# add = var:ai_central_bank_interest_refund_per_year
-	# # add = var:ai_central_bank_interest_refund_per_year_1
-	# # add = var:ai_central_bank_interest_refund_per_year_2
-	# # add = var:ai_central_bank_interest_refund_per_year_3
-	# # add = var:ai_central_bank_interest_refund_per_year_4
-	# # add = var:ai_central_bank_interest_refund_per_year_5
-	# # add = var:ai_central_bank_interest_refund_per_year_6
-	# # add = var:ai_central_bank_interest_refund_per_year_7
-	# # add = var:ai_central_bank_interest_refund_per_year_8
-	# # add = var:ai_central_bank_interest_refund_per_year_9
-	# # add = var:ai_central_bank_interest_refund_per_year_10
+#gold
+ai_central_bank_gold_loaned_1 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_1
+		add = var:ai_total_bond_value_1
+		if  = {
+			limit  = {
+				var:total_bond_value_1 > 0
+			}
+			add = var:total_bond_value_1
+		}
+	}
+}
+ai_central_bank_gold_loaned_2 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_2
+		add = var:ai_total_bond_value_2
+		if  = {
+			limit  = {
+				var:total_bond_value_2 > 0
+			}
+			add = var:total_bond_value_2
+		}
+	}
+}
+ai_central_bank_gold_loaned_3 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_3
+		add = var:ai_total_bond_value_3
+		if  = {
+			limit  = {
+				var:total_bond_value_3 > 0
+			}
+			add = var:total_bond_value_3
+		}
+	}
+}
+ai_central_bank_gold_loaned_4 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_4
+		add = var:ai_total_bond_value_4
+		if  = {
+			limit  = {
+				var:total_bond_value_4 > 0
+			}
+			add = var:total_bond_value_4
+		}
+	}
+}
+ai_central_bank_gold_loaned_5 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_5
+		add = var:ai_total_bond_value_5
+		if  = {
+			limit  = {
+				var:total_bond_value_5 > 0
+			}
+			add = var:total_bond_value_5
+		}
+	}
+}
+ai_central_bank_gold_loaned_6 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_6
+		add = var:ai_total_bond_value_6
+		if  = {
+			limit  = {
+				var:total_bond_value_6 > 0
+			}
+			add = var:total_bond_value_6
+		}
+	}
+}
+ai_central_bank_gold_loaned_7 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_7
+		add = var:ai_total_bond_value_7
+		if  = {
+			limit  = {
+				var:total_bond_value_7 > 0
+			}
+			add = var:total_bond_value_7
+		}
+	}
+}
+ai_central_bank_gold_loaned_8 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_8
+		add = var:ai_total_bond_value_8
+		if  = {
+			limit  = {
+				var:total_bond_value_8 > 0
+			}
+			add = var:total_bond_value_8
+		}
+	}
+}
+ai_central_bank_gold_loaned_9 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_9
+		add = var:ai_total_bond_value_9
+		if  = {
+			limit  = {
+				var:total_bond_value_9 > 0
+			}
+			add = var:total_bond_value_9
+		}
+	}
+}
+ai_central_bank_gold_loaned_10 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_10
+		add = var:ai_total_bond_value_10
+		if  = {
+			limit  = {
+				var:total_bond_value_10 > 0
+			}
+			add = var:total_bond_value_10
+		}
+	}
+}
+#interest
+ai_central_bank_interest_refund_per_year_1 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_1
+		add = var:ai_interest_calculated_1
+		if  = {
+			limit  = {
+				var:interest_calculated_1 > 0
+			}
+			add = var:interest_calculated_1
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_2 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_2
+		add = var:ai_interest_calculated_2
+		if  = {
+			limit  = {
+				var:interest_calculated_2 > 0
+			}
+			add = var:interest_calculated_2
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_3 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_3
+		add = var:ai_interest_calculated_3
+		if  = {
+			limit  = {
+				var:interest_calculated_3 > 0
+			}
+			add = var:interest_calculated_3
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_4 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_4
+		add = var:ai_interest_calculated_4
+		if  = {
+			limit  = {
+				var:interest_calculated_4 > 0
+			}
+			add = var:interest_calculated_4
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_5 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_5
+		add = var:ai_interest_calculated_5
+		if  = {
+			limit  = {
+				var:interest_calculated_5 > 0
+			}
+			add = var:interest_calculated_5
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_6 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_6
+		add = var:ai_interest_calculated_6
+		if  = {
+			limit  = {
+				var:interest_calculated_6 > 0
+			}
+			add = var:interest_calculated_6
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_7 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_7
+		add = var:ai_interest_calculated_7
+		if  = {
+			limit  = {
+				var:interest_calculated_7 > 0
+			}
+			add = var:interest_calculated_7
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_8 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_8
+		add = var:ai_interest_calculated_8
+		if  = {
+			limit  = {
+				var:interest_calculated_8 > 0
+			}
+			add = var:interest_calculated_8
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_9 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_9
+		add = var:ai_interest_calculated_9
+		if  = {
+			limit  = {
+				var:interest_calculated_9 > 0
+			}
+			add = var:interest_calculated_9
+		}
+	}
+}
+ai_central_bank_interest_refund_per_year_10 = {
+	every_in_list = {
+		variable = central_bank_debt_buyer_list_10
+		add = var:ai_interest_calculated_10
+		if  = {
+			limit  = {
+				var:interest_calculated_10 > 0
+			}
+			add = var:interest_calculated_10
+		}
+	}
 }
 
 ########################################################################################################################################
@@ -6007,7 +6702,6 @@ buy_bond_order_valid_5Y = {
 ########################################################################################################################################
 ########################################################################################################################################
 ########################################################################################################################################
-
 
 # bond_price_in_gold = {
 # 	value = bond_price
