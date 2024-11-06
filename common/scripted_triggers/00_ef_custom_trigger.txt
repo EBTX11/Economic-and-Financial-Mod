@@ -1,14 +1,62 @@
 building_financial_centre_spe = {
 	OR = {
-		has_building = building_financial_centre_fra
-		has_building = building_financial_centre_gbr
-		has_building = building_financial_centre_usa
-		has_building = building_financial_centre_net
-		has_building = building_financial_centre_ger
+		has_building = building_financial_centre_arg
 		has_building = building_financial_centre_aus
-		has_building = building_financial_centre_ita
+		has_building = building_financial_centre_bav
+		has_building = building_financial_centre_bel
+		has_building = building_financial_centre_bic
+		has_building = building_financial_centre_brz
 		has_building = building_financial_centre_chi
+		has_building = building_financial_centre_chl
+		has_building = building_financial_centre_den
+		has_building = building_financial_centre_egy
+		has_building = building_financial_centre_fra
+		has_building = building_financial_centre_frm
+		has_building = building_financial_centre_gre
+		has_building = building_financial_centre_gbr
+		has_building = building_financial_centre_hkh
+		has_building = building_financial_centre_ita
 		has_building = building_financial_centre_jap
+		has_building = building_financial_centre_mex
+		has_building = building_financial_centre_net
+		has_building = building_financial_centre_nsw
+		has_building = building_financial_centre_ont
+		has_building = building_financial_centre_peu
+		has_building = building_financial_centre_por
+		has_building = building_financial_centre_pru
+		has_building = building_financial_centre_que
+		has_building = building_financial_centre_rus
+		has_building = building_financial_centre_saf
+		has_building = building_financial_centre_sar
+		has_building = building_financial_centre_sic
+		has_building = building_financial_centre_spa
+		has_building = building_financial_centre_swe
+		has_building = building_financial_centre_tur
+		has_building = building_financial_centre_TUS
+		has_building = building_financial_centre_uru
+		has_building = building_financial_centre_usa
+	}
+}
+#####################################################################################################################################################
+
+
+
+#####################################################################################################################################################
+market_owner_is_root = {
+	market.owner = root
+}
+market_owner_is_root_univ_with_buiding = {
+	any_scope_state = {
+		is_production_method_active = {
+			building_type = building_bank
+			production_method = pm_no_gold_consuption
+		}
+		not = {
+			is_production_method_active = {
+				building_type = building_bank
+				production_method = pm_no_subject_currency_type
+			}
+		}
 	}
 }
 
@@ -17,6 +65,33 @@ owner_is_player = {
 	owner = {
 		is_player = yes
 	}
+}
+#####################################################################################################################################################
+has_central_bank_GS_GES_NISO = {
+	has_modifier = has_central_bank
+	or = {
+		has_law = law_type:law_gold_standard
+		has_law = law_type:law_gold_exchange_standard
+	}
+	not = {
+		has_law = law_type:law_isolationism
+	}
+}
+has_central_bank_GS_GES = {
+	has_modifier = has_central_bank
+	or = {
+		has_law = law_type:law_gold_standard
+		has_law = law_type:law_gold_exchange_standard
+	}
+}
+#####################################################################################################################################################
+has_financial_center = {
+	has_modifier = has_financial_center
+}
+#####################################################################################################################################################
+has_national_stockpile = {
+	has_modifier = has_national_stockpile
+	market_owner_is_root = yes
 }
 
 #####################################################################################################################################################
@@ -100,23 +175,49 @@ is_in_revaluation = {
 
 buy_currency_1 = {
 	money_value < money_value_target_real_below_10 #la monaie sous evalué à plus de 10% de la money_value
-	not = {  #pas d'achat si sujet, a le modifier d'echnge monetaire, a la loi isolationniste
-		is_subject = yes
-		has_law = law_type:law_isolationism
+	not = {  #pas d'achat sisujet , a le modifier d'echnge monetaire, a la loi isolationniste
+		# is_subject = yes #/ market_owner_is_root = yes #marche pas attention if faut l'autre 
+		# not = {
+		# 	#market_owner_is_root
+		# 	any_scope_state = {
+		# 		is_production_method_active = {
+		# 			building_type = building_bank
+		# 			production_method = pm_no_gold_consuption
+		# 		}
+		# 		not = {
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_no_subject_currency_type
+		# 			}
+		# 		}
+		# 	}
+		# }
+
 		has_modifier = economic_instability
 		var:currency_crisis = 1
 		var:central_bank_bankruptcy = 1
 		infamy >= infamy_threshold:pariah
 	}
 }
-# sell_currency_2 = {
-
-# }
-
 sell_currency_1 = {
+	has_central_bank_GS_GES_NISO = yes
 	not = {
-		is_subject = yes
-		has_law = law_type:law_isolationism
+		# is_subject = yes #/ market_owner_is_root = yes #marche pas attention if faut l'autre 
+		# not = {
+		# 	#market_owner_is_root
+		# 	any_scope_state = {
+		# 		is_production_method_active = {
+		# 			building_type = building_bank
+		# 			production_method = pm_no_gold_consuption
+		# 		}
+		# 		not = {
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_no_subject_currency_type
+		# 			}
+		# 		}
+		# 	}
+		# }
 	}
 	#2 possibilité:
 	OR = {
@@ -147,7 +248,6 @@ sell_currency_2 = {
 	scope:seller.central_bank_gold_reserves_state < 0
 	scope:seller.central_bank_gold_reserves_state_to_ensure_the_conversion_pourcent < 0.75
 }
-
 
 #####################################################################################################################################################
 is_valid_country = {
@@ -447,7 +547,274 @@ is_valid_country_ASH = {
 	}
 }
 #####################################################################################################################################################
+#####################################################################################################################################################
+is_valid_country_fc = {
+	root = {
+		OR = {
+			#c:BIC ?= this
 
+			is_valid_country_PRU = yes
+			is_valid_country_FRM = yes
+			is_valid_country_NGF = yes
+			is_valid_country_BAV = yes
+			is_valid_country_GER = yes
+			is_valid_country_ONT = yes
+			is_valid_country_QUE = yes
+			is_valid_country_CAN = yes
+			is_valid_country_BEL = yes
+			is_valid_country_BIC = yes
+			is_valid_country_PEU = yes
+			is_valid_country_BOL = yes
+			is_valid_country_SAR = yes
+			is_valid_country_SIC = yes
+			is_valid_country_ITA = yes
+			is_valid_country_BRZ = yes
+			is_valid_country_CHI = yes
+			is_valid_country_CHL = yes
+			is_valid_country_DEN = yes
+			is_valid_country_EGY = yes
+			is_valid_country_FRA = yes
+			is_valid_country_ARG = yes
+			is_valid_country_AUS = yes
+			is_valid_country_GRE = yes
+			is_valid_country_GBR = yes
+			is_valid_country_HKH = yes
+			is_valid_country_ITA = yes
+			is_valid_country_JAP = yes
+			is_valid_country_MEX = yes
+			is_valid_country_NET = yes
+			is_valid_country_POR = yes
+			is_valid_country_RUS = yes
+			is_valid_country_SAF = yes
+			is_valid_country_SPA = yes
+			is_valid_country_SWE = yes
+			is_valid_country_TUR = yes
+			is_valid_country_URU = yes
+			is_valid_country_USA = yes
+		}
+	}
+}
+is_valid_country_ARG= {
+	root = {  
+		game_date > 1854.1.1
+		c:ARG ?= this
+	}
+}
+is_valid_country_AUS= {
+	root = {  
+		game_date > 1771.1.1
+		c:AUS ?= this
+	}
+}
+is_valid_country_BAV= {
+	root = {  
+		game_date > 1830.1.1
+		c:BAV ?= this
+	}
+}
+is_valid_country_BEL= {
+	root = {  
+		game_date > 1801.1.1
+		c:BEL ?= this
+	}
+}
+is_valid_country_BIC= {
+	root = {  
+		game_date > 1875.1.1
+		c:BIC ?= this
+	}
+}
+is_valid_country_BRZ= {
+	root = {  
+		game_date > 1890.1.1
+		c:BRZ ?= this
+	}
+}
+is_valid_country_CHI= {
+	root = {  
+		game_date > 1866.1.1
+		c:CHI ?= this
+	}
+}
+is_valid_country_CHL= {
+	root = {  
+		game_date > 1893.1.1
+		c:CHL ?= this
+	}
+}
+is_valid_country_DEN= {
+	root = {  
+		game_date > 1808.1.1
+		c:DEN ?= this
+	}
+}
+is_valid_country_EGY= {
+	root = {  
+		game_date > 1903.1.1
+		c:EGY ?= this
+	}
+}
+is_valid_country_FRA= {
+	root = {  
+		game_date > 1724.1.1
+		c:FRA ?= this
+	}
+}
+is_valid_country_FRM= {
+	root = {  
+		game_date > 1585.1.1
+		c:FRM ?= this
+	}
+}
+is_valid_country_GRE= {
+	root = {  
+		game_date > 1876.1.1
+		c:GRE ?= this
+	}
+}
+is_valid_country_GBR= {
+	root = {  
+		game_date > 1801.1.1
+		c:GBR ?= this
+	}
+}
+is_valid_country_HKH= {
+	root = {  
+		game_date > 1891.1.1
+		c:HKH ?= this
+	}
+}
+is_valid_country_ITA= {
+	root = {  
+		game_date > 1808.1.1
+		c:ITA ?= this
+	}
+}
+is_valid_country_JAP= {
+	root = {  
+		game_date > 1878.1.1
+		c:JAP ?= this
+	}
+}
+is_valid_country_MEX= {
+	root = {  
+		game_date > 1894.1.1
+		c:MEX ?= this
+	}
+}
+is_valid_country_NET= {
+	root = {  
+		game_date > 1602.1.1
+		c:NET ?= this
+	}
+}
+is_valid_country_NSW= {
+	root = {  
+		game_date > 1871.1.1
+		c:NSW ?= this
+	}
+}
+is_valid_country_ONT= {
+	root = {  
+		game_date > 1852.1.1
+		c:ONT ?= this
+	}
+}
+is_valid_country_PEU= {
+	root = {  
+		game_date > 1860.1.1
+		c:PEU ?= this
+	}
+}
+is_valid_country_POR= {
+	root = {  
+		game_date > 1769.1.1
+		c:POR ?= this
+	}
+}
+is_valid_country_PRU= {
+	root = {  
+		game_date > 1739.1.1
+		c:PRU ?= this
+	}
+}
+is_valid_country_QUE= {
+	root = {  
+		game_date > 1832.1.1
+		c:QUE ?= this
+	}
+}
+is_valid_country_RUS= {
+	root = {  
+		game_date > 1789.1.1
+		c:RUS ?= this
+	}
+}
+is_valid_country_SAF= {
+	root = {  
+		game_date > 1887.1.1
+		c:SAF ?= this
+	}
+}
+is_valid_country_SAR= {
+	root = {  
+		game_date > 1850.1.1
+		c:SAR ?= this
+	}
+}
+is_valid_country_SIC= {
+	root = {  
+		game_date > 1810.1.1
+		c:SIC ?= this
+	}
+}
+is_valid_country_SPA= {
+	root = {  
+		game_date > 1831.1.1
+		c:SPA ?= this
+	}
+}
+is_valid_country_SWE= {
+	root = {  
+		game_date > 1863.1.1
+		c:SWE ?= this
+	}
+}
+is_valid_country_SWI= {
+	root = {  
+		game_date > 1850.1.1
+		c:SWI ?= this
+	}
+}
+is_valid_country_TUR= {
+	root = {  
+		game_date > 1866.1.1
+		c:TUR ?= this
+	}
+}
+is_valid_country_TUS= {
+	root = {  
+		game_date > 1835.1.1
+		c:TUS ?= this
+	}
+}
+is_valid_country_URU= {
+	root = {  
+		game_date > 1867.1.1
+		c:URU ?= this
+	}
+}
+is_valid_country_USA= {
+	root = {  
+		game_date > 1792.1.1
+		c:USA ?= this
+	}
+}
+
+#autre possible
+
+
+#####################################################################################################################################################
 #####################################################################################################################################################
 
 country_already_central_bank = {
@@ -467,6 +834,43 @@ country_already_national_stockpile = {
 }
 
 #####################################################################################################################################################
+macro_facilities_on_action_bc_limit = {
+	has_technology_researched = central_banking
+	is_revolutionary =  no
+	is_invalid_country = no
+	or = {
+		is_valid_country = yes
+		country_already_central_bank = yes
+		var:gdp_view >= 1
+		is_player = yes
+	}
+}
+macro_facilities_on_action_fc_limit = {
+	has_technology_researched = financial_center
+
+	is_revolutionary =  no
+	is_invalid_country = no
+	market_owner_is_root = yes 
+	or = {
+		is_valid_country_fc = yes
+		country_already_financial_center = yes
+		var:gdp_view >= 1
+		is_player = yes
+	}
+}
+macro_facilities_on_action_ns_limit = {
+	has_technology_researched = national_stockpile
+
+	is_revolutionary =  no
+	is_invalid_country = no
+	market_owner_is_root = yes 
+	or = {
+		#is_valid_country = yes #necessite juste la tech à voir le reste
+		country_already_national_stockpile = yes
+		var:gdp_view >= 1
+		is_player = yes
+	}
+}
 #####################################################################################################################################################
 
 law_currency_enacted = {
@@ -573,49 +977,62 @@ law_currency_enacted = {
 
 #####################################################################################################################################################
 
+# country_is_in_india = {
+# 	exists = capital
+# 	capital = {
+# 		state_is_in_india = yes
+# 	}
+# }
 
-
-# state_is_in_unwanted_region = {
+# state_is_in_india = {
 # 	OR = {
-# 		region = sr:region_persia
-# 		region = sr:region_himalayas
-# 		region = sr:region_central_asia
-# 		region = sr:region_indonesia
-# 		region = sr:region_indochina
 # 		region = sr:region_south_india
 # 		region = sr:region_north_india		
 # 	}
 # }
+
+state_is_in_unwanted_region = {
+	OR = {
+		region = sr:region_persia
+		region = sr:region_himalayas
+		region = sr:region_central_asia
+		region = sr:region_indonesia
+		region = sr:region_indochina
+		region = sr:region_south_india
+		region = sr:region_north_india		
+	}
+}
 # ### Country geography triggers
 # # exists = capital checks are necessary only because we may test these triggers and scope switch to capitals before states are initialized properly
 
-# country_is_in_unwanted_region = {
-# 	exists = capital
-# 	capital = {
-# 		state_is_in_unwanted_region = yes
-# 	}
-# }
-
+country_is_in_unwanted_region = {
+	exists = capital
+	capital = {
+		state_is_in_unwanted_region = yes
+	}
+	not = {
+		or = {
+			c:BIC ?= this
+			c:IND ?= this
+			c:DEI ?= this
+			#c:IND ?= this
+			c:PEN ?= this
+			c:PER ?= this
+			c:AFG ?= this
+			c:BUR ?= this
+			c:SIA ?= this
+			c:DAI ?= this
+			c:JAV ?= this
+			c:PHI ?= this
+			is_player = yes
+		}
+	}
+}
 
 is_invalid_country = {
 	root = {
 		OR = {
-
-			# if = {
-			# 	not = {
-			# 		or = {
-			# 			c:BIC ?= this
-			# 			c:IND ?= this
-			# 			c:DEI ?= this
-			# 			#c:IND ?= this #java indonesia ....
-			# 			c:PEN ?= this
-			# 			c:PER ?= this
-			# 			c:AFG ?= this
-			# 		}
-			# 	}
-			# 	country_is_in_unwanted_region = yes 
-			# }
-
+			country_is_in_unwanted_region = yes
 			c:D00 ?= this
 			c:D01 ?= this
 			c:D02 ?= this
@@ -721,8 +1138,6 @@ is_invalid_country = {
 }
 
 #####################################################################################################################################################
-
-
 
 market_goods_is_currency = {
 	OR = {

@@ -72496,9 +72496,6 @@ money_value_dinar_global_var = {
 			every_country = {
 				limit = {
 					has_modifier = dinar_leading_currency_type
-					#not = {
-					#	has_modifier = extreme_weak_currency
-					#}
 				}
 				add = money_value_target_real #money_value
 			}
@@ -72514,9 +72511,6 @@ money_value_dinar_algerian_dinar_global_var = {
 			every_country = {
 				limit = {
 					has_modifier = dinar_algerian_dinar_leading_currency_type
-					#not = {
-					#	has_modifier = extreme_weak_currency
-					#}
 				}
 				add = money_value_target_real #money_value
 			}
@@ -76771,54 +76765,16 @@ investement_pool_borrowing = {
 
 central_bank_production_methods = {
 	every_scope_state = {
-		# #pm_bond_production
-		# if = {
-		# 	limit = {
-		# 		owner  = {
-		# 			national_debt_compared_gdp >= 0.05
-		# 		}
-		# 		is_production_method_active = {
-		# 			building_type = building_bank
-		# 			production_method = pm_no_bond_production
-		# 		}
-		# 	}
-		# 	activate_production_method = {
-		# 		building_type = building_bank
-		# 		production_method = pm_bond_production
-		# 	}
-		# }
-		# if = {
-		# 	limit = {
-		# 		owner  = {
-		# 			national_debt_compared_gdp < 0.05
-		# 		}
-		# 		is_production_method_active = {
-		# 			building_type = building_bank
-		# 			production_method = pm_bond_production
-		# 		}
-		# 	}
-		# 	activate_production_method = {
-		# 		building_type = building_bank
-		# 		production_method = pm_no_bond_production
-		# 	}
-		# }
-
-		# -> pm_no_gold_standard_bank_money_currency
+		#-> pm_no_gold_standard_bank_money_currency
 		if = {
 			limit = {
-				is_production_method_active = {
+				is_production_method_active = {  #si currency standart alors enlve la nécessité de l'or 
 					building_type = building_bank
 					production_method = pm_no_gold_standard_bank_money_currency
 				}
-				or = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_paper_gold_consuption
-					}
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_gold_consuption
-					}
+				is_production_method_active = {
+					building_type = building_bank
+					production_method = pm_gold_consuption
 				}
 			}
 			activate_production_method = {
@@ -76831,97 +76787,16 @@ central_bank_production_methods = {
 			}
 		}
 
-		# -> pm_no_gold_standard_bank_money_currency
-		if = {
-			limit = {
-				owner = {
-					or = {
-						central_bank_gold_reserves_market_goods_sell_orders = 0
-						country_rank < rank_value:great_power
-						is_not_market_owner = yes
-						has_law = law_type:law_currency_standard
-					}
-					is_subject_custom_trigger = no
-				}
-				or = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_no_gold_consuption
-					}
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_gold_consuption
-					}
-				}
-				not = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_no_gold_standard_bank_money_currency
-					}
-				}
-			}
-			activate_production_method = {
-				building_type = building_bank
-				production_method = pm_paper_gold_consuption
-			}
-			activate_production_method = {
-				building_type = building_bank
-				production_method = pm_no_subject_currency_type
-			}
-		}
-		if = {
-			limit = {
-				owner = {
-					or = {
-						central_bank_gold_reserves_market_goods_sell_orders > 0
-						country_rank = rank_value:great_power
-					}
-					is_subject_custom_trigger = no
-					is_not_market_owner = no
-				}
-				or = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_no_gold_consuption
-					}
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_paper_gold_consuption
-					}
-				}
-				not = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_no_gold_standard_bank_money_currency
-					}
-				}
-			}
-			activate_production_method = {
-				building_type = building_bank
-				production_method = pm_gold_consuption
-			}
-			activate_production_method = {
-				building_type = building_bank
-				production_method = pm_no_subject_currency_type
-			}
-		}
-
 		# -> pm_gold_exchange_standard_bank_money_currency
 		if = {
 			limit = {
-				is_production_method_active = {
+				is_production_method_active = {  #si GES alors enlve la nécessité de l'or 
 					building_type = building_bank
 					production_method = pm_gold_exchange_standard_bank_money_currency
 				}
-				or = {
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_paper_gold_consuption
-					}
-					is_production_method_active = {
-						building_type = building_bank
-						production_method = pm_gold_consuption
-					}
+				is_production_method_active = {
+					building_type = building_bank
+					production_method = pm_gold_consuption
 				}
 			}
 			activate_production_method = {
@@ -76942,8 +76817,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -76966,8 +76846,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_algerian_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_algerian_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_algerian_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -76990,8 +76875,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_iraqi_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_iraqi_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_iraqi_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -77014,8 +76904,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_libyan_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_libyan_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_libyan_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -77038,8 +76933,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_moroccan_dirham_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_moroccan_dirham_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_moroccan_dirham_currency
+						}
 					}
 				}
 				not = {
@@ -77062,8 +76962,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_omanian_rial_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_omanian_rial_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_omanian_rial_currency
+						}
 					}
 				}
 				not = {
@@ -77086,8 +76991,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_qiran_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_qiran_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_qiran_currency
+						}
 					}
 				}
 				not = {
@@ -77110,8 +77020,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_saudi_riyal_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_saudi_riyal_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_saudi_riyal_currency
+						}
 					}
 				}
 				not = {
@@ -77134,8 +77049,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_serbian_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_serbian_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_serbian_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -77158,8 +77078,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_tunisian_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_tunisian_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_tunisian_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -77182,8 +77107,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dinar_yugoslav_dinar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dinar_yugoslav_dinar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dinar_yugoslav_dinar_currency
+						}
 					}
 				}
 				not = {
@@ -77206,8 +77136,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_australian_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_australian_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_australian_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77230,8 +77165,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_canadian_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_canadian_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_canadian_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77254,8 +77194,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_caribbean_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_caribbean_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_caribbean_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77278,8 +77223,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_confederate_states_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_confederate_states_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_confederate_states_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77302,8 +77252,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_liberian_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_liberian_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_liberian_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77326,8 +77281,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_new_zealand_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_new_zealand_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_new_zealand_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77350,8 +77310,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_sierra_leonean_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_sierra_leonean_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_sierra_leonean_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77374,8 +77339,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_dollar_united_states_dollar_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_dollar_united_states_dollar_currency
+						}
+						market.owner = {
+							has_law = law_type:law_dollar_united_states_dollar_currency
+						}
 					}
 				}
 				not = {
@@ -77398,8 +77368,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_ariary_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_ariary_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_ariary_currency
+						}
 					}
 				}
 				not = {
@@ -77422,8 +77397,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_central_african_eco_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_central_african_eco_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_central_african_eco_currency
+						}
 					}
 				}
 				not = {
@@ -77446,8 +77426,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_east_african_eco_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_east_african_eco_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_east_african_eco_currency
+						}
 					}
 				}
 				not = {
@@ -77470,8 +77455,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_ethiopian_birr_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_ethiopian_birr_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_ethiopian_birr_currency
+						}
 					}
 				}
 				not = {
@@ -77494,8 +77484,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_ghanaian_pound_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_ghanaian_pound_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_ghanaian_pound_currency
+						}
 					}
 				}
 				not = {
@@ -77518,8 +77513,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_nigerian_naira_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_nigerian_naira_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_nigerian_naira_currency
+						}
 					}
 				}
 				not = {
@@ -77542,8 +77542,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_south_african_rand_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_south_african_rand_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_south_african_rand_currency
+						}
 					}
 				}
 				not = {
@@ -77566,8 +77571,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_tuareg_ouguiya_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_tuareg_ouguiya_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_tuareg_ouguiya_currency
+						}
 					}
 				}
 				not = {
@@ -77590,8 +77600,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_eco_west_african_eco_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_eco_west_african_eco_currency
+						}
+						market.owner = {
+							has_law = law_type:law_eco_west_african_eco_currency
+						}
 					}
 				}
 				not = {
@@ -77614,8 +77629,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_franc_belgian_franc_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_franc_belgian_franc_currency
+						}
+						market.owner = {
+							has_law = law_type:law_franc_belgian_franc_currency
+						}
 					}
 				}
 				not = {
@@ -77638,8 +77658,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_franc_french_franc_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_franc_french_franc_currency
+						}
+						market.owner = {
+							has_law = law_type:law_franc_french_franc_currency
+						}
 					}
 				}
 				not = {
@@ -77662,8 +77687,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_franc_luxembourgish_franc_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_franc_luxembourgish_franc_currency
+						}
+						market.owner = {
+							has_law = law_type:law_franc_luxembourgish_franc_currency
+						}
 					}
 				}
 				not = {
@@ -77686,8 +77716,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_franc_swiss_franc_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_franc_swiss_franc_currency
+						}
+						market.owner = {
+							has_law = law_type:law_franc_swiss_franc_currency
+						}
 					}
 				}
 				not = {
@@ -77710,8 +77745,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_currency
+						}
 					}
 				}
 				not = {
@@ -77734,8 +77774,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_bavarian_gulden_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_bavarian_gulden_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_bavarian_gulden_currency
+						}
 					}
 				}
 				not = {
@@ -77758,8 +77803,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_florin_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_florin_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_florin_currency
+						}
 					}
 				}
 				not = {
@@ -77782,8 +77832,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_hungarian_forint_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_hungarian_forint_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_hungarian_forint_currency
+						}
 					}
 				}
 				not = {
@@ -77806,8 +77861,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_indies_guilder_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_indies_guilder_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_indies_guilder_currency
+						}
 					}
 				}
 				not = {
@@ -77830,8 +77890,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_gulden_south_german_gulden_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_gulden_south_german_gulden_currency
+						}
+						market.owner = {
+							has_law = law_type:law_gulden_south_german_gulden_currency
+						}
 					}
 				}
 				not = {
@@ -77854,8 +77919,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_czech_koruna_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_czech_koruna_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_czech_koruna_currency
+						}
 					}
 				}
 				not = {
@@ -77878,8 +77948,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_danish_krone_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_danish_krone_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_danish_krone_currency
+						}
 					}
 				}
 				not = {
@@ -77902,8 +77977,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_estonian_kroon_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_estonian_kroon_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_estonian_kroon_currency
+						}
 					}
 				}
 				not = {
@@ -77926,8 +78006,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_icelandic_krona_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_icelandic_krona_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_icelandic_krona_currency
+						}
 					}
 				}
 				not = {
@@ -77950,8 +78035,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_norwegian_krone_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_norwegian_krone_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_norwegian_krone_currency
+						}
 					}
 				}
 				not = {
@@ -77974,8 +78064,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_slovak_koruna_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_slovak_koruna_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_slovak_koruna_currency
+						}
 					}
 				}
 				not = {
@@ -77998,8 +78093,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_krone_swedish_krona_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_krone_swedish_krona_currency
+						}
+						market.owner = {
+							has_law = law_type:law_krone_swedish_krona_currency
+						}
 					}
 				}
 				not = {
@@ -78022,8 +78122,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_leon_leu_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_leon_leu_currency
+						}
+						market.owner = {
+							has_law = law_type:law_leon_leu_currency
+						}
 					}
 				}
 				not = {
@@ -78046,8 +78151,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_leon_lev_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_leon_lev_currency
+						}
+						market.owner = {
+							has_law = law_type:law_leon_lev_currency
+						}
 					}
 				}
 				not = {
@@ -78070,8 +78180,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_currency
+						}
 					}
 				}
 				not = {
@@ -78094,8 +78209,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_ducato_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_ducato_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_ducato_currency
+						}
 					}
 				}
 				not = {
@@ -78118,8 +78238,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_ottoman_lira_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_ottoman_lira_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_ottoman_lira_currency
+						}
 					}
 				}
 				not = {
@@ -78142,8 +78267,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_scudo_pontificio_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_scudo_pontificio_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_scudo_pontificio_currency
+						}
 					}
 				}
 				not = {
@@ -78166,8 +78296,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_scudo_sardo_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_scudo_sardo_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_scudo_sardo_currency
+						}
 					}
 				}
 				not = {
@@ -78190,8 +78325,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_lira_toscane_lira_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_lira_toscane_lira_currency
+						}
+						market.owner = {
+							has_law = law_type:law_lira_toscane_lira_currency
+						}
 					}
 				}
 				not = {
@@ -78214,8 +78354,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_mark_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_mark_currency
+						}
+						market.owner = {
+							has_law = law_type:law_mark_currency
+						}
 					}
 				}
 				not = {
@@ -78238,8 +78383,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_mark_finnish_markka_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_mark_finnish_markka_currency
+						}
+						market.owner = {
+							has_law = law_type:law_mark_finnish_markka_currency
+						}
 					}
 				}
 				not = {
@@ -78262,8 +78412,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78286,8 +78441,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_argentine_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_argentine_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_argentine_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78310,8 +78470,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_bolivien_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_bolivien_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_bolivien_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78334,8 +78499,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_chilean_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_chilean_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_chilean_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78358,8 +78528,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_colombian_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_colombian_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_colombian_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78382,8 +78557,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_costa_rican_colon_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_costa_rican_colon_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_costa_rican_colon_currency
+						}
 					}
 				}
 				not = {
@@ -78406,8 +78586,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_cuban_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_cuban_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_cuban_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78430,8 +78615,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_ecuadorian_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_ecuadorian_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_ecuadorian_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78454,8 +78644,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_el_salvador_colon_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_el_salvador_colon_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_el_salvador_colon_currency
+						}
 					}
 				}
 				not = {
@@ -78478,8 +78673,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_guatemalan_quetzal_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_guatemalan_quetzal_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_guatemalan_quetzal_currency
+						}
 					}
 				}
 				not = {
@@ -78502,8 +78702,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_honduran_lempira_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_honduran_lempira_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_honduran_lempira_currency
+						}
 					}
 				}
 				not = {
@@ -78526,8 +78731,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_mexican_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_mexican_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_mexican_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78550,8 +78760,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_nicaraguan_cordoba_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_nicaraguan_cordoba_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_nicaraguan_cordoba_currency
+						}
 					}
 				}
 				not = {
@@ -78574,8 +78789,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_paraguayan_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_paraguayan_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_paraguayan_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78598,8 +78818,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_philippine_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_philippine_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_philippine_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78622,8 +78847,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_sol_de_oro_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_sol_de_oro_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_sol_de_oro_currency
+						}
 					}
 				}
 				not = {
@@ -78646,8 +78876,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_uruguayan_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_uruguayan_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_uruguayan_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78670,8 +78905,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_peso_venezuelan_peso_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_peso_venezuelan_peso_currency
+						}
+						market.owner = {
+							has_law = law_type:law_peso_venezuelan_peso_currency
+						}
 					}
 				}
 				not = {
@@ -78694,8 +78934,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_pound_egyptian_pound_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_pound_egyptian_pound_currency
+						}
+						market.owner = {
+							has_law = law_type:law_pound_egyptian_pound_currency
+						}
 					}
 				}
 				not = {
@@ -78718,8 +78963,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_pound_irish_pound_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_pound_irish_pound_currency
+						}
+						market.owner = {
+							has_law = law_type:law_pound_irish_pound_currency
+						}
 					}
 				}
 				not = {
@@ -78742,8 +78992,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_pound_sterling_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_pound_sterling_currency
+						}
+						market.owner = {
+							has_law = law_type:law_pound_sterling_currency
+						}
 					}
 				}
 				not = {
@@ -78766,8 +79021,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_real_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_real_currency
+						}
+						market.owner = {
+							has_law = law_type:law_real_currency
+						}
 					}
 				}
 				not = {
@@ -78790,8 +79050,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_real_brazilian_real_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_real_brazilian_real_currency
+						}
+						market.owner = {
+							has_law = law_type:law_real_brazilian_real_currency
+						}
 					}
 				}
 				not = {
@@ -78814,8 +79079,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_rupee_indian_rupee_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_rupee_indian_rupee_currency
+						}
+						market.owner = {
+							has_law = law_type:law_rupee_indian_rupee_currency
+						}
 					}
 				}
 				not = {
@@ -78838,8 +79108,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_rupee_indonesian_rupiah_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_rupee_indonesian_rupiah_currency
+						}
+						market.owner = {
+							has_law = law_type:law_rupee_indonesian_rupiah_currency
+						}
 					}
 				}
 				not = {
@@ -78862,8 +79137,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_baht_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_baht_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_baht_currency
+						}
 					}
 				}
 				not = {
@@ -78886,8 +79166,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_dong_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_dong_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_dong_currency
+						}
 					}
 				}
 				not = {
@@ -78910,8 +79195,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_drachma_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_drachma_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_drachma_currency
+						}
 					}
 				}
 				not = {
@@ -78934,8 +79224,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_korean_won_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_korean_won_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_korean_won_currency
+						}
 					}
 				}
 				not = {
@@ -78958,8 +79253,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_latvian_lats_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_latvian_lats_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_latvian_lats_currency
+						}
 					}
 				}
 				not = {
@@ -78982,8 +79282,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_lithuanian_litas_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_lithuanian_litas_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_lithuanian_litas_currency
+						}
 					}
 				}
 				not = {
@@ -79006,8 +79311,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_peseta_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_peseta_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_peseta_currency
+						}
 					}
 				}
 				not = {
@@ -79030,8 +79340,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_ruble_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_ruble_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_ruble_currency
+						}
 					}
 				}
 				not = {
@@ -79054,8 +79369,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_uni_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_uni_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_uni_currency
+						}
 					}
 				}
 				not = {
@@ -79078,8 +79398,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_yen_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_yen_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_yen_currency
+						}
 					}
 				}
 				not = {
@@ -79102,8 +79427,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_yuan_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_yuan_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_yuan_currency
+						}
 					}
 				}
 				not = {
@@ -79126,8 +79456,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_spe_zloti_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_spe_zloti_currency
+						}
+						market.owner = {
+							has_law = law_type:law_spe_zloti_currency
+						}
 					}
 				}
 				not = {
@@ -79150,8 +79485,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_thaler_hannoveraner_thaler_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_thaler_hannoveraner_thaler_currency
+						}
+						market.owner = {
+							has_law = law_type:law_thaler_hannoveraner_thaler_currency
+						}
 					}
 				}
 				not = {
@@ -79174,8 +79514,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_thaler_prussian_thaler_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_thaler_prussian_thaler_currency
+						}
+						market.owner = {
+							has_law = law_type:law_thaler_prussian_thaler_currency
+						}
 					}
 				}
 				not = {
@@ -79198,8 +79543,13 @@ central_bank_production_methods_2 = {
 		if = {
 			limit = {
 				owner = {
-					any_overlord_or_above = {
-						has_law = law_type:law_thaler_saxon_thaler_currency
+					or = {
+						any_overlord_or_above = {
+							has_law = law_type:law_thaler_saxon_thaler_currency
+						}
+						market.owner = {
+							has_law = law_type:law_thaler_saxon_thaler_currency
+						}
 					}
 				}
 				not = {
@@ -79218,18 +79568,6 @@ central_bank_production_methods_2 = {
 				production_method = pm_no_gold_consuption
 			}
 		}
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 }
 
@@ -79262,7 +79600,6 @@ central_bank_production_methods_3 = {
 		}
 	}
 }
-
 
 #Bc production methode
 

@@ -22,7 +22,9 @@ ef_on_monthly_pulse_recurence = {
 
 	if  = {
 		limit = {
-			is_subject_custom_trigger = no
+			#is_subject_custom_trigger = no
+			market_owner_is_root = yes
+			#plus de limitation pour mieux cadré
 		}
 		remove_suject_currency = yes
 	}
@@ -48,10 +50,9 @@ central_bank_ef_on_monthly_pulse_country = {
 	#central_bank_interest_actual = yes  #à quiu cela  sert ?
 	#central_bank_gold_reserves_state = yes #à modifier pour unee valeur scripté
 
-	fluctuations_money_value_1_month = yes
-	government_loan_month = yes
+	government_loan_month = yes #peux imporrte le pays, si un pays possede une bc et crréer de la devise dirrectement pour le gouvernement alors cette monaie doit etre enregistré
 
-	#inflation_value & modifier
+	#inflation_value & modifier -> interet si possede une devise sinon non
 	inflation_modifier = yes
 	inflation_on_consumer_goods_market_value_fluctuations = yes
 	inflation_on_energy_market_value_fluctuations = yes
@@ -89,13 +90,20 @@ central_bank_ef_on_monthly_pulse_country = {
 		}
 	}
 
-	#stockpiling_currency_and_gold
+	#stockpiling_currency_and_gold -> à décompposé je pense
 	if  = {
 		limit = {
-			market.owner = root
-			not  = {
-				is_subject_custom_trigger = yes
-			}
+			market_owner_is_root  = yes
+
+
+
+
+			#-> à décompposé je pense
+			#-> à voirr si on veux que la balance de commerce existe pour le joueur runiquement meme avec un pays sans dezvise il va faloirr décomposé
+
+			# not  = {
+			# 	is_subject_custom_trigger = yes # -> Criticable car il existe des sujet qui  possede leurr proprre marché donc non
+			# }
 		}
 		stockpiling_currency_and_gold = yes
 	}
@@ -145,7 +153,7 @@ stockpiling_currency_and_gold = {
 	#stockpiling_financial_product_and_gold
 	stockpiling_central_bank_gold_reserves_state = yes
 	gold_by_trade_route = yes
-	
+
 	#stockpile finacial product
 	stockpiling_bond_1 = yes
 	stockpiling_manufacture_stock_1 = yes
@@ -766,13 +774,24 @@ ef_on_half_yearly_pulse_recurence = {
 
 central_bank_ef_on_half_yearly_pulse_country = {
 
-	fluctuations_money_value_1_year = yes
-	buy_sell_currency_order = yes
-	#check_central_bank_default = yes #?
-
 	if  = {
 		limit  = {
+			or  = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		}
+		fluctuations_money_value_1_year = yes
+		buy_sell_currency_order = yes
+	}
+
+	if  = {
+		limit = {
 			is_ai = yes
+			or  = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
 		}
 		ai_credit_at_central_bank = yes
 		ai_refund_central_bank = yes
@@ -887,7 +906,7 @@ ef_on_yearly_pulse_reset = {
 		limit = {
 			is_player = yes
 		}
-		
+
 		#grain
 		if = {
 			limit = {
@@ -1012,21 +1031,25 @@ ef_on_yearly_pulse_reset = {
 
 central_bank_ef_on_yearly_pulse_country = {
 
-	cumulative_inflation_5_year = yes
-	cumulative_inflation_10_year = yes
-	cumulative_inflation_since_beginning = yes
-
-	fluctuations_money_value_5_year = yes
-	fluctuations_money_value_10_year = yes
+	if  = {
+		limit  = {
+			or  = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		}
+		cumulative_inflation_5_year = yes
+		cumulative_inflation_10_year = yes
+		cumulative_inflation_since_beginning = yes
+		fluctuations_money_value_5_year = yes
+		fluctuations_money_value_10_year = yes
+	}
 
 	if = {
 		limit = {
 			is_ai = yes
-			has_technology_researched = gold_standard
-			not = {
-				has_law = law_type:law_isolationism
-				#is_subject_custom_trigger = yes #?
-			}
+			market_owner_is_root = yes
+			has_central_bank_GS_GES_NISO = yes
 		}
 		ai_buy_sell_currency = yes
 	}
@@ -1035,6 +1058,10 @@ central_bank_ef_on_yearly_pulse_country = {
 	if = {
 		limit = {
 			credit_at_central_bank_interest_per_month > 5
+			or  = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
 		}
 		credit_at_central_bank_interest_per_week = yes
 	}
@@ -1042,6 +1069,10 @@ central_bank_ef_on_yearly_pulse_country = {
 		limit = {
 			has_modifier = interest_at_the_central_bank
 			credit_at_central_bank_interest_per_month < 5
+			or  = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
 		}
 		credit_at_central_bank_interest_per_week_off = yes
 	}
@@ -1051,7 +1082,8 @@ central_bank_ef_on_yearly_pulse_country = {
 	central_bank_production_methods = yes
 	if = {
 		limit = {
-			is_subject_custom_trigger = yes
+			#is_subject_custom_trigger = yes
+			market_owner_is_root = no
 		}
 		central_bank_production_methods_2 = yes
 	}
@@ -1066,8 +1098,8 @@ central_bank_ef_on_yearly_pulse_country = {
 financial_center_ef_on_yearly_pulse_country = {
 	private_ownership_production_stocks = yes
 	financial_center_production_methods = yes
-	
-	ai_buy_central_bank_debt = yes #verif -> 
+
+	ai_buy_central_bank_debt = yes #verif ->
 
 	sovereign_bond_yields = yes #verif
 	bond_maturity_on_action = yes #attention ordre avec ai_buy_central_bank_debt
@@ -1076,7 +1108,7 @@ financial_center_ef_on_yearly_pulse_country = {
 			var:gold_loaned_to_central_bank_fix = gold_loaned_to_central_bank
 		}
 		gold_loaned_to_central_bank_fix = yes #attention ordre avec ai_buy_central_bank_debt
-		 
+
 	}
 }
 
@@ -1238,14 +1270,14 @@ ai_building_strategy = {
 	# 	XXXXXXXXX
 	# }
 
-	#A chaque boucle 
-	# - construction au niveau du pays 
+	#A chaque boucle
+	# - construction au niveau du pays
 	# - verifit si l'infrastructure est correct et l'ajoute
-	# - Financial center maintenue au niveau maximum à voir 5 niveau max par boucle 
+	# - Financial center maintenue au niveau maximum à voir 5 niveau max par boucle
 
-	# matière premiere dans tout les etat possible minimum 3 
-	# 
-	# - en fct des strategie du pays developpement de secteur 
+	# matière premiere dans tout les etat possible minimum 3
+	#
+	# - en fct des strategie du pays developpement de secteur
 
 
 
@@ -1260,7 +1292,7 @@ ai_building_strategy = {
 
 
 	#building_ef_private_construction
-	if  = { #construit la difference de bd 
+	if  = { #construit la difference de bd
 		limit  = {
 			building_ef_private_construction_lvl_to_build > 0
 		}
@@ -1284,15 +1316,15 @@ ai_building_strategy = {
 			1 = {
 				random_scope_state = {
 					limit ={
-						or ={							
+						or ={
 							not = {
 								has_building = building_ef_private_construction
 							}
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 1
@@ -1310,8 +1342,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 2
@@ -1329,8 +1361,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 3
@@ -1348,8 +1380,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 4
@@ -1367,8 +1399,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 5
@@ -1386,8 +1418,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 6
@@ -1405,8 +1437,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 7
@@ -1424,8 +1456,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 8
@@ -1443,8 +1475,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 9
@@ -1462,8 +1494,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 10
@@ -1481,8 +1513,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 11
@@ -1500,8 +1532,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 12
@@ -1519,8 +1551,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 13
@@ -1538,8 +1570,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 14
@@ -1557,8 +1589,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 15
@@ -1576,8 +1608,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 16
@@ -1595,8 +1627,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 17
@@ -1614,8 +1646,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 18
@@ -1633,8 +1665,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 19
@@ -1652,8 +1684,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 20
@@ -1671,8 +1703,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 21
@@ -1690,8 +1722,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 22
@@ -1709,8 +1741,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 23
@@ -1728,8 +1760,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 24
@@ -1747,8 +1779,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 25
@@ -1766,8 +1798,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 26
@@ -1785,8 +1817,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 27
@@ -1804,8 +1836,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 28
@@ -1823,8 +1855,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 29
@@ -1842,8 +1874,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 30
@@ -1861,8 +1893,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 31
@@ -1880,8 +1912,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 32
@@ -1899,8 +1931,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 33
@@ -1918,8 +1950,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 34
@@ -1937,8 +1969,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 35
@@ -1956,8 +1988,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 36
@@ -1975,8 +2007,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 37
@@ -1994,8 +2026,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 38
@@ -2013,8 +2045,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 39
@@ -2032,8 +2064,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 40
@@ -2051,8 +2083,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 41
@@ -2070,8 +2102,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 42
@@ -2089,8 +2121,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 43
@@ -2108,8 +2140,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 44
@@ -2127,8 +2159,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 45
@@ -2146,8 +2178,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 46
@@ -2165,8 +2197,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 47
@@ -2184,8 +2216,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 48
@@ -2203,8 +2235,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 49
@@ -2222,8 +2254,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 50
@@ -2241,8 +2273,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 51
@@ -2260,8 +2292,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 52
@@ -2279,8 +2311,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 53
@@ -2298,8 +2330,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 54
@@ -2317,8 +2349,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 55
@@ -2336,8 +2368,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 56
@@ -2355,8 +2387,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 57
@@ -2374,8 +2406,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 58
@@ -2393,8 +2425,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 59
@@ -2412,8 +2444,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 60
@@ -2431,8 +2463,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 61
@@ -2450,8 +2482,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 62
@@ -2469,8 +2501,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 63
@@ -2488,8 +2520,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 64
@@ -2507,8 +2539,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 65
@@ -2526,8 +2558,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 66
@@ -2545,8 +2577,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 67
@@ -2564,8 +2596,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 68
@@ -2583,8 +2615,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 69
@@ -2602,8 +2634,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 70
@@ -2621,8 +2653,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 71
@@ -2640,8 +2672,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 72
@@ -2659,8 +2691,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 73
@@ -2678,8 +2710,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 74
@@ -2697,8 +2729,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 75
@@ -2716,8 +2748,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 76
@@ -2735,8 +2767,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 77
@@ -2754,8 +2786,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 78
@@ -2773,8 +2805,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 79
@@ -2792,8 +2824,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 80
@@ -2811,8 +2843,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 81
@@ -2830,8 +2862,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 82
@@ -2849,8 +2881,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 83
@@ -2868,8 +2900,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 84
@@ -2887,8 +2919,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 85
@@ -2906,8 +2938,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 86
@@ -2925,8 +2957,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 87
@@ -2944,8 +2976,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 88
@@ -2963,8 +2995,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 89
@@ -2982,8 +3014,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 90
@@ -3001,8 +3033,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 91
@@ -3020,8 +3052,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 92
@@ -3039,8 +3071,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 93
@@ -3058,8 +3090,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 94
@@ -3077,8 +3109,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 95
@@ -3096,8 +3128,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 96
@@ -3115,8 +3147,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 97
@@ -3134,8 +3166,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 98
@@ -3153,8 +3185,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 99
@@ -3172,8 +3204,8 @@ ai_building_strategy = {
 							gdp > owner.gdp_05
 							#gdp > owner.gdp_03
 							#gdp > owner.gdp_04
-						} 
-					} 
+						}
+					}
 					create_building = {
 						building = building_ef_private_construction
 						level = 100
@@ -3209,8 +3241,8 @@ ai_building_strategy = {
 		# 			has_building = building_railway
 		# 			any_scope_building = {
 		# 				is_building_type = building_railway
-		# 				is_under_construction = yes 
-		# 			}	
+		# 				is_under_construction = yes
+		# 			}
 		# 		}
 		# 	}
 		# 	start_privately_funded_building_construction = building_railway
@@ -3223,11 +3255,11 @@ ai_building_strategy = {
 					#has_building = building_railway
 					any_scope_building = {
 						is_building_type = building_railway
-						is_under_construction = yes 
-					}	
+						is_under_construction = yes
+					}
 				}
 				state_market_access < 0.80
-				#probleme les colononie et terrictoire outre mere sur produiser des chemin de fer il doive etre exclu de la selection d'etat 
+				#probleme les colononie et terrictoire outre mere sur produiser des chemin de fer il doive etre exclu de la selection d'etat
 				is_incorporated = yes #aide l'ia n'incorpore jamais dees terrictoire hors de le terrictoire initiale
 			}
 			start_privately_funded_building_construction = building_railway
@@ -3239,8 +3271,8 @@ ai_building_strategy = {
 	# if  = {
 	# 	limit  = {
 	# 		has_technology_researched = railways
-			
-			
+
+
 	# 	}
 
 
@@ -4671,7 +4703,7 @@ ai_buy_sell_currency = {
 			sell_thaler_saxon_thaler_currency = yes
 		}
 	}
-	
+
 	#end_tag_3
 }
 all_currency_resold = {
@@ -6005,7 +6037,7 @@ all_currency_resold = {
 		}
 		sell_thaler_saxon_thaler_currency_crisis = yes
 	}
-	
+
 }
 ############################
 
@@ -14077,15 +14109,41 @@ update_modifiers_bc_fc_ns = {
 			any_scope_state = {
 				or = {
 					has_building = building_financial_centre
-					has_building = building_financial_centre_fra
-					has_building = building_financial_centre_gbr
-					has_building = building_financial_centre_usa
-					has_building = building_financial_centre_net
-					has_building = building_financial_centre_ger
+					has_building = building_financial_centre_arg
 					has_building = building_financial_centre_aus
-					has_building = building_financial_centre_ita
+					has_building = building_financial_centre_bav
+					has_building = building_financial_centre_bel
+					has_building = building_financial_centre_bic
+					has_building = building_financial_centre_brz
 					has_building = building_financial_centre_chi
+					has_building = building_financial_centre_chl
+					has_building = building_financial_centre_den
+					has_building = building_financial_centre_egy
+					has_building = building_financial_centre_fra
+					has_building = building_financial_centre_frm
+					has_building = building_financial_centre_gre
+					has_building = building_financial_centre_gbr
+					has_building = building_financial_centre_hkh
+					has_building = building_financial_centre_ita
 					has_building = building_financial_centre_jap
+					has_building = building_financial_centre_mex
+					has_building = building_financial_centre_net
+					has_building = building_financial_centre_nsw
+					has_building = building_financial_centre_ont
+					has_building = building_financial_centre_peu
+					has_building = building_financial_centre_por
+					has_building = building_financial_centre_pru
+					has_building = building_financial_centre_que
+					has_building = building_financial_centre_rus
+					has_building = building_financial_centre_saf
+					has_building = building_financial_centre_sar
+					has_building = building_financial_centre_sic
+					has_building = building_financial_centre_spa
+					has_building = building_financial_centre_swe
+					has_building = building_financial_centre_tur
+					has_building = building_financial_centre_TUS
+					has_building = building_financial_centre_uru
+					has_building = building_financial_centre_usa
 				}
 			}
 		}
@@ -14119,8 +14177,4 @@ update_modifiers_bc_fc_ns = {
 		remove_law_currency = yes
 		regulation_law_gold_standard = yes
 	}
-
-	#test 
-	#stockpiling_capital_state_transfert = yes
 }
-
