@@ -74,9 +74,45 @@ market_owner_is_root_univ_with_buiding_var = {
 	}
 }
 
+ai_purchase_territory_valid_NGF_var = {
+	if  = {
+		limit = {
+			ai_purchase_territory_valid_NGF  = yes
+		}
+		add  = 1
+	}
+}
 
 
 
+
+global_silver_production = {
+	every_country  = {
+		limit = {
+			central_bank_silver_reserves_market_goods_sell_orders > 0
+		}
+		add = central_bank_silver_reserves_market_goods_sell_orders
+	}
+}
+global_gold_production = {
+	every_country  = {
+		limit = {
+			central_bank_gold_reserves_market_goods_sell_orders > 0
+		}
+		add = central_bank_gold_reserves_market_goods_sell_orders
+	}
+}
+
+gold_silver_ratio = { # = gold_in_silver
+	value = global_gold_production
+	divide = global_silver_production
+	#max = 0.3
+}
+
+silver_in_gold = {
+	value = 1
+	divide = gold_silver_ratio
+}
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -169,7 +205,7 @@ highest_gdp = {
 	}
 }
 ratio_with_highest_gdp = {
-	value = GDP  
+	value = GDP
 	divide = highest_gdp
 }
 
@@ -210,7 +246,7 @@ reference_currency_owned_by_the_country_in_gold = {
 	multiply = global_monetary_reference
 }
 ratio_with_national_capacity_reference_currency = {
-	value = national_capacity  
+	value = national_capacity
 	divide = national_capacity_reference_currency
 }
 
@@ -401,7 +437,7 @@ institution_economic_central_bank_lvl_brut = {
 every_subject = {
 	every_country = {
 		limit = {
-			is_subject_of = root 
+			is_subject_of = root
 		}
 		add = 1
 	}
@@ -409,7 +445,7 @@ every_subject = {
 every_subject_gdp = {
 	every_country = {
 		limit = {
-			is_subject_of = root 
+			is_subject_of = root
 		}
 		add = gdp
 	}
@@ -417,7 +453,7 @@ every_subject_gdp = {
 every_subject_pop = {
 	every_country = {
 		limit = {
-			is_subject_of = root 
+			is_subject_of = root
 		}
 		add = total_population
 	}
@@ -425,14 +461,14 @@ every_subject_pop = {
 every_subject_gold = {
 	every_country = {
 		limit = {
-			is_subject_of = root 
+			is_subject_of = root
 		}
 		add = national_capacity
 	}
 }
 
 subject_overlord_gdp_ratio = {
-	value = gdp 
+	value = gdp
 	divide = overlord.gdp
 }
 subject_overlord_gdp_ratio_revers = {
@@ -855,14 +891,14 @@ money_value_0 = {
 	if = {
 		limit = {
 			not = {
-				has_technology_researched = gold_standard
+				has_technology_researched = metalique_standart
 			}
 		}
 		value = 0.01
 	}
 	if = {
 		limit = {
-			has_technology_researched = gold_standard
+			has_technology_researched = metalique_standart
 		}
 		value = national_capacity
 		divide = money_supply
@@ -906,6 +942,10 @@ money_value_target_real_below_25 = {
 	value = var:money_value_target_1
 	multiply = 0.75
 }
+money_value_target_real_above_25 = {
+	value = var:money_value_target_1
+	multiply = 1.25
+}
 money_value_target_real_gui = {
 	add = var:money_value_target_2
 }
@@ -921,9 +961,77 @@ money_value_target_with_the_reference_currency = {
 
 #quantité de devise achetable
 purchasable_currency_amount = {
-	add = money_supply
+	value = money_supply
 	subtract = money_value_target
 }
+money_supply_80 = {
+	value = money_supply
+	multiply = 0.8
+}
+
+purchasable_currency_amount_80 = {
+	value = money_supply_80
+	subtract = money_value_target
+}
+
+
+
+private_bank_funds_pourcent_projection = {
+	value = private_bank_funds
+	subtract = purchasable_currency_amount
+}
+private_bank_funds_pourcent_projection_ratio = {
+	value = private_bank_funds_pourcent_projection
+	divide = money_supply
+}
+
+
+private_bank_funds_pourcent_at_20 = {
+	value = private_bank_funds
+	multiply  = {
+		value = 0.3
+		divide = private_bank_funds_pourcent
+	}
+}
+private_bank_funds_pourcent_at_20_to_substract = {
+	value = private_bank_funds
+	subtract = private_bank_funds_pourcent_at_20
+}
+
+
+financial_product_by_trade_route = {
+	value = 0
+
+	if  = {
+		limit = {
+			has_technology_researched = postal_savings
+
+		}
+		add = 0.25
+	}
+	if  = {
+		limit = {
+			has_technology_researched = investment_banks
+
+		}
+		add = 0.25
+	}
+	if  = {
+		limit = {
+			has_technology_researched = international_exchange_standards
+
+		}
+		add = 0.25
+	}
+	if  = {
+		limit = {
+			has_technology_researched = modern_financial_instruments
+
+		}
+		add = 0.25
+	}
+}
+
 
 
 
@@ -1066,7 +1174,11 @@ central_bank_reserves = {
 	value = 0
 	if = {
 		limit = {
-			has_law = law_type:law_gold_standard
+			or = {
+				has_law = law_type:law_silver_standard
+				has_law = law_type:law_bimetallism_standard
+				has_law = law_type:law_gold_standard
+			}
 		}
 		add = central_bank_gold_reserves_state
 	}
@@ -1076,31 +1188,42 @@ central_bank_reserves = {
 		}
 		add = var:reference_currency_owned_by_the_country_equivalent_gold_fixe
 	}
-
-	#add = gold_loaned_to_central_bank
-	add = var:gold_loaned_to_central_bank_fixe #-> fixé la variable 
-	add = var:trade_balance_in_gold_fixe
- }
-percentage_gold_borrowed = {
-	value = gold_loaned_to_central_bank
-	divide = central_bank_reserves
-}
-all_gold_value_inflation = {
-	value = 0
-	add = central_bank_gold_reserves_state
+	add = var:gold_loaned_to_central_bank_fix
 	add = var:trade_balance_in_gold_fixe
 
-	#add = gold_loaned_to_central_bank
+	if = {
+		limit = {
+			has_law = law_type:law_silver_standard
+		}
+		multiply = gold_silver_ratio
+	}
 }
-all_gold_owned = {
-	value = 0
-	add = central_bank_gold_reserves_state
-	add = var:trade_balance_in_gold_fixe
+central_bank_gold_reserves_state_law = {
+	value = central_bank_gold_reserves_state
+}
 
-	#add = gold_loaned_to_central_bank
-}
+
 central_bank_gold_reserves_state = {
-	value = 1
+	value = central_bank_gold_reserves_state_nativve_for_stockpile
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_silver_standard
+			}
+		}
+		multiply = 1
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}
+		multiply = gold_silver_ratio
+	}
+}
+
+central_bank_gold_reserves_state_nativve_for_stockpile = {
+	value = 0
 	add = {
 		every_scope_state = {
 			if = {
@@ -1112,6 +1235,7 @@ central_bank_gold_reserves_state = {
 		}
 	}
 }
+
 central_bank_gold_reserves_state_25 = {
 	value = 1
 	add  = {
@@ -1131,6 +1255,24 @@ central_bank_gold_reserves_state_25 = {
 		}
 	}
 	multiply = 0.25
+}
+percentage_gold_borrowed = {
+	value = gold_loaned_to_central_bank
+	divide = central_bank_reserves
+}
+all_gold_value_inflation = {
+	value = 0
+	add = central_bank_gold_reserves_state
+	add = var:trade_balance_in_gold_fixe
+
+	#add = gold_loaned_to_central_bank
+}
+all_gold_owned = {
+	value = 0
+	add = central_bank_gold_reserves_state
+	add = var:trade_balance_in_gold_fixe
+
+	#add = gold_loaned_to_central_bank
 }
 country_credit = {
 	value = credit
@@ -1408,7 +1550,7 @@ bond_producted = {
 	divide = bond_price
 }
 
-#debt at war 
+#debt at war
 national_debt_allowed_in_gold_war = { #maximum 60% de dette en pib et minimum 16%
 	value = gold_reserves_15 #15% en plus
 	add = { #difference à 15%
@@ -1575,8 +1717,37 @@ credit_at_central_bank_2M5 = {
 	add = 2500000
 }
 central_bank_gold_reserves_market_goods_sell_orders = {
-	value = {
-		add = market.mg:gold.market_goods_sell_orders
+	if  = {
+		limit = {
+			not = {
+				#is_subject_custom_trigger = yes
+
+				or = {
+					is_subject_custom_trigger = yes
+					market_owner_is_root_univ_with_buiding = yes
+				}
+			}
+		}
+		value = {
+			add = owner.market.mg:gold.market_goods_sell_orders
+		}
+	}
+}
+central_bank_silver_reserves_market_goods_sell_orders = {
+	if  = {
+		limit = {
+			not = {
+				#is_subject_custom_trigger = yes
+
+				or = {
+					is_subject_custom_trigger = yes
+					market_owner_is_root_univ_with_buiding = yes
+				}
+			}
+		}
+		value = {
+			add = owner.market.mg:silver.market_goods_sell_orders
+		}
 	}
 }
 stockpiling_central_bank_gold_reserves_var_0 = {
@@ -2033,7 +2204,7 @@ export_value = {
 	if = {
 		limit = {
 			has_modifier = weak_currency
-			#is_ai = yes #pour  les test
+			#is_ai = yes #pour  les test -> je garde la génération importante mais en compte partie les import vvale suàper chère
 		}
 		multiply = difference_with_average_gold_exchange_rate_currencies_revers_100
 	}
@@ -2468,14 +2639,14 @@ import_value = {
 	if = {
 		limit = {
 			has_modifier = weak_currency
-			is_ai = no #pour  les test
+			is_ai = no #some cheat ai
 		}
 		multiply = difference_with_average_gold_exchange_rate_currencies_revers_100
 	}
 }
 import_value_in_gold_week = { #flux au mois en or
-	value = import_value_in_currency_week #cella est libelé dans ma devise 
-	multiply = money_value_target_real #pour avoir de l'or 
+	value = import_value_in_currency_week #cella est libelé dans ma devise
+	multiply = money_value_target_real #pour avoir de l'or
 	add = import_in_gold
 }
 import_value_in_gold = {
@@ -2674,7 +2845,7 @@ gold_reserves_rest = {
 	subtract = gold_reserves
 }
 gold_reserve_compared_gold_reserves_limit = {
-	value = gold_reserves 
+	value = gold_reserves
 	divide = gold_reserves_limit
 }
 ############################################################################################################################################################

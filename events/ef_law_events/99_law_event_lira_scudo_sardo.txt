@@ -1,0 +1,84 @@
+#lira_scudo_sardo
+namespace = law_event_lira_scudo_sardo
+
+#lira_scudo_sardo
+law_event_lira_scudo_sardo.1 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - lira_scudo_sardo"
+
+	duration = 1
+
+	immediate = {                                     
+		capital = {
+			save_scope_as = central_bank_site
+		}
+		
+		set_variable = {
+			name = money_value_target_1
+			value = { 0.1 1 }
+		}
+		change_variable = {
+			name = circulating_lira_scudo_sardo_c_var_1
+			add = { 50000009 100000009 }
+		}
+		scope:central_bank_site = {
+			change_variable = {
+				name = stockpiling_lira_scudo_sardo_state_1
+				add  = {
+					value = owner.var:circulating_lira_scudo_sardo_c_var_1
+					multiply = 0.1
+				}
+			}
+			change_variable = {
+				name = central_bank_gold_reserves_state_1
+				add = {
+					value = owner.var:circulating_lira_scudo_sardo_c_var_1
+					add = var:stockpiling_lira_scudo_sardo_state_1
+					multiply = owner.var:money_value_target_1
+				}
+			}
+		}
+		activate_law = law_type:law_lira_scudo_sardo_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_lira_scudo_sardo_currency_2 }
+			}
+			trigger_event = { id = law_event_lira_scudo_sardo.3 }
+		}
+	}
+}
+law_event_lira_scudo_sardo.2 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - lira_scudo_sardo"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_lira_scudo_sardo_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_lira_scudo_sardo_currency_2 }
+			}
+			trigger_event = { id = law_event_lira_scudo_sardo.3 }
+		}
+	}
+}
+law_event_lira_scudo_sardo.3 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "lira_scudo_sardo - interface"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_lira_scudo_sardo_currency_2
+	}
+}

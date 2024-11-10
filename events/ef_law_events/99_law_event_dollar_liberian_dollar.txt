@@ -1,0 +1,84 @@
+#dollar_liberian_dollar
+namespace = law_event_dollar_liberian_dollar
+
+#dollar_liberian_dollar
+law_event_dollar_liberian_dollar.1 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - dollar_liberian_dollar"
+
+	duration = 1
+
+	immediate = {                                     
+		capital = {
+			save_scope_as = central_bank_site
+		}
+		
+		set_variable = {
+			name = money_value_target_1
+			value = { 0.1 1 }
+		}
+		change_variable = {
+			name = circulating_dollar_liberian_dollar_c_var_1
+			add = { 50000009 100000009 }
+		}
+		scope:central_bank_site = {
+			change_variable = {
+				name = stockpiling_dollar_liberian_dollar_state_1
+				add  = {
+					value = owner.var:circulating_dollar_liberian_dollar_c_var_1
+					multiply = 0.1
+				}
+			}
+			change_variable = {
+				name = central_bank_gold_reserves_state_1
+				add = {
+					value = owner.var:circulating_dollar_liberian_dollar_c_var_1
+					add = var:stockpiling_dollar_liberian_dollar_state_1
+					multiply = owner.var:money_value_target_1
+				}
+			}
+		}
+		activate_law = law_type:law_dollar_liberian_dollar_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_dollar_liberian_dollar_currency_2 }
+			}
+			trigger_event = { id = law_event_dollar_liberian_dollar.3 }
+		}
+	}
+}
+law_event_dollar_liberian_dollar.2 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - dollar_liberian_dollar"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_dollar_liberian_dollar_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_dollar_liberian_dollar_currency_2 }
+			}
+			trigger_event = { id = law_event_dollar_liberian_dollar.3 }
+		}
+	}
+}
+law_event_dollar_liberian_dollar.3 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "dollar_liberian_dollar - interface"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_dollar_liberian_dollar_currency_2
+	}
+}

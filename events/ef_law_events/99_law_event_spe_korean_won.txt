@@ -1,0 +1,84 @@
+#spe_korean_won
+namespace = law_event_spe_korean_won
+
+#spe_korean_won
+law_event_spe_korean_won.1 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - spe_korean_won"
+
+	duration = 1
+
+	immediate = {                                     
+		capital = {
+			save_scope_as = central_bank_site
+		}
+		
+		set_variable = {
+			name = money_value_target_1
+			value = { 0.1 1 }
+		}
+		change_variable = {
+			name = circulating_spe_korean_won_c_var_1
+			add = { 50000009 100000009 }
+		}
+		scope:central_bank_site = {
+			change_variable = {
+				name = stockpiling_spe_korean_won_state_1
+				add  = {
+					value = owner.var:circulating_spe_korean_won_c_var_1
+					multiply = 0.1
+				}
+			}
+			change_variable = {
+				name = central_bank_gold_reserves_state_1
+				add = {
+					value = owner.var:circulating_spe_korean_won_c_var_1
+					add = var:stockpiling_spe_korean_won_state_1
+					multiply = owner.var:money_value_target_1
+				}
+			}
+		}
+		activate_law = law_type:law_spe_korean_won_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_spe_korean_won_currency_2 }
+			}
+			trigger_event = { id = law_event_spe_korean_won.3 }
+		}
+	}
+}
+law_event_spe_korean_won.2 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "Current circulation - spe_korean_won"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_spe_korean_won_currency
+		if = {
+			limit ={
+				not = { has_law = law_type:law_spe_korean_won_currency_2 }
+			}
+			trigger_event = { id = law_event_spe_korean_won.3 }
+		}
+	}
+}
+law_event_spe_korean_won.3 = {
+	type = country_event
+	placement = root
+	hidden = yes
+
+	title = "spe_korean_won - interface"
+
+	duration = 1
+
+	immediate = {                                     
+		activate_law = law_type:law_spe_korean_won_currency_2
+	}
+}
