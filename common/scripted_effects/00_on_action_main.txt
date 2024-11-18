@@ -30,7 +30,11 @@ ef_on_monthly_pulse_recurence = {
 	if  = {
 		limit = {
 			market_owner_is_root = no
-			market_owner_is_root_univ_with_buiding = no
+			or = {
+				market_owner_is_root_univ_with_buiding = no
+				not_the_same_monetary_system_as_overlord = yes
+				subjetc_no_modifier_on_bc = yes
+			}
 		}
 		subject_currency = yes
 		central_bank_production_methods = yes
@@ -54,10 +58,13 @@ ef_on_monthly_pulse_recurence = {
 # }
 
 central_bank_ef_on_monthly_pulse_country = {
-	#central_bank_interest_actual = yes  #à quiu cela  sert ?
-	#central_bank_metal_reserves_state = yes #à modifier pour unee valeur scripté
+	############################################################################################################################################################
+	#test
 
-	government_loan_month = yes #peux imporrte le pays, si un pays possede une bc et crréer de la devise dirrectement pour le gouvernement alors cette monaie doit etre enregistré
+	############################################################################################################################################################
+
+	currency_strength_modifier = yes
+	government_loan_month = yes  
 
 	#inflation_value & modifier -> interet si possede une devise sinon non
 	inflation_modifier = yes
@@ -68,8 +75,56 @@ central_bank_ef_on_monthly_pulse_country = {
 	inflation_on_military_equipment_market_value_fluctuations = yes
 	money_value_dif_01_market_value_fluctuations = yes
 
-	central_bank_metal_reserves_fix = yes
+	every_country = {
+		limit = {
+			global_country_ranking = 1
+		}
+		global_gold_silver_production = yes
+		if = {
+			limit = { 
+				or = {
+					global_var:money_value_median = 0
+					global_var:money_value_median = 1
+				}
+			}
+			currency_law_list = yes
+			money_value_global_var = yes
+			median_currency_value = yes
+		}
+	}
 
+	every_country = {
+		limit = {
+			has_modifier = global_monetary_reference
+		}
+		global_monetary_reference_global_var_fixe = yes
+	}
+
+	#monetary_policy_player
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_no_monetary_system
+				has_law = law_type:law_fiat_standard
+			}
+			not = {
+				has_law = law_type:law_isolationism
+			}
+			#ajout d'une condition pour  les pays qui passe en law_fiat_standard par la crise quand sera intégré 
+		}
+		activate_law = law_type:law_silver_standard
+		central_bank_production_methods = yes
+	}
+	
+	#has_law = law_type:law_no_monetary_system
+	#has_law = law_type:law_fiat_standard
+
+	#activate_law = law_type:law_no_monetary_system
+	#activate_law = law_type:law_fiat_standard
+	#activate_law = law_type:law_silver_standard
+	#activate_law = law_type:law_bimetallism_standard
+	#activate_law = law_type:law_gold_standard
+	#activate_law = law_type:law_gold_exchange_standard
 
 	#monetary_policy_player
 	if = {
@@ -105,9 +160,6 @@ central_bank_ef_on_monthly_pulse_country = {
 		limit = {
 			market_owner_is_root  = yes
 
-
-
-
 			#-> à décompposé je pense
 			#-> à voirr si on veux que la balance de commerce existe pour le joueur runiquement meme avec un pays sans dezvise il va faloirr décomposé
 
@@ -115,9 +167,10 @@ central_bank_ef_on_monthly_pulse_country = {
 			# 	is_subject_custom_trigger = yes # -> Criticable car il existe des sujet qui  possede leurr proprre marché donc non
 			# }
 		}
-		stockpiling_metal_and_trade_route = yes
+		stockpiling_central_bank_metal_reserves_state = yes
+		gold_by_trade_route = yes
 		stockpiling_currency = yes
-		stockpile_finacial_product = yes
+		trade_balance = yes #test 1mois
 	}
 
 	if  = {
@@ -148,6 +201,12 @@ financial_center_ef_on_monthly_pulse_country = {
 		}
 		RMSA_MMSA_order_trigger = yes
 	}
+	if  = {
+		limit = {
+			market_owner_is_root  = yes
+		}
+		stockpile_finacial_product = yes
+	}
 }
 
 national_stockpile_ef_on_monthly_pulse_country = {
@@ -158,595 +217,6 @@ national_stockpile_ef_on_monthly_pulse_country = {
 			has_modifier = has_national_stockpile
 		}
 		storing_releasing_on_action = yes
-	}
-}
-
-stockpiling_metal_and_trade_route = {
-	#stockpiling_financial_product_and_gold
-	stockpiling_central_bank_metal_reserves_state = yes
-	gold_by_trade_route = yes
-}
-
-stockpile_finacial_product = {
-	#stockpile finacial product
-	stockpiling_bond_1 = yes
-	stockpiling_manufacture_stock_1 = yes
-	stockpiling_agricultural_stock_1 = yes
-	stockpiling_mining_stock_1 = yes
-	stockpiling_railroad_stock_1 = yes
-}
-
-stockpiling_currency = {
-
-	if  = {
-		limit  = {
-			money_value_dinar > 0
-		}
-		stockpiling_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_algerian_dinar > 0
-		}
-		stockpiling_dinar_algerian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_iraqi_dinar > 0
-		}
-		stockpiling_dinar_iraqi_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_libyan_dinar > 0
-		}
-		stockpiling_dinar_libyan_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_moroccan_dirham > 0
-		}
-		stockpiling_dinar_moroccan_dirham_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_omanian_rial > 0
-		}
-		stockpiling_dinar_omanian_rial_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_qiran > 0
-		}
-		stockpiling_dinar_qiran_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_saudi_riyal > 0
-		}
-		stockpiling_dinar_saudi_riyal_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_serbian_dinar > 0
-		}
-		stockpiling_dinar_serbian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_tunisian_dinar > 0
-		}
-		stockpiling_dinar_tunisian_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dinar_yugoslav_dinar > 0
-		}
-		stockpiling_dinar_yugoslav_dinar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_australian_dollar > 0
-		}
-		stockpiling_dollar_australian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_canadian_dollar > 0
-		}
-		stockpiling_dollar_canadian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_caribbean_dollar > 0
-		}
-		stockpiling_dollar_caribbean_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_confederate_states_dollar > 0
-		}
-		stockpiling_dollar_confederate_states_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_liberian_dollar > 0
-		}
-		stockpiling_dollar_liberian_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_new_zealand_dollar > 0
-		}
-		stockpiling_dollar_new_zealand_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_sierra_leonean_dollar > 0
-		}
-		stockpiling_dollar_sierra_leonean_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_dollar_united_states_dollar > 0
-		}
-		stockpiling_dollar_united_states_dollar_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ariary > 0
-		}
-		stockpiling_eco_ariary_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_central_african_eco > 0
-		}
-		stockpiling_eco_central_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_east_african_eco > 0
-		}
-		stockpiling_eco_east_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ethiopian_birr > 0
-		}
-		stockpiling_eco_ethiopian_birr_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_ghanaian_pound > 0
-		}
-		stockpiling_eco_ghanaian_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_nigerian_naira > 0
-		}
-		stockpiling_eco_nigerian_naira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_south_african_rand > 0
-		}
-		stockpiling_eco_south_african_rand_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_tuareg_ouguiya > 0
-		}
-		stockpiling_eco_tuareg_ouguiya_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_eco_west_african_eco > 0
-		}
-		stockpiling_eco_west_african_eco_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_belgian_franc > 0
-		}
-		stockpiling_franc_belgian_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_french_franc > 0
-		}
-		stockpiling_franc_french_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_luxembourgish_franc > 0
-		}
-		stockpiling_franc_luxembourgish_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_franc_swiss_franc > 0
-		}
-		stockpiling_franc_swiss_franc_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden > 0
-		}
-		stockpiling_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_bavarian_gulden > 0
-		}
-		stockpiling_gulden_bavarian_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_florin > 0
-		}
-		stockpiling_gulden_florin_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_hungarian_forint > 0
-		}
-		stockpiling_gulden_hungarian_forint_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_indies_guilder > 0
-		}
-		stockpiling_gulden_indies_guilder_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_gulden_south_german_gulden > 0
-		}
-		stockpiling_gulden_south_german_gulden_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_czech_koruna > 0
-		}
-		stockpiling_krone_czech_koruna_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_danish_krone > 0
-		}
-		stockpiling_krone_danish_krone_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_estonian_kroon > 0
-		}
-		stockpiling_krone_estonian_kroon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_icelandic_krona > 0
-		}
-		stockpiling_krone_icelandic_krona_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_norwegian_krone > 0
-		}
-		stockpiling_krone_norwegian_krone_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_slovak_koruna > 0
-		}
-		stockpiling_krone_slovak_koruna_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_krone_swedish_krona > 0
-		}
-		stockpiling_krone_swedish_krona_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_leon_leu > 0
-		}
-		stockpiling_leon_leu_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_leon_lev > 0
-		}
-		stockpiling_leon_lev_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira > 0
-		}
-		stockpiling_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_ducato > 0
-		}
-		stockpiling_lira_ducato_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_ottoman_lira > 0
-		}
-		stockpiling_lira_ottoman_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_scudo_pontificio > 0
-		}
-		stockpiling_lira_scudo_pontificio_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_scudo_sardo > 0
-		}
-		stockpiling_lira_scudo_sardo_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_lira_toscane_lira > 0
-		}
-		stockpiling_lira_toscane_lira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_mark > 0
-		}
-		stockpiling_mark_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_mark_finnish_markka > 0
-		}
-		stockpiling_mark_finnish_markka_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso > 0
-		}
-		stockpiling_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_argentine_peso > 0
-		}
-		stockpiling_peso_argentine_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_bolivien_peso > 0
-		}
-		stockpiling_peso_bolivien_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_chilean_peso > 0
-		}
-		stockpiling_peso_chilean_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_colombian_peso > 0
-		}
-		stockpiling_peso_colombian_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_costa_rican_colon > 0
-		}
-		stockpiling_peso_costa_rican_colon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_cuban_peso > 0
-		}
-		stockpiling_peso_cuban_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_ecuadorian_peso > 0
-		}
-		stockpiling_peso_ecuadorian_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_el_salvador_colon > 0
-		}
-		stockpiling_peso_el_salvador_colon_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_guatemalan_quetzal > 0
-		}
-		stockpiling_peso_guatemalan_quetzal_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_honduran_lempira > 0
-		}
-		stockpiling_peso_honduran_lempira_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_mexican_peso > 0
-		}
-		stockpiling_peso_mexican_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_nicaraguan_cordoba > 0
-		}
-		stockpiling_peso_nicaraguan_cordoba_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_paraguayan_peso > 0
-		}
-		stockpiling_peso_paraguayan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_philippine_peso > 0
-		}
-		stockpiling_peso_philippine_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_sol_de_oro > 0
-		}
-		stockpiling_peso_sol_de_oro_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_uruguayan_peso > 0
-		}
-		stockpiling_peso_uruguayan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_peso_venezuelan_peso > 0
-		}
-		stockpiling_peso_venezuelan_peso_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_egyptian_pound > 0
-		}
-		stockpiling_pound_egyptian_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_irish_pound > 0
-		}
-		stockpiling_pound_irish_pound_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_pound_sterling > 0
-		}
-		stockpiling_pound_sterling_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_real > 0
-		}
-		stockpiling_real_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_real_brazilian_real > 0
-		}
-		stockpiling_real_brazilian_real_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_rupee_indian_rupee > 0
-		}
-		stockpiling_rupee_indian_rupee_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_rupee_indonesian_rupiah > 0
-		}
-		stockpiling_rupee_indonesian_rupiah_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_baht > 0
-		}
-		stockpiling_spe_baht_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_dong > 0
-		}
-		stockpiling_spe_dong_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_drachma > 0
-		}
-		stockpiling_spe_drachma_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_korean_won > 0
-		}
-		stockpiling_spe_korean_won_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_latvian_lats > 0
-		}
-		stockpiling_spe_latvian_lats_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_lithuanian_litas > 0
-		}
-		stockpiling_spe_lithuanian_litas_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_peseta > 0
-		}
-		stockpiling_spe_peseta_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_ruble > 0
-		}
-		stockpiling_spe_ruble_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_uni > 0
-		}
-		stockpiling_spe_uni_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_yen > 0
-		}
-		stockpiling_spe_yen_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_yuan > 0
-		}
-		stockpiling_spe_yuan_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_spe_zloti > 0
-		}
-		stockpiling_spe_zloti_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_hannoveraner_thaler > 0
-		}
-		stockpiling_thaler_hannoveraner_thaler_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_prussian_thaler > 0
-		}
-		stockpiling_thaler_prussian_thaler_c_1 = yes
-	}
-	if  = {
-		limit  = {
-			money_value_thaler_saxon_thaler > 0
-		}
-		stockpiling_thaler_saxon_thaler_c_1 = yes
 	}
 }
 
@@ -770,41 +240,32 @@ stockpiling_currency = {
 ############################################################################################################################################################
 
 ef_on_half_yearly_pulse_recurence = {
-	#currency_strength_modifier = yes #-> central_bank_ef_on_half_yearly_pulse_country
-
 	#########################################
 	#ai strategy
 	#########################################
 	ai_building_strategy = yes
 	fluctuations_gdp_1_year = yes
 
-	if = {
-		limit = {
-			market.owner = root
-		}
-		trade_balance = yes
-	}
+	# if = {
+	# 	limit = {
+	# 		market.owner = root
+	# 	}
+	# 	trade_balance = yes #test  1  mois
+	# }
 }
 
 # ef_on_half_yearly_pulse_reset = {
 # }
 
 central_bank_ef_on_half_yearly_pulse_country = {
-	#test
-	currency_strength_modifier = yes
 
 	if  = {
 		limit  = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
-			# or  = {
-			# 	has_law = law_type:law_gold_standard
-			# 	has_law = law_type:law_gold_exchange_standard
-			# }
+			has_central_bank_SS_BS_GS_GES_NISO = yes 
 		}
 		fluctuations_money_value_1_year = yes
 		buy_sell_currency_order = yes
 	}
-
 	if  = {
 		limit = {
 			is_ai = yes
@@ -876,9 +337,6 @@ ef_on_yearly_pulse_recurence = {
 	#GDP var -> limité ? 100 premier pays uniquement
 	fluctuations_gdp_5_year = yes
 	fluctuations_gdp_10_year = yes
-
-	#central_bank_interest -> pour que l'on prete à un sujet il ne peut pas etre un sujet et doit avoir GS ou GES 
-	#central_bank_interest_refund_per_year_in_gold = yes #-> test deplacer dans central_bank_ef_on_yearly_pulse_country
 }
 
 ef_on_yearly_pulse_reset = {
@@ -1052,15 +510,14 @@ central_bank_ef_on_yearly_pulse_country = {
 	####
 	#test
 
-	#central_bank_interest -> pour que l'on prete à un sujet il ne peut pas etre un sujet et doit avoir GS ou GES 
+	#central_bank_interest -> pour que l'on prete à un sujet il ne peut pas etre un sujet et doit avoir GS ou GES
 	central_bank_interest_refund_per_year_in_gold = yes
 	####
 
 	if  = {
 		limit  = {
-			or  = {
-				has_law = law_type:law_gold_standard
-				has_law = law_type:law_gold_exchange_standard
+			or  = {			
+				has_central_bank_SS_BS_GS_GES_NISO = yes
 			}
 		}
 		cumulative_inflation_5_year = yes
@@ -1115,8 +572,31 @@ central_bank_ef_on_yearly_pulse_country = {
 	if = {
 		limit = {
 			has_law = law_type:law_gold_exchange_standard
+			#securisé avec un trigger qui est invalide si la pm no subjet currency est selectionné
 		}
 		central_bank_production_methods_3 = yes
+	}
+
+	#money_value_target for ssubjectt or 0
+	if = {
+		limit = {
+			is_ai = yes
+			or  = {
+				is_subject_custom_trigger = yes
+				var:money_value_target_1 = 0
+			}
+		}
+		money_value_target_modification = yes
+	}
+
+	#is_extreme_weak_currency_solution
+	if = {
+		limit = {
+			is_ai = yes
+			is_extreme_weak_currency = yes
+			is_revolutionary = no
+		}
+		extreme_weak_currency_solution = yes
 	}
 }
 
@@ -1155,6 +635,39 @@ financial_center_ef_on_yearly_pulse_country = {
 # 	}
 # }
 
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+# ███████╗    ██╗   ██╗███████╗ █████╗ ██████╗
+# ██╔════╝    ╚██╗ ██╔╝██╔════╝██╔══██╗██╔══██╗
+# ███████╗     ╚████╔╝ █████╗  ███████║██████╔╝
+# ╚════██║      ╚██╔╝  ██╔══╝  ██╔══██║██╔══██╗
+# ███████║       ██║   ███████╗██║  ██║██║  ██║
+# ╚══════╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+central_bank_ef_on_five_year_pulse_country = {
+
+	#money_value_target_modification #sswitch pour 5ans
+	if = {
+		limit = {
+			has_modifier = has_central_bank
+			is_ai = yes
+			not  = {
+				is_subject_custom_trigger = yes
+			}
+		}
+		money_value_target_modification = yes
+	}
+}
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -1281,7 +794,6 @@ financial_center_ef_on_yearly_pulse_country = {
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
-
 
 ai_building_strategy = {
 	# limit = {
@@ -1297,22 +809,16 @@ ai_building_strategy = {
 	#
 	# - en fct des strategie du pays developpement de secteur
 
-
-
-
 	#idée coode
 		#num_queued_private_constructions
 	# construction_queue_num_queued_private_levels
 	#construction_queue_private_duration
 
-
-
-
-
 	#building_ef_private_construction
 	if  = { #construit la difference de bd
 		limit  = {
 			building_ef_private_construction_lvl_to_build > 0
+			has_modifier = has_financial_center
 		}
 
 		#initialisation
@@ -3489,7 +2995,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar > 0
 		}
-		buy_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_state > 1000000
@@ -3502,7 +3018,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_algerian_dinar > 0
 		}
-		buy_dinar_algerian_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_algerian_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_algerian_dinar_state > 1000000
@@ -3515,7 +3041,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_iraqi_dinar > 0
 		}
-		buy_dinar_iraqi_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_iraqi_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_iraqi_dinar_state > 1000000
@@ -3528,7 +3064,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_libyan_dinar > 0
 		}
-		buy_dinar_libyan_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_libyan_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_libyan_dinar_state > 1000000
@@ -3541,7 +3087,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_moroccan_dirham > 0
 		}
-		buy_dinar_moroccan_dirham_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_moroccan_dirham_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_moroccan_dirham_state > 1000000
@@ -3554,7 +3110,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_omanian_rial > 0
 		}
-		buy_dinar_omanian_rial_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_omanian_rial_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_omanian_rial_state > 1000000
@@ -3567,7 +3133,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_qiran > 0
 		}
-		buy_dinar_qiran_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_qiran_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_qiran_state > 1000000
@@ -3580,7 +3156,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_saudi_riyal > 0
 		}
-		buy_dinar_saudi_riyal_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_saudi_riyal_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_saudi_riyal_state > 1000000
@@ -3593,7 +3179,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_serbian_dinar > 0
 		}
-		buy_dinar_serbian_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_serbian_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_serbian_dinar_state > 1000000
@@ -3606,7 +3202,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_tunisian_dinar > 0
 		}
-		buy_dinar_tunisian_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_tunisian_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_tunisian_dinar_state > 1000000
@@ -3619,7 +3225,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dinar_yugoslav_dinar > 0
 		}
-		buy_dinar_yugoslav_dinar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dinar_yugoslav_dinar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dinar_yugoslav_dinar_state > 1000000
@@ -3632,7 +3248,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_australian_dollar > 0
 		}
-		buy_dollar_australian_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_australian_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_australian_dollar_state > 1000000
@@ -3645,7 +3271,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_canadian_dollar > 0
 		}
-		buy_dollar_canadian_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_canadian_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_canadian_dollar_state > 1000000
@@ -3658,7 +3294,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_caribbean_dollar > 0
 		}
-		buy_dollar_caribbean_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_caribbean_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_caribbean_dollar_state > 1000000
@@ -3671,7 +3317,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_confederate_states_dollar > 0
 		}
-		buy_dollar_confederate_states_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_confederate_states_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_confederate_states_dollar_state > 1000000
@@ -3684,7 +3340,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_liberian_dollar > 0
 		}
-		buy_dollar_liberian_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_liberian_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_liberian_dollar_state > 1000000
@@ -3697,7 +3363,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_new_zealand_dollar > 0
 		}
-		buy_dollar_new_zealand_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_new_zealand_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_new_zealand_dollar_state > 1000000
@@ -3710,7 +3386,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_sierra_leonean_dollar > 0
 		}
-		buy_dollar_sierra_leonean_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_sierra_leonean_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_sierra_leonean_dollar_state > 1000000
@@ -3723,7 +3409,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_dollar_united_states_dollar > 0
 		}
-		buy_dollar_united_states_dollar_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_dollar_united_states_dollar_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_dollar_united_states_dollar_state > 1000000
@@ -3736,7 +3432,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_ariary > 0
 		}
-		buy_eco_ariary_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_ariary_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_ariary_state > 1000000
@@ -3749,7 +3455,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_central_african_eco > 0
 		}
-		buy_eco_central_african_eco_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_central_african_eco_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_central_african_eco_state > 1000000
@@ -3762,7 +3478,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_east_african_eco > 0
 		}
-		buy_eco_east_african_eco_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_east_african_eco_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_east_african_eco_state > 1000000
@@ -3775,7 +3501,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_ethiopian_birr > 0
 		}
-		buy_eco_ethiopian_birr_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_ethiopian_birr_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_ethiopian_birr_state > 1000000
@@ -3788,7 +3524,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_ghanaian_pound > 0
 		}
-		buy_eco_ghanaian_pound_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_ghanaian_pound_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_ghanaian_pound_state > 1000000
@@ -3801,7 +3547,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_nigerian_naira > 0
 		}
-		buy_eco_nigerian_naira_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_nigerian_naira_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_nigerian_naira_state > 1000000
@@ -3814,7 +3570,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_south_african_rand > 0
 		}
-		buy_eco_south_african_rand_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_south_african_rand_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_south_african_rand_state > 1000000
@@ -3827,7 +3593,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_tuareg_ouguiya > 0
 		}
-		buy_eco_tuareg_ouguiya_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_tuareg_ouguiya_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_tuareg_ouguiya_state > 1000000
@@ -3840,7 +3616,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_eco_west_african_eco > 0
 		}
-		buy_eco_west_african_eco_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_eco_west_african_eco_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_eco_west_african_eco_state > 1000000
@@ -3853,7 +3639,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_franc_belgian_franc > 0
 		}
-		buy_franc_belgian_franc_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_franc_belgian_franc_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_franc_belgian_franc_state > 1000000
@@ -3866,7 +3662,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_franc_french_franc > 0
 		}
-		buy_franc_french_franc_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_franc_french_franc_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_franc_french_franc_state > 1000000
@@ -3879,7 +3685,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_franc_luxembourgish_franc > 0
 		}
-		buy_franc_luxembourgish_franc_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_franc_luxembourgish_franc_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_franc_luxembourgish_franc_state > 1000000
@@ -3892,7 +3708,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_franc_swiss_franc > 0
 		}
-		buy_franc_swiss_franc_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_franc_swiss_franc_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_franc_swiss_franc_state > 1000000
@@ -3905,7 +3731,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden > 0
 		}
-		buy_gulden_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_state > 1000000
@@ -3918,7 +3754,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden_bavarian_gulden > 0
 		}
-		buy_gulden_bavarian_gulden_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_bavarian_gulden_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_bavarian_gulden_state > 1000000
@@ -3931,7 +3777,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden_florin > 0
 		}
-		buy_gulden_florin_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_florin_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_florin_state > 1000000
@@ -3944,7 +3800,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden_hungarian_forint > 0
 		}
-		buy_gulden_hungarian_forint_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_hungarian_forint_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_hungarian_forint_state > 1000000
@@ -3957,7 +3823,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden_indies_guilder > 0
 		}
-		buy_gulden_indies_guilder_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_indies_guilder_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_indies_guilder_state > 1000000
@@ -3970,7 +3846,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_gulden_south_german_gulden > 0
 		}
-		buy_gulden_south_german_gulden_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_gulden_south_german_gulden_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_gulden_south_german_gulden_state > 1000000
@@ -3983,7 +3869,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_czech_koruna > 0
 		}
-		buy_krone_czech_koruna_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_czech_koruna_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_czech_koruna_state > 1000000
@@ -3996,7 +3892,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_danish_krone > 0
 		}
-		buy_krone_danish_krone_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_danish_krone_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_danish_krone_state > 1000000
@@ -4009,7 +3915,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_estonian_kroon > 0
 		}
-		buy_krone_estonian_kroon_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_estonian_kroon_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_estonian_kroon_state > 1000000
@@ -4022,7 +3938,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_icelandic_krona > 0
 		}
-		buy_krone_icelandic_krona_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_icelandic_krona_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_icelandic_krona_state > 1000000
@@ -4035,7 +3961,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_norwegian_krone > 0
 		}
-		buy_krone_norwegian_krone_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_norwegian_krone_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_norwegian_krone_state > 1000000
@@ -4048,7 +3984,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_slovak_koruna > 0
 		}
-		buy_krone_slovak_koruna_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_slovak_koruna_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_slovak_koruna_state > 1000000
@@ -4061,7 +4007,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_krone_swedish_krona > 0
 		}
-		buy_krone_swedish_krona_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_krone_swedish_krona_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_krone_swedish_krona_state > 1000000
@@ -4074,7 +4030,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_leon_leu > 0
 		}
-		buy_leon_leu_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_leon_leu_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_leon_leu_state > 1000000
@@ -4087,7 +4053,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_leon_lev > 0
 		}
-		buy_leon_lev_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_leon_lev_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_leon_lev_state > 1000000
@@ -4100,7 +4076,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira > 0
 		}
-		buy_lira_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_state > 1000000
@@ -4113,7 +4099,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira_ducato > 0
 		}
-		buy_lira_ducato_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_ducato_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_ducato_state > 1000000
@@ -4126,7 +4122,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira_ottoman_lira > 0
 		}
-		buy_lira_ottoman_lira_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_ottoman_lira_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_ottoman_lira_state > 1000000
@@ -4139,7 +4145,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira_scudo_pontificio > 0
 		}
-		buy_lira_scudo_pontificio_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_scudo_pontificio_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_scudo_pontificio_state > 1000000
@@ -4152,7 +4168,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira_scudo_sardo > 0
 		}
-		buy_lira_scudo_sardo_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_scudo_sardo_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_scudo_sardo_state > 1000000
@@ -4165,7 +4191,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_lira_toscane_lira > 0
 		}
-		buy_lira_toscane_lira_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_lira_toscane_lira_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_lira_toscane_lira_state > 1000000
@@ -4178,7 +4214,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_mark > 0
 		}
-		buy_mark_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_mark_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_mark_state > 1000000
@@ -4191,7 +4237,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_mark_finnish_markka > 0
 		}
-		buy_mark_finnish_markka_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_mark_finnish_markka_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_mark_finnish_markka_state > 1000000
@@ -4204,7 +4260,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso > 0
 		}
-		buy_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_state > 1000000
@@ -4217,7 +4283,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_argentine_peso > 0
 		}
-		buy_peso_argentine_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_argentine_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_argentine_peso_state > 1000000
@@ -4230,7 +4306,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_bolivien_peso > 0
 		}
-		buy_peso_bolivien_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_bolivien_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_bolivien_peso_state > 1000000
@@ -4243,7 +4329,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_chilean_peso > 0
 		}
-		buy_peso_chilean_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_chilean_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_chilean_peso_state > 1000000
@@ -4256,7 +4352,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_colombian_peso > 0
 		}
-		buy_peso_colombian_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_colombian_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_colombian_peso_state > 1000000
@@ -4269,7 +4375,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_costa_rican_colon > 0
 		}
-		buy_peso_costa_rican_colon_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_costa_rican_colon_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_costa_rican_colon_state > 1000000
@@ -4282,7 +4398,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_cuban_peso > 0
 		}
-		buy_peso_cuban_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_cuban_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_cuban_peso_state > 1000000
@@ -4295,7 +4421,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_ecuadorian_peso > 0
 		}
-		buy_peso_ecuadorian_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_ecuadorian_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_ecuadorian_peso_state > 1000000
@@ -4308,7 +4444,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_el_salvador_colon > 0
 		}
-		buy_peso_el_salvador_colon_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_el_salvador_colon_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_el_salvador_colon_state > 1000000
@@ -4321,7 +4467,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_guatemalan_quetzal > 0
 		}
-		buy_peso_guatemalan_quetzal_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_guatemalan_quetzal_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_guatemalan_quetzal_state > 1000000
@@ -4334,7 +4490,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_honduran_lempira > 0
 		}
-		buy_peso_honduran_lempira_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_honduran_lempira_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_honduran_lempira_state > 1000000
@@ -4347,7 +4513,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_mexican_peso > 0
 		}
-		buy_peso_mexican_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_mexican_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_mexican_peso_state > 1000000
@@ -4360,7 +4536,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_nicaraguan_cordoba > 0
 		}
-		buy_peso_nicaraguan_cordoba_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_nicaraguan_cordoba_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_nicaraguan_cordoba_state > 1000000
@@ -4373,7 +4559,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_paraguayan_peso > 0
 		}
-		buy_peso_paraguayan_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_paraguayan_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_paraguayan_peso_state > 1000000
@@ -4386,7 +4582,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_philippine_peso > 0
 		}
-		buy_peso_philippine_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_philippine_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_philippine_peso_state > 1000000
@@ -4399,7 +4605,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_sol_de_oro > 0
 		}
-		buy_peso_sol_de_oro_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_sol_de_oro_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_sol_de_oro_state > 1000000
@@ -4412,7 +4628,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_uruguayan_peso > 0
 		}
-		buy_peso_uruguayan_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_uruguayan_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_uruguayan_peso_state > 1000000
@@ -4425,7 +4651,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_peso_venezuelan_peso > 0
 		}
-		buy_peso_venezuelan_peso_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_peso_venezuelan_peso_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_peso_venezuelan_peso_state > 1000000
@@ -4438,7 +4674,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_pound_egyptian_pound > 0
 		}
-		buy_pound_egyptian_pound_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_pound_egyptian_pound_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_pound_egyptian_pound_state > 1000000
@@ -4451,7 +4697,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_pound_irish_pound > 0
 		}
-		buy_pound_irish_pound_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_pound_irish_pound_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_pound_irish_pound_state > 1000000
@@ -4464,7 +4720,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_pound_sterling > 0
 		}
-		buy_pound_sterling_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_pound_sterling_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_pound_sterling_state > 1000000
@@ -4477,7 +4743,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_real > 0
 		}
-		buy_real_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_real_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_real_state > 1000000
@@ -4490,7 +4766,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_real_brazilian_real > 0
 		}
-		buy_real_brazilian_real_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_real_brazilian_real_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_real_brazilian_real_state > 1000000
@@ -4503,7 +4789,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_rupee_indian_rupee > 0
 		}
-		buy_rupee_indian_rupee_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_rupee_indian_rupee_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_rupee_indian_rupee_state > 1000000
@@ -4516,7 +4812,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_rupee_indonesian_rupiah > 0
 		}
-		buy_rupee_indonesian_rupiah_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_rupee_indonesian_rupiah_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_rupee_indonesian_rupiah_state > 1000000
@@ -4529,7 +4835,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_baht > 0
 		}
-		buy_spe_baht_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_baht_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_baht_state > 1000000
@@ -4542,7 +4858,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_dong > 0
 		}
-		buy_spe_dong_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_dong_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_dong_state > 1000000
@@ -4555,7 +4881,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_drachma > 0
 		}
-		buy_spe_drachma_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_drachma_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_drachma_state > 1000000
@@ -4568,7 +4904,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_korean_won > 0
 		}
-		buy_spe_korean_won_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_korean_won_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_korean_won_state > 1000000
@@ -4581,7 +4927,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_latvian_lats > 0
 		}
-		buy_spe_latvian_lats_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_latvian_lats_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_latvian_lats_state > 1000000
@@ -4594,7 +4950,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_lithuanian_litas > 0
 		}
-		buy_spe_lithuanian_litas_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_lithuanian_litas_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_lithuanian_litas_state > 1000000
@@ -4607,7 +4973,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_peseta > 0
 		}
-		buy_spe_peseta_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_peseta_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_peseta_state > 1000000
@@ -4620,7 +4996,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_ruble > 0
 		}
-		buy_spe_ruble_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_ruble_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_ruble_state > 1000000
@@ -4633,7 +5019,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_uni > 0
 		}
-		buy_spe_uni_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_uni_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_uni_state > 1000000
@@ -4646,7 +5042,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_yen > 0
 		}
-		buy_spe_yen_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_yen_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_yen_state > 1000000
@@ -4657,10 +5063,19 @@ ai_buy_sell_currency = {
 	}
 	if  = {
 		limit  = {
-			money_value_spe_
-			yuan > 0
+			money_value_spe_yuan > 0
 		}
-		buy_spe_yuan_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_yuan_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_yuan_state > 1000000
@@ -4673,7 +5088,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_spe_zloti > 0
 		}
-		buy_spe_zloti_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_spe_zloti_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_spe_zloti_state > 1000000
@@ -4686,7 +5111,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_thaler_hannoveraner_thaler > 0
 		}
-		buy_thaler_hannoveraner_thaler_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_thaler_hannoveraner_thaler_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_thaler_hannoveraner_thaler_state > 1000000
@@ -4699,7 +5134,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_thaler_prussian_thaler > 0
 		}
-		buy_thaler_prussian_thaler_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_thaler_prussian_thaler_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_thaler_prussian_thaler_state > 1000000
@@ -4712,7 +5157,17 @@ ai_buy_sell_currency = {
 		limit  = {
 			money_value_thaler_saxon_thaler > 0
 		}
-		buy_thaler_saxon_thaler_currency = yes
+		if  = {
+			limit = {
+				not = {
+					or   = {
+						is_weak_currency = yes
+						is_extreme_weak_currency = yes
+					}
+				}
+			}
+			buy_thaler_saxon_thaler_currency = yes
+		}
 		if  = {
 			limit  = {
 				stockpiling_thaler_saxon_thaler_state > 1000000
@@ -4721,7 +5176,6 @@ ai_buy_sell_currency = {
 			sell_thaler_saxon_thaler_currency = yes
 		}
 	}
-
 	#end_tag_3
 }
 all_currency_resold = {
@@ -4731,7 +5185,7 @@ all_currency_resold = {
 			scope:target_country = {
 				has_law = law_type:law_dinar_currency
 				or = {
-						var:currency_crisis = 1
+					var:currency_crisis = 1
 					var:central_bank_bankruptcy = 1
 				}
 			}
@@ -5207,7 +5661,7 @@ all_currency_resold = {
 			scope:target_country = {
 				has_law = law_type:law_gulden_florin_currency
 				or = {
-						var:currency_crisis = 1
+					var:currency_crisis = 1
 					var:central_bank_bankruptcy = 1
 				}
 			}
@@ -14118,8 +14572,6 @@ update_modifiers_bc_fc_ns = {
 			}
 		}
 		central_bank_modifier = yes
-		#regulation_law_gold_standard = yes
-
 		stockpiling_capital_state_transfert = yes
 	}
 	if = {
@@ -14199,6 +14651,5 @@ update_modifiers_bc_fc_ns = {
 			}
 		}
 		remove_law_currency = yes
-		#regulation_law_gold_standard = yes
 	}
 }

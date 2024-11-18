@@ -3567,24 +3567,12 @@ refund_credit_at_central_bank = {
 		var:refund_credit_at_central_bank < gold_reserves_var
 	}
 	effect = {
-		change_variable = {
-			name = credit_at_central_bank
-			subtract = var:refund_credit_at_central_bank
-		}
 		add_treasury = {
 			subtract = var:refund_credit_at_central_bank #debt_issued_relative_GDP
 		}
-
-		every_scope_state = {
-			if = {
-				limit = {
-					has_modifier = central_bank_historic_place
-				}
-				change_variable = {
-					name = central_bank_metal_reserves_state_1
-					add = owner.var:refund_credit_at_central_bank #debt_issued_relative_GDP
-				}
-			}
+		change_variable = {
+			name = credit_at_central_bank
+			subtract = var:refund_credit_at_central_bank
 		}
 		if = {
 			limit = {
@@ -3595,6 +3583,20 @@ refund_credit_at_central_bank = {
 				value = 0
 			}
 		}
+		change_variable = {
+			name = government_loan
+			subtract = var:refund_credit_at_central_bank
+		}
+		if = {
+			limit = {
+				var:government_loan < 0
+			}
+			set_variable = {
+				name = government_loan
+				value = 0
+			}
+		}
+
 		credit_at_central_bank_interest_per_week = yes
 		if = {
 			limit = {
@@ -3614,20 +3616,22 @@ refund_credit_at_central_bank_all = {
 		add_treasury = {
 			subtract = var:credit_at_central_bank #debt_issued_relative_GDP
 		}
-		every_scope_state = {
-			if = {
-				limit = {
-					has_modifier = central_bank_historic_place
-				}
-				change_variable = {
-					name = central_bank_metal_reserves_state_1
-					add = owner.credit_at_central_bank #debt_issued_relative_GDP
-				}
-			}
+		change_variable = {
+			name = government_loan
+			subtract = var:credit_at_central_bank
 		}
 		change_variable = {
 			name = credit_at_central_bank
 			subtract = var:credit_at_central_bank
+		}
+		if = {
+			limit = {
+				var:government_loan < 0
+			}
+			set_variable = {
+				name = government_loan
+				value = 0
+			}
 		}
 		credit_at_central_bank_interest_per_week = yes
 		if = {

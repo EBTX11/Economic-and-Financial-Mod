@@ -5115,7 +5115,7 @@ destroy_building_not_allowed = {
 ## for adding central bank and flavored financial center at game start
 initialize_historic_macro_facilities_bc = {
 	add_technology_researched = banking
-	add_technology_researched = fiat_standard
+	add_technology_researched = currency_standards
 	add_technology_researched = central_banking
 	add_technology_researched = metalique_standart
 
@@ -5135,7 +5135,9 @@ initialize_historic_macro_facilities_bc = {
 			}
 		}
 	}
-	update_modifiers_bc_fc_ns = yes
+	# update_modifiers_bc_fc_ns = yes
+	central_bank_modifier = yes
+
 }
 
 initialize_historic_macro_facilities_fc = {
@@ -5158,7 +5160,33 @@ initialize_historic_macro_facilities_fc = {
 			}
 		}
 	}
-	update_modifiers_bc_fc_ns = yes
+	#update_modifiers_bc_fc_ns = yes
+	financial_center_modifier = yes
+
+}
+
+initialize_historic_macro_facilities_ns = {  
+	add_technology_researched = stockpiling_goods
+	add_technology_researched = national_stockpile
+
+	$STOCKPILE_SITE$ = {
+		create_building = {
+			building = building_national_stockpile
+			level = 1
+		}
+		owner = {
+			add_modifier = {
+				name = has_national_stockpile
+			}
+			set_variable = {
+				name = stockpile_location
+				value = $STOCKPILE_SITE$
+			}
+		}
+	}
+	#update_modifiers_bc_fc_ns = yes
+	national_stockpile_modifier = yes
+
 }
 
 #####################################################################################################################################################
@@ -7620,6 +7648,22 @@ macro_facilities_bc = {
 	trigger_event = {
 		id = central_bank_event.1
 	}
+	central_bank_modifier = yes
+	central_bank_production_methods = yes
+	if = {
+		limit = {
+			market_owner_is_root = no
+			market_owner_is_root_univ_with_buiding = no #na pas la configuration deja sujet actif evite les répétition
+		}
+		central_bank_production_methods_2 = yes
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_gold_exchange_standard
+			#securisé avec un trigger qui est invalide si la pm no subjet currency est selectionné
+		}
+		central_bank_production_methods_3 = yes
+	}
 }
 
 #####################################################################################################################################################
@@ -8610,11 +8654,6 @@ macro_facilities_on_action_fc = { #comme il n'y a plus de niveau macro_facilitie
 				}
 			}
 		}
-
-		change_variable = {
-			name = test_var_1
-			add = 1
-		}
 	}
 }
 has_second_financial_center = { #est utilisé pourr fairre apparaitre les centrre financier si il n'existe plus
@@ -8670,11 +8709,6 @@ has_second_financial_center = { #est utilisé pourr fairre apparaitre les centrr
 			}
 		}
 		macro_facilities_on_action_fc = yes
-
-		change_variable = {
-			name = test_var_2
-			add = 1
-		}
 	}
 }
 
@@ -9477,10 +9511,6 @@ macro_facilities_fc_sax = {
 #reparation
 #####################################################################################################################################################
 has_tech_financial_center_but_no_building_financial_center = { #est utilisé pourr fairre apparaitre les centrre financier si il n'existe plus
-	### redundancy: treated in event central_bank_event.1
-	capital = {
-		save_scope_as = financial_center_site
-	}
 	if = {
 		limit = {
 			macro_facilities_on_action_fc_limit = yes
@@ -9489,14 +9519,11 @@ has_tech_financial_center_but_no_building_financial_center = { #est utilisé pou
 			}
 		}
 		macro_facilities_on_action_fc = yes
-
-		
-		change_variable = {
-			name = test_var_2
-			add = 1000
-		}
-
 	}
+
+		# capital = {
+	# 	save_scope_as = financial_center_site
+	# }
 }
 
 #####################################################################################################################################################
@@ -9539,38 +9566,7 @@ financial_center_respawn_after_crisis = {
 #####################################################################################################################################################
 
 #####################################################################################################################################################
-#history
-#####################################################################################################################################################
-## for adding national stockpile at game start
-initialize_historic_stockpile = {
-	add_technology_researched = stockpiling_goods
-	add_technology_researched = national_stockpile
-
-	$STOCKPILE_SITE$ = {
-		create_building = {
-			building = building_national_stockpile
-			level = 1
-		}
-		add_modifier = {
-			name = national_stockpile_place
-		}
-		add_modifier = {
-			name = national_stockpile_historic_place #central_bank_historic_place
-		}
-		owner = {
-			add_modifier = {
-				name = has_national_stockpile
-			}
-			set_variable = {
-				name = stockpile_location
-				value = $STOCKPILE_SITE$
-			}
-		}
-	}
-}
-
-#####################################################################################################################################################
-#reparation
+#on_action
 #####################################################################################################################################################
 macro_facilities_on_action_ns = {
 	if = {

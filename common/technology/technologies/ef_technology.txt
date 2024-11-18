@@ -1,6 +1,4 @@
-﻿### ERA 3
-
-stockpiling_goods = {
+﻿stockpiling_goods = {
 	era = era_1
 	texture = "gfx/interface/icons/invention_icons/stockpiling_goods.dds"
 	category = society
@@ -22,21 +20,7 @@ national_stockpile = {
 		stockpiling_goods
 	}
 	on_researched = {
-		if  = {
-			limit = {
-				is_invalid_country = no
-				is_revolutionary = no #?
-				is_subject_custom_trigger = no
-				or = {
-					is_valid_country = yes
-					gdp_view >= 1
-					is_player = yes
-				}
-			}
-			trigger_event = {
-				id = national_stockpile_event.1
-			}
-		}
+		macro_facilities_on_action_ns = yes
 	}
 
 	ai_weight = {
@@ -62,16 +46,11 @@ currency_standards = {
 						has_technology_researched = metalique_standart
 					}
 				}
-				# is_ai = yes
-				# or = {
-				# 	is_invalid_country = yes
-				# 	is_valid_country = no
-				# }
 			}
 			trigger_event = {
-				id = fiat_standard_event.1
+				id = fiat_standard_event.1 #for interface
 			}
-			activate_law = law_type:law_silver_standard
+			activate_law = law_type:law_fiat_standard
 		}
 	}
 
@@ -100,7 +79,7 @@ banking = {
 	}
 
 	on_researched = {
-		add_technology_researched = fiat_standard
+		add_technology_researched = currency_standards 
 	}
 
 	ai_weight = {
@@ -178,11 +157,18 @@ metalique_standart = {
 	on_researched = {
 		if = {
 			limit = {
+				has_law = law_type:law_no_monetary_system
 				not = {
 					has_law = law_type:law_isolationism
 				}
 			}
-			#activate_law = law_type:law_gold_standard
+			activate_law = law_type:law_silver_standard
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_isolationism
+			}
+			activate_law = law_type:law_fiat_standard
 		}
 	}
 
@@ -190,7 +176,6 @@ metalique_standart = {
 		value = 100
 	}
 }
-
 corporate_charters = {
 	era = era_2
 	texture = "gfx/interface/icons/invention_icons/corporate_charters.dds"
@@ -222,23 +207,7 @@ financial_center = {
 		country_institution_economic_central_bank_max_investment_add = 1
 	}
 	on_researched = {
-		if  = {
-			# limit = {
-			# 	is_invalid_country = no
-			# 	is_revolutionary =  no
-			# 	or = {
-			# 		is_subject_custom_trigger = no
-			# 	}
-			# 	or = {
-			# 		is_valid_country = yes
-			# 		gdp_view >= 1
-			# 		is_player = yes
-			# 	}
-			# }
-			trigger_event = {
-				id = financial_center_event.1
-			}
-		}
+		macro_facilities_on_action_fc = yes
 	}
 
 	ai_weight = {
@@ -338,6 +307,65 @@ international_exchange_standards = {
 		value = 1
 	}
 }
+joint_stock_companies = {
+	era = era_2
+	texture = "gfx/interface/icons/invention_icons/joint_stock_companies.dds"
+	category = society
+
+	modifier = {
+		country_max_companies_add = 1
+		state_urbanization_per_level_mult = -0.1
+	}
+
+	unlocking_technologies = {
+		#central_banking
+		#corporate_charters
+		stock_exchange
+		financial_center
+	}
+
+	ai_weight = {
+		value = 2 # important tech
+	}
+}
+postal_savings = {
+	era = era_2
+	texture = "gfx/interface/icons/invention_icons/postal_savings.dds"
+	category = society
+
+	modifier = {
+		state_farmers_investment_pool_efficiency_mult = 0.15
+		state_shopkeepers_investment_pool_efficiency_mult = 0.15
+		building_cash_reserves_mult = 0.2
+		financial_product_by_trade_route_mult = 0.25
+	}
+
+	unlocking_technologies = {
+		stock_exchange
+	}
+
+	ai_weight = {
+		value = 1
+	}
+}
+modern_financial_instruments = {
+	era = era_5
+	texture = "gfx/interface/icons/invention_icons/modern_financial_instruments.dds"
+	category = society
+	modifier = {
+		country_minting_mult = 0.1
+		country_loan_interest_rate_add = -0.02
+		country_government_dividends_efficiency_add = 0.05
+		financial_product_by_trade_route_mult = 0.25
+	}
+	unlocking_technologies = {
+		international_exchange_standards
+	}
+
+	ai_weight = {
+		value = 1
+	}
+}
 
 # floating_exchange_rates = {
 # 	era = era_5
@@ -364,90 +392,3 @@ international_exchange_standards = {
 # 		value = 0.25
 # 	}
 # }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#other to delect or remplece
-
-joint_stock_companies = {
-	era = era_2
-	texture = "gfx/interface/icons/invention_icons/joint_stock_companies.dds"
-	category = society
-
-	modifier = {
-		country_max_companies_add = 1
-		state_urbanization_per_level_mult = -0.1
-	}
-
-	unlocking_technologies = {
-		#central_banking
-		#corporate_charters
-		stock_exchange
-		financial_center
-	}
-
-	ai_weight = {
-		value = 2 # important tech
-	}
-}
-
-postal_savings = {
-	era = era_2
-	texture = "gfx/interface/icons/invention_icons/postal_savings.dds"
-	category = society
-	
-	modifier = {
-		state_farmers_investment_pool_efficiency_mult = 0.15
-		state_shopkeepers_investment_pool_efficiency_mult = 0.15
-		building_cash_reserves_mult = 0.2
-		financial_product_by_trade_route_mult = 0.25
-	}
-	
-	unlocking_technologies = {
-		stock_exchange
-	}
-	
-	ai_weight = {
-		value = 1
-	}
-}
-
-modern_financial_instruments = {
-	era = era_5
-	texture = "gfx/interface/icons/invention_icons/modern_financial_instruments.dds"
-	category = society
-	modifier = {
-		country_minting_mult = 0.1
-		country_loan_interest_rate_add = -0.02	
-		country_government_dividends_efficiency_add = 0.05
-		financial_product_by_trade_route_mult = 0.25
-	}
-	unlocking_technologies = {
-		international_exchange_standards
-	}
-	
-	ai_weight = {
-		value = 1
-	}
-}

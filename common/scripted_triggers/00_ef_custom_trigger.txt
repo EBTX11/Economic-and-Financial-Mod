@@ -45,33 +45,6 @@ building_financial_centre_spe = {
 }
 #####################################################################################################################################################
 
-
-
-#####################################################################################################################################################
-market_owner_is_root = {
-	market.owner = root
-}
-market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente 
-	any_scope_state = { 
-		is_production_method_active = {
-			building_type = building_bank
-			production_method = pm_no_metal_consuption
-		}
-		not = {
-			is_production_method_active = {
-				building_type = building_bank
-				production_method = pm_no_subject_currency_type
-			}
-		}
-	}
-}
-market_owner_power_bloc_leader = {
-	is_power_bloc_leader = yes
-}
-
-
-
-
 #####################################################################################################################################################
 owner_is_player = {
 	owner = {
@@ -98,11 +71,21 @@ owner_is_player = {
 # 	}
 # }
 
-
-
+has_central_bank_SS_BS_GS_NISO = {
+	has_modifier = has_central_bank
+	or = {
+		has_law = law_type:law_silver_standard
+		has_law = law_type:law_bimetallism_standard
+		has_law = law_type:law_gold_standard
+	}
+	not = {
+		has_law = law_type:law_isolationism
+	}
+}
 has_central_bank_SS_BS_GS_GES_NISO = {
 	has_modifier = has_central_bank
 	or = {
+		#has_law = law_type:law_fiat_standard #test
 		has_law = law_type:law_silver_standard
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
@@ -111,6 +94,33 @@ has_central_bank_SS_BS_GS_GES_NISO = {
 	not = {
 		has_law = law_type:law_isolationism
 	}
+}
+has_central_bank_FS_SS_BS_GS_GES = {
+	has_modifier = has_central_bank
+	or = {
+		has_law = law_type:law_fiat_standard #test
+		has_law = law_type:law_silver_standard
+		has_law = law_type:law_bimetallism_standard
+		has_law = law_type:law_gold_standard
+		has_law = law_type:law_gold_exchange_standard
+	}
+}
+has_central_bank_FS_SS_BS_GS_GES_NISO = {
+	has_modifier = has_central_bank
+	or = {
+		has_law = law_type:law_fiat_standard #test
+		has_law = law_type:law_silver_standard
+		has_law = law_type:law_bimetallism_standard
+		has_law = law_type:law_gold_standard
+		has_law = law_type:law_gold_exchange_standard
+	}
+	not = {
+		has_law = law_type:law_isolationism
+	}
+}
+has_central_bank_GES = {
+	has_modifier = has_central_bank
+	has_law = law_type:law_gold_exchange_standard
 }
 has_central_bank_SS_BS_GS_GES = {
 	has_modifier = has_central_bank
@@ -175,7 +185,134 @@ is_not_market_owner = {
 		}
 	}
 }
+
+market_owner_is_root = {
+	market.owner = root
+}
+market_owner_is_root_2 = {
+	is_in_power_bloc = yes
+	is_power_bloc_leader = no
+}
+
+no_indepeendeent_market = {
+	or = {
+		is_subject_custom_trigger = yes
+		market_owner_is_root_2 =  yes
+	}
+}
+market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente 
+	any_scope_state = { 
+		is_production_method_active = {
+			building_type = building_bank
+			production_method = pm_no_metal_consuption
+		}
+		not = {
+			is_production_method_active = {
+				building_type = building_bank
+				production_method = pm_no_subject_currency_type
+			}
+		}
+	}
+}
+market_owner_power_bloc_leader = {
+	is_power_bloc_leader = yes
+}
 #####################################################################################################################################################
+
+
+
+
+#####################################################################################################################################################
+
+# or = {
+# 	has_modifier = strong_currency
+# 	has_modifier = reference_currency_no
+# 	has_modifier = reference_currency
+# }
+is_reference_currency = {
+	has_modifier = has_central_bank
+	has_modifier = global_monetary_reference
+	money_value_in_gold > global_var:money_value_median
+}
+is_reference_currency_no = {
+	has_modifier = has_central_bank
+	has_modifier = global_monetary_reference
+	money_value_in_gold < global_var:money_value_median
+}
+is_strong_currency = {
+	has_modifier = has_central_bank
+	not = {
+		has_modifier = global_monetary_reference
+	}
+	money_value_in_gold > money_value_median_1_25
+	#pb  peut  y  avvoir  ddes sttro,g  currency  avec  petit  money  supply  est  ou  petit national  cap
+	#central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
+}
+is_balanced_currency = {
+	has_modifier = has_central_bank
+	not = {
+		has_modifier = global_monetary_reference
+	}
+
+	money_value_in_gold < money_value_median_1_25
+
+
+	or = { 
+		is_on_top_10_national_capacity = yes
+		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
+	}
+	
+	or = { 
+		is_on_top_10_national_capacity = yes
+		money_value_in_gold > money_value_median_0_75
+	}
+}
+is_weak_currency = {
+	has_modifier = has_central_bank
+	not = {
+		has_modifier = global_monetary_reference
+	}
+	is_on_top_10_national_capacity  = no
+	money_value_in_gold < money_value_median_0_75
+	money_value_in_gold > 0.01
+}
+is_extreme_weak_currency = {
+	has_modifier = extreme_weak_currency
+	has_modifier = has_central_bank
+	not = {
+		has_modifier = global_monetary_reference
+		is_subject = yes
+	}
+}
+
+is_on_top_10_national_capacity_and_cap_sup_75 = {
+	is_on_top_10_national_capacity = yes
+	central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
+}
+is_on_top_10_national_capacity = {
+	
+	# any_in_global_list = {
+	# 	variable = dinar_iraqi_dinar_currency_law_list_ordered_1 #overrated_currency_list
+	# 	this = root
+	# }
+	any_in_list = {
+		variable = national_capacity_variable_list_ordered_1
+		this = root
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #####################################################################################################################################################
 is_in_devaluation = {
@@ -211,79 +348,53 @@ is_in_revaluation = {
 #####################################################################################################################################################
 
 buy_currency_1 = {
-	money_value < money_value_target_real_below_25 #la monaie sous evalué à plus de 10% de la money_value
+	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste 
+	money_value_in_gold < money_value_target_real_below_25  #la monaie sous evalué à plus de 10% de la money_value
 	not = {  #pas d'achat sisujet , a le modifier d'echnge monetaire, a la loi isolationniste
-		# is_subject = yes #/ market_owner_is_root = yes #marche pas attention if faut l'autre
-		# not = {
-		# 	#market_owner_is_root
-		# 	any_scope_state = {
-		# 		is_production_method_active = {
-		# 			building_type = building_bank
-		# 			production_method = pm_no_metal_consuption
-		# 		}
-		# 		not = {
-		# 			is_production_method_active = {
-		# 				building_type = building_bank
-		# 				production_method = pm_no_subject_currency_type
-		# 			}
-		# 		}
-		# 	}
-		# }
-
-		has_modifier = economic_instability
-		var:currency_crisis = 1
-		var:central_bank_bankruptcy = 1
-		infamy >= infamy_threshold:pariah
+		has_law = law_type:law_gold_exchange_standard # le GSE n'est plus réguler par les autre pays dans le future ajouter des méchanique pour que le pays ne puisse pas vendre la devise de référence et qui s'equilibre avec en l'achetant avec le reste d'or
+		or = { #ce n'est pas le role de cette effecte donc ne fait rien avec pays qui ont ces modifier
+			has_modifier = economic_instability
+			var:currency_crisis = 1
+			var:central_bank_bankruptcy = 1
+			infamy >= infamy_threshold:pariah
+			has_modifier = foreign_exchange_controls
+		}
 	}
 }
 sell_currency_1 = {
-	has_central_bank_SS_BS_GS_GES_NISO = yes
-	not = {
-		# is_subject = yes #/ market_owner_is_root = yes #marche pas attention if faut l'autre
-		# not = {
-		# 	#market_owner_is_root
-		# 	any_scope_state = {
-		# 		is_production_method_active = {
-		# 			building_type = building_bank
-		# 			production_method = pm_no_metal_consuption
-		# 		}
-		# 		not = {
-		# 			is_production_method_active = {
-		# 				building_type = building_bank
-		# 				production_method = pm_no_subject_currency_type
-		# 			}
-		# 		}
-		# 	}
-		# }
-	}
-	#2 possibilité:
-	OR = {
-		#buyer
-		money_value > money_value_target_real_above_25 #- soit la valeur doit etre equilibré car le pays qui rachete sa devise est sur-évaluée
+	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste 
 
-		#seller
-		scope:seller.trade_balance_in_currency < 0 #- soit le pays vendeur à un deficite à comblé est a besoins d'or donc il vent sont exédent
-		scope:seller.central_bank_metal_reserves_state < 0
-		scope:seller.central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
-
-		#crisis
-		has_modifier = economic_instability
-		var:currency_crisis = 1
-		var:central_bank_bankruptcy = 1
-		infamy >= infamy_threshold:pariah
+	money_value_in_gold > money_value_target_real_above_25 #- soit la valeur doit etre equilibré car le pays qui rachete sa devise est sur-évaluée
+	not = {  #pas d'achat sisujet , a le modifier d'echnge monetaire, a la loi isolationniste
+		has_law = law_type:law_gold_exchange_standard # le GSE n'est plus réguler par les autre pays dans le future ajouter des méchanique pour que le pays ne puisse pas vendre la devise de référence et qui s'equilibre avec en l'achetant avec le reste d'or
+		or = { #ce n'est pas le role de cette effecte donc ne fait rien avec pays qui ont ces modifier
+			has_modifier = economic_instability
+			var:currency_crisis = 1
+			var:central_bank_bankruptcy = 1
+			infamy >= infamy_threshold:pariah
+			has_modifier = foreign_exchange_controls
+		}
 	}
+
+	# OR = { #pas sa place ici
+	# 	#seller_root
+	# 	scope:seller_root.trade_balance_in_currency < 0 #- soit le pays vendeur à un deficite à comblé est a besoins d'or donc il vent sont exédent
+	# 	scope:seller_root.central_bank_metal_reserves_state < 0
+	# 	scope:seller_root.central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
+	# }
 }
-sell_currency_2 = {
-	scope:overrated_currency_country_owner = {
+sell_currency_crisis_1 = {
+	or  = {
 		has_modifier = economic_instability
 		var:currency_crisis = 1
-		var:central_bank_bankruptcy = 1
-		infamy >= infamy_threshold:pariah
 	}
-	#seller vend forcément car il a besoins d'or
-	scope:seller.trade_balance_in_currency < 0
-	scope:seller.central_bank_metal_reserves_state < 0
-	scope:seller.central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
+	or  = {
+		has_modifier = economic_instability
+		var:central_bank_bankruptcy = 1
+	}
+	not = { #ce n'est pas le role de cette effecte donc ne fait rien avec pays qui ont ces modifier
+		has_law = law_type:law_gold_exchange_standard
+	}
 }
 
 #####################################################################################################################################################
@@ -605,35 +716,43 @@ country_already_national_stockpile = {
 #####################################################################################################################################################
 macro_facilities_on_action_bc_limit = {
 	has_technology_researched = central_banking
-	is_revolutionary =  no
-	is_invalid_country = no
+	is_revolutionary = no
 	or = {
-		is_valid_country = yes
+		is_invalid_country = no
+		is_player = yes
+	}
+	or = {
+		is_valid_country = yes #date de la bc
 		country_already_central_bank = yes
-		var:gdp_view >= 1
+		var:gdp_view >= 1 #AI que à partir de 5M  GDP
 		is_player = yes
 	}
 }
 macro_facilities_on_action_fc_limit = {
 	has_technology_researched = financial_center
-	is_invalid_country = no
-	is_revolutionary =  no	
+	is_revolutionary = no
 	or = {
-		var:gdp_view >= 1
+		is_invalid_country = no
+		is_player = yes
+	}
+	or = {
+		var:gdp_view >= 1 #AI que à partir de 5M  GDP
 		country_already_financial_center = yes
 		is_player = yes
 	}
 }
 macro_facilities_on_action_ns_limit = {
 	has_technology_researched = national_stockpile
-
-	is_revolutionary =  no
+	is_revolutionary = no
 	is_invalid_country = no
+	or = {
+		is_invalid_country = no
+		is_player = yes
+	}
 	market_owner_is_root = yes
 	or = {
-		#is_valid_country = yes #necessite juste la tech à voir le reste
 		country_already_national_stockpile = yes
-		var:gdp_view >= 1
+		var:gdp_view >= 1 #AI que à partir de 5M  GDP
 		is_player = yes
 	}
 }
@@ -806,6 +925,7 @@ country_is_in_unwanted_region = {
 			c:PHI ?= this
 			c:BGL ?= this
 			c:HND ?= this
+			c:BHT ?= this
 			is_player = yes
 		}
 	}
@@ -1047,3 +1167,3602 @@ ai_purchase_territory_valid_NGF = {
 }
 
 #####################################################################################################################################################
+
+#dinar
+law_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_algerian_dinar
+law_dinar_algerian_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_algerian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_algerian_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_algerian_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_algerian_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_algerian_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_algerian_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_algerian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_iraqi_dinar
+law_dinar_iraqi_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_iraqi_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_iraqi_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_iraqi_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_iraqi_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_iraqi_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_iraqi_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_iraqi_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_libyan_dinar
+law_dinar_libyan_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_libyan_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_libyan_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_libyan_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_libyan_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_libyan_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_libyan_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_libyan_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_moroccan_dirham
+law_dinar_moroccan_dirham_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_moroccan_dirham_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_moroccan_dirham_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_moroccan_dirham_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_moroccan_dirham_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_moroccan_dirham_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_moroccan_dirham_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_moroccan_dirham_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_omanian_rial
+law_dinar_omanian_rial_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_omanian_rial_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_omanian_rial_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_omanian_rial_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_omanian_rial_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_omanian_rial_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_omanian_rial_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_omanian_rial_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_qiran
+law_dinar_qiran_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_qiran_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_qiran_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_qiran_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_qiran_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_qiran_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_qiran_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_qiran_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_saudi_riyal
+law_dinar_saudi_riyal_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_saudi_riyal_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_saudi_riyal_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_saudi_riyal_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_saudi_riyal_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_saudi_riyal_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_saudi_riyal_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_saudi_riyal_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_serbian_dinar
+law_dinar_serbian_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_serbian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_serbian_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_serbian_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_serbian_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_serbian_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_serbian_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_serbian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_tunisian_dinar
+law_dinar_tunisian_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_tunisian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_tunisian_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_tunisian_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_tunisian_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_tunisian_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_tunisian_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_tunisian_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dinar_yugoslav_dinar
+law_dinar_yugoslav_dinar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_yugoslav_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dinar_yugoslav_dinar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dinar_yugoslav_dinar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dinar_yugoslav_dinar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dinar_yugoslav_dinar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dinar_yugoslav_dinar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dinar_yugoslav_dinar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_australian_dollar
+law_dollar_australian_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_australian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_australian_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_australian_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_australian_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_australian_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_australian_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_australian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_canadian_dollar
+law_dollar_canadian_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_canadian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_canadian_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_canadian_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_canadian_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_canadian_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_canadian_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_canadian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_caribbean_dollar
+law_dollar_caribbean_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_caribbean_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_caribbean_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_caribbean_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_caribbean_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_caribbean_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_caribbean_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_caribbean_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_confederate_states_dollar
+law_dollar_confederate_states_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_confederate_states_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_confederate_states_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_confederate_states_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_confederate_states_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_confederate_states_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_confederate_states_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_confederate_states_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_liberian_dollar
+law_dollar_liberian_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_liberian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_liberian_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_liberian_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_liberian_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_liberian_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_liberian_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_liberian_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_new_zealand_dollar
+law_dollar_new_zealand_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_new_zealand_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_new_zealand_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_new_zealand_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_new_zealand_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_new_zealand_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_new_zealand_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_new_zealand_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_sierra_leonean_dollar
+law_dollar_sierra_leonean_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_sierra_leonean_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_sierra_leonean_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_sierra_leonean_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_sierra_leonean_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_sierra_leonean_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_sierra_leonean_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_sierra_leonean_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#dollar_united_states_dollar
+law_dollar_united_states_dollar_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_united_states_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_dollar_united_states_dollar_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = dollar_united_states_dollar_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_dollar_united_states_dollar_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = dollar_united_states_dollar_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_dollar_united_states_dollar_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = dollar_united_states_dollar_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_ariary
+law_eco_ariary_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ariary_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_ariary_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_ariary_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_ariary_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ariary_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_ariary_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_ariary_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_central_african_eco
+law_eco_central_african_eco_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_central_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_central_african_eco_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_central_african_eco_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_central_african_eco_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_central_african_eco_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_central_african_eco_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_central_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_east_african_eco
+law_eco_east_african_eco_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_east_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_east_african_eco_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_east_african_eco_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_east_african_eco_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_east_african_eco_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_east_african_eco_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_east_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_ethiopian_birr
+law_eco_ethiopian_birr_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ethiopian_birr_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_ethiopian_birr_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_ethiopian_birr_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_ethiopian_birr_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ethiopian_birr_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_ethiopian_birr_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_ethiopian_birr_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_ghanaian_pound
+law_eco_ghanaian_pound_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ghanaian_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_ghanaian_pound_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_ghanaian_pound_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_ghanaian_pound_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_ghanaian_pound_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_ghanaian_pound_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_ghanaian_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_nigerian_naira
+law_eco_nigerian_naira_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_nigerian_naira_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_nigerian_naira_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_nigerian_naira_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_nigerian_naira_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_nigerian_naira_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_nigerian_naira_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_nigerian_naira_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_south_african_rand
+law_eco_south_african_rand_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_south_african_rand_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_south_african_rand_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_south_african_rand_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_south_african_rand_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_south_african_rand_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_south_african_rand_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_south_african_rand_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_tuareg_ouguiya
+law_eco_tuareg_ouguiya_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_tuareg_ouguiya_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_tuareg_ouguiya_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_tuareg_ouguiya_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_tuareg_ouguiya_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_tuareg_ouguiya_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_tuareg_ouguiya_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_tuareg_ouguiya_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#eco_west_african_eco
+law_eco_west_african_eco_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_west_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_eco_west_african_eco_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = eco_west_african_eco_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_eco_west_african_eco_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = eco_west_african_eco_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_eco_west_african_eco_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = eco_west_african_eco_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#franc_belgian_franc
+law_franc_belgian_franc_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_belgian_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_franc_belgian_franc_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = franc_belgian_franc_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_franc_belgian_franc_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_belgian_franc_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_franc_belgian_franc_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = franc_belgian_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#franc_french_franc
+law_franc_french_franc_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_french_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_franc_french_franc_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = franc_french_franc_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_franc_french_franc_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_french_franc_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_franc_french_franc_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = franc_french_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#franc_luxembourgish_franc
+law_franc_luxembourgish_franc_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_luxembourgish_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_franc_luxembourgish_franc_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = franc_luxembourgish_franc_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_franc_luxembourgish_franc_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_luxembourgish_franc_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_franc_luxembourgish_franc_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = franc_luxembourgish_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#franc_swiss_franc
+law_franc_swiss_franc_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_swiss_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_franc_swiss_franc_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = franc_swiss_franc_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_franc_swiss_franc_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = franc_swiss_franc_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_franc_swiss_franc_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = franc_swiss_franc_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden
+law_gulden_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden_bavarian_gulden
+law_gulden_bavarian_gulden_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_bavarian_gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_bavarian_gulden_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_bavarian_gulden_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_bavarian_gulden_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_bavarian_gulden_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_bavarian_gulden_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_bavarian_gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden_florin
+law_gulden_florin_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_florin_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_florin_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_florin_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_florin_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_florin_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_florin_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_florin_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden_hungarian_forint
+law_gulden_hungarian_forint_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_hungarian_forint_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_hungarian_forint_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_hungarian_forint_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_hungarian_forint_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_hungarian_forint_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_hungarian_forint_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_hungarian_forint_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden_indies_guilder
+law_gulden_indies_guilder_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_indies_guilder_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_indies_guilder_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_indies_guilder_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_indies_guilder_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_indies_guilder_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_indies_guilder_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_indies_guilder_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#gulden_south_german_gulden
+law_gulden_south_german_gulden_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_south_german_gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_gulden_south_german_gulden_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = gulden_south_german_gulden_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_gulden_south_german_gulden_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = gulden_south_german_gulden_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_gulden_south_german_gulden_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = gulden_south_german_gulden_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_czech_koruna
+law_krone_czech_koruna_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_czech_koruna_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_czech_koruna_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_czech_koruna_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_czech_koruna_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_czech_koruna_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_czech_koruna_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_czech_koruna_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_danish_krone
+law_krone_danish_krone_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_danish_krone_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_danish_krone_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_danish_krone_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_danish_krone_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_danish_krone_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_danish_krone_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_danish_krone_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_estonian_kroon
+law_krone_estonian_kroon_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_estonian_kroon_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_estonian_kroon_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_estonian_kroon_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_estonian_kroon_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_estonian_kroon_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_estonian_kroon_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_estonian_kroon_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_icelandic_krona
+law_krone_icelandic_krona_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_icelandic_krona_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_icelandic_krona_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_icelandic_krona_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_icelandic_krona_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_icelandic_krona_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_icelandic_krona_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_icelandic_krona_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_norwegian_krone
+law_krone_norwegian_krone_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_norwegian_krone_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_norwegian_krone_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_norwegian_krone_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_norwegian_krone_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_norwegian_krone_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_norwegian_krone_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_norwegian_krone_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_slovak_koruna
+law_krone_slovak_koruna_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_slovak_koruna_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_slovak_koruna_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_slovak_koruna_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_slovak_koruna_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_slovak_koruna_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_slovak_koruna_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_slovak_koruna_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#krone_swedish_krona
+law_krone_swedish_krona_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_swedish_krona_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_krone_swedish_krona_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = krone_swedish_krona_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_krone_swedish_krona_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = krone_swedish_krona_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_krone_swedish_krona_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = krone_swedish_krona_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#leon_leu
+law_leon_leu_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = leon_leu_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_leon_leu_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = leon_leu_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_leon_leu_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = leon_leu_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_leon_leu_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = leon_leu_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#leon_lev
+law_leon_lev_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = leon_lev_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_leon_lev_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = leon_lev_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_leon_lev_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = leon_lev_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_leon_lev_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = leon_lev_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira
+law_lira_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira_ducato
+law_lira_ducato_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_ducato_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_ducato_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_ducato_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_ducato_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_ducato_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_ducato_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_ducato_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira_ottoman_lira
+law_lira_ottoman_lira_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_ottoman_lira_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_ottoman_lira_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_ottoman_lira_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_ottoman_lira_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_ottoman_lira_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_ottoman_lira_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_ottoman_lira_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira_scudo_pontificio
+law_lira_scudo_pontificio_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_pontificio_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_scudo_pontificio_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_pontificio_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_scudo_pontificio_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_pontificio_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_scudo_pontificio_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_pontificio_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira_scudo_sardo
+law_lira_scudo_sardo_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_sardo_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_scudo_sardo_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_sardo_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_scudo_sardo_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_sardo_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_scudo_sardo_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_scudo_sardo_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#lira_toscane_lira
+law_lira_toscane_lira_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_toscane_lira_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_lira_toscane_lira_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = lira_toscane_lira_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_lira_toscane_lira_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = lira_toscane_lira_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_lira_toscane_lira_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = lira_toscane_lira_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#mark
+law_mark_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = mark_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_mark_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = mark_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_mark_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = mark_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_mark_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = mark_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#mark_finnish_markka
+law_mark_finnish_markka_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = mark_finnish_markka_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_mark_finnish_markka_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = mark_finnish_markka_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_mark_finnish_markka_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = mark_finnish_markka_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_mark_finnish_markka_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = mark_finnish_markka_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso
+law_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_argentine_peso
+law_peso_argentine_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_argentine_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_argentine_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_argentine_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_argentine_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_argentine_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_argentine_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_argentine_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_bolivien_peso
+law_peso_bolivien_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_bolivien_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_bolivien_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_bolivien_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_bolivien_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_bolivien_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_bolivien_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_bolivien_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_chilean_peso
+law_peso_chilean_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_chilean_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_chilean_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_chilean_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_chilean_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_chilean_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_chilean_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_chilean_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_colombian_peso
+law_peso_colombian_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_colombian_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_colombian_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_colombian_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_colombian_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_colombian_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_colombian_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_colombian_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_costa_rican_colon
+law_peso_costa_rican_colon_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_costa_rican_colon_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_costa_rican_colon_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_costa_rican_colon_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_costa_rican_colon_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_costa_rican_colon_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_costa_rican_colon_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_costa_rican_colon_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_cuban_peso
+law_peso_cuban_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_cuban_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_cuban_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_cuban_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_cuban_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_cuban_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_cuban_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_cuban_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_ecuadorian_peso
+law_peso_ecuadorian_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_ecuadorian_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_ecuadorian_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_ecuadorian_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_ecuadorian_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_ecuadorian_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_ecuadorian_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_ecuadorian_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_el_salvador_colon
+law_peso_el_salvador_colon_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_el_salvador_colon_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_el_salvador_colon_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_el_salvador_colon_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_el_salvador_colon_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_el_salvador_colon_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_el_salvador_colon_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_el_salvador_colon_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_guatemalan_quetzal
+law_peso_guatemalan_quetzal_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_guatemalan_quetzal_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_guatemalan_quetzal_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_guatemalan_quetzal_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_guatemalan_quetzal_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_guatemalan_quetzal_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_guatemalan_quetzal_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_guatemalan_quetzal_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_honduran_lempira
+law_peso_honduran_lempira_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_honduran_lempira_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_honduran_lempira_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_honduran_lempira_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_honduran_lempira_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_honduran_lempira_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_honduran_lempira_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_honduran_lempira_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_mexican_peso
+law_peso_mexican_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_mexican_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_mexican_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_mexican_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_mexican_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_mexican_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_mexican_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_mexican_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_nicaraguan_cordoba
+law_peso_nicaraguan_cordoba_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_nicaraguan_cordoba_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_nicaraguan_cordoba_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_nicaraguan_cordoba_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_nicaraguan_cordoba_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_nicaraguan_cordoba_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_nicaraguan_cordoba_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_nicaraguan_cordoba_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_paraguayan_peso
+law_peso_paraguayan_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_paraguayan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_paraguayan_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_paraguayan_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_paraguayan_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_paraguayan_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_paraguayan_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_paraguayan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_philippine_peso
+law_peso_philippine_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_philippine_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_philippine_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_philippine_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_philippine_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_philippine_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_philippine_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_philippine_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_sol_de_oro
+law_peso_sol_de_oro_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_sol_de_oro_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_sol_de_oro_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_sol_de_oro_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_sol_de_oro_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_sol_de_oro_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_sol_de_oro_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_sol_de_oro_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_uruguayan_peso
+law_peso_uruguayan_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_uruguayan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_uruguayan_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_uruguayan_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_uruguayan_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_uruguayan_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_uruguayan_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_uruguayan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#peso_venezuelan_peso
+law_peso_venezuelan_peso_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_venezuelan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_peso_venezuelan_peso_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = peso_venezuelan_peso_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_peso_venezuelan_peso_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = peso_venezuelan_peso_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_peso_venezuelan_peso_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = peso_venezuelan_peso_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#pound_egyptian_pound
+law_pound_egyptian_pound_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_egyptian_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_pound_egyptian_pound_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = pound_egyptian_pound_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_pound_egyptian_pound_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_egyptian_pound_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_pound_egyptian_pound_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = pound_egyptian_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#pound_irish_pound
+law_pound_irish_pound_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_irish_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_pound_irish_pound_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = pound_irish_pound_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_pound_irish_pound_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_irish_pound_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_pound_irish_pound_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = pound_irish_pound_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#pound_sterling
+law_pound_sterling_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_sterling_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_pound_sterling_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = pound_sterling_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_pound_sterling_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = pound_sterling_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_pound_sterling_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = pound_sterling_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#real
+law_real_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = real_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_real_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = real_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_real_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = real_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_real_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = real_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#real_brazilian_real
+law_real_brazilian_real_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = real_brazilian_real_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_real_brazilian_real_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = real_brazilian_real_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_real_brazilian_real_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = real_brazilian_real_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_real_brazilian_real_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = real_brazilian_real_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#rupee_indian_rupee
+law_rupee_indian_rupee_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = rupee_indian_rupee_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_rupee_indian_rupee_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = rupee_indian_rupee_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_rupee_indian_rupee_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = rupee_indian_rupee_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_rupee_indian_rupee_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = rupee_indian_rupee_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#rupee_indonesian_rupiah
+law_rupee_indonesian_rupiah_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = rupee_indonesian_rupiah_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_rupee_indonesian_rupiah_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = rupee_indonesian_rupiah_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_rupee_indonesian_rupiah_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = rupee_indonesian_rupiah_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_rupee_indonesian_rupiah_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = rupee_indonesian_rupiah_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_baht
+law_spe_baht_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_baht_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_baht_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_baht_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_baht_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_baht_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_baht_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_baht_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_dong
+law_spe_dong_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_dong_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_dong_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_dong_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_dong_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_dong_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_dong_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_dong_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_drachma
+law_spe_drachma_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_drachma_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_drachma_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_drachma_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_drachma_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_drachma_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_drachma_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_drachma_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_korean_won
+law_spe_korean_won_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_korean_won_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_korean_won_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_korean_won_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_korean_won_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_korean_won_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_korean_won_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_korean_won_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_latvian_lats
+law_spe_latvian_lats_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_latvian_lats_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_latvian_lats_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_latvian_lats_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_latvian_lats_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_latvian_lats_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_latvian_lats_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_latvian_lats_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_lithuanian_litas
+law_spe_lithuanian_litas_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_lithuanian_litas_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_lithuanian_litas_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_lithuanian_litas_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_lithuanian_litas_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_lithuanian_litas_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_lithuanian_litas_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_lithuanian_litas_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_peseta
+law_spe_peseta_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_peseta_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_peseta_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_peseta_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_peseta_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_peseta_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_peseta_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_peseta_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_ruble
+law_spe_ruble_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_ruble_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_ruble_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_ruble_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_ruble_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_ruble_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_ruble_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_ruble_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_uni
+law_spe_uni_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_uni_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_uni_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_uni_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_uni_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_uni_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_uni_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_uni_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_yen
+law_spe_yen_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_yen_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_yen_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_yen_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_yen_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_yen_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_yen_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_yen_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_yuan
+law_spe_yuan_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_yuan_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_yuan_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_yuan_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_yuan_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_yuan_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_yuan_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_yuan_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#spe_zloti
+law_spe_zloti_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_zloti_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_spe_zloti_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = spe_zloti_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_spe_zloti_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = spe_zloti_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_spe_zloti_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = spe_zloti_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#thaler_hannoveraner_thaler
+law_thaler_hannoveraner_thaler_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_hannoveraner_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_thaler_hannoveraner_thaler_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = thaler_hannoveraner_thaler_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_thaler_hannoveraner_thaler_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_hannoveraner_thaler_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_thaler_hannoveraner_thaler_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = thaler_hannoveraner_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#thaler_prussian_thaler
+law_thaler_prussian_thaler_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_prussian_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_thaler_prussian_thaler_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = thaler_prussian_thaler_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_thaler_prussian_thaler_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_prussian_thaler_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_thaler_prussian_thaler_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = thaler_prussian_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+#thaler_saxon_thaler
+law_thaler_saxon_thaler_monetary_system_GS_BS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_saxon_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_gold_standard
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		}
+	}
+}
+law_thaler_saxon_thaler_monetary_system_SS_trigger = {
+	any_country = {
+		has_modifier = thaler_saxon_thaler_leading_currency_type
+		has_law = law_type:law_silver_standard
+	}
+}
+law_thaler_saxon_thaler_monetary_system_GS_GES_trigger = {
+	any_country = {
+		has_modifier = thaler_saxon_thaler_leading_currency_type
+		has_law = law_type:law_gold_standard
+		#or = {
+		#	has_law = law_type:law_gold_standard
+		#	has_law = law_type:law_gold_exchange_standard
+		#}
+	}
+}
+law_thaler_saxon_thaler_monetary_system_SS_BS_trigger = {
+	any_country = {
+		has_modifier = thaler_saxon_thaler_leading_currency_type
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_silver_standard
+		}  
+	}
+}
+
+#####################################################################################################################################################
+#####################################################################################################################################################
+devaluation_money_value_target_trigger = {
+	central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25
+	not = {
+		var:money_value_target_1 = 0
+		or = {
+			is_subject_custom_trigger = yes
+			market_owner_is_root_univ_with_buiding = yes
+		}
+	}
+
+	#####
+	#money_value_in_gold > global_var:money_value_median
+	#root.devaluation_score > root.revaluation_score_2}
+}
+
+revaluation_money_value_target_trigger = {
+	or = {
+		AND = {
+			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
+			revaluation_money_value_target > var:money_value_target_1
+		}
+		var:money_value_target_1 = 0
+	} 
+	not = {
+		gold_loaned_to_central_bank_ratio > 0.75
+		or = {
+			is_subject_custom_trigger = yes
+			market_owner_is_root_univ_with_buiding = yes
+		}
+	}
+
+	#######
+	# or  = {
+	# 	central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0
+	# 	root.revaluation_score > root.devaluation_score_2
+	# }
+}
+
+union_latine = {
+	root = {
+		OR = {
+			c:FRA ?= this
+			c:ITA ?= this 
+			c:BEL ?= this
+			c:SWI ?= this 
+			c:GRE ?= this 
+
+			c:SAR ?= this 
+			c:PAR ?= this 
+			c:MOD ?= this 
+			c:LUC ?= this 
+			c:TUS ?= this 
+			c:PAP ?= this 
+			c:SIC ?= this 
+		}
+	}
+}
+scripted_money_value_target = {
+	root = {
+		OR = {
+			c:GBR ?= this
+
+
+			#union latine
+			c:FRA ?= this
+			c:ITA ?= this 
+			c:BEL ?= this
+			c:SWI ?= this 
+			c:GRE ?= this 
+
+			c:SAR ?= this 
+			c:PAR ?= this 
+			c:MOD ?= this 
+			c:LUC ?= this 
+			c:TUS ?= this 
+			c:PAP ?= this 
+			c:SIC ?= this 
+
+			#Scandinavian Monetary Union
+			c:SWE ?= this  
+			c:DEN ?= this  
+			c:NOR ?= this  
+
+			c:USA ?= this
+
+			c:NET ?= this
+
+			c:AUS ?= this
+			c:GER ?= this
+			c:PRU ?= this
+			
+			c:RUS ?= this
+			c:CHI ?= this
+			
+			c:SPA ?= this
+
+			c:JAP ?= this 
+
+			c:MEX ?= this
+			c:BRZ ?= this
+
+			c:TUR ?= this
+			#is_valid_country_xxx = yes
+
+			#subject 
+			#c:BIC ?= this
+
+		}
+	}
+}
+# is_valid_country_xxx = {
+# 	root = {
+# 		game_date > 1851.1.1
+# 		c:PHI ?= this  #1851
+# 	}
+# }
+
+subjetc_no_modifier_on_bc = {
+	market_owner_is_root = no
+	is_subject_custom_trigger = yes
+	has_modifier = has_central_bank
+	not = {
+		any_scope_building = {
+		or = {
+			has_modifier = protectora_limit_30
+			has_modifier = dominion_limit_50
+			has_modifier = puppet_limit_75
+			}
+		}
+	}
+}
+not_the_same_monetary_system_as_overlord = {
+	or = {
+		and = {
+			any_overlord_or_above = {
+				has_law = law_type:law_fiat_standard
+			}
+			not = {
+				has_law = law_type:law_fiat_standard
+			}
+		}
+		and = {
+			any_overlord_or_above = {
+				has_law = law_type:law_silver_standard
+			}
+			not = {
+				has_law = law_type:law_silver_standard
+			}
+		}
+		and = {
+			any_overlord_or_above = {
+				has_law = law_type:law_bimetallism_standard
+			}
+			not = {
+				has_law = law_type:law_bimetallism_standard
+			}
+		}
+		and = {
+			any_overlord_or_above = {
+				has_law = law_type:law_gold_standard
+			}
+			not = {
+				has_law = law_type:law_gold_standard
+			}
+		}
+		and = {
+			any_overlord_or_above = {
+				has_law = law_type:law_gold_exchange_standard
+			}
+			not = {
+				has_law = law_type:law_gold_standard
+			}
+		}
+	}
+}
