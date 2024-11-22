@@ -85,7 +85,6 @@ has_central_bank_SS_BS_GS_NISO = {
 has_central_bank_SS_BS_GS_GES_NISO = {
 	has_modifier = has_central_bank
 	or = {
-		#has_law = law_type:law_fiat_standard #test
 		has_law = law_type:law_silver_standard
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
@@ -152,6 +151,23 @@ ai_set_stockpile_reserve_limit_spe_country = {
 }
 #####################################################################################################################################################
 
+subject_overlord_has_central_bank = {
+	if = {
+		limit = {
+			or = {
+				is_subject_custom_trigger = yes
+				no_indepeendeent_market_test = no
+			} 
+		}
+		overlord_has_central_bank = yes
+	}
+}
+overlord_has_central_bank = {
+	any_overlord_or_above = {
+		has_modifier = has_central_bank
+	}
+}
+
 #####################################################################################################################################################
 is_subject_custom_trigger = {
 	#root = {
@@ -160,7 +176,9 @@ is_subject_custom_trigger = {
 			is_subject_type = subject_type_puppet
 			is_subject_type = subject_type_tributary
 			is_subject_type = subject_type_vassal
+			is_subject_type = subject_type_chartered_company
 			is_subject_type = subject_type_dominion
+			is_subject_type = subject_type_colony
 			is_subject_type = subject_type_personal_union
 
 			# NOT = {
@@ -192,6 +210,9 @@ market_owner_is_root = {
 market_owner_is_root_2 = {
 	is_in_power_bloc = yes
 	is_power_bloc_leader = no
+}
+market_owner_is_root_4 = {
+	market.owner = this
 }
 
 no_indepeendeent_market = {
@@ -237,12 +258,6 @@ no_indepeendeent_market_test = {
 
 
 #####################################################################################################################################################
-
-# or = {
-# 	has_modifier = strong_currency
-# 	has_modifier = reference_currency_no
-# 	has_modifier = reference_currency
-# }
 is_reference_currency = {
 	has_modifier = has_central_bank
 	has_modifier = global_monetary_reference
@@ -258,75 +273,39 @@ is_strong_currency = {
 	not = {
 		has_modifier = global_monetary_reference
 	}
-	money_value_in_gold > money_value_median_1_25
-	#pb  peut  y  avvoir  ddes sttro,g  currency  avec  petit  money  supply  est  ou  petit national  cap
-	#central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
+	money_value_in_gold > money_value_median_1_25 
 }
 is_balanced_currency = {
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
+		money_value_in_gold > money_value_median_1_25 
 	}
-
-	money_value_in_gold < money_value_median_1_25
-
-
 	or = { 
-		is_on_top_10_national_capacity = yes
-		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
-	}
-	
-	or = { 
-		is_on_top_10_national_capacity = yes
-		money_value_in_gold > money_value_median_0_75
+		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
+		and = { 
+			money_value_in_gold < money_value_median_1_25
+			money_value_in_gold > money_value_median_0_75
+		}
 	}
 }
 is_weak_currency = {
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
+		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
 	}
-	is_on_top_10_national_capacity  = no
 	money_value_in_gold < money_value_median_0_75
 	money_value_in_gold > 0.01
 }
 is_extreme_weak_currency = {
-	has_modifier = extreme_weak_currency
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
 		is_subject = yes
 	}
+	money_value_in_gold <= 0.01
 }
-
-is_on_top_10_national_capacity_and_cap_sup_75 = {
-	is_on_top_10_national_capacity = yes
-	central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75
-}
-is_on_top_10_national_capacity = {
-	
-	# any_in_global_list = {
-	# 	variable = dinar_iraqi_dinar_currency_law_list_ordered_1 #overrated_currency_list
-	# 	this = root
-	# }
-	any_in_list = {
-		variable = national_capacity_variable_list_ordered_1
-		this = root
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #####################################################################################################################################################
 is_in_devaluation = {
@@ -4742,40 +4721,65 @@ subjetc_no_modifier_on_bc = {
 not_the_same_monetary_system_as_overlord = {
 	or = {
 		and = {
-			any_overlord_or_above = {
-				has_law = law_type:law_fiat_standard
+			or = {
+				any_overlord_or_above = {
+					has_law = law_type:law_fiat_standard
+				}
+				market.owner = {
+					has_law = law_type:law_fiat_standard
+				}
 			}
 			not = {
 				has_law = law_type:law_fiat_standard
 			}
 		}
 		and = {
-			any_overlord_or_above = {
-				has_law = law_type:law_silver_standard
+			or = {
+				any_overlord_or_above = {
+					has_law = law_type:law_silver_standard
+				}
+				market.owner = {
+					has_law = law_type:law_silver_standard
+				}
 			}
 			not = {
 				has_law = law_type:law_silver_standard
 			}
 		}
 		and = {
-			any_overlord_or_above = {
-				has_law = law_type:law_bimetallism_standard
+			or = {
+				any_overlord_or_above = {
+					has_law = law_type:law_bimetallism_standard
+				}
+				market.owner = {
+					has_law = law_type:law_bimetallism_standard
+				}
 			}
 			not = {
 				has_law = law_type:law_bimetallism_standard
 			}
 		}
 		and = {
-			any_overlord_or_above = {
-				has_law = law_type:law_gold_standard
+			or = {
+				any_overlord_or_above = {
+					has_law = law_type:law_gold_standard
+				}
+				market.owner = {
+					has_law = law_type:law_gold_standard
+				}
 			}
 			not = {
 				has_law = law_type:law_gold_standard
 			}
 		}
 		and = {
-			any_overlord_or_above = {
-				has_law = law_type:law_gold_exchange_standard
+			or = {
+				any_overlord_or_above = {
+					has_law = law_type:law_gold_standard
+				}
+				market.owner = {
+					has_law = law_type:law_gold_standard
+				}
 			}
 			not = {
 				has_law = law_type:law_gold_standard

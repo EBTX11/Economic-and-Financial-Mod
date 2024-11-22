@@ -624,12 +624,66 @@ types country_panel_types
 					visible = "[Not(Country.IsInPowerBloc)]"
 
 					blockoverride "stats_tooltip" {
+						tooltip = "NO_POWER_BLOC_TOOLTIP"
+					}
+
+					blockoverride "entire_icon" {
+						icon = {
+							texture = "gfx/interface/main_hud/powerblocs.dds"
+							size = { 50 50 }
+							parentanchor = right|vcenter
+						}
+					}
+
+					blockoverride "stats_label" {
+						text = "[concept_power_bloc]"
+					}
+
+					blockoverride "stats_value" {
+						text = "COUNTRY_PANEL_LEVERAGE_LABEL"
+					}
+				}
+
+				#LEVERAGE - Country is a leader of a Power Bloc
+				country_stats_entry = {
+					visible = "[And(Country.GetPowerBloc.IsLeader(Country.Self), Not(Country.IsLocalPlayer))]"
+
+					blockoverride "stats_tooltip" {
+						tooltip = "LEVERAGE_ON_LEADER_NOT_APPLICABLE"
+					}
+
+					blockoverride "information_icon" {
+						texture = "gfx/interface/icons/generic_icons/leverage.dds"
+					}
+
+					blockoverride "stats_label" {
+						text = "YOUR_LEVERAGE"
+					}
+
+					blockoverride "stats_value" {
+						text = "NONE"
+						default_format = "#title"
+					}
+				}
+
+				#LEVERAGE - Country is NOT a leader of a Power Bloc
+				country_stats_entry = {
+					visible = "[And(Not(Country.GetPowerBloc.IsLeader(Country.Self)), Not(Country.IsLocalPlayer))]"
+
+					blockoverride "stats_tooltip" {
 						tooltipwidget = {
 							RegularTooltip_Leverage = {
 								datacontext = "[GetPlayer.GetPowerBloc]"
 
 								blockoverride "has_power_bloc_context_visibility" {
 									visible = "[GetPlayer.IsInPowerBloc]"
+								}
+
+								blockoverride "have_no_power_bloc" {
+									custom_tooltip_textbox = {
+										visible = "[Not(GetPlayer.IsInPowerBloc)]"
+										text = "PLAYER_IS_NOT_IN_A_POWER_BLOC"
+									}
 								}
 							}
 						}
@@ -640,10 +694,11 @@ types country_panel_types
 					}
 
 					blockoverride "stats_label" {
-						text = "[concept_power_bloc]"
+						text = "YOUR_LEVERAGE"
 					}
+
 					blockoverride "stats_value" {
-						text = "COUNTRY_PANEL_LEVERAGE_LABEL"
+						text = "COUNTRY_PANEL_LEVERAGE_VALUE"
 					}
 				}
 
@@ -730,7 +785,7 @@ types country_panel_types
 						text = "COUNTRY_GDP_ONE_LINE"
 					}
 					blockoverride "stats_value" {
-						raw_text = "[Country.GetCustom('currency_symbol')][Country.GetGDP|Dv]"
+						raw_text = "[Country.GetCustom('currency_symbol')] [Country.GetGDP|Dv]"
 					}
 
 					blockoverride "stats_rank" {
@@ -777,6 +832,7 @@ types country_panel_types
 				############################################################################################################################################################
 				############################################################################################################################################################
 				############################################################################################################################################################
+
 
 				##POPULATION
 				country_stats_entry = {
@@ -1237,94 +1293,6 @@ types country_panel_types
 				}
 			}
 		}
-
-		default_header = {
-			visible = "[Country.IsSubject]"
-
-			blockoverride "text" {
-				text = "OVERLORD"
-			}
-		}
-
-		overlord = {
-			visible = "[And(And(Country.IsAIOrOtherPlayer, Country.GetSubjectType.IsValid), Not(Country.IsSubjectOf(GetPlayer.Self)))]"
-
-			blockoverride "diplo_actions_button_visibility" {
-				visible = no
-			}
-
-			blockoverride "overlord_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
-			}
-
-			blockoverride "liberty_desire_overlord_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
-			}
-
-			blockoverride "whos_overlord_text" {
-				text = "COUNTRY_OVERLORD"
-			}
-
-			blockoverride "whos_liberty_desire_text" {
-				text = "COUNTRY_DIPLOMACY_TAB_LIBERTY_DESIRE"
-			}
-
-			blockoverride "active_pacts_datamodel" {
-				datamodel = "[CountryPanel.AccessCountry.GetNonSubjectDiplomaticPactsWith(Country.GetOverlord)]"
-			}
-
-			blockoverride "country_subject_type_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.GetSubjectType]"
-			}
-
-			blockoverride "country_liberty_desire_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry]"
-			}
-		}
-
-		overlord = {
-			visible = "[And(And(Country.IsAIOrOtherPlayer, Country.GetSubjectType.IsValid), Country.IsSubjectOf(GetPlayer.Self))]"
-
-			blockoverride "diplo_actions_button_visibility" {
-				visible = no
-			}
-
-			blockoverride "overlord_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
-			}
-
-			blockoverride "whos_overlord_text" {
-				text = "COUNTRY_OVERLORD"
-			}
-
-			blockoverride "whos_liberty_desire_text" {
-				text = "COUNTRY_DIPLOMACY_TAB_LIBERTY_DESIRE"
-			}
-
-			blockoverride "active_pacts_datamodel" {
-				datamodel = "[Country.GetNonSubjectDiplomaticPactsWith(Country.GetOverlord)]"
-			}
-
-			blockoverride "country_subject_type_datacontext" {
-				datacontext = "[Country.GetSubjectType]"
-			}
-
-			blockoverride "country_liberty_desire_datacontext" {
-				datacontext = "[Country]"
-			}
-		}
-
-		overlord = {
-			visible = "[And(Country.IsLocalPlayer, Country.GetSubjectType.IsValid)]"
-
-			blockoverride "overlord_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
-			}
-
-			blockoverride "liberty_desire_overlord_datacontext" {
-				datacontext = "[CountryPanel.AccessCountry.AccessOverlord]"
-			}
-		}
 	}	
 }
 
@@ -1671,61 +1639,67 @@ types diplomatic
 				}
 
 				blockoverride "progressbar_type" {
-					gold_progressbar_horizontal = {
-						size = { 100% 100% }
-						visible = "[Not(Or( GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT')), GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))))]"
-						blockoverride "background" {}
-						blockoverride "frame" {}
-						blockoverride "glow_visible" {
-							visible = "[LibertyDesireLevel.IsActive( Country.GetLibertyDesireRaw )]"
-						}
+					block "liberty_desire_bar_stagnated" {
+						gold_progressbar_horizontal = {
+							visible = "[Not(Or( GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT')), GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))))]"
+							size = { 100% 100% }
+							blockoverride "background" {}
+							blockoverride "frame" {}
+							blockoverride "glow_visible" {
+								visible = "[LibertyDesireLevel.IsActive( Country.GetLibertyDesireRaw )]"
+							}
 
-						blockoverride "values" {
-							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
-							min = 0
-							max = 1
-						}
-					}
-
-					changed_value_decreased_progressbar_horizontal = {
-						size = { 100% 100% }
-						visible = "[GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
-
-						blockoverride "second_progressbar" {}
-
-						blockoverride "values" {
-							min = 0
-							max = 1
-							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
-						}
-
-						blockoverride "glow_size" {
-							size = { 40 100% }
-						}
-
-						blockoverride "arrow_texture_density" {
-							texture_density = 6 #use to match height of progressbar
+							blockoverride "values" {
+								value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+								min = 0
+								max = 1
+							}
 						}
 					}
 
-					changed_value_increased_progressbar_horizontal = {
-						size = { 100% 100% }
-						visible = "[GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
+					block "liberty_desire_bar_decreased" {
+						changed_value_decreased_progressbar_horizontal = {
+							visible = "[GreaterThan_CFixedPoint(Abs_CFixedPoint(Country.GetWeeklyLibertyDesireChange), GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
+							size = { 100% 100% }
 
-						blockoverride "second_progressbar" {}
+							blockoverride "second_progressbar" {}
 
-						blockoverride "values" {
-							value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
-							min = 0
-							max = 1
+							blockoverride "values" {
+								min = 0
+								max = 1
+								value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+							}
+
+							blockoverride "glow_size" {
+								size = { 40 100% }
+							}
+
+							blockoverride "arrow_texture_density" {
+								texture_density = 6 #use to match height of progressbar
+							}
 						}
+					}
 
-						blockoverride "glow_size" {
-							size = { 40 100% }
-						}
+					block "liberty_desire_bar_increased" {
+						changed_value_increased_progressbar_horizontal = {
+							visible = "[GreaterThan_CFixedPoint(Country.GetWeeklyLibertyDesireChange, GetDefine('NGUI', 'LIBERTY_DESIRE_TREND_INDICATOR_LIMIT'))]"
+							size = { 100% 100% }
 
-						blockoverride "arrow_texture_density" {
-							texture_density = 6 #use to match height of progressbar
+							blockoverride "second_progressbar" {}
+
+							blockoverride "values" {
+								value = "[LibertyDesireLevel.GetProgress( Country.GetLibertyDesireRaw )]"
+								min = 0
+								max = 1
+							}
+
+							blockoverride "glow_size" {
+								size = { 40 100% }
+							}
+
+							blockoverride "arrow_texture_density" {
+								texture_density = 6 #use to match height of progressbar
+							}
 						}
 					}
 				}
@@ -2295,8 +2269,44 @@ types war_panel
 		block "entire_icon" {
 			icon = {
 				block "information_icon" {
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					#texture = "gfx/interface/icons/generic_icons/gdp.dds"
-				}
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+			}
 				size = { 40 40 }
 				position = { -5 0 }
 				parentanchor = right|vcenter
@@ -3152,3 +3162,5 @@ types country_info
 		}
 	}
 }
+
+

@@ -28,21 +28,59 @@ types market_panel
 					soundeffect = "event:/SFX/UI/SideBar/markets_stop"
 				}
 			}
-			state = {
-				name = update_cache
-				# on_finish = "[GetScriptedGui('country_market_cache').Execute(GuiScope.SetRoot(AccessPlayer.MakeScope).End)]"
-				# on_finish = "[GetScriptedGui('country_btype_cache').Execute(GuiScope.SetRoot(AccessPlayer.MakeScope).End)]"
-				on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
-				on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
-			}
-			state = {
-				name = build_list
-				on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
-				on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
-			}
+
+			
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+
+			# ███╗   ███╗ ██████╗ ██████╗ 
+			# ████╗ ████║██╔═══██╗██╔══██╗
+			# ██╔████╔██║██║   ██║██║  ██║
+			# ██║╚██╔╝██║██║   ██║██║  ██║
+			# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+			# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+			#E&F mod
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+
+		state = {
+			name = update_cache 
+			on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+			on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+		}
+		state = {
+			name = build_list
+			on_finish = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+			on_finish = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(MarketPanel.AccessMarket.MakeScope).End)]"
+		}
+
+		
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+
+			# ███╗   ███╗ ██████╗ ██████╗ 
+			# ████╗ ████║██╔═══██╗██╔══██╗
+			# ██╔████╔██║██║   ██║██║  ██║
+			# ██║╚██╔╝██║██║   ██║██║  ██║
+			# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+			# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+			#E&F mod
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+			############################################################################################################################################################
+
 		}
 		
-		datacontext = "[MarketPanel.AccessMarket]"
+		datacontext = "[MarketPanel.GetMarket]"
 		
 		blockoverride "window_header_name"
 		{
@@ -60,6 +98,7 @@ types market_panel
 				}
 				blockoverride "first_button_click" {
 					onclick = "[InformationPanel.SelectTab('default')]"
+					onclick = "[MarketPanel.ShowTrade]"
 				}
 				blockoverride "first_button_visibility" {
 					visible = "[InformationPanel.IsTabSelected('default')]"
@@ -82,6 +121,7 @@ types market_panel
 				}
 				blockoverride "second_button_click" {
 					onclick = "[InformationPanel.SelectTab('trade_routes')]"
+					onclick = "[MarketPanel.ShowTrade]"
 				}
 				blockoverride "second_button_visibility" {
 					visible = "[InformationPanel.IsTabSelected('trade_routes')]"
@@ -97,22 +137,23 @@ types market_panel
 				}
 
 				blockoverride "third_button" {
-					text = "MARKET_PANEL_TRADE_SUGGESTIONS_TAB_LABEL"
+					text = "MARKET_PANEL_FOOD_SECURITY_TAB_LABEL"
 				}
 				blockoverride "third_button_tooltip" {
-					tooltip = "MARKET_PANEL_STATES_TAB_LABEL" 
+					tooltip = "MARKET_PANEL_FOOD_SECURITY_TAB_LABEL" 
 				}
 				blockoverride "third_button_click" {
-					onclick = "[InformationPanel.SelectTab('trade_suggestions')]"
+					onclick = "[InformationPanel.SelectTab('food_security')]"
+					onclick = "[MarketPanel.ShowStarvation]"
 				}
 				blockoverride "third_button_visibility" {
-					visible = "[InformationPanel.IsTabSelected('trade_suggestions')]"
+					visible = "[InformationPanel.IsTabSelected('food_security')]"
 				}
 				blockoverride "third_button_visibility_checked" {
-					visible = "[Not( InformationPanel.IsTabSelected('trade_suggestions') )]"
+					visible = "[Not( InformationPanel.IsTabSelected('food_security') )]"
 				}
 				blockoverride "third_button_selected" {
-					text = "MARKET_PANEL_TRADE_SUGGESTIONS_TAB_LABEL"
+					text = "MARKET_PANEL_FOOD_SECURITY_TAB_LABEL"
 				}
 
 				blockoverride "fourth_button" {
@@ -120,6 +161,7 @@ types market_panel
 				}
 				blockoverride "fourth_button_click" {
 					onclick = "[InformationPanel.SelectTab('states')]"
+					onclick = "[MarketPanel.ShowTrade]"
 				}
 				blockoverride "fourth_button_visibility" {
 					visible = "[InformationPanel.IsTabSelected('states')]"
@@ -188,6 +230,129 @@ types market_panel
 				visible = "[InformationPanel.IsTabSelected('default')]"
 				direction = vertical
 
+				section_header_button = {
+					datacontext = "[GetMetaPlayer.GetPlayedOrObservedCountry]"
+					
+					blockoverride "left_text" {
+						text = "MONTHLY_PRICE_REPORT"
+						fontsize_min = 12
+						elide = right
+					}
+
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle( 'monthly_price_report_dropdown' )]"
+						enabled = "[GreaterThan_CFixedPoint(Market.GetMarketSharePercentageFor( Country.Self ), '(CFixedPoint)0')]"
+					}
+					
+					blockoverride "onclick_showmore" {
+						visible = "[Not(GetVariableSystem.Exists( 'monthly_price_report_dropdown' ))]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[GetVariableSystem.Exists( 'monthly_price_report_dropdown' )]"
+					}
+				}
+
+				flowcontainer = {
+					visible = "[GetVariableSystem.Exists( 'monthly_price_report_dropdown' )]"
+					direction = vertical
+					datacontext = "[GetMetaPlayer.GetPlayedOrObservedCountry]"
+					parentanchor = hcenter
+
+					minimumsize = { @panel_width -1 }
+					margin_top = 10
+					margin_bottom = 10
+
+					background = {
+						using = entry_bg
+					}
+
+					textbox = {
+						text = "MONTHLY_PRICE_REPORT"
+						autoresize = yes
+						default_format = "#title"
+						align = nobaseline
+						margin_left = 10
+						maximumsize = { @panel_width -1 }
+					}
+
+					textbox = {
+						margin = { 10 10 }
+						margin_bottom = 5
+						text = "[Country.GetPriceReportDesc]"
+						autoresize = yes
+						align = nobaseline
+						maximumsize = { @panel_width -1 }
+						multiline = yes
+					}
+				}
+
+				### SUGGESTIONS IMPORT
+				section_header_button = {
+					blockoverride "left_text" {
+						text = "IMPORT_SUGGESTIONS_TITLE"
+						fontsize_min = 12
+						elide = right
+					}
+					
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle('suggest_import_trade_routes')]"
+					}
+					
+					blockoverride "onclick_showmore" {
+						visible = "[Not(GetVariableSystem.Exists('suggest_import_trade_routes'))]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[GetVariableSystem.Exists('suggest_import_trade_routes')]"
+					}
+				}
+
+				suggest_trade_goods = {}
+
+				### SUGGESTIONS EXPORT
+				section_header_button = {
+					blockoverride "left_text" {
+						text = "EXPORT_SUGGESTIONS_TITLE"
+						fontsize_min = 12
+						elide = right
+					}
+					
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle('suggest_export_trade_routes')]"
+					}
+					
+					blockoverride "onclick_showmore" {
+						visible = "[Not(GetVariableSystem.Exists('suggest_export_trade_routes'))]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[GetVariableSystem.Exists('suggest_export_trade_routes')]"
+					}
+				}
+
+				suggest_trade_goods = {
+					blockoverride "visible" {
+						visible = "[GetVariableSystem.Exists('suggest_export_trade_routes')]"
+					}
+					blockoverride "empty_state_visibility" {
+						visible = "[IsDataModelEmpty(Market.AccessGoodsSuggestedForExport)]"
+					}
+					blockoverride "goods_visibility" {
+						visible = "[Not(IsDataModelEmpty(Market.AccessGoodsSuggestedForExport))]"
+					}
+					blockoverride "empty_state_text" {
+						text = "NO_GOODS_EXPORT_SUGGESTION"
+					}
+					blockoverride "datamodel" {
+						datamodel = "[Market.AccessGoodsSuggestedForExport]"
+					}
+					blockoverride "button_functions" {
+						enabled = "[Goods.CanEstablishExportTradeRoute]"
+						onclick = "[Goods.EstablishExportTradeRoute]"
+					}
+				}
+
 				section_header_button = {					
 					blockoverride "left_text" {
 						text = "FILTERS"
@@ -213,6 +378,7 @@ types market_panel
 						visible = "[GetVariableSystem.Exists( 'market_filters' )]"
 					}
 				}
+
 				flowcontainer = {
 					visible = "[GetVariableSystem.Exists( 'market_filters' )]"
 					margin_bottom = 10
@@ -438,6 +604,63 @@ types market_panel
 					}
 				}
 			}
+
+			flowcontainer = {
+				visible = "[InformationPanel.IsTabSelected('default')]"
+
+				sort_button = {
+					size = { 50 20 }
+					tooltip = "SORT_BY_MARKET_GOODS"
+					onclick = "[Market.Sort('name')]"
+					onclick = "[Market.RestoreSort]"
+					button = {
+						texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
+						size = { 25 25 }
+						parentanchor = center
+						alwaystransparent = yes
+					}
+				}
+
+				sort_button = {
+					name = "tutorial_highlight_market_details_panel_sell_orders"
+					align = hcenter|nobaseline
+					text = "[concept_sell_orders]"
+					size = { 100 20 }
+					onclick = "[Market.Sort('sell')]"
+					onclick = "[Market.RestoreSort]"
+					elide = right
+				}
+
+				sort_button = {
+					name = "tutorial_highlight_market_details_panel_buy_orders"
+					align = hcenter|nobaseline
+					text = "[concept_buy_orders]"
+					size = { 100 20 }
+					onclick = "[Market.Sort('buy')]"
+					onclick = "[Market.RestoreSort]"
+					margin_right = 7
+					elide = right
+				}
+
+				sort_button = {
+					align = hcenter|nobaseline
+					text = "BALANCE"
+					size = { 80 20 }
+					onclick = "[Market.Sort('balance')]"
+					onclick = "[Market.RestoreSort]"
+					margin_right = 7
+					tooltip = "SORT_BY_BALANCE_TOOLTIP"
+					elide = right
+				}
+				
+				sort_button = {
+					align = hcenter|nobaseline
+					text = "[concept_market_price]"
+					size = { 210 20 }
+					onclick = "[Market.Sort('price')]"
+					onclick = "[Market.RestoreSort]"
+				}
+			}
 		}
 		### BUTTONS TO OPEN LENSBAR WITH OPTIONS
 		blockoverride "fixed_bottom"{
@@ -456,7 +679,7 @@ types market_panel
 
 				flowcontainer = {
 					spacing = 10
-					visible = "[MarketPanel.AccessMarket.GetOwner.IsPlayer]"
+					visible = "[MarketPanel.GetMarket.GetOwner.IsPlayer]"
 					parentanchor = hcenter
 
 					button = {
@@ -523,8 +746,8 @@ types market_panel
 					using = default_fade_in_out
 				}
 
-				market_panel_trade_routes_trade_suggestions = {
-					visible = "[InformationPanel.IsTabSelected('trade_suggestions')]"
+				market_panel_food_security_content = {
+					visible = "[InformationPanel.IsTabSelected('food_security')]"
 					using = default_fade_in_out
 				}
 
@@ -581,16 +804,16 @@ types market_panel
 		}
 
 		blockoverride "pin_properties" {
-			visible = "[MarketPanel.AccessMarket.IsPinnedInOutliner]"
-			onclick = "[MarketPanel.AccessMarket.TogglePinInOutliner]"
-			datacontext = "[MarketPanel.AccessMarket]"
+			visible = "[MarketPanel.GetMarket.IsPinnedInOutliner]"
+			onclick = "[MarketPanel.GetMarket.TogglePinInOutliner]"
+			datacontext = "[MarketPanel.GetMarket]"
 			tooltip = "UNPIN_MARKET"
 		}
 
 		blockoverride "unpin_properties" {
-			visible = "[Not(MarketPanel.AccessMarket.IsPinnedInOutliner)]"
-			onclick = "[MarketPanel.AccessMarket.TogglePinInOutliner]"
-			datacontext = "[MarketPanel.AccessMarket]"
+			visible = "[Not(MarketPanel.GetMarket.IsPinnedInOutliner)]"
+			onclick = "[MarketPanel.GetMarket.TogglePinInOutliner]"
+			datacontext = "[MarketPanel.GetMarket]"
 			tooltip = "PIN_MARKET"
 		}
 
@@ -615,65 +838,6 @@ types market_panel
 
 			flowcontainer = {
 				using = default_list_position
-				margin = { 0 5 }
-				margin_top = 10
-				
-				sort_button = {
-					size = { 50 20 }
-					tooltip = "SORT_BY_MARKET_GOODS"
-					onclick = "[Market.Sort('name')]"
-					onclick = "[Market.RestoreSort]"
-					button = {
-						texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
-						size = { 25 25 }
-						parentanchor = center
-						alwaystransparent = yes
-					}
-				}
-
-				sort_button = {
-					name = "tutorial_highlight_market_details_panel_sell_orders"
-					align = hcenter|nobaseline
-					text = "[concept_sell_orders]"
-					size = { 100 20 }
-					onclick = "[Market.Sort('sell')]"
-					onclick = "[Market.RestoreSort]"
-					elide = right
-				}
-
-				sort_button = {
-					name = "tutorial_highlight_market_details_panel_buy_orders"
-					align = hcenter|nobaseline
-					text = "[concept_buy_orders]"
-					size = { 100 20 }
-					onclick = "[Market.Sort('buy')]"
-					onclick = "[Market.RestoreSort]"
-					margin_right = 7
-					elide = right
-				}
-
-				sort_button = {
-					align = hcenter|nobaseline
-					text = "BALANCE"
-					size = { 80 20 }
-					onclick = "[Market.Sort('balance')]"
-					onclick = "[Market.RestoreSort]"
-					margin_right = 7
-					tooltip = "SORT_BY_BALANCE_TOOLTIP"
-					elide = right
-				}
-				
-				sort_button = {
-					align = hcenter|nobaseline
-					text = "[concept_market_price]"
-					size = { 210 20 }
-					onclick = "[Market.Sort('price')]"
-					onclick = "[Market.RestoreSort]"
-				}
-			}
-
-			flowcontainer = {
-				using = default_list_position
 				direction = vertical
 				spacing = 20
 				
@@ -683,12 +847,11 @@ types market_panel
 					datamodel = "[Market.AccessMarketGoods( MarketPanel.GetFilters )]"
 					spacing = 2
 					parentanchor = hcenter
-
+					
 					item = {
 						goods_entry_button = {}
 					}
 				}
-				
 				
 				############################################################################################################################################################
 				############################################################################################################################################################
@@ -811,8 +974,8 @@ types market_panel
 							}
 						}
 					}							
-				}	
-
+				}					
+				
 				textbox = {
 					parentanchor = hcenter
 					minimumsize = { 450 -1 }
@@ -872,8 +1035,45 @@ types market_panel
 				
 				block "staple_onclick" {
 					onclick = "[MarketPanel.Filter('staple')]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
 					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
 
 					using = market_filter_staple_button_sound
 				}
@@ -889,8 +1089,46 @@ types market_panel
 				
 				block "staple_onclick" {
 					onclick = "[MarketPanel.Filter('staple')]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					using = market_filter_staple_button_sound
 				}
 				blockoverride "icon" {
@@ -918,8 +1156,47 @@ types market_panel
 				
 				block "industrial_onclick" {
 					onclick = "[MarketPanel.Filter('industrial')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+					using = market_filter_industrial_button_sound
 				}
 				blockoverride "icon" {
 					texture = "gfx/interface/market_view/filter_industrial_goods.dds"
@@ -933,8 +1210,47 @@ types market_panel
 				
 				block "industrial_onclick" {
 					onclick = "[MarketPanel.Filter('industrial')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"					using = market_filter_industrial_button_sound
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+					using = market_filter_industrial_button_sound
 				}
 				blockoverride "icon" {
 					texture = "gfx/interface/market_view/filter_industrial_goods_selected.dds"
@@ -962,8 +1278,46 @@ types market_panel
 				
 				block "luxury_onclick" {
 					onclick = "[MarketPanel.Filter('luxury')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					using = market_filter_luxury_button_sound
 				}
 				blockoverride "icon" {
@@ -978,8 +1332,46 @@ types market_panel
 				
 				block "luxury_onclick" {
 					onclick = "[MarketPanel.Filter('luxury')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					using = market_filter_luxury_button_sound
 				}
 				blockoverride "icon" {
@@ -1008,8 +1400,46 @@ types market_panel
 				
 				block "military_onclick" {
 					onclick = "[MarketPanel.Filter('military')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					using = market_filter_military_button_sound
 				}
 				blockoverride "icon" {
@@ -1024,12 +1454,143 @@ types market_panel
 				
 				block "military_onclick" {
 					onclick = "[MarketPanel.Filter('military')]"
-					onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
-					onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				onclick = "[GetScriptedGui('market_gui_market_currency_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+				onclick = "[GetScriptedGui('market_gui_market_financial_product_list').Execute(GuiScope.SetRoot(Market.MakeScope).AddScope('list_filter',MakeScopeValue('(CFixedPoint)1')).End)]"
+
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
+				# ███╗   ███╗ ██████╗ ██████╗ 
+				# ████╗ ████║██╔═══██╗██╔══██╗
+				# ██╔████╔██║██║   ██║██║  ██║
+				# ██║╚██╔╝██║██║   ██║██║  ██║
+				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+				#E&F mod
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+				############################################################################################################################################################
+
 					using = market_filter_military_button_sound
 				}
 				blockoverride "icon" {
 					texture = "gfx/interface/market_view/filter_military_goods_selected.dds"
+				}
+			}
+		}
+	}
+
+	### SUGGEST TRADE GOODS
+	type suggest_trade_goods = flowcontainer {
+		direction = vertical
+		margin = { 0 5 }
+		parentanchor = hcenter
+		
+		block "visible" {
+			visible = "[GetVariableSystem.Exists('suggest_import_trade_routes')]"
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				block "empty_state_visibility" {
+					visible = "[IsDataModelEmpty(Market.AccessGoodsSuggestedForImport)]"
+				}
+			}
+			blockoverride "text" {
+				block "empty_state_text" {
+					text = "NO_GOODS_IMPORT_SUGGESTION"
+				}
+			}
+		}
+		
+		fixedgridbox = {
+			name = buttons
+			parentanchor = hcenter
+			block "goods_visibility" {
+				visible = "[Not(IsDataModelEmpty(Market.AccessGoodsSuggestedForImport))]"
+			}
+			block "datamodel" {
+				datamodel = "[Market.AccessGoodsSuggestedForImport]"
+			}
+			maxhorizontalslots = 6
+			addrow = 70
+			addcolumn = 80
+			flipdirection = yes
+			
+			item = {
+				widget = {
+					size = { 80 70 }
+					
+					button_icon_square_map_interaction = {
+						parentanchor = center
+						size = { 70 70 }
+						block "button_functions" {
+							onclick = "[Goods.EstablishImportTradeRoute]"
+						}
+
+						tooltipwidget = {
+							FancyTooltip_Goods = {}
+						}
+
+						blockoverride "icon" {
+							texture = "[Goods.GetTexture]"
+						}
+
+						blockoverride "icon_size" {
+							size = { 80% 80% }
+						}
+
+						widget = {
+							parentanchor = bottom
+							size = { 100% 35 }
+
+							background = {
+								using = fade_up_colored
+								color = { 0.1 0.1 0.1 1 }
+								alpha = 1
+								using = simple_frame_mask
+							}
+						}
+
+						textbox = {
+							parentanchor = bottom
+							autoresize = yes
+							align = nobaseline
+							margin = { 6 3 }
+							text = "[Goods.GetMarketBuyAndSellOrdersBalance|0+=]"
+						}
+
+						textbox = {
+							parentanchor = right|bottom
+							autoresize = yes
+							align = nobaseline
+							margin = { 6 3 }
+							text = "[Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+						}
+					}
 				}
 			}
 		}
@@ -1202,116 +1763,118 @@ types market_panel
 
 			vertical_divider = {}
 			
-			widget = {
-				using = market_price_tooltip_with_graph
-				size = { 210 55 }
+			block "last_column" {
+				widget = {
+					using = market_price_tooltip_with_graph
+					size = { 210 55 }
 
-				
-				textbox = {
-					align = right|nobaseline
-					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
-					size = { 90 40 }
-					margin_right = 10
-					parentanchor = vcenter
-					margin_left = 5
-					fontsize_min = 12
-					elide = right
-				}
+					
+					textbox = {
+						align = right|nobaseline
+						raw_text = "[Market.GetOwner.GetCustom('currency_symbol')] [Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+						size = { 90 40 }
+						margin_right = 10
+						parentanchor = vcenter
+						margin_left = 5
+						fontsize_min = 12
+						elide = right
+					}
 
-				# graph
-				flowcontainer = {
-					position = { 90 0 }
-					parentanchor = vcenter
+					# graph
+					flowcontainer = {
+						position = { 90 0 }
+						parentanchor = vcenter
 
-					widget = {
-						size = { 40 26 }
+						widget = {
+							size = { 40 26 }
 
-						background = {
-							using = light_bg
-							margin = { 3 3 }
-						}
-						
-						background = {
-							texture = "gfx/interface/graph/graph_frame.dds"
-							spriteType = Corneredtiled
-							spriteborder = { 2 2 }
-							texture_density = 5
-							margin = { 1 1 }
-							alpha = 1
-
-							modify_texture = {
-								texture = "gfx/interface/backgrounds/default_bg_shading.dds"
-								spriteType = Corneredstretched
-								spriteborder = { 0 0 }
-								blend_mode = overlay
+							background = {
+								using = light_bg
+								margin = { 3 3 }
+							}
+							
+							background = {
+								texture = "gfx/interface/graph/graph_frame.dds"
+								spriteType = Corneredtiled
+								spriteborder = { 2 2 }
+								texture_density = 5
+								margin = { 1 1 }
 								alpha = 1
+
+								modify_texture = {
+									texture = "gfx/interface/backgrounds/default_bg_shading.dds"
+									spriteType = Corneredstretched
+									spriteborder = { 0 0 }
+									blend_mode = overlay
+									alpha = 1
+								}
+							}
+
+							plotline = {
+								parentanchor = center
+								size = { 38 24 }
+								using = plot_line
+								width = 2
+								color = { .9 .9 .9 1.0 }
+								visible = "[Not(IsEmpty(Goods.GetPriceTrend))]"
+								plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 							}
 						}
-
-						plotline = {
-							parentanchor = center
-							size = { 38 24 }
-							using = plot_line
-							width = 2
-							color = { .9 .9 .9 1.0 }
-							visible = "[Not(IsEmpty(Goods.GetPriceTrend))]"
-							plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
-						}
 					}
-				}
 
-				flowcontainer = {
-					direction = vertical
-					minimumsize = { 80 52 }
-					spacing = 4
-					margin_top = 8
-					parentanchor = right
-
-					textbox = {
-						visible = "[GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')]"
-						align = right|nobaseline
-						text = "MARKET_PANEL_GOODS_PRICE_GOLD"
-						autoresize = yes
-						margin_right = 10
+					flowcontainer = {
+						direction = vertical
+						minimumsize = { 80 52 }
+						spacing = 4
+						margin_top = 8
 						parentanchor = right
-					}
 
-					textbox = {
-						visible = "[And( Not(LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')), Not(GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')))]"
-						align = hcenter|nobaseline
-						text = "MARKET_PANEL_GOODS_PRICE"
-						autoresize = yes
-						parentanchor = hcenter
-					}
-
-					textbox = {
-						visible = "[LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')]"
-						align = left|nobaseline
-						text = "MARKET_PANEL_GOODS_PRICE_BLUE"
-						autoresize = yes
-						margin_left = 10
-						parentanchor = left
-					}
-
-					double_direction_progressbar_gold = {
-						size = { 60 6 }
-						parentanchor = hcenter
-
-						blockoverride "negative_min_max_values" {
-							min = -0.75
-							max = 0
+						textbox = {
+							visible = "[GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')]"
+							align = right|nobaseline
+							text = "MARKET_PANEL_GOODS_PRICE_GOLD"
+							autoresize = yes
+							margin_right = 10
+							parentanchor = right
 						}
 
-						blockoverride "positive_min_max_values" {
-							min = 0
-							max = 0.75
+						textbox = {
+							visible = "[And( Not(LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')), Not(GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')))]"
+							align = hcenter|nobaseline
+							text = "MARKET_PANEL_GOODS_PRICE"
+							autoresize = yes
+							parentanchor = hcenter
 						}
-						
-						blockoverride "value_left" {
-							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+
+						textbox = {
+							visible = "[LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')]"
+							align = left|nobaseline
+							text = "MARKET_PANEL_GOODS_PRICE_BLUE"
+							autoresize = yes
+							margin_left = 10
+							parentanchor = left
 						}
-						blockoverride "value_right" {
-							value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+
+						double_direction_progressbar_gold = {
+							size = { 60 6 }
+							parentanchor = hcenter
+
+							blockoverride "negative_min_max_values" {
+								min = -0.75
+								max = 0
+							}
+
+							blockoverride "positive_min_max_values" {
+								min = 0
+								max = 0.75
+							}
+							
+							blockoverride "value_left" {
+								value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+							}
+							blockoverride "value_right" {
+								value = "[FixedPointToFloat(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice))]"
+							}
 						}
 					}
 				}
@@ -1319,7 +1882,172 @@ types market_panel
 		}
 	}
 
-	
+	type state_goods_entry_button = button {
+		size = { @panel_width 50 }
+		using = default_button
+		onclick = "[InformationPanelBar.OpenGoodsStatePanel(Goods.GetState, Goods.Self)]"
+		using = select_button_sound
+		onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+
+		block "tooltip" {
+		}
+
+		flowcontainer = {
+			parentanchor = left|vcenter
+			widgetanchor = left|vcenter
+			
+			using = goods_list_item
+			
+			textbox = {
+				align = right|nobaseline
+				visible = "[GreaterThan_CFixedPoint(Goods.GetStateProduction, '(CFixedPoint)0')]"
+				text = "[Goods.GetStateProductionWithTooltip]"
+				size = { 95 40 }
+				margin_right = 10
+				parentanchor = vcenter
+			}
+
+			textbox = {
+				align = right|nobaseline
+				visible = "[Not(GreaterThan_CFixedPoint(Goods.GetStateProduction, '(CFixedPoint)0'))]"
+				raw_text = "-"
+				alpha = 0.5
+				size = { 95 40 }
+				margin_right = 10
+				parentanchor = vcenter
+			}
+
+			vertical_divider = {}
+			
+			textbox = {
+				align = right|nobaseline
+				visible = "[GreaterThan_CFixedPoint(Goods.GetStateConsumption, '(CFixedPoint)0')]"
+				text = "[Goods.GetStateConsumptionWithTooltip]"
+				size = { 90 40 }
+				margin_right = 10
+				parentanchor = vcenter
+			}
+
+			textbox = {
+				align = right|nobaseline
+				visible = "[Not(GreaterThan_CFixedPoint(Goods.GetStateConsumption, '(CFixedPoint)0'))]"
+				raw_text = "-"
+				alpha = 0.5
+				size = { 90 40 }
+				margin_right = 10
+				parentanchor = vcenter
+			}
+
+			vertical_divider = {}
+			
+			flowcontainer = {
+				direction = vertical
+				minimumsize = { 90 52 }
+				margin_top = 8
+				spacing = 4
+				tooltip = "STATE_GOODS_BALANCE_TOOLTIP"
+
+				textbox = {
+					visible = "[GreaterThan_int32(FixedPointToInt(Goods.GetStateProductionConsumptionDiff), '(int32)0')]"
+					align = right|nobaseline
+					text = "GOODS_LOCAL_PRICE_PANEL_BALANCE_GOLD"
+					autoresize = yes
+					margin_right = 15
+					parentanchor = right
+				}
+
+				textbox = {
+					visible = "[EqualTo_int32(FixedPointToInt(Goods.GetStateProductionConsumptionDiff), '(int32)0')]"
+					align = hcenter|nobaseline
+					text = "GOODS_LOCAL_PRICE_PANEL_BALANCE"
+					autoresize = yes
+					parentanchor = hcenter
+				}
+
+				textbox = {
+					visible = "[LessThan_int32(FixedPointToInt(Goods.GetStateProductionConsumptionDiff), '(int32)0')]"
+					align = left|nobaseline
+					text = "GOODS_LOCAL_PRICE_PANEL_BALANCE_BLUE"
+					autoresize = yes
+					margin_left = 15
+					parentanchor = left
+				}
+
+				double_direction_progressbar_gold = {
+					size = { 60 6 }
+					parentanchor = hcenter
+
+					blockoverride "negative_min_max_values" {
+						min = "[Negate_float(FixedPointToFloat(Goods.GetMarket.GetMaxImbalanceScaledByBasePrice))]"
+						max = 0
+					}
+
+					blockoverride "positive_min_max_values" {
+						min = 0
+						max = "[FixedPointToFloat(Goods.GetMarket.GetMaxImbalanceScaledByBasePrice)]"
+					}
+					
+					blockoverride "value_left" {
+						value = "[FixedPointToInt(Multiply_CFixedPoint(Goods.GetStateProductionConsumptionDiff, Goods.GetBasePrice))]"
+					}
+					blockoverride "value_right" {
+						value = "[FixedPointToInt(Multiply_CFixedPoint(Goods.GetStateProductionConsumptionDiff, Goods.GetBasePrice))]"
+					}
+				}
+			}
+
+			vertical_divider = {}
+			
+			block "last_column" {
+				widget = {
+					using = market_price_tooltip_with_graph
+					size = { 90 55 }
+
+					textbox = {
+						parentanchor = vcenter
+						align = right|nobaseline
+						size = { 80 40 }
+						fontsize_min = 12
+						elide = right
+						raw_text = "[Market.GetOwner.GetCustom('currency_symbol')] [Goods.GetStatePrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )]"
+					}
+				}
+
+				vertical_divider = {}
+
+				widget = {
+					tooltip = "GOODS_SHORTAGE_TOOLTIP"
+					size = { 120 55 }
+					
+					textbox = {
+						visible = "[Goods.HasShortageInState]"
+						align = right|nobaseline
+						size = { 110 40 }
+						margin_right = 10
+						parentanchor = vcenter
+						margin_left = 5
+						fontsize_min = 12
+						elide = right
+						text = "FOOD_SECURITY_GOODS_ITEM_HAS_SHORTAGE_IN_STATE"
+					}
+
+					textbox = {
+						visible = "[Not(Goods.HasShortageInState)]"
+						align = right|nobaseline
+						size = { 110 40 }
+						margin_right = 10
+						parentanchor = vcenter
+						margin_left = 5
+						fontsize_min = 12
+						elide = right
+						using = empty_state_text_properties
+						text = "FOOD_SECURITY_GOODS_ITEM_NO_SHORTAGE"
+					}
+				}
+			}
+		}
+	}
+
 	############################################################################################################################################################
 	############################################################################################################################################################
 	############################################################################################################################################################
@@ -1378,7 +2106,6 @@ types market_panel
 	############################################################################################################################################################
 	############################################################################################################################################################
 
-	
 	type filter_button = button {
 		using = default_button
 		using = tooltip_above

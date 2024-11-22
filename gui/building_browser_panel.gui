@@ -350,7 +350,7 @@ types building_browser_panel_types
 								text = "GROUPING"
 							}
 
-							blockoverride "filter_line_base_alpha"
+							blockoverride "filter_line_base_alpha" 
 							{
 								alpha = 1
 							}
@@ -365,7 +365,7 @@ types building_browser_panel_types
 
 									blockoverride "line_button_onclick"
 									{
-										onclick = "[GetVariableSystem.Toggle( 'building_browser_grouped_by_building_type' )]"
+										onclick = "[BuildingBrowserPanel.ToggleGroupedByBuildingType]"
 									}
 
 									blockoverride "line_button_icon_texture"
@@ -375,7 +375,7 @@ types building_browser_panel_types
 
 									blockoverride "line_button_selected"
 									{
-										visible = "[Not(GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' ))]"
+										visible = "[BuildingBrowserPanel.IsGroupedByBuildingType]"
 									}
 
 								}
@@ -387,7 +387,7 @@ types building_browser_panel_types
 
 									blockoverride "line_button_onclick"
 									{
-										onclick = "[GetVariableSystem.Toggle( 'building_browser_grouped_by_building_type' )]"
+										onclick = "[BuildingBrowserPanel.ToggleGroupedByBuildingType]"
 									}
 
 									blockoverride "line_button_icon_texture"
@@ -398,9 +398,40 @@ types building_browser_panel_types
 
 									blockoverride "line_button_selected"
 									{
-										visible = "[GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' )]"
+										visible = "[Not(BuildingBrowserPanel.IsGroupedByBuildingType)]"
 									}
 
+								}										
+							}
+						}
+
+						# NATIONALIZE FILTERED BUILDINGS BUTTON
+						button = {
+							size = { 404 50 }
+							using = default_button_primary
+							enabled = "[BuildingBrowserPanel.CanShowNationalizeBuildingsWindow]"
+							onclick = "[BuildingBrowserPanel.ShowNationalizeBuildingsWindow]"
+							tooltip = "[BuildingBrowserPanel.GetNationalizeBuildingsButtonTooltip]"
+
+							flowcontainer = {
+								parentanchor = center
+								spacing = 5
+
+								icon = {
+									parentanchor = vcenter
+									size = { 40 40 }
+									texture = "gfx/interface/production_methods/nationalize.dds"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									using = fontsize_large
+									align = hcenter|nobaseline
+									autoresize = yes
+									max_width = 350
+									fontsize_min = 14
+									elide = right
+									text = "NATIONALIZE_FILTERED_BUILDINGS_LABEL"
 								}
 							}
 						}
@@ -409,18 +440,15 @@ types building_browser_panel_types
 						button = {
 							size = { 404 50 }
 							using = default_button_primary
+							enabled = "[BuildingBrowserPanel.IsAnyFilterActive]"
+							onclick = "[BuildingBrowserPanel.ResetAllFilters]"
 
 							textbox = {
 								size = { 100% 100% }
-								text = "RESET_FILTERS"
 								using = fontsize_large
-								align = center|nobaseline
+								align = hcenter|nobaseline
+								text = "RESET_FILTERS"
 							}
-
-							enabled = "[BuildingBrowserPanel.IsAnyFilterActive]"
-
-							onclick = "[BuildingBrowserPanel.ResetAllFilters]"
-
 						}
 
 						scrollarea = {
@@ -637,7 +665,7 @@ types building_browser_panel_types
 												}
 
 											}
-
+											
 										}
 									}
 
@@ -650,7 +678,7 @@ types building_browser_panel_types
 
 										blockoverride "filter_line_active_visible"
 										{
-											visible = "[Not(And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign'))))]"
+											visible = "[Not(And(And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign'))), Not(BuildingBrowserPanel.IsFiltered('owned_company'))))]"
 										}
 
 										blockoverride "filter_line_buttons"
@@ -666,6 +694,7 @@ types building_browser_panel_types
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
 												}
 
 												blockoverride "line_button_icon_texture"
@@ -675,7 +704,7 @@ types building_browser_panel_types
 
 												blockoverride "line_button_selected"
 												{
-													visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign')))]"
+													visible = "[And(And(And(Not(BuildingBrowserPanel.IsFiltered('owned_company')), Not(BuildingBrowserPanel.IsFiltered('owned_national'))), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign')))]"
 													alpha = @all_filter_selected_alpha
 												}
 
@@ -691,6 +720,7 @@ types building_browser_panel_types
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'yes')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
 												}
 
 												blockoverride "line_button_icon_texture"
@@ -715,7 +745,7 @@ types building_browser_panel_types
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'yes')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
-
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
 												}
 
 												blockoverride "line_button_icon_texture"
@@ -741,6 +771,7 @@ types building_browser_panel_types
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'yes')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
 													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
 												}
 
 												blockoverride "line_button_icon_texture"
@@ -755,6 +786,131 @@ types building_browser_panel_types
 
 											}
 
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "BUILDING_FILTER_OWNERSHIP_COMPANY_TT"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'yes')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
+													onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_has_companies_owners.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													visible = "[BuildingBrowserPanel.IsFilterYes('owned_company')]"
+												}
+
+											}
+											
+										}
+									}
+
+									### POTENTIAL BUILDING TYPES FILTER
+									building_browser_filter_line = {
+										visible = no # todo - PRCAL-36023 - Remove this visible check
+										parentanchor = hcenter
+
+										blockoverride "filter_line_label"
+										{
+											text = "AVAILABILITY"
+										}
+
+										blockoverride "filter_line_active_visible"
+										{
+											#visible = "[BuildingBrowserPanel.IsFiltered('is_existing')]" # todo - PRCAL-36023
+										}
+
+										blockoverride "filter_line_buttons"
+										{
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "AVAILABLITY_ALL"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'off')]" # todo - PRCAL-36023
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+												}
+
+												blockoverride "line_button_selected"
+												{
+													#visible = "[Not(BuildingBrowserPanel.IsFiltered('is_existing'))]" # todo - PRCAL-36023
+													alpha = @all_filter_selected_alpha
+												}
+
+											}
+
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ONLY_AVAILABLE_BUILDING_TYPES"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'yes')]" # todo - PRCAL-36023
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_existing_building_available.dds"
+												}
+
+												blockoverride "line_button_icon_size"
+												{
+													size = { 25 25 }
+												}
+
+												blockoverride "line_button_selected"
+												{
+													#visible = "[BuildingBrowserPanel.IsFilterYes('is_existing')]" # todo - PRCAL-36023
+													visible = no
+												}
+											}
+
+											building_browser_filter_line_button = {
+												blockoverride "line_button_tooltip"
+												{
+													tooltip = "ONLY_POTENTIAL_BUILDING_TYPES"
+												}
+
+												blockoverride "line_button_onclick"
+												{
+													#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'no')]" # todo - PRCAL-36023
+												}
+
+												blockoverride "line_button_icon_texture"
+												{
+													texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_new_building_available.dds"
+												}
+
+												blockoverride "line_button_icon_size"
+												{
+													size = { 25 25 }
+												}
+
+												blockoverride "line_button_selected"
+												{
+													#visible = "[BuildingBrowserPanel.IsFilterNo('is_existing')]" # todo - PRCAL-36023
+													visible = no
+												}
+											}
 										}
 									}
 
@@ -778,7 +934,7 @@ types building_browser_panel_types
 										}
 
 										blockoverride "onclick_showless" {
-											visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]"
+											visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]" 
 										}
 
 										background = {
@@ -789,25 +945,25 @@ types building_browser_panel_types
 
 
 									flowcontainer = {
-										visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]"
+										visible = "[GetVariableSystem.Exists( 'building_browser_filter_building_type' )]" 
 										using = pop_browser_filter_section
 
 										spacing = 10
 
 										flowcontainer = {
-
+											
 											direction = horizontal
 
 											spacing = 7
 
 											flowcontainer = {
-
+												
 												direction = horizontal
 
 												button = {
 													size = { 180 35 }
 													using = default_button
-													onclick = "[BuildingBrowserPanel.BuildingTypeFilterShowAllTypes]"
+													onclick = "[BuildingBrowserPanel.BuildingTypeFilterShowAllTypes]"	
 
 													textbox = {
 														size = { 100% 100% }
@@ -843,7 +999,7 @@ types building_browser_panel_types
 											button_icon_round_toggle = {
 												size = { 29 29 }
 												parentanchor = vcenter
-
+												
 												blockoverride "on_click" {
 													onclick = "[GetVariableSystem.Toggle('building_browser_filter_building_type_view_grid')]"
 												}
@@ -889,7 +1045,7 @@ types building_browser_panel_types
 														position = { 4 0 }
 														size = { 28 28 }
 														parentanchor = vcenter
-														texture = "[BuildingType.GetTexture]"
+														texture = "[BuildingType.GetIcon]"
 													}
 
 													textbox = {
@@ -932,7 +1088,7 @@ types building_browser_panel_types
 													icon = {
 														size = { 28 28 }
 														parentanchor = center
-														texture = "[BuildingType.GetTexture]"
+														texture = "[BuildingType.GetIcon]"
 													}
 
 													tooltip = "[BuildingType.GetName]"
@@ -1020,7 +1176,7 @@ types building_browser_panel_types
 												}
 											}
 										}
-
+										
 										dynamicgridbox = {
 											datamodel = "[BuildingBrowserPanel.GetAllStates]"
 											datamodel_wrap = 2
@@ -1032,10 +1188,14 @@ types building_browser_panel_types
 													using = default_button
 													onclick = "[BuildingBrowserPanel.StateFilterToggleShown(State.AccessSelf)]"
 
+													tooltipwidget = {
+														FancyTooltip_State = {}
+													}
+
 													textbox = {
 														parentanchor = vcenter
 														size = { 200 35 }
-														text = "[State.GetOwner.GetFlagTextIcon] [State.GetName]"
+														text = "[State.GetOwner.GetFlagTextIcon] [State.GetNameNoFormatting]"
 														multiline = yes
 														fontsize_min = 12
 														elide = right
@@ -1862,11 +2022,11 @@ types building_browser_panel_types
 
 								sort_button = {
 									size = { 50 30 }
-									text = "concept_building"
-									tooltip = "SORT_BY_BUILDING"
+									text = "NAME"
+									tooltip = "SORT_BY_NAME"
 									align = nobaseline
 									onclick = "[BuildingBrowserPanel.Sort('building')]"
-									visible = "[GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' )]"
+									visible = "[Not(BuildingBrowserPanel.IsGroupedByBuildingType)]"
 								}
 
 								sort_button = {
@@ -1875,16 +2035,16 @@ types building_browser_panel_types
 									tooltip = "SORT_BY_STATE"
 									align = nobaseline
 									onclick = "[BuildingBrowserPanel.Sort('state')]"
-									visible = "[GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' )]"
+									visible = "[Not(BuildingBrowserPanel.IsGroupedByBuildingType)]"
 								}
 
 								sort_button = {
 									size = { 75 30 }
-									text = "concept_building"
-									tooltip = "SORT_BY_BUILDING"
+									text = "NAME"
+									tooltip = "SORT_BY_NAME"
 									align = nobaseline
 									onclick = "[BuildingBrowserPanel.Sort('building')]"
-									visible = "[Not(GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' ))]"
+									visible = "[BuildingBrowserPanel.IsGroupedByBuildingType]"
 								}
 
 								sort_button = {
@@ -1893,7 +2053,7 @@ types building_browser_panel_types
 									tooltip = "SORT_BY_STATE"
 									align = nobaseline
 									onclick = "[BuildingBrowserPanel.Sort('state')]"
-									visible = "[Not(GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' ))]"
+									visible = "[BuildingBrowserPanel.IsGroupedByBuildingType]"
 								}
 
 								sort_button = {
@@ -2003,7 +2163,7 @@ types building_browser_panel_types
 											addcolumn = @spreadsheet_width
 											datamodel = "[BuildingBrowserPanel.GetSortedAndFilteredBuildings]"
 											parentanchor = hcenter
-											visible = "[GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' )]"
+											visible = "[Not(BuildingBrowserPanel.IsGroupedByBuildingType)]"
 
 											item = {
 												widget = {
@@ -2023,7 +2183,7 @@ types building_browser_panel_types
 										flowcontainer = {
 											datamodel = "[BuildingBrowserPanel.GetBuildingBrowserBuildingTypeItems]"
 											parentanchor = hcenter
-											visible = "[Not(GetVariableSystem.Exists( 'building_browser_grouped_by_building_type' ))]"
+											visible = "[BuildingBrowserPanel.IsGroupedByBuildingType]"
 											direction = vertical
 											spacing = 3
 											margin_top = 3
@@ -2177,114 +2337,530 @@ types building_browser_panel_types
 
 		blockoverride "fixed_top" {
 
-			#TABS
-			tab_buttons = {
-				blockoverride "first_button"
-				{
-					text = "ALL"
-				}
-				blockoverride "first_button_tooltip" {
-					tooltip = "ALL"
-				}
-				blockoverride "first_button_click"
-				{
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
-				}
-				blockoverride "first_button_visibility"
-				{
-					visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('is_urban')), Not(BuildingBrowserPanel.IsFiltered('is_rural'))), Not(BuildingBrowserPanel.IsFiltered('is_development')))]"
-				}
-				blockoverride "first_button_visibility_checked"
-				{
-					visible = "[Or(Or(BuildingBrowserPanel.IsFiltered('is_urban'), BuildingBrowserPanel.IsFiltered('is_rural')), BuildingBrowserPanel.IsFiltered('is_development'))]"
-				}
-				blockoverride "first_button_selected"
-				{
-					text = "ALL"
+			flowcontainer = {
+				direction = vertical
+
+				background = {
+					using = dropdown_background
+					margin = { 0 -2 }
 				}
 
-				blockoverride "second_button"
-				{
-					text = "IS_URBAN"
-				}
-				blockoverride "second_button_tooltip" {
-					tooltip = "IS_URBAN"
-				}
-				blockoverride "second_button_click"
-				{
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'yes')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
-				}
-				blockoverride "second_button_visibility"
-				{
-					visible = "[BuildingBrowserPanel.IsFilterYes('is_urban')]"
-				}
-				blockoverride "second_button_visibility_checked"
-				{
-					visible = "[Not(BuildingBrowserPanel.IsFilterYes('is_urban'))]"
-				}
-				blockoverride "second_button_selected"
-				{
-					text = "IS_URBAN"
+				section_header_button = {					
+					blockoverride "arrow_position" {
+						position = { 10 0 }
+						parentanchor = left|vcenter
+					}
+
+					blockoverride "left_text" {
+						text = "FILTERS"
+						fontsize_min = 12
+						elide = right
+					}
+
+					blockoverride "right_text" {
+						section_header_right_text = {
+							text = "CURRENT_COMPACT_BUILDING_BROWSER_FILTER"
+						}
+					}
+
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle( 'compact_building_browser_filters' )]"
+					}
+					
+					blockoverride "onclick_showmore" {
+						visible = "[Not(GetVariableSystem.Exists( 'compact_building_browser_filters' ))]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[GetVariableSystem.Exists( 'compact_building_browser_filters' )]"
+					}
 				}
 
-				blockoverride "third_button"
-				{
-					text = "IS_RURAL"
-				}
-				blockoverride "third_button_tooltip" {
-					tooltip = "IS_RURAL"
-				}
-				blockoverride "third_button_click"
-				{
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'yes')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
-				}
-				blockoverride "third_button_visibility"
-				{
-					visible = "[BuildingBrowserPanel.IsFilterYes('is_rural')]"
-				}
-				blockoverride "third_button_visibility_checked"
-				{
-					visible = "[Not(BuildingBrowserPanel.IsFilterYes('is_rural'))]"
-				}
-				blockoverride "third_button_selected"
-				{
-					text = "IS_RURAL"
-				}
+				flowcontainer = {
+					visible = "[GetVariableSystem.Exists( 'compact_building_browser_filters' )]"
+					parentanchor = hcenter
+					margin_bottom = 10
+					margin_top = 5
+					using = default_list_position
+					direction = vertical
+					minimumsize = { @panel_width_plus_14 -1 }
 
-				blockoverride "fourth_button"
-				{
-					text = "IS_DEVELOPMENT"
-				}
-				blockoverride "fourth_button_name"
-				{
-					name = "tutorial_highlight_development_tab"
-				}
-				blockoverride "fourth_button_tooltip" {
-					tooltip = "IS_DEVELOPMENT"
-				}
-				blockoverride "fourth_button_click"
-				{
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
-					onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'yes')]"
-				}
-				blockoverride "fourth_button_visibility"
-				{
-					visible = "[BuildingBrowserPanel.IsFilterYes('is_development')]"
-				}
-				blockoverride "fourth_button_visibility_checked"
-				{
-					visible = "[Not(BuildingBrowserPanel.IsFilterYes('is_development'))]"
-				}
-				blockoverride "fourth_button_selected"
-				{
-					text = "IS_DEVELOPMENT"
+					### BUILDING LOCATION FILTER
+					building_browser_filter_line = {
+						parentanchor = hcenter
+						blockoverride "line_background" {}
+
+						blockoverride "filter_line_label"
+						{
+							text = "LOCATION"
+						}
+
+						blockoverride "filter_line_active_visible"
+						{
+							visible = "[BuildingBrowserPanel.IsFiltered('is_domestic')]"
+						}
+
+						blockoverride "line_size"
+						{
+							size = { @panel_width 38 }
+						}
+
+						blockoverride "filter_line_buttons"
+						{
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "ALL"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_domestic', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[Not(BuildingBrowserPanel.IsFiltered('is_domestic'))]"
+									alpha = @all_filter_selected_alpha
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "IS_DOMESTIC"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_domestic', 'yes')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_domestic.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('is_domestic')]"
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "IS_ABROAD"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_domestic', 'no')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/buttons/button_icons/foreign_invest.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterNo('is_domestic')]"
+								}
+							}
+						}
+					}
+
+					### BUILDING GROUP FILTER
+					building_browser_filter_line = {
+						parentanchor = hcenter
+						blockoverride "line_background" {}
+
+						blockoverride "filter_line_label"
+						{
+							text = "BUILDING_GROUP"
+						}
+
+						blockoverride "filter_line_active_visible"
+						{
+							visible = "[Not(And(And(Not(BuildingBrowserPanel.IsFiltered('is_urban')), Not(BuildingBrowserPanel.IsFiltered('is_rural'))), Not(BuildingBrowserPanel.IsFiltered('is_development'))))]"
+						}
+
+						blockoverride "line_size"
+						{
+							size = { @panel_width 38 }
+						}
+
+						blockoverride "filter_line_buttons"
+						{
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "ALL"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('is_urban')), Not(BuildingBrowserPanel.IsFiltered('is_rural'))), Not(BuildingBrowserPanel.IsFiltered('is_development')))]"
+									alpha = @all_filter_selected_alpha
+								}
+
+							}
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "IS_URBAN"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_urban.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('is_urban')]"
+								}
+
+							}
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "IS_RURAL"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'off')]"
+
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_rural.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('is_rural')]"
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "IS_DEVELOPMENT"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_development', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_urban', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('is_rural', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_development.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('is_development')]"
+								}
+
+							}
+							
+						}
+					}
+
+					### BUILDING OWNERSHIP FILTER
+					building_browser_filter_line = {
+						parentanchor = hcenter
+						blockoverride "line_background" {}
+
+						blockoverride "filter_line_label"
+						{
+							text = "BUILDING_FILTER_OWNERSHIP"
+						}
+
+						blockoverride "filter_line_active_visible"
+						{
+							visible = "[Not(And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign'))))]"
+						}
+
+						blockoverride "line_size"
+						{
+							size = { @panel_width 38 }
+						}
+
+						blockoverride "filter_line_buttons"
+						{
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "ALL"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[And(And(Not(BuildingBrowserPanel.IsFiltered('owned_national')), Not(BuildingBrowserPanel.IsFiltered('owned_private'))), Not(BuildingBrowserPanel.IsFiltered('owned_foreign')))]"
+									alpha = @all_filter_selected_alpha
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "BUILDING_FILTER_OWNERSHIP_GOVERNMENT_TT"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/generic_icons/government_building_icon.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('owned_national')]"
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "BUILDING_FILTER_OWNERSHIP_PRIVATE_TT"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/generic_icons/privately_owned_building_icon.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('owned_private')]"
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "BUILDING_FILTER_OWNERSHIP_FOREIGN_TT"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_foreign_owners.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('owned_foreign')]"
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "BUILDING_FILTER_OWNERSHIP_COMPANY_TT"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_company', 'yes')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_foreign', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_national', 'off')]"
+									onclick = "[BuildingBrowserPanel.SetFilterMode('owned_private', 'off')]"
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_has_companies_owners.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									visible = "[BuildingBrowserPanel.IsFilterYes('owned_company')]"
+								}
+							}
+						}
+					}
+
+					### POTENTIAL BUILDING TYPES FILTER
+					building_browser_filter_line = {
+						visible = no # todo - PRCAL-36023 - Remove this visible check
+						parentanchor = hcenter
+						blockoverride "line_background" {}
+
+						blockoverride "filter_line_label"
+						{
+							text = "AVAILABILITY"
+						}
+
+						blockoverride "filter_line_active_visible"
+						{
+							#visible = "[BuildingBrowserPanel.IsFiltered('is_existing')]" # todo - PRCAL-36023
+						}
+
+						blockoverride "line_size"
+						{
+							size = { @panel_width 38 }
+						}
+
+						blockoverride "filter_line_buttons"
+						{
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "AVAILABLITY_ALL"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'off')]" # todo - PRCAL-36023
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
+								}
+
+								blockoverride "line_button_selected"
+								{
+									#visible = "[Not(BuildingBrowserPanel.IsFiltered('is_existing'))]" # todo - PRCAL-36023
+									alpha = @all_filter_selected_alpha
+								}
+
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "ONLY_AVAILABLE_BUILDING_TYPES"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'yes')]" # todo - PRCAL-36023
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_existing_building_available.dds"
+								}
+
+								blockoverride "line_button_icon_size"
+								{
+									size = { 25 25 }
+								}
+
+								blockoverride "line_button_selected"
+								{
+									#visible = "[BuildingBrowserPanel.IsFilterYes('is_existing')]" # todo - PRCAL-36023
+									visible = no
+								}
+							}
+
+							building_browser_filter_line_button = {
+								blockoverride "line_button_tooltip"
+								{
+									tooltip = "ONLY_POTENTIAL_BUILDING_TYPES"
+								}
+
+								blockoverride "line_button_onclick"
+								{
+									#onclick = "[BuildingBrowserPanel.SetFilterMode('is_existing', 'no')]" # todo - PRCAL-36023
+								}
+
+								blockoverride "line_button_icon_texture"
+								{
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_new_building_available.dds"
+								}
+
+								blockoverride "line_button_icon_size"
+								{
+									size = { 25 25 }
+								}
+
+								blockoverride "line_button_selected"
+								{
+									#visible = "[BuildingBrowserPanel.IsFilterNo('is_existing')]" # todo - PRCAL-36023
+									visible = no
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -2294,7 +2870,8 @@ types building_browser_panel_types
 
 				sort_button = {
 					size = { 135 30 }
-					text = "concept_building"
+					text = "NAME"
+					tooltip = "SORT_BY_BUILDING_NAME"
 					align = nobaseline
 					onclick = "[BuildingBrowserPanel.Sort('building')]"
 				}
@@ -2302,13 +2879,15 @@ types building_browser_panel_types
 				sort_button = {
 					size = { 135 30 }
 					text = "SIZE"
+					tooltip = "SORT_BY_BUILDING_SIZE"
 					align = nobaseline
 					onclick = "[BuildingBrowserPanel.Sort('level')]"
 				}
 
 				sort_button = {
 					size = { 135 30 }
-					text = "concept_production_methods"
+					text = "BUILDING_DATABASE_ORDER"
+					tooltip = "SORT_BY_BUILDING_TYPE"
 					align = nobaseline
 					onclick = "[BuildingBrowserPanel.Sort('database_order')]"
 				}
@@ -2316,6 +2895,7 @@ types building_browser_panel_types
 				sort_button = {
 					size = { 135 30 }
 					text = "concept_productivity"
+					tooltip = "SORT_BY_BUILDING_PRODUCTIVITY"
 					align = nobaseline
 					onclick = "[BuildingBrowserPanel.Sort('profitability')]"
 				}
@@ -2327,7 +2907,7 @@ types building_browser_panel_types
 			flowcontainer = {
 				direction = vertical
 
-
+			
 				# Remove this, currently needed to make sure GetBuildingBrowserBuildingTypeItems is being populated
 				flowcontainer = {
 					datamodel = "[BuildingBrowserPanel.GetSortedAndFilteredBuildings]"
@@ -2343,8 +2923,15 @@ types building_browser_panel_types
 					datamodel = "[BuildingBrowserPanel.GetBuildingBrowserBuildingTypeItems]"
 
 					item = {
-						buildings_production_method_item = {
-							datacontext = "[BuildingBrowserBuildingTypeItem.GetBuildingType]"
+						container = {
+							buildings_production_method_item = {
+								#visible = "[BuildingBrowserBuildingTypeItem.BuildingBrowserBuildingTypeItem.ExistsIn(GetPlayer.Self)]" # todo - PRCAL-36023
+							}
+
+							buildings_production_method_item_potential = {
+								#visible = "[And(Not(BuildingBrowserBuildingTypeItem.BuildingBrowserBuildingTypeItem.ExistsIn(GetPlayer.Self)), BuildingBrowserBuildingTypeItem.BuildingBrowserBuildingTypeItem.IsPotentialIn(GetPlayer.Self))]" # todo - PRCAL-36023
+								visible = no
+							}
 						}
 					}
 				}
@@ -2359,7 +2946,7 @@ types building_browser_panel_types
 					blockoverride "text" {
 						text = "AVAILABLE_URBAN_BUILDINGS"
 					}
-				}
+				} 
 
 				#POTENTIAL RURAL
 				building_panel_potential_buildings = {
@@ -2371,7 +2958,7 @@ types building_browser_panel_types
 					blockoverride "text" {
 						text = "AVAILABLE_RURAL_BUILDINGS"
 					}
-				}
+				} 
 
 
 				#POTENTIAL DEVELOPMENT
@@ -2384,7 +2971,7 @@ types building_browser_panel_types
 					blockoverride "text" {
 						text = "AVAILABLE_DEVELOPMENT_BUILDINGS"
 					}
-				}
+				} 
 			}
 		}
 
@@ -2427,7 +3014,7 @@ types building_browser_panel_types
 
 		flowcontainer = {
 			margin = { 7 -5 }
-
+			
 			dynamicgridbox = {
 				block "potential_building_types" {
 
@@ -2436,10 +3023,6 @@ types building_browser_panel_types
 				datamodel_wrap = 5
 
 				item = {
-
-					#ici
-					visible = "[Not(EqualTo_string(BuildingType.GetKey,'building_financial_centre'))]"
-
 					container = {
 						producing_building_button = {}
 					}
@@ -2447,8 +3030,6 @@ types building_browser_panel_types
 			}
 		}
 	}
-
-
 }
 
 types building_browser_panel_types {
@@ -2458,20 +3039,32 @@ types building_browser_panel_types {
 		}
 
 		block "first_info" {
-			icon = {
-				size = { 50 50 }
-				texture = "[Building.GetTexture]"
-			}
+			button = {
+				onrightclick = "[RightClickMenuManager.ShowForBuilding(Building.AccessSelf)]"
+				
+				size = { 170 @spreadsheet_height }
 
-			textbox = {
-				text = "BUILDING_BROWSER_BUILDING_AND_STATE"
-				size = { 120 @spreadsheet_height }
-				align = nobaseline
-				margin_right = 5
-				margin_left = 5
-				elide = right
-				fontsize_min = 12
-				multiline = yes
+				icon = {
+					texture = "[Building.GetIcon]"
+					size = { 50 50 }
+					parentanchor = vcenter
+				}
+
+				textbox = {
+					datacontext = "[Building.GetState]"
+									
+					position = { 50 0 }
+					parentanchor = vcenter
+					size = { 120 @spreadsheet_height }
+					margin = { 5 0 }
+					
+					align = nobaseline
+					elide = right
+					fontsize_min = 12
+					multiline = yes
+
+					text = "STATE_NAME_WITH_FOREIGN_FLAG_NO_FORMAT"
+				}
 			}
 
 			vertical_divider = {}
@@ -2481,7 +3074,7 @@ types building_browser_panel_types {
 
 				flowcontainer = {
 					visible = "[Not(IsDataModelEmpty(Building.AccessState.AccessStateRegion.AccessTraits))]"
-					datamodel = "[Building.AccessState.AccessStateRegion.AccessTraits]"
+					datamodel = "[DataModelFirst(Building.AccessState.AccessStateRegion.AccessTraits,'(int32)3')]"
 					parentanchor = vcenter
 					margin_left = 5
 
@@ -2665,7 +3258,7 @@ types building_browser_panel_types {
 				flowcontainer = {
 					parentanchor = vcenter
 					textbox = {
-						raw_text = "[Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetCurrentCashReserves|Dv]"
+						raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetCurrentCashReserves|Dv]"
 						margin_left = 4
 						align = hcenter|nobaseline
 						autoresize = yes
@@ -2692,7 +3285,7 @@ types building_browser_panel_types {
 			textbox = {
 				visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
 				using = productivity_tooltip_with_graph
-				raw_text = "[Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
 				align = nobaseline
 				autoresize = yes
 				margin_left = 5
@@ -2716,8 +3309,8 @@ types building_browser_panel_types {
 					widget = {
 						size = { 35 35 }
 
-						building_nationalize_button = {
-							parentanchor = center
+						building_nationalize_button = { 
+							parentanchor = center  
 						}
 					}
 
@@ -2726,7 +3319,7 @@ types building_browser_panel_types {
 						size = { 35 35 }
 
 						building_privatize_toggle = {
-							parentanchor = center
+							parentanchor = center 
 						}
 					}
 
@@ -2734,50 +3327,8 @@ types building_browser_panel_types {
 					widget = {
 						size = { 35 35 }
 
-						widget = {
-							visible = "[Building.GetBuildingType.CanBeSubsidized]"
-							size = { 35 35 }
+						building_subsidize_toggle = {
 							parentanchor = center
-
-							icon = {
-								using = rotate_glow_blue
-								size = { 130% 130% }
-								visible = "[And(Building.GetBuildingType.CanBeSubsidized,Building.IsSubsidized)]"
-								alwaystransparent = yes
-								parentanchor = center
-								using = default_fade_in_out
-							}
-							button_icon_round_action = {
-								size = { 100% 100% }
-								visible = "[And(Building.GetBuildingType.CanBeSubsidized,Building.IsSubsidized)]"
-								enabled = "[IsValid( Building.ToggleSubsidies )]"
-								onclick = "[Execute( Building.ToggleSubsidies )]"
-								tooltip = SUBSIDIZED_YES
-								using = icon_toggle_single_off_sound
-
-								blockoverride "icon" {
-									texture = "gfx/interface/production_methods/subsidized.dds"
-								}
-								blockoverride "icon_size" {
-									size = { 80% 80% }
-								}
-							}
-
-							button_icon_round_action = {
-								size = { 100% 100% }
-								visible = "[And(Building.GetBuildingType.CanBeSubsidized,Not(Building.IsSubsidized))]"
-								enabled = "[IsValid( Building.ToggleSubsidies )]"
-								onclick = "[Execute( Building.ToggleSubsidies )]"
-								tooltip = SUBSIDIZED_NO
-								using = icon_toggle_single_on_sound
-
-								blockoverride "icon" {
-									texture = "gfx/interface/production_methods/subsidized_not.dds"
-								}
-								blockoverride "icon_size" {
-									size = { 80% 80% }
-								}
-							}
 						}
 					}
 
@@ -2785,12 +3336,13 @@ types building_browser_panel_types {
 					widget = {
 						size = { 35 35 }
 
-						building_auto_expand = {
+						building_auto_expand_toggle = {
 							parentanchor = center
 						}
 					}
-
+					
 					widget = { size = { 5 5 }}
+
 					button_icon_goto = {
 						parentanchor = vcenter
 						size = { 30 30 }
@@ -2850,7 +3402,7 @@ types building_browser_panel_types {
 						icon = {
 							parentanchor = center
 							size = { 70 70 }
-							texture = "[BuildingType.GetTexture]"
+							texture = "[BuildingType.GetIcon]"
 						}
 					}
 
@@ -2934,10 +3486,49 @@ types building_browser_panel_types {
 							parentanchor = vcenter
 
 							item = {
+
 								widget = {
 									size = { 50 50 }
 									tooltip = "BUILDING_TYPE_BULK_CHANGE_TOOLTIP"
 									using = tooltip_above
+									
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+
+									# ███╗   ███╗ ██████╗ ██████╗ 
+									# ████╗ ████║██╔═══██╗██╔══██╗
+									# ██╔████╔██║██║   ██║██║  ██║
+									# ██║╚██╔╝██║██║   ██║██║  ██║
+									# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+									# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+									#E&F mod
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+
+									visible = "[Not(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(EqualTo_string(ProductionMethodGroup.GetKey,'pmg_market_liquidity'),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_manufacture_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_agricultural_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_mining_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_railroad_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_bond_exchange')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_monetary_system')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_bond_production')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_additional_production_method')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_currency_type')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_subject_currency_type')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_market_liquidity_urban_center')))]"
+
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+
+									# ███╗   ███╗ ██████╗ ██████╗ 
+									# ████╗ ████║██╔═══██╗██╔══██╗
+									# ██╔████╔██║██║   ██║██║  ██║
+									# ██║╚██╔╝██║██║   ██║██║  ██║
+									# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+									# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+									#E&F mod
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
+									############################################################################################################################################################
 
 									button = {
 										visible = "[NotEqualTo_int32( GetDataModelSize( ProductionMethodGroup.AccessCountryProductionMethods( GetPlayer.Self ) ), '(int32)1' )]"
@@ -3037,7 +3628,7 @@ types building_browser_panel_types {
 
 						textbox = {
 							visible = "[And(Not(BuildingType.IsGovernmentFunded), Not(BuildingType.IsSubsistenceBuilding))]"
-							raw_text = "[Building.GetState.GetOwner.GetCustom('currency_symbol')][BuildingBrowserBuildingTypeItem.GetFilteredAverageProductivity|1]"
+							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [BuildingBrowserBuildingTypeItem.GetFilteredAverageProductivity|1]"
 							size = { 100 @spreadsheet_header_height }
 							align = nobaseline
 							using = fontsize_large
@@ -3058,14 +3649,17 @@ types building_browser_panel_types {
 							margin = { 4 4 }
 
 							widget = {
-								#spot to align with "nationalize"
 								size = { 35 35 }
+								building_type_nationalize_button = {
+									parentanchor = center
+								}
 							}
 
 							### privatize
 							widget = {
 								size = { 35 35 }
-								building_privatize_bulk_toggle = {
+								
+								building_type_privatize_toggle = {
 									parentanchor = center
 								}
 							}
@@ -3074,133 +3668,19 @@ types building_browser_panel_types {
 							widget = {
 								size = { 35 35 }
 
-								widget = {
-									size = { 35 35 }
-									visible = "[BuildingType.CanBeSubsidized]"
+								building_type_subsidize_toggle = {
 									parentanchor = center
-
-									icon = {
-										using = rotate_glow_blue
-										size = { 130% 130% }
-										visible = "[BuildingBrowserBuildingTypeItem.HasAllSubsidies]"
-										alwaystransparent = yes
-										parentanchor = center
-										using = default_fade_in_out
-									}
-
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[BuildingBrowserBuildingTypeItem.HasAllSubsidies]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										tooltip = "SUBSIDIZED_ALL_YES"
-										using = icon_toggle_all_off_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/subsidized.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[BuildingBrowserBuildingTypeItem.HasAllNoSubsidies]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										tooltip = "SUBSIDIZED_ALL_NO"
-										using = icon_toggle_all_on_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/subsidized_not.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[BuildingBrowserBuildingTypeItem.HasMixedSubsidies]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllSubsidies )]"
-										tooltip = "SUBSIDIZED_ALL_MIXED"
-										using = icon_toggle_all_on_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/subsidized_mixed.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
 								}
 							}
 
-							### auto expand
+							### Auto Expand
 							widget = {
 								size = { 35 35 }
 
-								widget = {
-									size = { 35 35 }
-									visible = "[BuildingType.CanBeAutoExpanded]"
+								building_type_auto_expand_toggle = {
 									parentanchor = center
-
-									icon = {
-										using = rotate_glow_blue
-										size = { 130% 130% }
-										visible = "[And(BuildingBrowserBuildingTypeItem.HasAllAutoExpand, BuildingBrowserBuildingTypeItem.GetBuildingType.CanBeAutoExpanded)]"
-										alwaystransparent = yes
-										parentanchor = center
-										using = default_fade_in_out
-									}
-
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[And(BuildingBrowserBuildingTypeItem.HasAllAutoExpand, BuildingBrowserBuildingTypeItem.GetBuildingType.CanBeAutoExpanded)]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										tooltip = "AUTO_EXPAND_ALL_YES"
-										using = icon_toggle_all_off_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/auto_expand.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[And(BuildingBrowserBuildingTypeItem.HasAllNoAutoExpand, BuildingBrowserBuildingTypeItem.GetBuildingType.CanBeAutoExpanded)]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										tooltip = "AUTO_EXPAND_ALL_NO"
-										using = icon_toggle_all_on_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/auto_expand_not.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
-									button_icon_round_action = {
-										size = { 100% 100% }
-										visible = "[BuildingBrowserBuildingTypeItem.HasMixedAutoExpand]"
-										enabled = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										onclick = "[Execute( BuildingBrowserBuildingTypeItem.ToggleAllAutoExpand )]"
-										tooltip = "AUTO_EXPAND_ALL_MIXED"
-										using = icon_toggle_all_on_sound
-
-										blockoverride "icon" {
-											texture = "gfx/interface/production_methods/subsidized_mixed.dds"
-										}
-										blockoverride "icon_size" {
-											size = { 70% 70% }
-										}
-									}
 								}
-							}
+							}						
 						}
 					}
 				}
@@ -3226,27 +3706,36 @@ types building_browser_panel_types {
 
 						building_browser_building_item = {
 							blockoverride "first_info" {
-								textbox = {
-									text = "BUILDING_BROWSER_BUILDING_AND_STATE"
-									size = { 170 @spreadsheet_height }
-									align = nobaseline
-									margin_right = 10
-									elide = right
-									fontsize_min = 12
-									margin_left = 10
-									using = fontsize_large
 
-									### AUTO DOWNSIZE WARNING
-									icon = {
-										size = { 32 32 }
-										position = { 153 0 }
-										parentanchor = vcenter
-										visible = "[Building.IsAutoDownsizing]"
-										texture = "gfx/interface/production_methods/auto_downsize.dds"
-										tooltip = "[Building.GetAutoDownsizeTooltip]"
+								button = {
+									onrightclick = "[RightClickMenuManager.ShowForBuilding(Building.AccessSelf)]"
+									size = { 170 @spreadsheet_height }
+
+									textbox = {
+										datacontext = "[Building.GetState]"
+										
+										size = { 100% 100% }
+										align = nobaseline
+										margin = { 10 0 }
+										elide = right
+										fontsize_min = 12
+										
+										using = fontsize_large
+
+										text = "STATE_NAME_WITH_FOREIGN_FLAG_NO_FORMAT"
+
+										### AUTO DOWNSIZE WARNING
+										icon = {
+											size = { 32 32 }
+											position = { 153 0 }
+											parentanchor = vcenter
+											visible = "[Building.IsAutoDownsizing]"
+											texture = "gfx/interface/production_methods/auto_downsize.dds"
+											tooltip = "[Building.GetAutoDownsizeTooltip]"
+										}									
 									}
 								}
-
+								
 								vertical_divider = {}
 
 								widget = {
@@ -3336,16 +3825,14 @@ types building_browser_panel_types {
 				align = hcenter|nobaseline
 			}
 		}
-
-
 	}
 
-
-
-
 	type building_browser_filter_line = widget {
-		background = {
-			using = dark_area
+		
+		block "line_background" {
+			background = {
+				using = dark_area
+			}
 		}
 
 		background = {
@@ -3360,7 +3847,9 @@ types building_browser_panel_types {
 			}
 		}
 
-		size = { 404 38 }
+		block "line_size" {
+			size = { 404 38 }
+		}
 
 		hbox = {
 			layoutpolicy_horizontal = expanding
@@ -3380,16 +3869,15 @@ types building_browser_panel_types {
 					fontsize_min = 12
 					elide = right
 
-					block "filter_line_base_alpha"
+					block "filter_line_base_alpha" 
 					{
 						alpha = 0.5
-					}
+					}	
 
-
-					block "filter_line_label"
+					block "filter_line_label" 
 					{
 						raw_text = "#todo todo#!"
-					}
+					}					
 				}
 
 				# put a full opacity text on top of the half opacity text if this line is active
@@ -3401,7 +3889,7 @@ types building_browser_panel_types {
 					fontsize_min = 12
 					elide = right
 
-					block "filter_line_label"
+					block "filter_line_label" 
 					{
 						raw_text = "#todo todo#!"
 					}
@@ -3413,11 +3901,11 @@ types building_browser_panel_types {
 				}
 			}
 
-
+			
 
 			block "filter_line_buttons"
 			{
-
+				
 			}
 		}
 	}
@@ -3430,16 +3918,21 @@ types building_browser_panel_types {
 
 		block "line_button_onclick"
 		{
-			#onclick =
+			#onclick = 
 		}
 
 		align = nobaseline
-
+		
 		using = default_button
 
 		icon = {
-			size = { 30 30 }
 			parentanchor = center
+
+			block "line_button_icon_size"
+			{
+				size = { 30 30 }
+			}
+
 			block "line_button_icon_texture"
 			{
 				texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_all.dds"
@@ -3456,13 +3949,13 @@ types building_browser_panel_types {
 		icon = {
 			block "line_button_selected"
 			{
-				#visible =
+				#visible = 
 			}
-
+			
 			using = highlighted_square_selection
 		}
 	}
-
+	
 }
 
 

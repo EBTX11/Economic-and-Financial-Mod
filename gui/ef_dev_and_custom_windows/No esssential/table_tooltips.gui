@@ -1,0 +1,90 @@
+template state_taxation_revenue_with_table {
+	tooltip = "STATE_TAX_REVENUE_TOOLTIP_HEADER"
+	tooltipwidget = {
+		TableTooltip_StateTaxationRevenue = {}
+	}
+}
+
+template state_government_expenses_with_table {
+	tooltip = "STATE_GOVERNMENT_EXPENSES_TOOLTIP_HEADER"
+	tooltipwidget = {
+		TableTooltip_StateGovernmentExpenses = {}
+	}
+}
+
+template market_goods_orders_with_table {
+	tooltip = "GOODS_PANEL_VALUE_TOOLTIP_HEADER"
+	tooltipwidget = {
+		TableTooltip_MarketGoodsOrders = {}
+	}
+}
+
+Types table_tooltips {
+	type TableTooltip_StateTaxationRevenue = RegularTooltip {
+		blockoverride "table_visibility" {
+			visible = "[NotZero_CFixedPoint(State.GetTaxationRevenue)]"
+		}
+
+		blockoverride "table_style" {
+			using = condensed_table
+		}
+
+		blockoverride "table_datamodel" {
+			datamodel = "[State.GetBuildingsWithTaxationRevenue]"
+		}
+
+		blockoverride "table_value_1" {
+			text = "[Building.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			tooltip = "TOOLTIP_BUILDING_TAXES_TOOLTIP"
+			raw_text = "@money![Building.GetTaxationRevenue|+=D]"
+		}
+	}
+	
+	type TableTooltip_StateGovernmentExpenses = RegularTooltip {
+		blockoverride "table_visibility" {
+			visible = "[NotZero_CFixedPoint(State.GetGovernmentExpenses)]"
+		}
+
+		blockoverride "table_style" {
+			using = condensed_table
+		}
+
+		blockoverride "table_datamodel" {
+			datamodel = "[State.GetBuildingsWithGovernmentExpenses]"
+		}
+
+		blockoverride "table_value_1" {
+			text = "[Building.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			tooltip = "[Building.GetGovernmentExpensesDesc]"
+			raw_text = "@money![Negate(Building.GetGovernmentExpenses)|+=D]"
+		}
+	}
+	
+	type TableTooltip_MarketGoodsOrders = RegularTooltip {
+		blockoverride "table_visibility" {
+			visible = "[NotZero_CFixedPoint(GoodsPanelValue.GetValue)]"
+		}
+
+		blockoverride "table_style" {
+			using = condensed_table
+		}
+
+		blockoverride "table_datamodel" {
+			datamodel = "[GoodsPanelValue.GetChildren]"
+		}
+
+		blockoverride "table_value_1" {
+			text = "[GoodsPanelChildValue.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			raw_text = "[GoodsPanelChildValue.GetValue|Dv]"
+		}
+	}
+}

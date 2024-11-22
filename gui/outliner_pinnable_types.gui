@@ -140,31 +140,6 @@ types pinnable_outliner_items {
 			flowcontainer = {
 				parentanchor = vcenter
 
-				widget = {
-					datacontext = "[Character.PredictLawToAgitate(GetPlayer.Self)]"
-					datacontext = "[Law.GetPoliticalMovement]"
-					tooltip = "AGITATOR_POLITICAL_MOVEMENT"
-					size = { 25 25 }
-					parentanchor = vcenter
-
-					widget = {
-						visible = "[Character.IsAgitator]"
-						size = { 100% 100% }
-
-						icon = {
-							visible = "[Law.IsValid]"
-							size = { 100% 100% }
-							texture = "[Law.GetTexture]"
-						}
-
-						icon = {
-							visible = "[Not(Law.IsValid)]"
-							size = { 100% 100% }
-							texture = "gfx/interface/icons/generic_icons/red_cross.dds"
-						}
-					}
-				}
-
 				icon = {
 					datacontext = "[Character.AccessInterestGroup]"
 					texture = "[InterestGroup.GetTexture]"
@@ -284,7 +259,7 @@ types pinnable_outliner_items {
 			}
 
 			textbox = {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Company.GetFormattedProductivity]"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Company.GetFormattedProductivity]"
 				autoresize = yes
 				align = right|nobaseline
 				parentanchor = vcenter
@@ -475,7 +450,7 @@ types pinnable_outliner_items {
 		datacontext = "[OutlinerEntry.AccessScope.AccessMilitaryFormation]"
 
 		icon = {
-			visible = "[MilitaryFormation.IsBeingHighlighted]"
+			visible = "[Or(MilitaryFormation.IsBeingHighlighted, MilitaryFormation.IsSelected)]"
 			using = highlighted_square_selection
 		}
 
@@ -492,6 +467,11 @@ types pinnable_outliner_items {
 		blockoverride "onclick" {
 			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.AccessSelf, 'default' )]"
 			onrightclick = "[RightClickMenuManager.ShowForMilitaryFormation(MilitaryFormation.AccessSelf)]"
+
+			click_modifiers = {
+				onshift = "[MilitaryFormation.Select]"
+				onctrl = "[MilitaryFormation.ToggleSelected]"
+			}
 		}
 
 		blockoverride "onhover" {
@@ -920,6 +900,108 @@ types pinnable_outliner_items {
 		}
 	}
 
+	type non_revolutionary_political_movement_item = pinnable_outliner_entry {
+		datacontext = "[OutlinerEntry.AccessScope.AccessPoliticalMovement]"
+
+		tooltipwidget = {
+			FancyTooltip_PoliticalMovement = {}
+		}
+
+		# Override the entire item so we can make it responsive using an hbox
+		blockoverride "widget" {
+			hbox = {
+				layoutpolicy_horizontal = expanding
+				spacing = 5
+				margin_left = 5
+				margin_right = 25
+				maximumsize = { @entry_width -1 }
+
+				flowcontainer = {
+
+					icon = {
+						parentanchor = vcenter
+						size = { 25 25 }
+						texture = "[PoliticalMovement.GetTexture]"
+					}
+				}
+
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					align = nobaseline
+					elide = right
+					fontsize_min = 12
+					text = "[PoliticalMovement.GetNameNoFormatting]"
+				}
+
+				bolster_icon = {
+					visible = "[PoliticalMovement.IsBolstered]"
+					size = { 25 25 }
+
+					blockoverride "tooltip" {}
+				}
+
+				suppress_icon = {
+					visible = "[PoliticalMovement.IsSuppressed]"
+					size = { 25 25 }
+
+					blockoverride "tooltip" {}
+				}
+
+				flowcontainer = {
+					spacing = 2
+
+					icon = {
+						parentanchor = vcenter
+						size = { 25 25 }
+						texture = "gfx/interface/icons/generic_icons/population.dds"
+					}
+
+					textbox = {
+						parentanchor = vcenter
+						size = { 30 30 }
+						align = nobaseline
+						elide = right
+						fontsize_min = 12
+						text = "POLITICAL_MOVEMENT_SUPPORT_WITHOUT_LABEL"
+					}
+				}
+
+				flowcontainer = {
+					spacing = 2
+
+					icon = {
+						visible = "[LessThan_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
+						parentanchor = vcenter
+						size = { 25 25 }
+						texture = "gfx/interface/icons/political_movement_icons/political_activism.dds"
+					}
+
+					icon = {
+						visible = "[GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
+						parentanchor = vcenter
+						size = { 25 25 }
+						texture = "gfx/interface/icons/political_movement_icons/political_activism_red.dds"
+					}
+
+					textbox = {
+						parentanchor = vcenter
+						size = { 30 30 }
+						align = nobaseline
+						elide = right
+						fontsize_min = 12
+						text = "POLITICAL_MOVEMENT_RADICALISM_WITHOUT_LABEL"
+					}
+				}
+			}
+		}
+
+		blockoverride "onclick" {
+			onclick = "[InformationPanelBar.OpenPoliticalMovementPanel(PoliticalMovement.AccessSelf)]"
+			onrightclick = "[RightClickMenuManager.ShowForPoliticalMovement(PoliticalMovement.AccessSelf)]"
+		}
+	}
+
 
 
 	type outliner_countries = pinnable_outliner_group {
@@ -952,6 +1034,27 @@ types pinnable_outliner_items {
 			}
 
 			interest_group_item = {
+				blockoverride "group_margin_left" {}
+
+				blockoverride "text_size" {
+					minimumsize = { 207 -1 }
+					maximumsize = { 207 -1 }
+					margin_left = 5
+				}
+			}
+		}
+	}
+
+	type outliner_non_revolutionary_political_movements = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('non_revolutionary_political_movements')]"
+		
+
+		blockoverride "item" {
+			blockoverride "entry_size" {
+				size = { @entry_width @entry_height }
+			}
+
+			non_revolutionary_political_movement_item = {
 				blockoverride "group_margin_left" {}
 
 				blockoverride "text_size" {
@@ -1017,6 +1120,8 @@ types pinnable_outliner_items {
 				}
 
 				hbox = {
+					tooltip = "POLITICAL_LOBBY_APPEASEMENT_TOOLTIP"
+
 					icon = {
 						name = "appeasement_icon"
 						texture = "gfx/interface/icons/political_lobby_icons/lobby_appeasement.dds"
@@ -1081,6 +1186,10 @@ types pinnable_outliner_items {
 	type market_item = pinnable_outliner_entry {
 		datacontext = "[OutlinerEntry.AccessScope.AccessMarket]"
 
+		tooltipwidget = {
+			FancyTooltip_Market = {}
+		}
+
 		blockoverride "widget" {
 			flowcontainer = {
 				position = { 5 0 }
@@ -1096,19 +1205,16 @@ types pinnable_outliner_items {
 						margin_right = 7
 						margin_left = 3
 
-						tiny_flag = {
+						tiny_flag_no_interact = {
 							parentanchor = vcenter
 							datacontext = "[Market.GetOwner]"
+
+							blockoverride "tooltip" {}
 						}
 					}
 
 					textbox = {
 						text = "[Market.GetNameNoFormatting]"
-						
-						tooltipwidget = {
-							FancyTooltip_Market = {}
-						}
-
 						align = left|nobaseline
 						autoresize = yes
 						elide = right
@@ -1289,7 +1395,7 @@ types pinnable_outliner_items {
 					autoresize = yes
 					minimumsize = { 70 -1 }
 					maximumsize = { 70 -1 }
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
 					align = right|nobaseline
 					using = market_price_tooltip_with_graph
 				}
@@ -1687,7 +1793,7 @@ types pinnable_outliner_items {
 
 				icon = {
 					size = { 26 26 }
-					texture = "[Building.GetTexture]"
+					texture = "[Building.GetIcon]"
 
 					tooltipwidget = {
 						FancyTooltip_Building = {}
@@ -1698,7 +1804,8 @@ types pinnable_outliner_items {
 					block "expand_buttons_margin" {}
 					align = left|nobaseline
 					elide = right
-					text = "[Building.GetState.GetNameNoFormatting]"
+					datacontext = "[Building.GetState]"
+					text = "STATE_NAME_WITH_FOREIGN_FLAG_NO_FORMAT"
 					fontsize_min = 14
 					layoutpolicy_horizontal = expanding
 					layoutpolicy_vertical = expanding
@@ -1828,7 +1935,7 @@ types pinnable_outliner_items {
 					textbox = {
 						visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
 						size = { 55 25 }
-						raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+						raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
 						align = right|nobaseline
 						fontsize_min = 12
 						using = productivity_tooltip_with_graph	

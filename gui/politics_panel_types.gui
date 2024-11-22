@@ -19,14 +19,6 @@ template law_header
 	using = fontsize_large
 }
 
-template investment_bar_bg
-{
-	texture = "gfx/interface/politics_view/investment_bar_bg.dds"
-	spriteType = Corneredtiled
-	spriteborder = { 43 0 }
-	shaderfile = "gfx/FX/pdxgui_default.shader"
-}
-
 template plot_line {
 	gfxtype = linegfx
 	effectname = "PdxGuiLineScreenSpace"
@@ -54,7 +46,10 @@ types information_panels_types
 			using = default_button_action
 			visible = "[Not(Law.IsBeingEnacted)]"
 			size = { @panel_width_minus_10 40 }
-			tooltip = "TOOLTIP_ENACT_LAW"
+			
+			tooltipwidget = {
+				RegularTooltip_LawEnactment = {}
+			}
 
 			textbox = {
 				text = "ENACT_LAW"
@@ -104,42 +99,64 @@ types information_panels_types
 	type law_enactment_controls2 = hbox {
 		layoutpolicy_horizontal = preferred
 		layoutpolicy_vertical = preferred
-		visible = "[Not(Law.IsActive)]"
-		tooltip = "[GetPlayer.GetLawEnactmentProgressDesc]"
+		margin = { 5 0 }
+		spacing = 10
 
-		button = {
-			layoutpolicy_horizontal = preferred
-			layoutstretchfactor_horizontal = 1
-			name = "tutorial_highlight_enact"
-			using = default_button_action
-			visible = "[Not(Law.IsBeingEnacted)]"
-			size = { 0 40 }
-			tooltip = "TOOLTIP_ENACT_LAW"
+		block "enact_button" {
+			button = {
+				layoutpolicy_horizontal = expanding
+				visible = "[Not(Law.IsBeingEnacted)]"
+				name = "tutorial_highlight_enact"
+				using = default_button_action
+				size = { 0 36 }
+				enabled = "[IsValid( Law.StartEnacting )]"
+				onclick = "[Execute( Law.StartEnacting )]"
+				using = confirm_button_sound
 
-			textbox = {
-				text = "ENACT_LAW"
-				align = nobaseline
-				autoresize = yes
-				parentanchor = center
-			}
-			tooltip_horizontalbehavior = mirror
+				tooltipwidget = {
+					RegularTooltip_LawEnactment = {}
+				}
 
-			enabled = "[IsValid( Law.StartEnacting )]"
-			onclick = "[Execute( Law.StartEnacting )]"
-			using = confirm_button_sound
-		}
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					margin = { 12 5 }
+					spacing = 5
 
-		textbox = {
-			layoutpolicy_horizontal = preferred
-			text = CURRENTLY_ACTIVE_LAW
-			size = { 0 40 }
-			visible = "[Law.IsActive]"
-			align = hcenter|nobaseline
-			using = fontsize_large
-			elide = right
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						size = { 0 20 }
+						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
+						min_width = 52
+						default_format = "#b"
+						text = "ENACT"
+					}
 
-			background = {
-				using = entry_bg
+					expand = {}
+
+					flowcontainer = {
+						spacing = 10
+
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							align = nobaseline
+							elide = right
+							fontsize_min = 12
+							text = "ENACT_LAW_SUCCESS_CHANCE"
+						}
+
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							align = nobaseline
+							elide = right
+							fontsize_min = 12
+							text = "ENACT_LAW_STALL_CHANCE"
+						}
+					}
+				}
 			}
 		}
 	}
@@ -158,16 +175,16 @@ types information_panels_types
 			layoutpolicy_vertical = preferred
 			block "datamodel" {}
 			spacing = 15
-
+			
 			item = {
 				hbox = {
 					layoutpolicy_horizontal = expanding
 					layoutpolicy_vertical = preferred
-
+					
 					background = {
 						using = simple_frame
 					}
-
+					
 					block "move_to_government_button_party" {
 						button_icon_move_left = {
 							enabled = "[Party.CanJoinGovernment]"
@@ -176,35 +193,35 @@ types information_panels_types
 							size = { 35 0 }
 							onclick = "[ReformGovernment.StageParty(Party.AccessSelf)]"
 							tooltip = "[Party.GetCanJoinGovernmentDesc]"
-
+							
 							blockoverride "icon_size" {
 								size = { 35 90 }
 							}
 						}
 					}
-
+					
 					vbox = {
 						layoutpolicy_horizontal = expanding
 						layoutpolicy_vertical = preferred
-
+					
 						# party header
 						hbox = {
 							layoutpolicy_horizontal = expanding
 							layoutpolicy_vertical = preferred
 							spacing = 5
 							margin = { 10 0 }
-
+							
 							background = {
 								texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
 								color = "[Party.GetColor]"
 								alpha = 0.5
 								mirror = horizontal
-
+								
 								modify_texture = {
 									using = texture_velvet
 								}
 							}
-
+							
 							textbox = {
 								layoutpolicy_horizontal = expanding
 								size = { 0 40 }
@@ -219,13 +236,13 @@ types information_panels_types
 								size = { 35 35 }
 							}
 						}
-
+						
 						# igs inside the party
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							layoutpolicy_vertical = preferred
 							datamodel = "[Party.GetMembers]"
-
+							
 							item = {
 								ig_item_details = {
 									blockoverride "move_to_government_button" {}
@@ -234,14 +251,14 @@ types information_panels_types
 							}
 						}
 					}
-
+				
 					block "move_to_opposition_button_party" {
 						button_icon_move_right = {
 							visible = "[GetVariableSystem.Exists('reform_government')]"
 							layoutpolicy_vertical = expanding
 							size = { 35 0 }
 							onclick = "[ReformGovernment.UnstageParty(Party.AccessSelf)]"
-
+							
 							blockoverride "icon_size" {
 								size = { 35 90 }
 							}
@@ -250,24 +267,24 @@ types information_panels_types
 				}
 			}
 		}
-
+		
 		### IGs without parties
 		vbox = {
 			layoutpolicy_horizontal = expanding
 			layoutpolicy_vertical = preferred
 			block "datamodel_independent_igs" {}
-
+			
 			item = {
 				ig_item_details = {}
 			}
 		}
-
+		
 		block "marginal_igs" {
 			### MARGINAL IGs
 			section_header_button = {
 				name = "tutorial_highlight_marginalized_title"
 				visible = "[Not(IsDataModelEmpty(AccessPlayer.AccessMarginalInterestGroups))]"
-
+				
 				blockoverride "layout" {
 					size = { 0 38 }
 					layoutpolicy_horizontal = expanding
@@ -279,7 +296,7 @@ types information_panels_types
 				blockoverride "onclick" {
 					onclick = "[GetVariableSystem.Toggle('marginalized_igs_expanded')]"
 				}
-
+				
 				blockoverride "onclick_showmore" {
 					visible = "[Not(GetVariableSystem.Exists('marginalized_igs_expanded'))]"
 				}
@@ -294,13 +311,13 @@ types information_panels_types
 				layoutpolicy_vertical = preferred
 				visible = "[GetVariableSystem.Exists('marginalized_igs_expanded')]"
 				datamodel = "[AccessPlayer.AccessMarginalInterestGroups]"
-
+				
 				item = {
 					ig_item_details = {}
 				}
 			}
 		}
-
+		
 		widget = {
 			layoutpolicy_horizontal = expanding
 			layoutpolicy_vertical = expanding
@@ -321,25 +338,25 @@ types information_panels_types
 				using = texture_velvet
 			}
 		}
-
+		
 		divider_clean = {
 			size = { 0 2 }
 			layoutpolicy_horizontal = expanding
 		}
-
+		
 		hbox = {
 			layoutpolicy_horizontal = expanding
 			layoutpolicy_vertical = preferred
-
+			
 			block "move_to_government_button" {
 				button_icon_move_left = {
 					visible = "[GetVariableSystem.Exists('reform_government')]"
 					layoutpolicy_vertical = expanding
 					size = { 35 0 }
 					onclick = "[ReformGovernment.StageInterestGroup(InterestGroup.AccessSelf)]"
-					enabled = "[Not(InterestGroup.IsRevolutionary)]"
-					tooltip = "[AddLocalizationIf(InterestGroup.IsRevolutionary, 'REFORM_GOVERNMENT_MOVE_TO_GOVERNMENT_BUTTON_TOOLTIP')]"
-
+					enabled = "[Not(InterestGroup.IsInsurrectionary)]"
+					tooltip = "[AddLocalizationIf(InterestGroup.IsInsurrectionary, 'REFORM_GOVERNMENT_MOVE_TO_GOVERNMENT_BUTTON_TOOLTIP')]"
+					
 					blockoverride "icon_size" {
 						size = { 35 90 }
 					}
@@ -385,7 +402,7 @@ types information_panels_types
 								blend_mode = alphamultiply
 							}
 						}
-
+						
 						### LEADING IG
 						icon = {
 							texture = "gfx/interface/icons/generic_icons/leading_interest_group_icon.dds"
@@ -402,23 +419,10 @@ types information_panels_types
 						}
 
 						icon = {
-							visible = "[InterestGroup.IsRevolutionary]"
+							visible = "[InterestGroup.IsInsurrectionary]"
 							size = { 35 35 }
 							texture = "gfx/interface/icons/politics_icons/revolution.dds"
 							tooltip = "REVOLUTION_IG_TOOLTIP"
-						}
-						### SUPPRESSED / BOLSTERED
-						icon = {
-							tooltip = "TOOLTIP_SUPPRESSED"
-							size = { 35 35 }
-							visible = "[InterestGroup.IsSuppressed]"
-							texture = "gfx/interface/icons/generic_icons/ig_suppress.dds"
-						}
-						icon = {
-							tooltip = "TOOLTIP_PROMOTED"
-							size = { 35 35 }
-							visible = "[InterestGroup.IsBolstered]"
-							texture = "gfx/interface/icons/generic_icons/ig_bolster.dds"
 						}
 
 						### NAME
@@ -441,13 +445,13 @@ types information_panels_types
  						}
 
  						expand = {}
-
+						
 						### CLOUT
 						vbox = {
 							layoutpolicy_vertical = preferred
 							spacing = 4
 							using = clout_tooltip_with_graph
-
+							
 							textbox = {
 								layoutpolicy_horizontal = preferred
 								size = { 0 20 }
@@ -457,7 +461,7 @@ types information_panels_types
 								default_format = "#variable"
 								using = fontsize_large
 							}
-
+							
 							bar_horizontal = {
 								size = { 150 10 }
 
@@ -609,17 +613,17 @@ types information_panels_types
 						parentanchor = bottom|right
 					}
 				}
-
+				
 				widget = { size = { 15 15 }}
 			}
-
+			
 			block "move_to_opposition_button" {
 				button_icon_move_right = {
 					visible = "[GetVariableSystem.Exists('reform_government')]"
 					layoutpolicy_vertical = expanding
 					size = { 35 0 }
 					onclick = "[ReformGovernment.UnstageInterestGroup(InterestGroup.AccessSelf)]"
-
+					
 					blockoverride "icon_size" {
 						size = { 35 90 }
 					}
@@ -787,7 +791,7 @@ types information_panels_types
 				parentanchor = right|vcenter
 				block "chart_button_button_position" {
 					position = { -10 0 }
-				}
+				}	
 
 				blockoverride "on_click" {
 					onclick = "[GetVariableSystem.Toggle('piecharts')]"
@@ -907,7 +911,7 @@ types information_panels_types
 
 			block "barchart_frame"
 			{
-
+				
 			}
 
 			block "additional_bars_before" {}
@@ -926,7 +930,7 @@ types information_panels_types
 						block "barchart_item_datacontext" {}
 
 						block "barchart_item_margins" {
-							margin = { 4 4 }
+							margin = { 10 10 }
 						}
 
 						layoutpolicy_horizontal = expanding
@@ -955,7 +959,7 @@ types information_panels_types
 								modify_texture = {
 									using = simple_frame_mask
 								}
-
+								
 								block "barchart_item_bg_texture_fade_left" {
 									using = progressbar_texture_properties
 								}
@@ -964,7 +968,7 @@ types information_panels_types
 							background = {
 								texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
 								block "barchart_item_color" {}
-
+								
 								modify_texture = {
 									using = simple_frame_mask
 								}
@@ -977,14 +981,14 @@ types information_panels_types
 							background = {
 								using = entry_bg_simple_colored
 								block "barchart_item_color" {}
-							}
+							}	
 						}
-
+						
 
 						block "barchart_item_icon" {
 							icon = {
 								block "barchart_item_icon_properties" {
-									size = { 30 30 }
+									size = { 32 32 }
 								}
 							}
 						}
@@ -1002,6 +1006,123 @@ types information_panels_types
 				fontsize_min = 12
 				elide = left
 				margin_left = 5
+			}
+		}
+	}
+
+	type v3_clickable_stacked_barchart = widget {
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+
+			block "barchart_datamodel" {}
+
+			item = {
+				button = {
+
+					block "barchart_item_button_properties"
+					{
+						# onclick etc
+					}
+
+					block "barchart_item_visibility" {}
+					block "barchart_item_datacontext" {}
+
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding					
+
+					block "barchart_item_stretchfactor" {
+						# This is what is actually setting the horizontal of the item
+						# layoutstretchfactor_horizontal = ?
+					}
+
+					block "barchart_item_tooltip" {
+						# tooltipwidget/tooltip = ? 
+					}	
+
+					block "barchart_item_tooltip_placement" {
+						using = tooltip_below
+					}
+
+					vbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding	
+
+						widget = {
+							block "barchart_item_vertical_inset" {
+								size = { 0 0 }
+							}
+						}
+
+						widget = {
+							layoutpolicy_horizontal = expanding
+							layoutpolicy_vertical = expanding	
+
+							widget = {
+								size = { 100% 100% }
+								block "barchart_item_background" {
+
+									button = {
+										size = { 100% 100% }
+										alwaystransparent = yes
+										texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
+										mirror = horizontal
+
+										modify_texture = {
+											using = simple_frame_mask
+										}
+
+										block "barchart_item_color" {}
+										
+										block "barchart_item_bg_texture_fade_left" {
+											using = progressbar_texture_properties
+										}
+									}
+
+									button = {
+										size = { 100% 100% }
+										alwaystransparent = yes
+										texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
+										
+										modify_texture = {
+											using = simple_frame_mask
+										}
+
+										block "barchart_item_color" {}
+
+										block "barchart_item_bg_texture_fade_right" {
+											using = progressbar_texture_properties
+										}
+									}
+
+									button = {
+										size = { 100% 100% }
+										alwaystransparent = yes
+										using = entry_bg_simple_colored
+										block "barchart_item_color" {}
+									}
+
+									icon = {
+										size = { 100% 100% }
+										alwaystransparent = yes
+										using = simple_frame
+									}
+								}
+							}
+
+							widget = {
+								size = { 100% 100% }
+								block "barchart_item_contents" {}
+							}							
+						}
+
+						widget = {
+							block "barchart_item_vertical_inset" {
+								size = { 0 0 }
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1853,7 +1974,7 @@ types information_panels_types
 			}
 		}
 	}
-
+	
 	# use for fullscreens if you need layoutpolicies
 	type v3_plotline_hbox = vbox {
 		layoutpolicy_horizontal = expanding
@@ -1996,7 +2117,7 @@ types information_panels_types
 						margin_top = 10
 						align = left|nobaseline
 						using = fontsize_small
-
+						
 						block "everything_that_is_not_empty_state_visibility" {
 							visible = yes
 						}
@@ -2020,7 +2141,7 @@ types information_panels_types
 						align = left
 						margin_top = 8
 						using = fontsize_small
-
+						
 						block "everything_that_is_not_empty_state_visibility" {
 							visible = yes
 						}
@@ -2040,7 +2161,7 @@ types information_panels_types
 						align = right
 						margin_top = 8
 						using = fontsize_small
-
+						
 						block "everything_that_is_not_empty_state_visibility" {
 							visible = yes
 						}
@@ -2194,53 +2315,62 @@ types information_panels_types
 					}
 				}
 
-				widget = {
-					size = { 40 60 }
-					datacontext = "[Law.GetGroup]"
-					datacontext = "[Law]"
-					tooltip = "TOOLTIP_CHANGE_FROM_LAW"
+				law_changable_widget = {}
+			}
+		}
+	}
 
-					icon = {
-						texture = "gfx/interface/icons/generic_icons/toggle.dds"
-						alpha = "[TransparentIfFalse(Or(GreaterThan_int32(LawGroup.GetNumEnactable, '(int32)0'), GreaterThan_int32(LawGroup.GetNumPotentialEnactable, '(int32)0')))]"
+	type law_changable_widget = widget {
+		size = { 40 60 }
+		datacontext = "[Law.GetGroup]"
+		tooltip = "TOOLTIP_CHANGE_FROM_LAW"
 
-						size = { 30 30 }
-						parentanchor = bottom|hcenter
-					}
+		icon = {
+			texture = "gfx/interface/icons/generic_icons/toggle.dds"
+			alpha = "[TransparentIfFalse(Or(GreaterThan_int32(LawGroup.GetNumEnactable, '(int32)0'), GreaterThan_int32(LawGroup.GetNumPotentialEnactable, '(int32)0')))]"
 
-					textbox = {
-						visible = "[Not(GetPlayer.IsEnactingLaw)]"
-						background = {
-							using = blurry_dark_background
-						}
-						size = { 40 30 }
-						using = fontsize_xl
-						align = hcenter|nobaseline
-						alpha = "[TransparentIfZero_int32(LawGroup.GetNumEnactable)]"
-						raw_text = "#variable [LawGroup.GetNumEnactable]#!"
-						parentanchor = hcenter
-					}
+			size = { 75% 50% }
+			parentanchor = bottom|hcenter
+		}
 
-					textbox = {
-						visible = "[GetPlayer.IsEnactingLaw]"
-						background = {
-							using = blurry_dark_background
-						}
-						raw_text = "#variable [LawGroup.GetNumPotentialEnactable]#!"
-						tooltip = "TOOLTIP_CHANGE_FROM_LAW_CURRENTLY_ENACTING"
-						alpha = "[TransparentIfZero_int32(LawGroup.GetNumPotentialEnactable)]"
-						size = { 40 30 }
-						using = fontsize_xl
-						align = hcenter|nobaseline
-						parentanchor = hcenter
-					}
-				}
+		textbox = {
+			visible = "[Not(GetPlayer.IsEnactingLaw)]"
+			background = {
+				using = blurry_dark_background
+			}
+			size = { 100% 50% }
+			align = hcenter|nobaseline
+			alpha = "[TransparentIfZero_int32(LawGroup.GetNumEnactable)]"
+			raw_text = "#variable [LawGroup.GetNumEnactable]#!"
+			parentanchor = hcenter
+
+			block "law_change_textsize"
+			{
+				using = fontsize_xl
+			}
+		}
+
+		textbox = {
+			visible = "[GetPlayer.IsEnactingLaw]"
+			background = {
+				using = blurry_dark_background
+			}
+			raw_text = "#variable [LawGroup.GetNumPotentialEnactable]#!"
+			tooltip = "TOOLTIP_CHANGE_FROM_LAW_CURRENTLY_ENACTING"
+			alpha = "[TransparentIfZero_int32(LawGroup.GetNumPotentialEnactable)]"
+			size = { 100% 50% }
+			
+			align = hcenter|nobaseline
+			parentanchor = hcenter
+
+			block "law_change_textsize"
+			{
+				using = fontsize_xl
 			}
 		}
 	}
 
 	type political_movement_item = button {
-		onclick = "[InformationPanelBar.OpenChangeLaw(PoliticalMovement.GetLaw)]"
 		using = default_button
 
 		flowcontainer = {
@@ -2261,12 +2391,7 @@ types information_panels_types
 
 			flowcontainer = {
 				spacing = 10
-				law_icon = {
-					datacontext = "[PoliticalMovement.GetLaw]"
-					parentanchor = vcenter
-					size = { 70 70 }
-				}
-
+				
 				flowcontainer = {
 					direction = vertical
 
@@ -2279,17 +2404,8 @@ types information_panels_types
 					}
 
 					textbox = {
-						visible = "[Not(PoliticalMovement.IsPlacated)]"
 						text = "POLITICAL_MOVEMENT_RADICALISM_WITH_LABEL"
 						tooltip = "POLITICAL_MOVEMENT_RADICALISM_TOOLTIP"
-						align = left|nobaseline
-						autoresize = yes
-						elide = right
-					}
-
-					textbox = {
-						visible = "[PoliticalMovement.IsPlacated]"
-						text = "[concept_political_movement_placated]"
 						align = left|nobaseline
 						autoresize = yes
 						elide = right
@@ -2313,7 +2429,7 @@ types information_panels_types
 							}
 							textbox = {
 								parentanchor = vcenter
-								text = "[PoliticalMovement.GetNumSupportingPops|Dv]"
+								text = "[PoliticalMovement.GetNumSupportingIndividuals|Dv]"
 								autoresize = yes
 								align = left|nobaseline
 							}
@@ -2415,10 +2531,10 @@ types information_panels_types
 
 	### this is used for VBOX/HBOX
 	type enactable_generic_law2 = hbox {
-		alpha = "[TransparentIfFalse(Or(Or(IsPotential(Law.StartEnacting), Law.IsBeingEnacted), Law.IsActive))]"
-		layoutpolicy_horizontal = preferred
-		layoutpolicy_vertical = preferred
 		visible = "[Law.IsVisible]"
+		alpha = "[TransparentIfFalse(And(Law.HasNecessaryTech, Law.HasNecessaryLaws))]"
+		layoutpolicy_horizontal = preferred
+		layoutpolicy_vertical = expanding
 
 		widget = {
 			size = { 18 87 }
@@ -2432,7 +2548,7 @@ types information_panels_types
 
 		vbox = {
 			layoutpolicy_horizontal = preferred
-			layoutpolicy_vertical = preferred
+			layoutpolicy_vertical = expanding
 			margin = { 5 5 }
 
 			background = {
@@ -2441,14 +2557,14 @@ types information_panels_types
 			}
 
 			background = {
+				visible = "[Law.IsActive]"
 				using = light_bg
 				alpha = 0.8
 				using = frame_small_mask
-				visible = "[Law.IsActive]"
 			}
 			background = {
-				using = frame_small
 				visible = "[Law.IsActive]"
+				using = frame_small
 			}
 
 			background = {
@@ -2461,15 +2577,16 @@ types information_panels_types
 				using = highlighted_square_selection
 			}
 
-			widget = {
-				layoutpolicy_horizontal = preferred
-				layoutpolicy_vertical = fixed
-				size = { 0 90 }
+			vbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				minimumsize = { 0 90 }
 
 				hbox = {
 					layoutpolicy_horizontal = preferred
 					layoutpolicy_vertical = expanding
 					margin_right = 10
+					block "spacing_between_button_and_approval_info" {}
 
 					button = {
 						layoutpolicy_horizontal = preferred
@@ -2480,58 +2597,108 @@ types information_panels_types
 						hbox = {
 							layoutpolicy_horizontal = preferred
 							layoutpolicy_vertical = expanding
-
-							resizeparent = yes
-
-							margin = { 5 0 }
+							margin_left = 5
 
 							tooltipwidget = {
 								FancyTooltip_Law = {}
 							}
 
 							law_icon = {
-								size = { 55 55 }
+								block "law_icon_size" {
+									size = { 80 80 }
+								}
 							}
 
 							vbox = {
 								layoutpolicy_horizontal = preferred
 								layoutpolicy_vertical = expanding
-								margin_right = 5
+								margin = { 0 5 }
+								spacing = 5
 
-								widget = {
-									layoutpolicy_horizontal = expanding
-									layoutpolicy_vertical = expanding
-								}
+								expand = {}
 
 								block "lawgroup"
 								{
 									textbox = {
 										layoutpolicy_horizontal = preferred
-										raw_text = "#title [Law.GetGroup.GetNameNoFormatting]#!"
-										align = left|nobaseline
 										size = { 0 20 }
-										elide = right
 										margin_left = 5
 										fontsize_min = 14
+										align = left|nobaseline
+										elide = right
+										raw_text = "#title [Law.GetGroup.GetNameNoFormatting]#!"
 									}
 								}
 
 								textbox = {
 									layoutpolicy_horizontal = preferred
-									text = "LAW"
-									align = left|nobaseline
 									size = { 0 30 }
-									using = fontsize_xxl
-									elide = right
 									margin_bottom = 5
 									margin_left = 5
+									align = left|nobaseline
+									using = fontsize_xxl
+									elide = right
 									fontsize_min = 14
+									text = "LAW"
 								}
 
-								widget = {
-									layoutpolicy_horizontal = expanding
-									layoutpolicy_vertical = expanding
+								hbox = {
+									layoutpolicy_horizontal = preferred
+
+									law_enactment_controls2 = {
+										visible = "[And(Not(Law.IsActive), Not(Law.IsBeingEnacted))]"
+									}
+
+									hbox = {
+										visible = "[And(Law.IsActive, Not(Law.IsBeingEnacted))]"
+										layoutpolicy_horizontal = preferred
+
+										textbox = {
+											margin = { 5 0 }
+											autoresize = yes
+											align = hcenter|nobaseline
+											using = fontsize_large
+											max_width = 160
+											fontsize_min = 12
+											elide = right
+											text = "CURRENTLY_ACTIVE_LAW"
+										}
+
+										widget = {
+											layoutpolicy_horizontal = expanding
+										}
+									}
+									
+									hbox = {
+										visible = "[Law.IsBeingEnacted]"
+										layoutpolicy_horizontal = preferred
+										layoutpolicy_vertical = expanding
+										margin = { 5 0 }
+										spacing = 10
+
+										textbox = {
+											autoresize = yes
+											align = hcenter|nobaseline
+											max_width = 130
+											fontsize_min = 12
+											elide = right
+											using = fontsize_large
+											text = "BEING_ENACTED_LAW"
+										}
+
+										button_icon_cancel = {
+											size = { 35 35 }
+											tooltip = "[Law.GetCancelTooltip]"
+											enabled = "[IsValid( Law.StopEnacting )]"
+											onclick = "[PopupManager.AskConfirmation( Law.StopEnacting )]"
+											using = close_button_sound
+										}
+
+										expand = {}
+									}
 								}
+
+								expand = {}
 							}
 
 							block "currently_active_law" {
@@ -2539,7 +2706,7 @@ types information_panels_types
 								vbox = {
 									layoutpolicy_horizontal = preferred
 									layoutpolicy_vertical = expanding
-									margin_right = 5
+									margin_right = 10
 
 									widget = {
 										layoutpolicy_horizontal = expanding
@@ -2550,7 +2717,7 @@ types information_panels_types
 										layoutpolicy_horizontal = preferred
 										text = "CURRENTLY_ACTIVE_LAW_IN_LAWGROUP"
 										align = left|nobaseline
-										size = { 0 20 }
+										autoresize = yes
 										elide = right
 										margin_left = 5
 										fontsize_min = 14
@@ -2560,7 +2727,7 @@ types information_panels_types
 										layoutpolicy_horizontal = preferred
 										text = "LAW_GROUP_ACTIVE_LAW"
 										align = left|nobaseline
-										size = { 0 30 }
+										autoresize = yes
 										using = fontsize_large
 										elide = right
 										margin_bottom = 5
@@ -2580,50 +2747,6 @@ types information_panels_types
 					approval_info_small = {
 						name = "tutorial_highlight_approval_info"
 					}
-				}
-			}
-
-			law_enactment_controls2 = {}
-
-			textbox = {
-				layoutpolicy_horizontal = preferred
-				text = "CURRENTLY_ACTIVE_LAW"
-				size = { 0 40 }
-				visible = "[Law.IsActive]"
-				align = hcenter|nobaseline
-				using = fontsize_large
-				elide = right
-
-				background = {
-					using = light_bg
-					alpha = 0.4
-				}
-			}
-			hbox = {
-				layoutpolicy_horizontal = preferred
-				layoutpolicy_vertical = expanding
-				margin = { 5 0 }
-
-				background = {
-					using = dark_area
-				}
-
-				textbox = {
-					layoutpolicy_horizontal = preferred
-					text = "BEING_ENACTED_LAW"
-					size = { 0 40 }
-					visible = "[Law.IsBeingEnacted]"
-					align = hcenter|nobaseline
-					elide = right
-				}
-
-				button_icon_cancel = {
-					visible = "[Law.IsBeingEnacted]"
-					size = { 35 35 }
-					tooltip = "[Law.GetCancelTooltip]"
-					enabled = "[IsValid( Law.StopEnacting )]"
-					onclick = "[PopupManager.AskConfirmation( Law.StopEnacting )]"
-					using = close_button_sound
 				}
 			}
 		}
@@ -2650,6 +2773,16 @@ types information_panels_types
 			}
 		}
 
+		blockoverride "spacing_between_button_and_approval_info" {
+			spacing = 5
+		}
+
+		blockoverride "law_icon_size" {
+			size = { 55 55 }
+		}
+
+		blockoverride "enact_button" {}
+
 		blockoverride "button" {
 			using = default_button
 			onclick = "[InformationPanelBar.OpenChangeLaw(Law.AccessSelf)]"
@@ -2675,11 +2808,11 @@ types information_panels_types
 				vbox = {
 					margin_left = 20
 					margin_bottom = 10
-
+				
 					law_enactment_progress = {
    						 size = { 80 80 }
 					}
-
+					
 					button = {
 						visible = "[Law.IsBeingEnacted]"
 						size = { 100 40 }
@@ -2697,7 +2830,7 @@ types information_panels_types
 					layoutpolicy_vertical = preferred
 					spacing = 5
 					margin = { 20 10 }
-
+					
 					textbox = {
 						layoutpolicy_horizontal = expanding
 						size = { 0 20 }
@@ -2706,7 +2839,7 @@ types information_panels_types
 						elide = right
 						fontsize_min = 14
 					}
-
+					
 					hbox = {
 						layoutpolicy_horizontal = expanding
 
@@ -2730,7 +2863,7 @@ types information_panels_types
 
 					hbox = {
 						layoutpolicy_horizontal = expanding
-
+						
 						textbox = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 25 }
@@ -2794,12 +2927,11 @@ types information_panels_types
 
 			item = {
 				vbox = {
+					widgetid = "[Law.GetGroup.GetKey]"
 					margin = { 10 3 }
 					layoutpolicy_horizontal = preferred
 					layoutpolicy_vertical = expanding
-					widgetid = "[Law.GetGroup.GetKey]"
 
-					
 					############################################################################################################################################################
 					############################################################################################################################################################
 					############################################################################################################################################################
@@ -2838,7 +2970,6 @@ types information_panels_types
 					############################################################################################################################################################
 					############################################################################################################################################################
 
-
 					background = {
 						visible = "[Law.IsBeingEnacted]"
 						using = highlighted_square_selection
@@ -2847,7 +2978,7 @@ types information_panels_types
 					}
 
 					active_law = {
-						visible = "[Not(Law.IsBeingEnacted)]"
+						visible = "[And(Not(Law.IsBeingEnacted), Law.AppliesTo(GetPlayer.Self))]"
 					}
 
 					enacting_law = {
@@ -2856,6 +2987,7 @@ types information_panels_types
 				}
 			}
 		}
+
 		widget = {
 			layoutpolicy_horizontal = preferred
 			layoutpolicy_vertical = expanding
@@ -2866,6 +2998,7 @@ types information_panels_types
 		block "powerful_visibility" {
 			visible = "[InterestGroup.IsPowerful]"
 		}
+
 		size = { 100% 100% }
 		parentanchor = center
 		texture = "gfx/interface/icons/ig_icons/influential_ig_frame.dds"
@@ -2939,7 +3072,7 @@ types information_panels_types
 				{
 					tooltip = IN_GOVERNMENT_DESC
 				}
-
+				
 			}
 		}
 	}
@@ -3259,7 +3392,7 @@ types information_panels_types
 		}
 
 		flowcontainer = {
-			visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrApprove, '(CFixedPoint)0')]"
+			#visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrApprove, '(CFixedPoint)0')]"
 			spacing = 5
 			tooltip = "TOOLTIP_LAW_APPROVAL"
 
@@ -3299,7 +3432,7 @@ types information_panels_types
 		flowcontainer = {
 			spacing = 5
 			tooltip = "TOOLTIP_LAW_DISAPPROVAL"
-			visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrDisapprove, '(CFixedPoint)0')]"
+			#visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrDisapprove, '(CFixedPoint)0')]"
 
 
 			icon = {
@@ -3336,7 +3469,7 @@ types information_panels_types
 		}
 
 		flowcontainer = {
-			visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrUndecided, '(CFixedPoint)0')]"
+			#visible = "[GreaterThan_CFixedPoint(Law.GetPercentPolStrUndecided, '(CFixedPoint)0')]"
 			spacing = 5
 			tooltip = "TOOLTIP_LAW_INDIFFERENT"
 
@@ -3430,7 +3563,7 @@ types information_panels_types
 
 	type interest_group_filter = hbox {
 		spacing = 5
-
+		
 		### IG FILTER
 		widget = {
 			size = { 75 75 }
@@ -3483,7 +3616,7 @@ types information_panels_types
 			using = tooltip_below
 			blockoverride "show_hat" {}
 			blockoverride "highlight" {}
-
+			
 			### IG ICON
 			character_ig_button = {
 				blockoverride "interestgroup_datacontext" {
@@ -3494,7 +3627,7 @@ types information_panels_types
 				position = { 2 0 }
 				blockoverride "in_government_icon" {}
 			}
-
+			
 			### IDEOLOGY
 			icon = {
 				parentanchor = bottom|right
@@ -3529,8 +3662,14 @@ types information_panels_types
 			}
 
 			hbox = {
-				margin_left = 5
 				layoutpolicy_horizontal = expanding
+				spacing = 5
+
+				acceptance_status_small_icon = {
+					datacontext = "[Character.GetAcceptanceStatusIn( GetPlayer )]"
+
+					tooltip = "CHARACTER_ACCEPTANCE_TOOLTIP"
+				}
 
 				textbox = {
 					autoresize = yes
@@ -3563,8 +3702,8 @@ types information_panels_types
 
 			hbox = {
 				layoutpolicy_horizontal = preferred
-				datacontext = "[Character.PredictLawToAgitate(GetPlayer.Self)]"
-				datacontext = "[Law.GetPoliticalMovement]"
+				datacontext = "[Character.PredictMovementToJoin(GetPlayer.Self)]"
+				visible = "[Character.WillJoinMovementIfInvited(GetPlayer.Self)]"
 				spacing = 5
 
 				textbox = {
@@ -3574,19 +3713,36 @@ types information_panels_types
 					elide = right
 					fontsize_min = 14
 					align = right|nobaseline
-					text = "AGITATOR_START_JOIN_POLITICAL_MOVEMENT"
+					text = "AGITATOR_JOIN_POLITICAL_MOVEMENT"
 				}
 
 				icon = {
-					visible = "[Law.IsValid]"
 					size = { 60 60 }
-					texture = "[Law.GetTexture]"
-
-					tooltipwidget = {
-						FancyTooltip_Law = {}
-					}
+					texture = "[PoliticalMovement.GetTexture]"
 				}
 			}
+			
+			hbox = {
+				layoutpolicy_horizontal = preferred
+				datacontext = "[Character.PredictMovementTypeToStart(GetPlayer.Self)]"
+				visible = "[Character.WillStartMovementIfInvited(GetPlayer.Self)]"
+				spacing = 5
+
+				textbox = {
+					layoutpolicy_horizontal = preferred
+					multiline = yes
+					size = { 0 60 }
+					elide = right
+					fontsize_min = 14
+					align = right|nobaseline
+					text = "AGITATOR_START_POLITICAL_MOVEMENT"
+				}
+
+				icon = {
+					size = { 60 60 }
+					texture = "[PoliticalMovementType.GetTexture]"
+				}
+			}			
 
 			expand = {}
 
@@ -3635,274 +3791,140 @@ types information_panels_types
 		}
 	}
 
-	### SECESSION ITEM
-	type politics_panel_secession = flowcontainer {
-		spacing = 20
-		margin = { 20 20 }
-		tooltip = "SECESSION_PROGRESS_TOOLTIP"
-
-		background = {
-			using = entry_bg
-		}
-
-		widget = {
-			size = { 60 60 }
-			parentanchor = vcenter
-
-			icon = {
-				using = rotate_glow_red_02
-				parentanchor = center
-				size = { 300% 300% }
-			}
-
-			icon = {
-				parentanchor = center
-				size = { 100% 100% }
-				texture = "gfx/interface/icons/war_goals/secession.dds"
-			}
-		}
-
-		flowcontainer = {
-			parentanchor = vcenter
-			direction = vertical
-			spacing = 5
-
-			textbox = {
-				align = nobaseline
-				autoresize = yes
-				using = fontsize_xl
-				text = "SECESSION_HEADER_FORMATTED"
-			}
-
-			textbox = {
-				align = nobaseline
-				autoresize = yes
-				text = "SECESSION_CULTURE_TURMOIL_TEXT"
-				max_width = 240
-				fontsize_min = 14
-				elide = right
-			}
-		}
-
-
-		flowcontainer = {
-			parentanchor = vcenter
-			direction = vertical
-			spacing = 5
-
-			#### SECESSION PROGRESSBAR ####
-			bad_progressbar_horizontal = {
-				size = { 355 30 }
-				tooltip = "SECESSION_PROGRESS_TOOLTIP"
-
-				blockoverride "values" {
-					value = "[FixedPointToFloat( CivilWar.GetProgress )]"
-					min = 0
-					max = 1
-				}
-
-				textbox = {
-					text = "[CivilWar.GetProgress|v%0]"
-					autoresize = yes
-					align = nobaseline
-					parentanchor = right|vcenter
-					margin_right = 35
-				}
-
-				widget = {
-					size = { 25 25 }
-					parentanchor = right|vcenter
-					position = { -5 0 }
-
-					icon = {
-						using = rotate_glow_red_02
-						parentanchor = center
-						size = { 300% 300% }
-					}
-
-					icon = {
-						parentanchor = center
-						size = { 100% 100% }
-						texture = "gfx/interface/icons/war_goals/secession.dds"
-					}
-				}
-			}
-
-			flowcontainer = {
-				parentanchor = right
-				spacing = 5
-
-				icon = {
-					parentanchor = vcenter
-					size = { 25 25 }
-					texture = "gfx/interface/icons/state_status_icons/has_turmoil.dds"
-				}
-
-				textbox = {
-					parentanchor = vcenter
-					text = "SECESSION_HEADER_TOOLTIP"
-					align = nobaseline
-					autoresize = yes
-					max_width = 330
-					fontsize_min = 14
-					elide = right
-				}
-			}
-		}
-	}
-
 	### POLITICAL MOVEMENT ITEM - HBOX
 	type politics_panel_political_movement_item = flowcontainer {
 		direction = vertical
 
-		tooltipwidget = {
-			FancyTooltip_PoliticalMovement = {}
+		block "tooltip" {
+			tooltipwidget = {
+				FancyTooltip_PoliticalMovement = {}
+			}
 		}
 
 		###NORMAL NON-REVOLUTIONARY MOVEMENT###
 		widget = {
-			size = { 500 100 }
+			visible = "[Not(PoliticalMovement.IsInsurrectionary)]"
 
-			visible = "[Not(PoliticalMovement.IsRevolutionary)]"
+			block "button_size" {
+				size = { 500 60 }
+			}
 
 			button = {
-				size = { 100% 90 }
+				parentanchor = center
+				size = { 100% 100% }
 				onclick = "[InformationPanelBar.OpenPoliticalMovementPanel(PoliticalMovement.AccessSelf)]"
+				onrightclick = "[RightClickMenuManager.ShowForPoliticalMovement(PoliticalMovement.AccessSelf)]"
 				using = default_button
-				parentanchor = bottom
 
-				vbox = {
+				hbox = {
 					layoutpolicy_horizontal = expanding
 
 					hbox = {
 						layoutpolicy_horizontal = expanding
-						margin_top = 5
-						margin_left = 5
+						margin_left = 10
 						spacing = 2
 
-						law_icon = {
-							datacontext = "[PoliticalMovement.GetLaw]"
-							size = { 37 37 }
+						icon = {
+							size = { 40 40 }
+							texture = "[PoliticalMovement.GetTexture]"
+
+							bolster_icon = {
+								visible = "[PoliticalMovement.IsBolstered]"
+								size = { 30 30 }
+								position = { -18 -15 }
+								blockoverride "tooltip" {}
+							}
+
+							suppress_icon = {
+								visible = "[PoliticalMovement.IsSuppressed]"
+								parentanchor = bottom
+								size = { 30 30 }
+								position = { -18 15 }
+								blockoverride "tooltip" {}
+							}
 						}
 
 						textbox = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 20 }
-							align = left|vcenter
+							align = nobaseline
 							elide = right
 							fontsize_min = 12
-
-							background = {
-								using = dark_area
-								alpha = 0.3
-								margin_bottom = 6
-								margin_top = 4
-
-								modify_texture = {
-									texture = "gfx/interface/masks/fade_horizontal_center.dds"
-									blend_mode = alphamultiply
-								}
-							}
-
-							text = "[PoliticalMovement.GetName]"
+							text = "[PoliticalMovement.GetNameNoFormatting]"	
 						}
 					}
 
+					expand = {}
+
 					hbox = {
 						layoutpolicy_horizontal = expanding
-						margin = { 10 0 }
+						margin_right = 10
 
-						### Characters ###
-						hbox = {
-							layoutpolicy_horizontal = preferred
-							layoutpolicy_vertical = preferred
-							visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetSupportingCharacters))]"
-							datamodel = "[PoliticalMovement.GetSupportingCharacters]"
-							margin_left = 5
-							margin_bottom = 7
-							spacing = 3
-
-							item = {
-								character_portrait_mini = {
-
-									blockoverride "portrait_button_onrightclick" {}
-
-									blockoverride "tooltip" {}
-
-									character_ig_icon = {
-										parentanchor = bottom|right
-										size = { 12 12 }
-
-										blockoverride "tooltip" {}
-									}
-								}
-							}
-
-							###CODE SUPPORT NEEDED TO SHOW ADDITIONAL AGITATORS AFTER 3 CHARACTER PORTRAITS. FEEL FREE TO CHANGE THE DATA CONTEXT IF THERES SOMETHING MORE SUITABLE###
-							#textbox = {
-							#	layoutpolicy_horizontal = expanding
-							#	visible = "[GreaterThan_int32(PoliticalMovement.GetSupportingCharacters.GetNumAgitators, '(int32)0')]"
-							#	size = { 0 30 }
-							#	align = left|nobaseline
-							#	parentanchor = vcenter
-							#	text = "AGITATORS_IN_QUEUE"
-							#	fontsize_min = 12
-							#	elide = right
-							#	autoresize = yes
-							#}
+						block "right_text_max_width" {
+							max_width = 135
 						}
 
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							layoutpolicy_vertical = preferred
-							margin_bottom = 15
+							margin = { 0 5 }
 
-							textbox = {
+							hbox = {
 								layoutpolicy_horizontal = expanding
-								size = { 0 20 }
-								align = right|nobaseline
-								elide = right
-								fontsize_min = 12
-								text = "POLITICAL_MOVEMENT_SUPPORT_WITH_LABEL"
+
+								icon = {
+									size = { 25 25 }
+									texture = "gfx/interface/icons/generic_icons/population.dds"
+								}
+
+								block "additional_support_label" {}
+
+								expand = {}
+
+								textbox = {
+									layoutpolicy_horizontal = expanding
+									size = { 0 20 }
+									align = right|nobaseline
+									elide = right
+									fontsize_min = 12
+
+									block "support_label_text" {
+										text = "POLITICAL_MOVEMENT_SUPPORT"
+									}
+								}
 							}
 
-							textbox = {
+							hbox = {
 								layoutpolicy_horizontal = expanding
-								visible = "[Not(PoliticalMovement.IsPlacated)]"
-								size = { 0 20 }
-								align = right|nobaseline
-								elide = right
-								fontsize_min = 12
-								text = "POLITICAL_MOVEMENT_RADICALISM_WITH_LABEL"
+
+								icon = {
+									visible = "[GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
+									size = { 25 25 }
+									texture = "gfx/interface/icons/political_movement_icons/political_activism_red.dds"
+								}
+
+								icon = {
+									visible = "[Not(GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5'))]"
+									size = { 25 25 }
+									texture = "gfx/interface/icons/political_movement_icons/political_activism.dds"
+								}
+
+								block "additional_activism_label" {}
+
+								expand = {}
+
+								textbox = {
+									layoutpolicy_horizontal = expanding
+									size = { 0 20 }
+									align = right|nobaseline
+									elide = right
+									fontsize_min = 12
+
+									block "activism_label_text" {
+										text = "POLITICAL_MOVEMENT_RADICALISM"
+									}
+								}
 							}
-
-							textbox = {
-								layoutpolicy_horizontal = expanding
-								size = { 0 20 }
-								align = right|nobaseline
-								elide = right
-								fontsize_min = 12
-
-								visible = "[PoliticalMovement.IsPlacated]"
-								text = "[concept_political_movement_placated]"
-							}
-						}
-					}
-				}
-			}
-
-			### Interest Groups
-			flowcontainer = {
-				visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetSupportingInterestGroups))]"
-				datamodel = "[PoliticalMovement.GetSupportingInterestGroups]"
-				parentanchor = hcenter
-
-				item = {
-					ig_button = {
-						size = { 26 26 }
-
-						tooltipwidget = {
-						 	FancyTooltip_IG = {}
 						}
 					}
 				}
@@ -3911,10 +3933,12 @@ types information_panels_types
 
 		###REVOLUTIONARY MOVEMENT###
 		widget = {
-			size = { 500 120 }
+			block "button_size_revolutionary" {
+				size = { 500 110 }
+			}
 
-			visible = "[PoliticalMovement.IsRevolutionary]"
-			alpha = 0
+			visible = "[PoliticalMovement.IsInsurrectionary]"
+			alpha = 0 
 
 			###REVOLUTION ANIMATION###
 			state = {
@@ -3977,12 +4001,15 @@ types information_panels_types
 
 					state = {
 						name = 4
-						size = { 500 110 }
 						delay = 0.1
 						duration = 0.05
 						using = Animation_Curve_EaseOut
 						on_finish = "[PdxGuiWidget.FindChild('outliner_info').TriggerAnimation('show')]"
 						on_finish = "[PdxGuiWidget.FindChild('revolution_clock').TriggerAnimation('show')]"
+						
+						block "button_size_revolutionary" {
+							size = { 500 110 }
+						}
 					}
 
 					vfx = {
@@ -3990,7 +4017,7 @@ types information_panels_types
 						blockoverride "entity_instance" {
 							entity_instance = vfx_ui_plane_war_panel_fire_plane_entity
 						}
-
+						
 						alpha = 0.2
 					}
 
@@ -4046,121 +4073,72 @@ types information_panels_types
 								round_progress_bad = {
 									size = { 80% 80% }
 									position = { 0 7 }
-									value = "[FixedPointToFloat(PoliticalMovement.GetRevolution.GetClockTime)]"
+									value = "[FixedPointToFloat(PoliticalMovement.GetCivilWar.GetClockTime)]"
 									parentanchor = center
 								}
-
+								
 								icon = {
 									size = { 100% 100% }
 									texture = "gfx/interface/backgrounds/revolution_clock_frame.dds"
-									law_icon = {
-										datacontext = "[PoliticalMovement.GetLaw]"
-										size = { 50% 50% }
-										position = { 0 4 }
-										parentanchor = center
-									}
+								}
+
+								icon = {
+									parentanchor = center
+									position = { 0 5 }
+									size = { 50 50 }
+									texture = "[PoliticalMovement.GetTexture]"
 								}
 							}
 						}
-
 
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							margin_top = 10
 							margin_right = 20
 
-
 							### REVOLUTION PROGRESSBAR ###
-
 							hbox = {
 								layoutpolicy_horizontal = expanding
 								margin_bottom = 3
 
-								expand = {}
-
 								widget = {
-									size = { 180 25 }
-
-									bad_progressbar_horizontal = {
-										datacontext = "[PoliticalMovement.GetRevolution]"
-										size = { 180 25 }
-										tooltip = "REVOLUTIONS_PROGRESS_TOOLTIP"
-
-										blockoverride "values" {
-											value = "[FixedPointToFloat( PoliticalMovement.GetRevolution.GetProgress )]"
-											min = 0
-											max = 1
-										}
-
-										flowcontainer = {
-											parentanchor = vcenter
-											margin_left = 10
-											spacing = 7
-
-											### revolution header
-											textbox = {
-												text = "REVOLUTIONS_HEADER"
-												tooltip = "REVOLUTIONS_HEADER_TOOLTIP"
-												align = nobaseline
-												autoresize = yes
-											}
-										}
-
-										textbox = {
-											text = "[PoliticalMovement.GetRevolution.GetProgress|%0v]"
-											autoresize = yes
-											align = nobaseline
-											parentanchor = right|vcenter
-											margin_right = 35
-										}
-
-										blockoverride "in_government_icon"{}
-
-										icon = {
-											parentanchor = right|vcenter
-											size = { 25 25 }
-											texture = "gfx/interface/icons/politics_icons/radicalized.dds"
-											position = { -5 0 }
-										}
+									block "revolution_progressbar_size" {
+										size = { 380 25 }
 									}
+									
+									revolution_progress_bar = {}
 								}
 							}
-
-							### LAW HEADER ###
+							
+							### MOVEMENT NAME HEADER ###
 							hbox = {
 								layoutpolicy_horizontal = expanding
-								margin_top = 5
-								margin_right = 12
-								spacing = 2
+								margin = { 0 5 }
+
+								background = {
+									using = dark_area
+									alpha = 0.4
+									
+									modify_texture = {
+										texture = "gfx/interface/masks/fade_horizontal_center.dds"
+										blend_mode = alphamultiply
+									}
+								}
 
 								textbox = {
 									layoutpolicy_horizontal = expanding
 									size = { 0 20 }
-									align = right|vcenter
+									align = right|nobaseline
 									elide = right
 									fontsize_min = 12
+									text = "[PoliticalMovement.GetNameNoFormatting]"	
 
-									background = {
-										using = dark_area
-										alpha = 0.4
-										margin_bottom = 6
-										margin_top = 4
-
-										modify_texture = {
-											texture = "gfx/interface/masks/fade_horizontal_center.dds"
-											blend_mode = alphamultiply
-										}
-									}
-
-									text = "[PoliticalMovement.GetName]"
 								}
 							}
 
 							hbox = {
 								layoutpolicy_horizontal = expanding
-								margin_right = 12
 								spacing = 2
-
 
 								widget = {
 									size = { 30 30 }
@@ -4169,11 +4147,12 @@ types information_panels_types
 
 								### Characters ###
 								widget = {
+									visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetTopSupportingCharacters))]"
 									layoutpolicy_horizontal = expanding
 									size = { 0 35 }
-									visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetTopSupportingCharacters))]"
+
 									flowcontainer = {
-										parentanchor = bottom|left
+										parentanchor = vcenter
 										spacing = 3
 										margin_right = 10
 
@@ -4193,56 +4172,71 @@ types information_panels_types
 
 										textbox = {
 											visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetBottomSupportingCharacters))]"
-											tooltip = "[PoliticalMovement.GetBottomSupportingCharactersDesc]"
-											size = { 0 30 }
-											align = left|nobaseline
 											parentanchor = vcenter
-											text = "AGITATORS_IN_QUEUE"
+											size = { 0 30 }
+											align = nobaseline
 											fontsize_min = 12
 											autoresize = yes
+											tooltip = "[PoliticalMovement.GetBottomSupportingCharactersDesc]"
+											text = "AGITATORS_IN_QUEUE"
 										}
 									}
 								}
 
-								textbox = {
+								hbox = {
 									layoutpolicy_horizontal = expanding
-									visible = "[Not(PoliticalMovement.IsPlacated)]"
-									margin_top = 10
-									size = { 0 20 }
-									align = right|nobaseline
-									elide = right
-									fontsize_min = 12
-									text = "POLITICAL_MOVEMENT_RADICALISM_WITHOUT_LABEL"
+									spacing = 2
+
+									expand = {}
+
+									icon = {
+										size = { 30 30 }
+										texture = "gfx/interface/icons/generic_icons/population.dds"
+									}
+
+									textbox = {
+										autoresize = yes
+										align = nobaseline
+										elide = right
+										fontsize_min = 12
+										text = "POLITICAL_MOVEMENT_SUPPORT_WITHOUT_LABEL"
+									}
+
+									widget = {
+										size = { 5 5 }
+									}
+
+									icon = {
+										visible = "[LessThan_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
+										size = { 30 30 }
+										texture = "gfx/interface/icons/political_movement_icons/political_activism.dds"
+									}
+
+									icon = {
+										visible = "[GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
+										size = { 30 30 }
+										texture = "gfx/interface/icons/political_movement_icons/political_activism_red.dds"
+									}
+
+									textbox = {
+										visible = "[Not(GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetTargetRadicalism, '(CFixedPoint)1'))]"
+										autoresize = yes
+										align = nobaseline
+										elide = right
+										fontsize_min = 12
+										text = "POLITICAL_MOVEMENT_RADICALISM_WITHOUT_LABEL"
+									}
+
+									textbox = {
+										visible = "[GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetTargetRadicalism, '(CFixedPoint)1')]"
+										autoresize = yes
+										align = nobaseline
+										elide = right
+										fontsize_min = 12
+										text = "POLITICAL_MOVEMENT_RADICALISM_WITHOUT_LABEL_RED"
+									}
 								}
 							}
-						}
-					}
-				}
-
-			}
-
-
-			### Interest Groups
-			flowcontainer = {
-				visible = "[Not(IsDataModelEmpty(PoliticalMovement.GetSupportingInterestGroups))]"
-				datamodel = "[PoliticalMovement.GetSupportingInterestGroups]"
-				parentanchor = hcenter
-				alpha = 0
-				name = "interest_group_top"
-
-				state = {
-					name = show
-					alpha = 1
-					delay = 1.4
-					duration = 0.2
-					using = Animation_Curve_Default
-				}
-				item = {
-					ig_button = {
-						size = { 26 26 }
-
-						tooltipwidget = {
-						 	FancyTooltip_IG = {}
 						}
 					}
 				}
@@ -4250,8 +4244,8 @@ types information_panels_types
 		}
 
 		outliner_revolutionary_movement_events = {
-			visible = "[PoliticalMovement.IsRevolutionary]"
-
+			visible = "[PoliticalMovement.IsInsurrectionary]"
+			
 			blockoverride "size" {
 				size = { 500 35 }
 			}
@@ -4262,6 +4256,84 @@ types information_panels_types
 		}
 	}
 
+	type revolution_progress_bar = bad_progressbar_horizontal {
+		size = { 100% 100% }
+
+		block "datacontext" {
+			datacontext = "[PoliticalMovement.GetCivilWar]"
+		}
+
+		tooltip = "CIVIL_WAR_PROGRESS_TOOLTIP"
+
+		blockoverride "values" {
+			value = "[FixedPointToFloat( PoliticalMovement.GetCivilWar.GetProgress )]"
+			min = 0
+			max = 1
+		}
+
+		blockoverride "inbetween_progress_and_frame" {
+			icon = {
+				visible = "[GreaterThanOrEqualTo_CFixedPoint(PoliticalMovement.GetTargetRadicalism, '(CFixedPoint)1')]"
+				size = { 100% 100% }
+				using = look_at_me_animation_weak
+				texture = "gfx/interface/progressbar/progressbar_bad_glow.dds"
+			}
+		}
+
+		flowcontainer = {
+			parentanchor = vcenter
+			margin_left = 10
+			spacing = 7
+
+			### revolution header
+			textbox = {
+				visible = "[CivilWar.IsRevolution]"
+				align = nobaseline
+				autoresize = yes
+				text = "REVOLUTIONS_HEADER"
+			}
+			
+			### secession header
+			textbox = {
+				visible = "[CivilWar.IsSecession]"
+				align = nobaseline
+				autoresize = yes
+				text = "SECESSION_HEADER"
+			}
+
+			block "additional_items_after_left_text" {}
+		}
+
+		flowcontainer = {
+			parentanchor = right|vcenter
+			margin_right = 35
+			spacing = 5
+
+			textbox = {
+				parentanchor = vcenter
+				autoresize = yes
+				align = nobaseline
+				text = "[CivilWar.GetProgress|%0v]"
+			}
+
+			textbox = {
+				block "next_checkpoint_progress_text_visibility" {}
+				parentanchor = vcenter
+				autoresize = yes
+				align = nobaseline
+				raw_text = "(#v [CivilWar.GetProgressAtCheckpoint|-=%0]#!)"
+			}
+		}
+		
+		blockoverride "in_government_icon"{}
+
+		icon = {
+			parentanchor = right|vcenter
+			size = { 25 25 }
+			texture = "gfx/interface/icons/politics_icons/radicalized.dds"
+			position = { -5 0 }
+		}
+	}
 }
 
 template = "color_green_approval"
@@ -4288,3 +4360,5 @@ template = "color_blue_negative"
 {
    color = { 0.2 0.4 0.5 1 }
 }
+
+

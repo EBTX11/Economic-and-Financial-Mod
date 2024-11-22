@@ -42,14 +42,43 @@ types budget
 				blockoverride "illu" {
 					texture = "gfx/interface/illustrations/top_illus/top_illu_budget.dds"
 				}
+
 				textbox = {
 					name = "tutorial_highlight_weekly_balance_budget"
 					parentanchor = center
 					using = fontsize_mega
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][AccessPlayer.PredictWeeklyBalanceWithEconomyHealthHint]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')] [AccessPlayer.PredictWeeklyBalanceWithEconomyHealthHint]"
 					autoresize = yes
 					align = center|nobaseline
 					using = money_tooltip_with_graph
+				}
+
+				map_modes_single_button_minimized = {
+					datacontext = "[BudgetPanel.GetMapModeList]"
+					parentanchor = right
+					position = { -10 10 }
+
+					blockoverride "button_click" {
+						onclick = "[RightClickMenuManager.ToggleMapModes(MapModeList.AccessSelf, PdxGuiWidget.AccessSelf)]"
+					}
+
+					blockoverride "button_icon" {
+						texture = "gfx/interface/main_hud/lens_map_info.dds"
+					}
+
+					blockoverride "button_text" {
+						text = "[MapModeList.GetSelectedMapMode.GetName]"
+						margin = { 15 0 }
+						max_width = 160
+					}
+
+					blockoverride "expanded_size" {
+						size = { 190 45 }
+					}
+
+					blockoverride "right_icon_size" {
+						size = { 25 25 }
+					}
 				}
 			}
 
@@ -108,6 +137,33 @@ types budget
 				blockoverride "second_button_name" {
 					name = "tutorial_highlight_states"
 				}
+
+				# blockoverride "third_button"
+				# {
+				# 	text = "BUDGET_TAB_ASSETS"
+				# }
+				# blockoverride "third_button_tooltip" {
+				# 	tooltip = "BUDGET_TAB_ASSETS"
+				# }
+				# blockoverride "third_button_click"
+				# {
+				# 	onclick = "[InformationPanel.SelectTab('assets')]"
+				# }
+				# blockoverride "third_button_visibility"
+				# {
+				# 	visible = "[InformationPanel.IsTabSelected('assets')]"
+				# }
+				# blockoverride "third_button_visibility_checked"
+				# {
+				# 	visible = "[Not( InformationPanel.IsTabSelected('assets') )]"
+				# }
+				# blockoverride "third_button_selected"
+				# {
+				# 	text = "BUDGET_TAB_ASSETS"
+				# }
+				# blockoverride "third_button_name" {
+				# 	name = "tutorial_highlight_assets"
+				# }
 
 				############################################################################################################################################################
 				############################################################################################################################################################
@@ -214,6 +270,7 @@ types budget
 				############################################################################################################################################################
 				############################################################################################################################################################
 				############################################################################################################################################################
+
 			}
 			
 			widget = { size = { 1 10 }}
@@ -240,7 +297,7 @@ types budget
 							text = "NATIONAL_REVENUE"
 						}
 						blockoverride "text2" {
-							raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictWeeklyIncome|D+=]#!"
+							raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictWeeklyIncome|D+=]#!"
 							using = total_income_tooltip_with_graph
 						}
 					}					
@@ -316,7 +373,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetIncomeTaxIncome|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetIncomeTaxIncome|D+=]"
 								using = tax_income_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetIncomeTaxIncome)]"
 							}
@@ -329,7 +386,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetPollTaxIncome|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetPollTaxIncome|D+=]"
 								using = tax_poll_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetPollTaxIncome)]"
 							}
@@ -343,7 +400,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictConsumptionTaxes|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictConsumptionTaxes|D+=]"
 								using = consumption_tax_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictConsumptionTaxes)]"
 							}
@@ -352,14 +409,15 @@ types budget
 						flowcontainer = {
 							dynamicgridbox = {
 								flipdirection = yes
-								datamodel_wrap = 5
+								datamodel_wrap = 10
 								datamodel = "[BudgetPanel.AccessTaxedGoods]"
 								item = {		
 									button_icon_round = {
 										size = { 35 35 }
 										onclick = "[InformationPanelBar.OpenGoodsPanel(AccessPlayer.AccessFirstMarket.Self, Goods.Self)]"
 										onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
-										tooltip = "BUDGET_CONSUMPTION_TAX_TOOLTIP"													
+										tooltip = "BUDGET_CONSUMPTION_TAX_TOOLTIP"
+										using = tooltip_se
 
 										blockoverride "icon" {
 											texture = "[Goods.GetTexture]"
@@ -387,7 +445,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictDividendsTaxes|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictDividendsTaxes|D+=]"
 								using = dividends_tax_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictDividendsTaxes)]"
 							}
@@ -400,7 +458,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictTariffs|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictTariffs|D+=]"
 								using = tariffs_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictTariffs)]"
 							}
@@ -413,7 +471,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictMinting|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictMinting|D+=]"
 								using = minting_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictMinting)]"
 							}
@@ -426,7 +484,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictGovernmentShareDividends|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictGovernmentShareDividends|D+=]"
 								using = government_share_dividends_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictGovernmentShareDividends)]"
 							}
@@ -439,7 +497,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetInvestmentIncome|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetInvestmentIncome|D+=]"
 								using = investment_income_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetInvestmentIncome)]"
 							}
@@ -452,7 +510,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictDiplomaticPactsIncome|D+=]#!"
+								raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictDiplomaticPactsIncome|D+=]#!"
 								using = diplomatic_pacts_income_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictDiplomaticPactsIncome)]"
 							}
@@ -465,7 +523,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetModifier.GetValueFor('country_tax_income_add')|D+=]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetModifier.GetValueFor('country_tax_income_add')|D+=]"
 								using = additional_income_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetModifier.GetValueFor('country_tax_income_add'))]"
 							}
@@ -483,7 +541,7 @@ types budget
 							text = "NATIONAL_EXPENSES"
 						}
 						blockoverride "text2" {
-							raw_text = "#bold #N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetWeeklyExpenses|D-]#!"
+							raw_text = "#bold #N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetWeeklyExpenses|D-]#!"
 							using = total_expenses_tooltip_with_graph
 						}
 					}
@@ -501,7 +559,7 @@ types budget
 
 							blockoverride "text_money" {
 								alpha = "[TransparentIfZero(GetPlayer.GetConstructionGoodsExpenses)]"
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetConstructionGoodsExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetConstructionGoodsExpenses|D-]"
 								using = construction_goods_expense_tooltip_with_graph
 							}
 
@@ -661,7 +719,7 @@ types budget
 							blockoverride "second_line" {}
 
 							blockoverride "text_money" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.PredictGovernmentWagesExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.PredictGovernmentWagesExpenses|D-]"
 								using = government_wages_expense_tooltip_with_graph
 							}
 
@@ -750,7 +808,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetGovernmentGoodsExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetGovernmentGoodsExpenses|D-]"
 								using = government_goods_expense_tooltip_with_graph
 							}
 
@@ -765,7 +823,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetGovernmentSlavesExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetGovernmentSlavesExpenses|D-]"
 								using = government_slaves_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetGovernmentSlavesExpenses)]"
 							}
@@ -786,7 +844,7 @@ types budget
 							blockoverride "second_line" {}
 
 							blockoverride "text_money" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.PredictMilitaryWagesExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.PredictMilitaryWagesExpenses|D-]"
 								using = military_wages_expense_tooltip_with_graph
 							}
 
@@ -874,7 +932,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetMilitaryGoodsExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetMilitaryGoodsExpenses|D-]"
 								using = military_goods_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetMilitaryGoodsExpenses)]"
 							}
@@ -890,7 +948,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetMilitarySlavesExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetMilitarySlavesExpenses|D-]"
 								using = military_slaves_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetMilitarySlavesExpenses)]"
 							}
@@ -905,7 +963,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetWelfarePaymentsExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetWelfarePaymentsExpenses|D-]"
 								using = welfare_payments_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetWelfarePaymentsExpenses)]"
 							}
@@ -918,7 +976,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetSubsidiesExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetSubsidiesExpenses|D-]"
 								using = subsidies_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetSubsidiesExpenses)]"
 							}
@@ -931,7 +989,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.PredictGovernmentShareLosses|D-]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.PredictGovernmentShareLosses|D-]"
 								using = government_share_losses_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictGovernmentShareLosses)]"
 							}
@@ -944,7 +1002,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.PredictDiplomaticPactsExpenses|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.PredictDiplomaticPactsExpenses|D-]"
 								using = diplomatic_pacts_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.PredictDiplomaticPactsExpenses)]"
 							}
@@ -957,7 +1015,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetInterestPayment|D-]"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetInterestPayment|D-]"
 								using = interest_expense_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetInterestPayment)]"
 							}
@@ -970,7 +1028,7 @@ types budget
 							}
 
 							blockoverride "text_2" {
-								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')]-[GetPlayer.GetModifier.GetValueFor('country_expenses_add')|D-]#!"
+								raw_text = "#N [GetPlayer.GetCustom('currency_symbol')] -[GetPlayer.GetModifier.GetValueFor('country_expenses_add')|D-]#!"
 								using = additional_expenses_tooltip_with_graph
 								alpha = "[TransparentIfZero(GetPlayer.GetModifier.GetValueFor('country_expenses_add'))]"
 							}
@@ -987,7 +1045,7 @@ types budget
 							text = "[concept_unrealized_taxes]"
 						}
 						blockoverride "text2" {
-							raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetUnrealizedTaxes|D-]"
+							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetUnrealizedTaxes|D-]"
 							tooltip = UNREALIZED_TAXES_BREAKDOWN
 						}
 					}
@@ -1105,7 +1163,7 @@ types budget
 										size = { 0 40 }
 										
 										align = right|nobaseline
-										raw_text = "[GetPlayer.GetCustom('currency_symbol')][State.GetAverageAnnualWage|vD]"
+										raw_text = "[GetPlayer.GetCustom('currency_symbol')] [State.GetAverageAnnualWage|vD]"
 										tooltip = "[State.GetAverageAnnualWageDesc]"
 									}
 
@@ -1115,8 +1173,8 @@ types budget
 										size = { 0 40 }
 										
 										align = right|nobaseline
-										raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')][State.GetGovernmentExpenses|+d]#!"
-										tooltip = "[State.GetGovernmentExpensesTooltip]"
+										raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')] [State.GetGovernmentExpenses|+d]#!"
+										using = state_government_expenses_with_table
 										alpha = "[TransparentIfZero(State.GetGovernmentExpenses)]"
 									}
 
@@ -1126,7 +1184,7 @@ types budget
 										size = { 0 40 }
 										
 										align = right|nobaseline
-										raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')][State.GetTaxationRevenue|=+D]#!"
+										raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')] [State.GetTaxationRevenue|=+D]#!"
 										alpha = "[TransparentIfZero(State.GetTaxationRevenue)]"
 
 										using = state_taxation_revenue_with_table
@@ -1152,7 +1210,7 @@ types budget
 
 				default_header = {
 					blockoverride "text" {
-						text = "[concept_government_treasury]"
+						text = "[concept_gold_reserves]"
 					}
 				}
 
@@ -1190,7 +1248,7 @@ types budget
 							visible = "[GreaterThan_CFixedPoint( GetPlayer.GetGoldReserveRatio, '(CFixedPoint)0' )]"
 							using = fontsize_large
 							autoresize = yes
-							raw_text = " #variable [GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetGoldReserves|K]#! ([AccessPlayer.PredictWeeklyBalanceWithEconomyHealthHint])"
+							raw_text = " #variable [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetGoldReserves|K]#! ([AccessPlayer.PredictWeeklyBalanceWithEconomyHealthHint])"
 							parentanchor = right|vcenter
 							align = right|nobaseline
 							margin_right = 20
@@ -1200,7 +1258,7 @@ types budget
 							visible = "[Not(GreaterThan_CFixedPoint( GetPlayer.GetGoldReserveRatio, '(CFixedPoint)0' ))]"
 							using = fontsize_large
 							autoresize = yes
-							raw_text = " #variable [GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetGoldReserves|K]#!"
+							raw_text = " #variable [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetGoldReserves|K]#!"
 							parentanchor = right|vcenter
 							align = right|nobaseline
 							margin_right = 20
@@ -1233,7 +1291,7 @@ types budget
 					textbox = {
 						using = fontsize_large
 						autoresize = yes
-						raw_text = "#v [GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetInvestmentPool|D+]#! ([GetPlayer.GetInvestmentPoolChange|=+D])"
+						raw_text = "#v [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetInvestmentPool|D+]#! ([GetPlayer.GetInvestmentPoolChange|=+D])"
 						parentanchor = right|vcenter
 						align = right|nobaseline
 						margin_right = 20
@@ -1311,7 +1369,7 @@ types budget
 					textbox = {
 						using = fontsize_large
 						autoresize = yes
-						raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')][GetPlayer.GetPrincipal|K]#!"
+						raw_text = "#variable [GetPlayer.GetCustom('currency_symbol')] [GetPlayer.GetPrincipal|K]#!"
 						parentanchor = right|vcenter
 						align = right|nobaseline
 						margin_right = 20
@@ -1340,7 +1398,7 @@ types budget
 					textbox = {
 						using = fontsize_large
 						autoresize = yes
-						raw_text = "[GetPlayer.GetCustom('currency_symbol')]#variable [GetPlayer.GetRemainingCredit|2*]#! / [GetPlayer.GetMaxCredit|2*]"
+						raw_text = "[GetPlayer.GetCustom('currency_symbol')] #variable [GetPlayer.GetRemainingCredit|2*]#! / [GetPlayer.GetMaxCredit|2*]"
 						parentanchor = right|vcenter
 						align = right|nobaseline
 						margin_right = 20
@@ -1396,6 +1454,7 @@ types budget
 			############################################################################################################################################################
 			############################################################################################################################################################
 			############################################################################################################################################################
+
 		}
 	}
 
@@ -1447,7 +1506,7 @@ types budget
 		textbox = {
 			autoresize = yes
 			block "text_money" {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')] 0"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')]  0"
 			}
 			parentanchor = right|vcenter
 			margin_bottom = 6
@@ -1474,7 +1533,7 @@ types budget
 		textbox = {
 			autoresize = yes
 			block "text_2" {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')] 0"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')]  0"
 			}
 			parentanchor = right|vcenter
 			margin_bottom = 6
