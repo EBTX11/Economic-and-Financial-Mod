@@ -20,8 +20,7 @@ GLOBAL = {
 
 		if = {
 			limit = {
-				has_modifier = has_financial_center
-
+				has_modifier = has_financial_center 
 			}
 			var:central_bank_location = {
 				set_variable = {
@@ -373,7 +372,7 @@ GLOBAL = {
 				value = { 100 300 }
 			}
 		}
-		#thaler_prussian_thaler
+		#thaler_prussian_thaler PRU
 		if = {
 			limit = {
 				c:PRU ?= this
@@ -385,6 +384,52 @@ GLOBAL = {
 			change_variable = {
 				name = circulating_thaler_prussian_thaler_c_var_1
                 add = { 50000009 100000009 }
+			}
+			var:central_bank_location = {
+				change_variable = {
+					name = stockpiling_thaler_prussian_thaler_state_1
+                    add  = {
+						value = owner.var:circulating_thaler_prussian_thaler_c_var_1
+						multiply = 0.1
+					}
+				}
+				change_variable = {
+					name = silver_state_1
+                    add = {
+						value = owner.var:circulating_thaler_prussian_thaler_c_var_1
+						add = var:stockpiling_thaler_prussian_thaler_state_1
+						multiply = owner.var:money_value_target_1
+					}
+				}
+				change_variable = {
+					name = gold_state_1
+                    add = {
+						value = var:silver_state_1
+						multiply = 0.12
+					}
+				}
+			}
+			set_institution_investment_level = {
+				institution = institution_economic_central_bank
+				level = 3
+			}
+			set_variable = {
+				name = base_index_value
+				value = { 100 300 }
+			}
+		}
+		#thaler_prussian_thaler FRM
+		if = {
+			limit = {
+				c:FRM ?= this
+			}
+			set_variable = {
+				name = money_value_target_1
+                value = 16.7 #{ 10 20 }
+			}
+			change_variable = {
+				name = circulating_thaler_prussian_thaler_c_var_1
+                add = { 50009 100009 }
 			}
 			var:central_bank_location = {
 				change_variable = {
@@ -2183,41 +2228,10 @@ GLOBAL = {
 		add_treasury = {
 			add = gold_reserves_limit
 		}
-		ai_build_privat_building_silver_mine = yes
-		ai_build_privat_building_gold_mine = yes
+		# ai_build_privat_building_silver_mine = yes
+		# ai_build_privat_building_gold_mine = yes
 
 		currency_law_list = yes
-	}
-
-
-	# s:STATE_AUSTRIA={
-	# 	region_state:AUS={
-	# 		create_building={
-	# 			building="building_financial_centre_aus"
-	# 			add_ownership={
-	# 				company={
-	# 					type=company_Rothschild_Bank_Europe
-	# 					country="c:AUS"
-	# 					levels=5
-	# 				}
-	# 			}
-	# 			reserves=1
-	# 		}
-	# 		create_building={
-	# 			building="building_financial_centre"
-	# 			add_ownership={
-	# 				company={
-	# 					type=company_gwr
-	# 					country="c:AUS"
-	# 					levels=2
-	# 				}
-	# 			}
-	# 			reserves=1
-	# 			activate_production_methods={ "pm_early_trains"  "pm_wooden_passenger_carriages" }
-	# 		}
-	# 	}
-	# }
-
-
+	} 
 }
 

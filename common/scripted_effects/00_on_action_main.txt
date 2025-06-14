@@ -20,6 +20,19 @@
 ef_on_monthly_pulse_recurence = {
 	update_modifiers_bc_fc_ns = yes
 
+	#is_extreme_weak_currency_solution
+	if = {
+		limit = {
+			is_ai = yes
+			is_extreme_weak_currency = yes
+			is_revolutionary = no
+			not = {
+				has_law = law_type:law_isolationism #extreme_weak_currency est normal
+			}
+		}
+		extreme_weak_currency_solution = yes
+	}
+
 	if  = {
 		limit = {
 			market_owner_is_root = yes
@@ -107,6 +120,11 @@ central_bank_ef_on_monthly_pulse_country = {
 			}
 			not = {
 				has_law = law_type:law_isolationism
+				or  = {
+					var:currency_crisis >= 1
+					var:central_bank_bankruptcy >= 1 #temps de que le pays reset en, extreme weajk currency cela va va déclanvher la crise -> une crise ce déckanche dure 2 ans si à l'issu des 2ans le pays est toujour en extreme weak currency il va retrigger la crise
+					var:extreme_weak_currency_solution_count > 1
+				}
 			}
 			#ajout d'une condition pour  les pays qui passe en law_fiat_standard par la crise quand sera intégré 
 		}
@@ -151,6 +169,23 @@ central_bank_ef_on_monthly_pulse_country = {
 			}
 			monetary_policy_inflation_reset = yes
 		}
+		if = {
+			limit = {
+				market_owner_is_root_4 = no
+				or = {
+					has_law = law_type:law_revaluation_25
+					has_law = law_type:law_revaluation_50
+					has_law = law_type:law_revaluation_75
+					has_law = law_type:law_revaluation_100
+					has_law = law_type:law_devaluation_25
+					has_law = law_type:law_devaluation_50
+					has_law = law_type:law_devaluation_75
+					has_law = law_type:law_devaluation_100 
+				}
+			}
+			monetary_policy_inflation_reset_law = yes
+			
+		}
 	}
 
 	#stockpiling_currency_and_gold -> à décompposé je pense
@@ -189,8 +224,7 @@ central_bank_ef_on_monthly_pulse_country = {
 		}
 	}
 }
-financial_center_ef_on_monthly_pulse_country = {
-
+financial_center_ef_on_monthly_pulse_country = {	
 	if  = {
 		limit  = {
 			is_player = yes
@@ -572,15 +606,15 @@ central_bank_ef_on_yearly_pulse_country = {
 		money_value_target_modification = yes
 	}
 
-	#is_extreme_weak_currency_solution
-	if = {
-		limit = {
-			is_ai = yes
-			is_extreme_weak_currency = yes
-			is_revolutionary = no
-		}
-		extreme_weak_currency_solution = yes
-	}
+	# #is_extreme_weak_currency_solution
+	# if = {
+	# 	limit = {
+	# 		is_ai = yes
+	# 		is_extreme_weak_currency = yes
+	# 		is_revolutionary = no
+	# 	}
+	# 	extreme_weak_currency_solution = yes
+	# }
 }
 financial_center_ef_on_yearly_pulse_country = {
 	private_ownership_production_stocks = yes
@@ -658,1942 +692,3229 @@ ai_building_strategy = {
 	# - en fct des strategie du pays developpement de secteur
 
 	#idée coode
-		#num_queued_private_constructions
+	#num_queued_private_constructions
 	# construction_queue_num_queued_private_levels
 	#construction_queue_private_duration
 
-	#building_ef_private_construction
-	if  = { #construit la difference de bd
-		limit  = {
-			building_ef_private_construction_lvl_to_build > 0
-			has_modifier = has_financial_center
-		}
-
-		#initialisation
-		# while = {
-		# 	count = building_ef_private_construction_lvl_to_build
-		# 	random_scope_state = {
-		# 		start_privately_funded_building_construction = building_ef_private_construction
-		# 	}
-		# }
-
-		# random_scope_state = {
-		# 	save_scope_as = state_target
-		# }
-		# scope:state_target = {
-
-		#brut
-		switch = {
-			trigger = building_ef_private_construction_lvl_to_build
-			1 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							not = {
-								has_building = building_ef_private_construction
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 1
-					}
-				}
-			}
-			2 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 2
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 2
-					}
-				}
-			}
-			3 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 3
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 3
-					}
-				}
-			}
-			4 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 4
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 4
-					}
-				}
-			}
-			5 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 5
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 5
-					}
-				}
-			}
-			6 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 6
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 6
-					}
-				}
-			}
-			7 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 7
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 7
-					}
-				}
-			}
-			8 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 8
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 8
-					}
-				}
-			}
-			9 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 9
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 9
-					}
-				}
-			}
-			10 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 10
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 10
-					}
-				}
-			}
-			11 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 11
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 11
-					}
-				}
-			}
-			12 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 12
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 12
-					}
-				}
-			}
-			13 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 13
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 13
-					}
-				}
-			}
-			14 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 14
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 14
-					}
-				}
-			}
-			15 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 15
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 15
-					}
-				}
-			}
-			16 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 16
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 16
-					}
-				}
-			}
-			17 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 17
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 17
-					}
-				}
-			}
-			18 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 18
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 18
-					}
-				}
-			}
-			19 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 19
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 19
-					}
-				}
-			}
-			20 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 20
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 20
-					}
-				}
-			}
-			21 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 21
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 21
-					}
-				}
-			}
-			22 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 22
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 22
-					}
-				}
-			}
-			23 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 23
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 23
-					}
-				}
-			}
-			24 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 24
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 24
-					}
-				}
-			}
-			25 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 25
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 25
-					}
-				}
-			}
-			26 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 26
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 26
-					}
-				}
-			}
-			27 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 27
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 27
-					}
-				}
-			}
-			28 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 28
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 28
-					}
-				}
-			}
-			29 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 29
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 29
-					}
-				}
-			}
-			30 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 30
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 30
-					}
-				}
-			}
-			31 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 31
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 31
-					}
-				}
-			}
-			32 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 32
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 32
-					}
-				}
-			}
-			33 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 33
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 33
-					}
-				}
-			}
-			34 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 34
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 34
-					}
-				}
-			}
-			35 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 35
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 35
-					}
-				}
-			}
-			36 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 36
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 36
-					}
-				}
-			}
-			37 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 37
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 37
-					}
-				}
-			}
-			38 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 38
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 38
-					}
-				}
-			}
-			39 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 39
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 39
-					}
-				}
-			}
-			40 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 40
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 40
-					}
-				}
-			}
-			41 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 41
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 41
-					}
-				}
-			}
-			42 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 42
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 42
-					}
-				}
-			}
-			43 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 43
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 43
-					}
-				}
-			}
-			44 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 44
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 44
-					}
-				}
-			}
-			45 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 45
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 45
-					}
-				}
-			}
-			46 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 46
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 46
-					}
-				}
-			}
-			47 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 47
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 47
-					}
-				}
-			}
-			48 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 48
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 48
-					}
-				}
-			}
-			49 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 49
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 49
-					}
-				}
-			}
-			50 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 50
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 50
-					}
-				}
-			}
-			51 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 51
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 51
-					}
-				}
-			}
-			52 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 52
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 52
-					}
-				}
-			}
-			53 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 53
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 53
-					}
-				}
-			}
-			54 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 54
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 54
-					}
-				}
-			}
-			55 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 55
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 55
-					}
-				}
-			}
-			56 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 56
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 56
-					}
-				}
-			}
-			57 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 57
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 57
-					}
-				}
-			}
-			58 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 58
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 58
-					}
-				}
-			}
-			59 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 59
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 59
-					}
-				}
-			}
-			60 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 60
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 60
-					}
-				}
-			}
-			61 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 61
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 61
-					}
-				}
-			}
-			62 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 62
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 62
-					}
-				}
-			}
-			63 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 63
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 63
-					}
-				}
-			}
-			64 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 64
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 64
-					}
-				}
-			}
-			65 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 65
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 65
-					}
-				}
-			}
-			66 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 66
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 66
-					}
-				}
-			}
-			67 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 67
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 67
-					}
-				}
-			}
-			68 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 68
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 68
-					}
-				}
-			}
-			69 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 69
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 69
-					}
-				}
-			}
-			70 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 70
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 70
-					}
-				}
-			}
-			71 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 71
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 71
-					}
-				}
-			}
-			72 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 72
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 72
-					}
-				}
-			}
-			73 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 73
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 73
-					}
-				}
-			}
-			74 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 74
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 74
-					}
-				}
-			}
-			75 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 75
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 75
-					}
-				}
-			}
-			76 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 76
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 76
-					}
-				}
-			}
-			77 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 77
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 77
-					}
-				}
-			}
-			78 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 78
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 78
-					}
-				}
-			}
-			79 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 79
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 79
-					}
-				}
-			}
-			80 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 80
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 80
-					}
-				}
-			}
-			81 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 81
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 81
-					}
-				}
-			}
-			82 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 82
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 82
-					}
-				}
-			}
-			83 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 83
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 83
-					}
-				}
-			}
-			84 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 84
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 84
-					}
-				}
-			}
-			85 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 85
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 85
-					}
-				}
-			}
-			86 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 86
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 86
-					}
-				}
-			}
-			87 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 87
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 87
-					}
-				}
-			}
-			88 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 88
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 88
-					}
-				}
-			}
-			89 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 89
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 89
-					}
-				}
-			}
-			90 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 90
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 90
-					}
-				}
-			}
-			91 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 91
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 91
-					}
-				}
-			}
-			92 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 92
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 92
-					}
-				}
-			}
-			93 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 93
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 93
-					}
-				}
-			}
-			94 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 94
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 94
-					}
-				}
-			}
-			95 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 95
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 95
-					}
-				}
-			}
-			96 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 96
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 96
-					}
-				}
-			}
-			97 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 97
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 97
-					}
-				}
-			}
-			98 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 98
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 98
-					}
-				}
-			}
-			99 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 99
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 99
-					}
-				}
-			}
-			100 = {
-				random_scope_state = {
-					limit ={
-						or ={
-							any_scope_building = {
-								is_building_type = building_ef_private_construction
-								level < 100
-							}
-							gdp > owner.gdp_05
-							#gdp > owner.gdp_03
-							#gdp > owner.gdp_04
-						}
-					}
-					create_building = {
-						building = building_ef_private_construction
-						level = 100
-					}
-				}
-			}
-		}
-
-		#developpement -> en fonction du % de pib de la capital possibilité pour le pays d'augmenter sont secteru de la construction privé
-		# while = {
-		# 	count = building_ef_private_construction_lvl_to_build
-		# 	random_scope_state = {
-		# 		start_privately_funded_building_construction = building_ef_private_construction
-		# 	}
-		# }
-	}
+	# #building_ef_private_construction
+	# if = {
+	# 	limit  = {
+	# 		building_ef_private_construction_lvl_to_build > 0
+	# 		has_modifier = has_financial_center
+	# 	}
+		
+	# 	random_scope_state = {
+	# 		limit = {
+	# 			not = {
+	# 				building_ef_private_construction_lvl_to_build = 0
+	# 			}
+	# 			building_urban_center_lvl_by_base_rate >= building_ef_private_construction_lvl_state
+	# 		}
+	# 		switch = {
+	# 			trigger = building_urban_center_lvl_by_base_rate
+	# 			1 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 1
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 1
+	# 					}
+	# 				}
+	# 			}
+	# 			2 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 2
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 2
+	# 					}
+	# 				}
+	# 			}
+	# 			3 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 3
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 3
+	# 					}
+	# 				}
+	# 			}
+	# 			4 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 4
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 4
+	# 					}
+	# 				}
+	# 			}
+	# 			5 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 5
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 5
+	# 					}
+	# 				}
+	# 			}
+	# 			6 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 6
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 6
+	# 					}
+	# 				}
+	# 			}
+	# 			7 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 7
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 7
+	# 					}
+	# 				}
+	# 			}
+	# 			8 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 8
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 8
+	# 					}
+	# 				}
+	# 			}
+	# 			9 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 9
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 9
+	# 					}
+	# 				}
+	# 			}
+	# 			10 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 10
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 10
+	# 					}
+	# 				}
+	# 			}
+	# 			11 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 11
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 11
+	# 					}
+	# 				}
+	# 			}
+	# 			12 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 12
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 12
+	# 					}
+	# 				}
+	# 			}
+	# 			13 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 13
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 13
+	# 					}
+	# 				}
+	# 			}
+	# 			14 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 14
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 14
+	# 					}
+	# 				}
+	# 			}
+	# 			15 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 15
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 15
+	# 					}
+	# 				}
+	# 			}
+	# 			16 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 16
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 16
+	# 					}
+	# 				}
+	# 			}
+	# 			17 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 17
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 17
+	# 					}
+	# 				}
+	# 			}
+	# 			18 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 18
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 18
+	# 					}
+	# 				}
+	# 			}
+	# 			19 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 19
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 19
+	# 					}
+	# 				}
+	# 			}
+	# 			20 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 20
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 20
+	# 					}
+	# 				}
+	# 			}
+	# 			21 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 21
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 21
+	# 					}
+	# 				}
+	# 			}
+	# 			22 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 22
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 22
+	# 					}
+	# 				}
+	# 			}
+	# 			23 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 23
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 23
+	# 					}
+	# 				}
+	# 			}
+	# 			24 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 24
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 24
+	# 					}
+	# 				}
+	# 			}
+	# 			25 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 25
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 25
+	# 					}
+	# 				}
+	# 			}
+	# 			26 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 26
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 26
+	# 					}
+	# 				}
+	# 			}
+	# 			27 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 27
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 27
+	# 					}
+	# 				}
+	# 			}
+	# 			28 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 28
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 28
+	# 					}
+	# 				}
+	# 			}
+	# 			29 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 29
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 29
+	# 					}
+	# 				}
+	# 			}
+	# 			30 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 30
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 30
+	# 					}
+	# 				}
+	# 			}
+	# 			31 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 31
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 31
+	# 					}
+	# 				}
+	# 			}
+	# 			32 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 32
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 32
+	# 					}
+	# 				}
+	# 			}
+	# 			33 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 33
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 33
+	# 					}
+	# 				}
+	# 			}
+	# 			34 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 34
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 34
+	# 					}
+	# 				}
+	# 			}
+	# 			35 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 35
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 35
+	# 					}
+	# 				}
+	# 			}
+	# 			36 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 36
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 36
+	# 					}
+	# 				}
+	# 			}
+	# 			37 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 37
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 37
+	# 					}
+	# 				}
+	# 			}
+	# 			38 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 38
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 38
+	# 					}
+	# 				}
+	# 			}
+	# 			39 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 39
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 39
+	# 					}
+	# 				}
+	# 			}
+	# 			40 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 40
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 40
+	# 					}
+	# 				}
+	# 			}
+	# 			41 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 41
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 41
+	# 					}
+	# 				}
+	# 			}
+	# 			42 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 42
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 42
+	# 					}
+	# 				}
+	# 			}
+	# 			43 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 43
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 43
+	# 					}
+	# 				}
+	# 			}
+	# 			44 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 44
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 44
+	# 					}
+	# 				}
+	# 			}
+	# 			45 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 45
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 45
+	# 					}
+	# 				}
+	# 			}
+	# 			46 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 46
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 46
+	# 					}
+	# 				}
+	# 			}
+	# 			47 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 47
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 47
+	# 					}
+	# 				}
+	# 			}
+	# 			48 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 48
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 48
+	# 					}
+	# 				}
+	# 			}
+	# 			49 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 49
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 49
+	# 					}
+	# 				}
+	# 			}
+	# 			50 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 50
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 50
+	# 					}
+	# 				}
+	# 			}
+	# 			51 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 51
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 51
+	# 					}
+	# 				}
+	# 			}
+	# 			52 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 52
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 52
+	# 					}
+	# 				}
+	# 			}
+	# 			53 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 53
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 53
+	# 					}
+	# 				}
+	# 			}
+	# 			54 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 54
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 54
+	# 					}
+	# 				}
+	# 			}
+	# 			55 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 55
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 55
+	# 					}
+	# 				}
+	# 			}
+	# 			56 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 56
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 56
+	# 					}
+	# 				}
+	# 			}
+	# 			57 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 57
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 57
+	# 					}
+	# 				}
+	# 			}
+	# 			58 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 58
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 58
+	# 					}
+	# 				}
+	# 			}
+	# 			59 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 59
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 59
+	# 					}
+	# 				}
+	# 			}
+	# 			60 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 60
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 60
+	# 					}
+	# 				}
+	# 			}
+	# 			61 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 61
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 61
+	# 					}
+	# 				}
+	# 			}
+	# 			62 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 62
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 62
+	# 					}
+	# 				}
+	# 			}
+	# 			63 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 63
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 63
+	# 					}
+	# 				}
+	# 			}
+	# 			64 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 64
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 64
+	# 					}
+	# 				}
+	# 			}
+	# 			65 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 65
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 65
+	# 					}
+	# 				}
+	# 			}
+	# 			66 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 66
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 66
+	# 					}
+	# 				}
+	# 			}
+	# 			67 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 67
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 67
+	# 					}
+	# 				}
+	# 			}
+	# 			68 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 68
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 68
+	# 					}
+	# 				}
+	# 			}
+	# 			69 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 69
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 69
+	# 					}
+	# 				}
+	# 			}
+	# 			70 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 70
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 70
+	# 					}
+	# 				}
+	# 			}
+	# 			71 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 71
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 71
+	# 					}
+	# 				}
+	# 			}
+	# 			72 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 72
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 72
+	# 					}
+	# 				}
+	# 			}
+	# 			73 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 73
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 73
+	# 					}
+	# 				}
+	# 			}
+	# 			74 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 74
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 74
+	# 					}
+	# 				}
+	# 			}
+	# 			75 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 75
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 75
+	# 					}
+	# 				}
+	# 			}
+	# 			76 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 76
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 76
+	# 					}
+	# 				}
+	# 			}
+	# 			77 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 77
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 77
+	# 					}
+	# 				}
+	# 			}
+	# 			78 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 78
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 78
+	# 					}
+	# 				}
+	# 			}
+	# 			79 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 79
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 79
+	# 					}
+	# 				}
+	# 			}
+	# 			80 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 80
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 80
+	# 					}
+	# 				}
+	# 			}
+	# 			81 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 81
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 81
+	# 					}
+	# 				}
+	# 			}
+	# 			82 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 82
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 82
+	# 					}
+	# 				}
+	# 			}
+	# 			83 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 83
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 83
+	# 					}
+	# 				}
+	# 			}
+	# 			84 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 84
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 84
+	# 					}
+	# 				}
+	# 			}
+	# 			85 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 85
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 85
+	# 					}
+	# 				}
+	# 			}
+	# 			86 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 86
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 86
+	# 					}
+	# 				}
+	# 			}
+	# 			87 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 87
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 87
+	# 					}
+	# 				}
+	# 			}
+	# 			88 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 88
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 88
+	# 					}
+	# 				}
+	# 			}
+	# 			89 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 89
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 89
+	# 					}
+	# 				}
+	# 			}
+	# 			90 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 90
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 90
+	# 					}
+	# 				}
+	# 			}
+	# 			91 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 91
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 91
+	# 					}
+	# 				}
+	# 			}
+	# 			92 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 92
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 92
+	# 					}
+	# 				}
+	# 			}
+	# 			93 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 93
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 93
+	# 					}
+	# 				}
+	# 			}
+	# 			94 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 94
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 94
+	# 					}
+	# 				}
+	# 			}
+	# 			95 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 95
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 95
+	# 					}
+	# 				}
+	# 			}
+	# 			96 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 96
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 96
+	# 					}
+	# 				}
+	# 			}
+	# 			97 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 97
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 97
+	# 					}
+	# 				}
+	# 			}
+	# 			98 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 98
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 98
+	# 					}
+	# 				}
+	# 			}
+	# 			99 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 99
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 99
+	# 					}
+	# 				}
+	# 			}
+	# 			100 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 100
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 100
+	# 					}
+	# 				}
+	# 			}
+	# 			101 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 101
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 101
+	# 					}
+	# 				}
+	# 			}
+	# 			102 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 102
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 102
+	# 					}
+	# 				}
+	# 			}
+	# 			103 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 103
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 103
+	# 					}
+	# 				}
+	# 			}
+	# 			104 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 104
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 104
+	# 					}
+	# 				}
+	# 			}
+	# 			105 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 105
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 105
+	# 					}
+	# 				}
+	# 			}
+	# 			106 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 106
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 106
+	# 					}
+	# 				}
+	# 			}
+	# 			107 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 107
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 107
+	# 					}
+	# 				}
+	# 			}
+	# 			108 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 108
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 108
+	# 					}
+	# 				}
+	# 			}
+	# 			109 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 109
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 109
+	# 					}
+	# 				}
+	# 			}
+	# 			110 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 110
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 110
+	# 					}
+	# 				}
+	# 			}
+	# 			111 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 111
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 111
+	# 					}
+	# 				}
+	# 			}
+	# 			112 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 112
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 112
+	# 					}
+	# 				}
+	# 			}
+	# 			113 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 113
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 113
+	# 					}
+	# 				}
+	# 			}
+	# 			114 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 114
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 114
+	# 					}
+	# 				}
+	# 			}
+	# 			115 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 115
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 115
+	# 					}
+	# 				}
+	# 			}
+	# 			116 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 116
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 116
+	# 					}
+	# 				}
+	# 			}
+	# 			117 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 117
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 117
+	# 					}
+	# 				}
+	# 			}
+	# 			118 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 118
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 118
+	# 					}
+	# 				}
+	# 			}
+	# 			119 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 119
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 119
+	# 					}
+	# 				}
+	# 			}
+	# 			120 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 120
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 120
+	# 					}
+	# 				}
+	# 			}
+	# 			121 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 121
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 121
+	# 					}
+	# 				}
+	# 			}
+	# 			122 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 122
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 122
+	# 					}
+	# 				}
+	# 			}
+	# 			123 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 123
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 123
+	# 					}
+	# 				}
+	# 			}
+	# 			124 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 124
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 124
+	# 					}
+	# 				}
+	# 			}
+	# 			125 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 125
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 125
+	# 					}
+	# 				}
+	# 			}
+	# 			126 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 126
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 126
+	# 					}
+	# 				}
+	# 			}
+	# 			127 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 127
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 127
+	# 					}
+	# 				}
+	# 			}
+	# 			128 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 128
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 128
+	# 					}
+	# 				}
+	# 			}
+	# 			129 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 129
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 129
+	# 					}
+	# 				}
+	# 			}
+	# 			130 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 130
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 130
+	# 					}
+	# 				}
+	# 			}
+	# 			131 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 131
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 131
+	# 					}
+	# 				}
+	# 			}
+	# 			132 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 132
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 132
+	# 					}
+	# 				}
+	# 			}
+	# 			133 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 133
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 133
+	# 					}
+	# 				}
+	# 			}
+	# 			134 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 134
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 134
+	# 					}
+	# 				}
+	# 			}
+	# 			135 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 135
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 135
+	# 					}
+	# 				}
+	# 			}
+	# 			136 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 136
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 136
+	# 					}
+	# 				}
+	# 			}
+	# 			137 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 137
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 137
+	# 					}
+	# 				}
+	# 			}
+	# 			138 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 138
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 138
+	# 					}
+	# 				}
+	# 			}
+	# 			139 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 139
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 139
+	# 					}
+	# 				}
+	# 			}
+	# 			140 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 140
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 140
+	# 					}
+	# 				}
+	# 			}
+	# 			141 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 141
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 141
+	# 					}
+	# 				}
+	# 			}
+	# 			142 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 142
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 142
+	# 					}
+	# 				}
+	# 			}
+	# 			143 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 143
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 143
+	# 					}
+	# 				}
+	# 			}
+	# 			144 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 144
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 144
+	# 					}
+	# 				}
+	# 			}
+	# 			145 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 145
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 145
+	# 					}
+	# 				}
+	# 			}
+	# 			146 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 146
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 146
+	# 					}
+	# 				}
+	# 			}
+	# 			147 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 147
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 147
+	# 					}
+	# 				}
+	# 			}
+	# 			148 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 148
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 148
+	# 					}
+	# 				}
+	# 			}
+	# 			149 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 149
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 149
+	# 					}
+	# 				}
+	# 			}
+	# 			150 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 150
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 150
+	# 					}
+	# 				}
+	# 			}
+	# 			151 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 151
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 151
+	# 					}
+	# 				}
+	# 			}
+	# 			152 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 152
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 152
+	# 					}
+	# 				}
+	# 			}
+	# 			153 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 153
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 153
+	# 					}
+	# 				}
+	# 			}
+	# 			154 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 154
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 154
+	# 					}
+	# 				}
+	# 			}
+	# 			155 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 155
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 155
+	# 					}
+	# 				}
+	# 			}
+	# 			156 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 156
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 156
+	# 					}
+	# 				}
+	# 			}
+	# 			157 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 157
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 157
+	# 					}
+	# 				}
+	# 			}
+	# 			158 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 158
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 158
+	# 					}
+	# 				}
+	# 			}
+	# 			159 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 159
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 159
+	# 					}
+	# 				}
+	# 			}
+	# 			160 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 160
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 160
+	# 					}
+	# 				}
+	# 			}
+	# 			161 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 161
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 161
+	# 					}
+	# 				}
+	# 			}
+	# 			162 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 162
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 162
+	# 					}
+	# 				}
+	# 			}
+	# 			163 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 163
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 163
+	# 					}
+	# 				}
+	# 			}
+	# 			164 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 164
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 164
+	# 					}
+	# 				}
+	# 			}
+	# 			165 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 165
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 165
+	# 					}
+	# 				}
+	# 			}
+	# 			166 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 166
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 166
+	# 					}
+	# 				}
+	# 			}
+	# 			167 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 167
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 167
+	# 					}
+	# 				}
+	# 			}
+	# 			168 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 168
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 168
+	# 					}
+	# 				}
+	# 			}
+	# 			169 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 169
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 169
+	# 					}
+	# 				}
+	# 			}
+	# 			170 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 170
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 170
+	# 					}
+	# 				}
+	# 			}
+	# 			171 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 171
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 171
+	# 					}
+	# 				}
+	# 			}
+	# 			172 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 172
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 172
+	# 					}
+	# 				}
+	# 			}
+	# 			173 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 173
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 173
+	# 					}
+	# 				}
+	# 			}
+	# 			174 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 174
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 174
+	# 					}
+	# 				}
+	# 			}
+	# 			175 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 175
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 175
+	# 					}
+	# 				}
+	# 			}
+	# 			176 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 176
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 176
+	# 					}
+	# 				}
+	# 			}
+	# 			177 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 177
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 177
+	# 					}
+	# 				}
+	# 			}
+	# 			178 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 178
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 178
+	# 					}
+	# 				}
+	# 			}
+	# 			179 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 179
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 179
+	# 					}
+	# 				}
+	# 			}
+	# 			180 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 180
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 180
+	# 					}
+	# 				}
+	# 			}
+	# 			181 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 181
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 181
+	# 					}
+	# 				}
+	# 			}
+	# 			182 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 182
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 182
+	# 					}
+	# 				}
+	# 			}
+	# 			183 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 183
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 183
+	# 					}
+	# 				}
+	# 			}
+	# 			184 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 184
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 184
+	# 					}
+	# 				}
+	# 			}
+	# 			185 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 185
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 185
+	# 					}
+	# 				}
+	# 			}
+	# 			186 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 186
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 186
+	# 					}
+	# 				}
+	# 			}
+	# 			187 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 187
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 187
+	# 					}
+	# 				}
+	# 			}
+	# 			188 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 188
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 188
+	# 					}
+	# 				}
+	# 			}
+	# 			189 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 189
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 189
+	# 					}
+	# 				}
+	# 			}
+	# 			190 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 190
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 190
+	# 					}
+	# 				}
+	# 			}
+	# 			191 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 191
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 191
+	# 					}
+	# 				}
+	# 			}
+	# 			192 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 192
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 192
+	# 					}
+	# 				}
+	# 			}
+	# 			193 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 193
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 193
+	# 					}
+	# 				}
+	# 			}
+	# 			194 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 194
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 194
+	# 					}
+	# 				}
+	# 			}
+	# 			195 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 195
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 195
+	# 					}
+	# 				}
+	# 			}
+	# 			196 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 196
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 196
+	# 					}
+	# 				}
+	# 			}
+	# 			197 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 197
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 197
+	# 					}
+	# 				}
+	# 			}
+	# 			198 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 198
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 198
+	# 					}
+	# 				}
+	# 			}
+	# 			199 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 199
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 199
+	# 					}
+	# 				}
+	# 			}
+	# 			200 = {
+	# 				if = {
+	# 					limit ={
+	# 						or ={
+	# 							not = {
+	# 								has_building = building_ef_private_construction
+	# 							}
+	# 							b:building_urban_center.level <= 200
+	# 						}
+	# 					}
+	# 					create_building = {
+	# 						building = building_ef_private_construction
+	# 						level = 200
+	# 					}
+	# 				}
+	# 			}
+	# 		}
+	# 	}
+	# }
 
 	#building_railway
 	if  = {
@@ -5025,1337 +6346,1338 @@ ai_buy_sell_currency = {
 	#end_tag_3
 }
 all_currency_resold = {
-	#dinar
-	if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_currency
-				or = {
-					var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_state > 0
-		}
-		sell_dinar_currency_crisis = yes
-	}
-	#dinar_algerian_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_algerian_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_algerian_dinar_state > 0
-		}
-		sell_dinar_algerian_dinar_currency_crisis = yes
-	}
-	#dinar_iraqi_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_iraqi_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_iraqi_dinar_state > 0
-		}
-		sell_dinar_iraqi_dinar_currency_crisis = yes
-	}
-	#dinar_libyan_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_libyan_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_libyan_dinar_state > 0
-		}
-		sell_dinar_libyan_dinar_currency_crisis = yes
-	}
-	#dinar_moroccan_dirham
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_moroccan_dirham_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_moroccan_dirham_state > 0
-		}
-		sell_dinar_moroccan_dirham_currency_crisis = yes
-	}
-	#dinar_omanian_rial
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_omanian_rial_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_omanian_rial_state > 0
-		}
-		sell_dinar_omanian_rial_currency_crisis = yes
-	}
-	#dinar_qiran
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_qiran_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_qiran_state > 0
-		}
-		sell_dinar_qiran_currency_crisis = yes
-	}
-	#dinar_saudi_riyal
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_saudi_riyal_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_saudi_riyal_state > 0
-		}
-		sell_dinar_saudi_riyal_currency_crisis = yes
-	}
-	#dinar_serbian_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_serbian_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_serbian_dinar_state > 0
-		}
-		sell_dinar_serbian_dinar_currency_crisis = yes
-	}
-	#dinar_tunisian_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_tunisian_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_tunisian_dinar_state > 0
-		}
-		sell_dinar_tunisian_dinar_currency_crisis = yes
-	}
-	#dinar_yugoslav_dinar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dinar_yugoslav_dinar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dinar_yugoslav_dinar_state > 0
-		}
-		sell_dinar_yugoslav_dinar_currency_crisis = yes
-	}
-	#dollar_australian_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_australian_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_australian_dollar_state > 0
-		}
-		sell_dollar_australian_dollar_currency_crisis = yes
-	}
-	#dollar_canadian_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_canadian_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_canadian_dollar_state > 0
-		}
-		sell_dollar_canadian_dollar_currency_crisis = yes
-	}
-	#dollar_caribbean_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_caribbean_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_caribbean_dollar_state > 0
-		}
-		sell_dollar_caribbean_dollar_currency_crisis = yes
-	}
-	#dollar_confederate_states_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_confederate_states_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_confederate_states_dollar_state > 0
-		}
-		sell_dollar_confederate_states_dollar_currency_crisis = yes
-	}
-	#dollar_liberian_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_liberian_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_liberian_dollar_state > 0
-		}
-		sell_dollar_liberian_dollar_currency_crisis = yes
-	}
-	#dollar_new_zealand_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_new_zealand_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_new_zealand_dollar_state > 0
-		}
-		sell_dollar_new_zealand_dollar_currency_crisis = yes
-	}
-	#dollar_sierra_leonean_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_sierra_leonean_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_sierra_leonean_dollar_state > 0
-		}
-		sell_dollar_sierra_leonean_dollar_currency_crisis = yes
-	}
-	#dollar_united_states_dollar
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_dollar_united_states_dollar_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_dollar_united_states_dollar_state > 0
-		}
-		sell_dollar_united_states_dollar_currency_crisis = yes
-	}
-	#eco_ariary
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_ariary_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_ariary_state > 0
-		}
-		sell_eco_ariary_currency_crisis = yes
-	}
-	#eco_central_african_eco
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_central_african_eco_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_central_african_eco_state > 0
-		}
-		sell_eco_central_african_eco_currency_crisis = yes
-	}
-	#eco_east_african_eco
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_east_african_eco_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_east_african_eco_state > 0
-		}
-		sell_eco_east_african_eco_currency_crisis = yes
-	}
-	#eco_ethiopian_birr
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_ethiopian_birr_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_ethiopian_birr_state > 0
-		}
-		sell_eco_ethiopian_birr_currency_crisis = yes
-	}
-	#eco_ghanaian_pound
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_ghanaian_pound_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_ghanaian_pound_state > 0
-		}
-		sell_eco_ghanaian_pound_currency_crisis = yes
-	}
-	#eco_nigerian_naira
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_nigerian_naira_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_nigerian_naira_state > 0
-		}
-		sell_eco_nigerian_naira_currency_crisis = yes
-	}
-	#eco_south_african_rand
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_south_african_rand_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_south_african_rand_state > 0
-		}
-		sell_eco_south_african_rand_currency_crisis = yes
-	}
-	#eco_tuareg_ouguiya
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_tuareg_ouguiya_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_tuareg_ouguiya_state > 0
-		}
-		sell_eco_tuareg_ouguiya_currency_crisis = yes
-	}
-	#eco_west_african_eco
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_eco_west_african_eco_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_eco_west_african_eco_state > 0
-		}
-		sell_eco_west_african_eco_currency_crisis = yes
-	}
-	#franc_belgian_franc
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_franc_belgian_franc_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_franc_belgian_franc_state > 0
-		}
-		sell_franc_belgian_franc_currency_crisis = yes
-	}
-	#franc_french_franc
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_franc_french_franc_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_franc_french_franc_state > 0
-		}
-		sell_franc_french_franc_currency_crisis = yes
-	}
-	#franc_luxembourgish_franc
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_franc_luxembourgish_franc_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_franc_luxembourgish_franc_state > 0
-		}
-		sell_franc_luxembourgish_franc_currency_crisis = yes
-	}
-	#franc_swiss_franc
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_franc_swiss_franc_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_franc_swiss_franc_state > 0
-		}
-		sell_franc_swiss_franc_currency_crisis = yes
-	}
-	#gulden
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_state > 0
-		}
-		sell_gulden_currency_crisis = yes
-	}
-	#gulden_bavarian_gulden
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_bavarian_gulden_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_bavarian_gulden_state > 0
-		}
-		sell_gulden_bavarian_gulden_currency_crisis = yes
-	}
-	#gulden_florin
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_florin_currency
-				or = {
-					var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_florin_state > 0
-		}
-		sell_gulden_florin_currency_crisis = yes
-	}
-	#gulden_hungarian_forint
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_hungarian_forint_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_hungarian_forint_state > 0
-		}
-		sell_gulden_hungarian_forint_currency_crisis = yes
-	}
-	#gulden_indies_guilder
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_indies_guilder_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_indies_guilder_state > 0
-		}
-		sell_gulden_indies_guilder_currency_crisis = yes
-	}
-	#gulden_south_german_gulden
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_gulden_south_german_gulden_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_gulden_south_german_gulden_state > 0
-		}
-		sell_gulden_south_german_gulden_currency_crisis = yes
-	}
-	#krone_czech_koruna
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_czech_koruna_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_czech_koruna_state > 0
-		}
-		sell_krone_czech_koruna_currency_crisis = yes
-	}
-	#krone_danish_krone
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_danish_krone_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_danish_krone_state > 0
-		}
-		sell_krone_danish_krone_currency_crisis = yes
-	}
-	#krone_estonian_kroon
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_estonian_kroon_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_estonian_kroon_state > 0
-		}
-		sell_krone_estonian_kroon_currency_crisis = yes
-	}
-	#krone_icelandic_krona
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_icelandic_krona_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_icelandic_krona_state > 0
-		}
-		sell_krone_icelandic_krona_currency_crisis = yes
-	}
-	#krone_norwegian_krone
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_norwegian_krone_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_norwegian_krone_state > 0
-		}
-		sell_krone_norwegian_krone_currency_crisis = yes
-	}
-	#krone_slovak_koruna
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_slovak_koruna_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_slovak_koruna_state > 0
-		}
-		sell_krone_slovak_koruna_currency_crisis = yes
-	}
-	#krone_swedish_krona
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_krone_swedish_krona_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_krone_swedish_krona_state > 0
-		}
-		sell_krone_swedish_krona_currency_crisis = yes
-	}
-	#leon_leu
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_leon_leu_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_leon_leu_state > 0
-		}
-		sell_leon_leu_currency_crisis = yes
-	}
-	#leon_lev
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_leon_lev_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_leon_lev_state > 0
-		}
-		sell_leon_lev_currency_crisis = yes
-	}
-	#lira
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_state > 0
-		}
-		sell_lira_currency_crisis = yes
-	}
-	#lira_ducato
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_ducato_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_ducato_state > 0
-		}
-		sell_lira_ducato_currency_crisis = yes
-	}
-	#lira_ottoman_lira
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_ottoman_lira_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_ottoman_lira_state > 0
-		}
-		sell_lira_ottoman_lira_currency_crisis = yes
-	}
-	#lira_scudo_pontelse_ificio
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_scudo_pontelse_ificio_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_scudo_pontelse_ificio_state > 0
-		}
-		sell_lira_scudo_pontelse_ificio_currency_crisis = yes
-	}
-	#lira_scudo_sardo
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_scudo_sardo_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_scudo_sardo_state > 0
-		}
-		sell_lira_scudo_sardo_currency_crisis = yes
-	}
-	#lira_toscane_lira
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_lira_toscane_lira_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_lira_toscane_lira_state > 0
-		}
-		sell_lira_toscane_lira_currency_crisis = yes
-	}
-	#mark
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_mark_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_mark_state > 0
-		}
-		sell_mark_currency_crisis = yes
-	}
-	#mark_finnish_markka
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_mark_finnish_markka_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_mark_finnish_markka_state > 0
-		}
-		sell_mark_finnish_markka_currency_crisis = yes
-	}
-	#peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_state > 0
-		}
-		sell_peso_currency_crisis = yes
-	}
-	#peso_argentine_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_argentine_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_argentine_peso_state > 0
-		}
-		sell_peso_argentine_peso_currency_crisis = yes
-	}
-	#peso_bolivien_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_bolivien_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_bolivien_peso_state > 0
-		}
-		sell_peso_bolivien_peso_currency_crisis = yes
-	}
-	#peso_chilean_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_chilean_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_chilean_peso_state > 0
-		}
-		sell_peso_chilean_peso_currency_crisis = yes
-	}
-	#peso_colombian_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_colombian_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_colombian_peso_state > 0
-		}
-		sell_peso_colombian_peso_currency_crisis = yes
-	}
-	#peso_costa_rican_colon
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_costa_rican_colon_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_costa_rican_colon_state > 0
-		}
-		sell_peso_costa_rican_colon_currency_crisis = yes
-	}
-	#peso_cuban_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_cuban_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_cuban_peso_state > 0
-		}
-		sell_peso_cuban_peso_currency_crisis = yes
-	}
-	#peso_ecuadorian_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_ecuadorian_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_ecuadorian_peso_state > 0
-		}
-		sell_peso_ecuadorian_peso_currency_crisis = yes
-	}
-	#peso_el_salvador_colon
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_el_salvador_colon_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_el_salvador_colon_state > 0
-		}
-		sell_peso_el_salvador_colon_currency_crisis = yes
-	}
-	#peso_guatemalan_quetzal
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_guatemalan_quetzal_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_guatemalan_quetzal_state > 0
-		}
-		sell_peso_guatemalan_quetzal_currency_crisis = yes
-	}
-	#peso_honduran_lempira
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_honduran_lempira_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_honduran_lempira_state > 0
-		}
-		sell_peso_honduran_lempira_currency_crisis = yes
-	}
-	#peso_mexican_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_mexican_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_mexican_peso_state > 0
-		}
-		sell_peso_mexican_peso_currency_crisis = yes
-	}
-	#peso_nicaraguan_cordoba
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_nicaraguan_cordoba_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_nicaraguan_cordoba_state > 0
-		}
-		sell_peso_nicaraguan_cordoba_currency_crisis = yes
-	}
-	#peso_paraguayan_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_paraguayan_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_paraguayan_peso_state > 0
-		}
-		sell_peso_paraguayan_peso_currency_crisis = yes
-	}
-	#peso_philippine_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_philippine_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_philippine_peso_state > 0
-		}
-		sell_peso_philippine_peso_currency_crisis = yes
-	}
-	#peso_sol_de_oro
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_sol_de_oro_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_sol_de_oro_state > 0
-		}
-		sell_peso_sol_de_oro_currency_crisis = yes
-	}
-	#peso_uruguayan_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_uruguayan_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_uruguayan_peso_state > 0
-		}
-		sell_peso_uruguayan_peso_currency_crisis = yes
-	}
-	#peso_venezuelan_peso
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_peso_venezuelan_peso_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_peso_venezuelan_peso_state > 0
-		}
-		sell_peso_venezuelan_peso_currency_crisis = yes
-	}
-	#pound_egyptian_pound
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_pound_egyptian_pound_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_pound_egyptian_pound_state > 0
-		}
-		sell_pound_egyptian_pound_currency_crisis = yes
-	}
-	#pound_irish_pound
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_pound_irish_pound_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_pound_irish_pound_state > 0
-		}
-		sell_pound_irish_pound_currency_crisis = yes
-	}
-	#pound_sterling
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_pound_sterling_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_pound_sterling_state > 0
-		}
-		sell_pound_sterling_currency_crisis = yes
-	}
-	#real
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_real_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_real_state > 0
-		}
-		sell_real_currency_crisis = yes
-	}
-	#real_brazilian_real
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_real_brazilian_real_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_real_brazilian_real_state > 0
-		}
-		sell_real_brazilian_real_currency_crisis = yes
-	}
-	#rupee_indian_rupee
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_rupee_indian_rupee_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_rupee_indian_rupee_state > 0
-		}
-		sell_rupee_indian_rupee_currency_crisis = yes
-	}
-	#rupee_indonesian_rupiah
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_rupee_indonesian_rupiah_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_rupee_indonesian_rupiah_state > 0
-		}
-		sell_rupee_indonesian_rupiah_currency_crisis = yes
-	}
-	#spe_baht
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_baht_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_baht_state > 0
-		}
-		sell_spe_baht_currency_crisis = yes
-	}
-	#spe_dong
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_dong_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_dong_state > 0
-		}
-		sell_spe_dong_currency_crisis = yes
-	}
-	#spe_drachma
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_drachma_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_drachma_state > 0
-		}
-		sell_spe_drachma_currency_crisis = yes
-	}
-	#spe_korean_won
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_korean_won_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_korean_won_state > 0
-		}
-		sell_spe_korean_won_currency_crisis = yes
-	}
-	#spe_latvian_lats
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_latvian_lats_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_latvian_lats_state > 0
-		}
-		sell_spe_latvian_lats_currency_crisis = yes
-	}
-	#spe_lithuanian_litas
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_lithuanian_litas_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_lithuanian_litas_state > 0
-		}
-		sell_spe_lithuanian_litas_currency_crisis = yes
-	}
-	#spe_peseta
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_peseta_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_peseta_state > 0
-		}
-		sell_spe_peseta_currency_crisis = yes
-	}
-	#spe_ruble
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_ruble_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_ruble_state > 0
-		}
-		sell_spe_ruble_currency_crisis = yes
-	}
-	#spe_uni
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_uni_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_uni_state > 0
-		}
-		sell_spe_uni_currency_crisis = yes
-	}
-	#spe_yen
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_yen_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_yen_state > 0
-		}
-		sell_spe_yen_currency_crisis = yes
-	}
-	#spe_yuan
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_yuan_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_yuan_state > 0
-		}
-		sell_spe_yuan_currency_crisis = yes
-	}
-	#spe_zloti
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_spe_zloti_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_spe_zloti_state > 0
-		}
-		sell_spe_zloti_currency_crisis = yes
-	}
-	#thaler_hannoveraner_thaler
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_thaler_hannoveraner_thaler_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_thaler_hannoveraner_thaler_state > 0
-		}
-		sell_thaler_hannoveraner_thaler_currency_crisis = yes
-	}
-	#thaler_prussian_thaler
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_thaler_prussian_thaler_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_thaler_prussian_thaler_state > 0
-		}
-		sell_thaler_prussian_thaler_currency_crisis = yes
-	}
-	#thaler_saxon_thaler
-	else_if  = {
-		limit  = {
-			scope:target_country = {
-				has_law = law_type:law_thaler_saxon_thaler_currency
-				or = {
-						var:currency_crisis = 1
-					var:central_bank_bankruptcy = 1
-				}
-			}
-			stockpiling_thaler_saxon_thaler_state > 0
-		}
-		sell_thaler_saxon_thaler_currency_crisis = yes
-	}
-
+	#brace
+		#dinar
+		if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_currency
+					or = {
+						var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_state > 0
+			}
+			sell_dinar_currency_crisis = yes
+		}
+		#dinar_algerian_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_algerian_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_algerian_dinar_state > 0
+			}
+			sell_dinar_algerian_dinar_currency_crisis = yes
+		}
+		#dinar_iraqi_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_iraqi_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_iraqi_dinar_state > 0
+			}
+			sell_dinar_iraqi_dinar_currency_crisis = yes
+		}
+		#dinar_libyan_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_libyan_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_libyan_dinar_state > 0
+			}
+			sell_dinar_libyan_dinar_currency_crisis = yes
+		}
+		#dinar_moroccan_dirham
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_moroccan_dirham_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_moroccan_dirham_state > 0
+			}
+			sell_dinar_moroccan_dirham_currency_crisis = yes
+		}
+		#dinar_omanian_rial
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_omanian_rial_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_omanian_rial_state > 0
+			}
+			sell_dinar_omanian_rial_currency_crisis = yes
+		}
+		#dinar_qiran
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_qiran_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_qiran_state > 0
+			}
+			sell_dinar_qiran_currency_crisis = yes
+		}
+		#dinar_saudi_riyal
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_saudi_riyal_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_saudi_riyal_state > 0
+			}
+			sell_dinar_saudi_riyal_currency_crisis = yes
+		}
+		#dinar_serbian_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_serbian_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_serbian_dinar_state > 0
+			}
+			sell_dinar_serbian_dinar_currency_crisis = yes
+		}
+		#dinar_tunisian_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_tunisian_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_tunisian_dinar_state > 0
+			}
+			sell_dinar_tunisian_dinar_currency_crisis = yes
+		}
+		#dinar_yugoslav_dinar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dinar_yugoslav_dinar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dinar_yugoslav_dinar_state > 0
+			}
+			sell_dinar_yugoslav_dinar_currency_crisis = yes
+		}
+		#dollar_australian_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_australian_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_australian_dollar_state > 0
+			}
+			sell_dollar_australian_dollar_currency_crisis = yes
+		}
+		#dollar_canadian_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_canadian_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_canadian_dollar_state > 0
+			}
+			sell_dollar_canadian_dollar_currency_crisis = yes
+		}
+		#dollar_caribbean_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_caribbean_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_caribbean_dollar_state > 0
+			}
+			sell_dollar_caribbean_dollar_currency_crisis = yes
+		}
+		#dollar_confederate_states_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_confederate_states_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_confederate_states_dollar_state > 0
+			}
+			sell_dollar_confederate_states_dollar_currency_crisis = yes
+		}
+		#dollar_liberian_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_liberian_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_liberian_dollar_state > 0
+			}
+			sell_dollar_liberian_dollar_currency_crisis = yes
+		}
+		#dollar_new_zealand_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_new_zealand_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_new_zealand_dollar_state > 0
+			}
+			sell_dollar_new_zealand_dollar_currency_crisis = yes
+		}
+		#dollar_sierra_leonean_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_sierra_leonean_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_sierra_leonean_dollar_state > 0
+			}
+			sell_dollar_sierra_leonean_dollar_currency_crisis = yes
+		}
+		#dollar_united_states_dollar
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_dollar_united_states_dollar_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_dollar_united_states_dollar_state > 0
+			}
+			sell_dollar_united_states_dollar_currency_crisis = yes
+		}
+		#eco_ariary
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_ariary_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_ariary_state > 0
+			}
+			sell_eco_ariary_currency_crisis = yes
+		}
+		#eco_central_african_eco
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_central_african_eco_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_central_african_eco_state > 0
+			}
+			sell_eco_central_african_eco_currency_crisis = yes
+		}
+		#eco_east_african_eco
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_east_african_eco_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_east_african_eco_state > 0
+			}
+			sell_eco_east_african_eco_currency_crisis = yes
+		}
+		#eco_ethiopian_birr
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_ethiopian_birr_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_ethiopian_birr_state > 0
+			}
+			sell_eco_ethiopian_birr_currency_crisis = yes
+		}
+		#eco_ghanaian_pound
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_ghanaian_pound_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_ghanaian_pound_state > 0
+			}
+			sell_eco_ghanaian_pound_currency_crisis = yes
+		}
+		#eco_nigerian_naira
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_nigerian_naira_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_nigerian_naira_state > 0
+			}
+			sell_eco_nigerian_naira_currency_crisis = yes
+		}
+		#eco_south_african_rand
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_south_african_rand_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_south_african_rand_state > 0
+			}
+			sell_eco_south_african_rand_currency_crisis = yes
+		}
+		#eco_tuareg_ouguiya
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_tuareg_ouguiya_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_tuareg_ouguiya_state > 0
+			}
+			sell_eco_tuareg_ouguiya_currency_crisis = yes
+		}
+		#eco_west_african_eco
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_eco_west_african_eco_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_eco_west_african_eco_state > 0
+			}
+			sell_eco_west_african_eco_currency_crisis = yes
+		}
+		#franc_belgian_franc
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_franc_belgian_franc_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_franc_belgian_franc_state > 0
+			}
+			sell_franc_belgian_franc_currency_crisis = yes
+		}
+		#franc_french_franc
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_franc_french_franc_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_franc_french_franc_state > 0
+			}
+			sell_franc_french_franc_currency_crisis = yes
+		}
+		#franc_luxembourgish_franc
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_franc_luxembourgish_franc_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_franc_luxembourgish_franc_state > 0
+			}
+			sell_franc_luxembourgish_franc_currency_crisis = yes
+		}
+		#franc_swiss_franc
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_franc_swiss_franc_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_franc_swiss_franc_state > 0
+			}
+			sell_franc_swiss_franc_currency_crisis = yes
+		}
+		#gulden
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_state > 0
+			}
+			sell_gulden_currency_crisis = yes
+		}
+		#gulden_bavarian_gulden
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_bavarian_gulden_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_bavarian_gulden_state > 0
+			}
+			sell_gulden_bavarian_gulden_currency_crisis = yes
+		}
+		#gulden_florin
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_florin_currency
+					or = {
+						var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_florin_state > 0
+			}
+			sell_gulden_florin_currency_crisis = yes
+		}
+		#gulden_hungarian_forint
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_hungarian_forint_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_hungarian_forint_state > 0
+			}
+			sell_gulden_hungarian_forint_currency_crisis = yes
+		}
+		#gulden_indies_guilder
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_indies_guilder_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_indies_guilder_state > 0
+			}
+			sell_gulden_indies_guilder_currency_crisis = yes
+		}
+		#gulden_south_german_gulden
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_gulden_south_german_gulden_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_gulden_south_german_gulden_state > 0
+			}
+			sell_gulden_south_german_gulden_currency_crisis = yes
+		}
+		#krone_czech_koruna
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_czech_koruna_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_czech_koruna_state > 0
+			}
+			sell_krone_czech_koruna_currency_crisis = yes
+		}
+		#krone_danish_krone
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_danish_krone_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_danish_krone_state > 0
+			}
+			sell_krone_danish_krone_currency_crisis = yes
+		}
+		#krone_estonian_kroon
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_estonian_kroon_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_estonian_kroon_state > 0
+			}
+			sell_krone_estonian_kroon_currency_crisis = yes
+		}
+		#krone_icelandic_krona
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_icelandic_krona_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_icelandic_krona_state > 0
+			}
+			sell_krone_icelandic_krona_currency_crisis = yes
+		}
+		#krone_norwegian_krone
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_norwegian_krone_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_norwegian_krone_state > 0
+			}
+			sell_krone_norwegian_krone_currency_crisis = yes
+		}
+		#krone_slovak_koruna
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_slovak_koruna_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_slovak_koruna_state > 0
+			}
+			sell_krone_slovak_koruna_currency_crisis = yes
+		}
+		#krone_swedish_krona
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_krone_swedish_krona_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_krone_swedish_krona_state > 0
+			}
+			sell_krone_swedish_krona_currency_crisis = yes
+		}
+		#leon_leu
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_leon_leu_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_leon_leu_state > 0
+			}
+			sell_leon_leu_currency_crisis = yes
+		}
+		#leon_lev
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_leon_lev_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_leon_lev_state > 0
+			}
+			sell_leon_lev_currency_crisis = yes
+		}
+		#lira
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_state > 0
+			}
+			sell_lira_currency_crisis = yes
+		}
+		#lira_ducato
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_ducato_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_ducato_state > 0
+			}
+			sell_lira_ducato_currency_crisis = yes
+		}
+		#lira_ottoman_lira
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_ottoman_lira_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_ottoman_lira_state > 0
+			}
+			sell_lira_ottoman_lira_currency_crisis = yes
+		}
+		#lira_scudo_pontelse_ificio
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_scudo_pontelse_ificio_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_scudo_pontelse_ificio_state > 0
+			}
+			sell_lira_scudo_pontelse_ificio_currency_crisis = yes
+		}
+		#lira_scudo_sardo
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_scudo_sardo_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_scudo_sardo_state > 0
+			}
+			sell_lira_scudo_sardo_currency_crisis = yes
+		}
+		#lira_toscane_lira
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_lira_toscane_lira_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_lira_toscane_lira_state > 0
+			}
+			sell_lira_toscane_lira_currency_crisis = yes
+		}
+		#mark
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_mark_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_mark_state > 0
+			}
+			sell_mark_currency_crisis = yes
+		}
+		#mark_finnish_markka
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_mark_finnish_markka_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_mark_finnish_markka_state > 0
+			}
+			sell_mark_finnish_markka_currency_crisis = yes
+		}
+		#peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_state > 0
+			}
+			sell_peso_currency_crisis = yes
+		}
+		#peso_argentine_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_argentine_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_argentine_peso_state > 0
+			}
+			sell_peso_argentine_peso_currency_crisis = yes
+		}
+		#peso_bolivien_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_bolivien_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_bolivien_peso_state > 0
+			}
+			sell_peso_bolivien_peso_currency_crisis = yes
+		}
+		#peso_chilean_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_chilean_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_chilean_peso_state > 0
+			}
+			sell_peso_chilean_peso_currency_crisis = yes
+		}
+		#peso_colombian_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_colombian_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_colombian_peso_state > 0
+			}
+			sell_peso_colombian_peso_currency_crisis = yes
+		}
+		#peso_costa_rican_colon
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_costa_rican_colon_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_costa_rican_colon_state > 0
+			}
+			sell_peso_costa_rican_colon_currency_crisis = yes
+		}
+		#peso_cuban_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_cuban_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_cuban_peso_state > 0
+			}
+			sell_peso_cuban_peso_currency_crisis = yes
+		}
+		#peso_ecuadorian_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_ecuadorian_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_ecuadorian_peso_state > 0
+			}
+			sell_peso_ecuadorian_peso_currency_crisis = yes
+		}
+		#peso_el_salvador_colon
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_el_salvador_colon_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_el_salvador_colon_state > 0
+			}
+			sell_peso_el_salvador_colon_currency_crisis = yes
+		}
+		#peso_guatemalan_quetzal
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_guatemalan_quetzal_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_guatemalan_quetzal_state > 0
+			}
+			sell_peso_guatemalan_quetzal_currency_crisis = yes
+		}
+		#peso_honduran_lempira
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_honduran_lempira_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_honduran_lempira_state > 0
+			}
+			sell_peso_honduran_lempira_currency_crisis = yes
+		}
+		#peso_mexican_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_mexican_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_mexican_peso_state > 0
+			}
+			sell_peso_mexican_peso_currency_crisis = yes
+		}
+		#peso_nicaraguan_cordoba
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_nicaraguan_cordoba_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_nicaraguan_cordoba_state > 0
+			}
+			sell_peso_nicaraguan_cordoba_currency_crisis = yes
+		}
+		#peso_paraguayan_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_paraguayan_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_paraguayan_peso_state > 0
+			}
+			sell_peso_paraguayan_peso_currency_crisis = yes
+		}
+		#peso_philippine_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_philippine_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_philippine_peso_state > 0
+			}
+			sell_peso_philippine_peso_currency_crisis = yes
+		}
+		#peso_sol_de_oro
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_sol_de_oro_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_sol_de_oro_state > 0
+			}
+			sell_peso_sol_de_oro_currency_crisis = yes
+		}
+		#peso_uruguayan_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_uruguayan_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_uruguayan_peso_state > 0
+			}
+			sell_peso_uruguayan_peso_currency_crisis = yes
+		}
+		#peso_venezuelan_peso
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_peso_venezuelan_peso_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_peso_venezuelan_peso_state > 0
+			}
+			sell_peso_venezuelan_peso_currency_crisis = yes
+		}
+		#pound_egyptian_pound
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_pound_egyptian_pound_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_pound_egyptian_pound_state > 0
+			}
+			sell_pound_egyptian_pound_currency_crisis = yes
+		}
+		#pound_irish_pound
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_pound_irish_pound_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_pound_irish_pound_state > 0
+			}
+			sell_pound_irish_pound_currency_crisis = yes
+		}
+		#pound_sterling
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_pound_sterling_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_pound_sterling_state > 0
+			}
+			sell_pound_sterling_currency_crisis = yes
+		}
+		#real
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_real_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_real_state > 0
+			}
+			sell_real_currency_crisis = yes
+		}
+		#real_brazilian_real
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_real_brazilian_real_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_real_brazilian_real_state > 0
+			}
+			sell_real_brazilian_real_currency_crisis = yes
+		}
+		#rupee_indian_rupee
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_rupee_indian_rupee_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_rupee_indian_rupee_state > 0
+			}
+			sell_rupee_indian_rupee_currency_crisis = yes
+		}
+		#rupee_indonesian_rupiah
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_rupee_indonesian_rupiah_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_rupee_indonesian_rupiah_state > 0
+			}
+			sell_rupee_indonesian_rupiah_currency_crisis = yes
+		}
+		#spe_baht
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_baht_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_baht_state > 0
+			}
+			sell_spe_baht_currency_crisis = yes
+		}
+		#spe_dong
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_dong_currency
+					or = {
+						var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_dong_state > 0
+			}
+			sell_spe_dong_currency_crisis = yes
+		}
+		#spe_drachma
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_drachma_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_drachma_state > 0
+			}
+			sell_spe_drachma_currency_crisis = yes
+		}
+		#spe_korean_won
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_korean_won_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_korean_won_state > 0
+			}
+			sell_spe_korean_won_currency_crisis = yes
+		}
+		#spe_latvian_lats
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_latvian_lats_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_latvian_lats_state > 0
+			}
+			sell_spe_latvian_lats_currency_crisis = yes
+		}
+		#spe_lithuanian_litas
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_lithuanian_litas_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_lithuanian_litas_state > 0
+			}
+			sell_spe_lithuanian_litas_currency_crisis = yes
+		}
+		#spe_peseta
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_peseta_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_peseta_state > 0
+			}
+			sell_spe_peseta_currency_crisis = yes
+		}
+		#spe_ruble
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_ruble_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_ruble_state > 0
+			}
+			sell_spe_ruble_currency_crisis = yes
+		}
+		#spe_uni
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_uni_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_uni_state > 0
+			}
+			sell_spe_uni_currency_crisis = yes
+		}
+		#spe_yen
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_yen_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_yen_state > 0
+			}
+			sell_spe_yen_currency_crisis = yes
+		}
+		#spe_yuan
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_yuan_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_yuan_state > 0
+			}
+			sell_spe_yuan_currency_crisis = yes
+		}
+		#spe_zloti
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_spe_zloti_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_spe_zloti_state > 0
+			}
+			sell_spe_zloti_currency_crisis = yes
+		}
+		#thaler_hannoveraner_thaler
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_thaler_hannoveraner_thaler_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_thaler_hannoveraner_thaler_state > 0
+			}
+			sell_thaler_hannoveraner_thaler_currency_crisis = yes
+		}
+		#thaler_prussian_thaler
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_thaler_prussian_thaler_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_thaler_prussian_thaler_state > 0
+			}
+			sell_thaler_prussian_thaler_currency_crisis = yes
+		}
+		#thaler_saxon_thaler
+		else_if  = {
+			limit  = {
+				scope:target_country = {
+					has_law = law_type:law_thaler_saxon_thaler_currency
+					or = {
+							var:currency_crisis = 1
+						var:central_bank_bankruptcy = 1
+					}
+				}
+				stockpiling_thaler_saxon_thaler_state > 0
+			}
+			sell_thaler_saxon_thaler_currency_crisis = yes
+		}
+	#brace
 }
 buy_sell_currency_order = {
 	#begin_tag_4
@@ -13950,15 +15272,10 @@ ai_set_stockpile_reserve_limit = {
 	ef_ai_set_ironclads_reserve = yes
 }
 ai_buy_central_bank_debt = {
-	every_country = {
-		limit = {
-			global_country_ranking = 1
-		}
-		central_bank_debt_variable_list = yes
-	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_1 = 0
 		}
@@ -13966,7 +15283,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_2 = 0
 		}
@@ -13974,7 +15292,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_3 = 0
 		}
@@ -13982,7 +15301,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_4 = 0
 		}
@@ -13990,7 +15310,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_5 = 0
 		}
@@ -13998,7 +15319,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_6 = 0
 		}
@@ -14006,7 +15328,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_7 = 0
 		}
@@ -14014,7 +15337,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_8 = 0
 		}
@@ -14022,7 +15346,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_9 = 0
 		}
@@ -14030,7 +15355,8 @@ ai_buy_central_bank_debt = {
 	}
 	if = {
 		limit = {
-			has_modifier = has_financial_center
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			is_ai = yes
 			var:ai_selle_bond_maturity_yers_time_10 = 0
 		}
@@ -14385,6 +15711,199 @@ money_value_global_var = {
 	money_value_thaler_hannoveraner_thaler_global_var = yes
 	money_value_thaler_prussian_thaler_global_var = yes
 	money_value_thaler_saxon_thaler_global_var = yes #end_tag_5
+
+	money_value_target_dinar_global_var = yes
+	money_value_target_dinar_algerian_dinar_global_var = yes
+	money_value_target_dinar_iraqi_dinar_global_var = yes
+	money_value_target_dinar_libyan_dinar_global_var = yes
+	money_value_target_dinar_moroccan_dirham_global_var = yes
+	money_value_target_dinar_omanian_rial_global_var = yes
+	money_value_target_dinar_qiran_global_var = yes
+	money_value_target_dinar_saudi_riyal_global_var = yes
+	money_value_target_dinar_serbian_dinar_global_var = yes
+	money_value_target_dinar_tunisian_dinar_global_var = yes
+	money_value_target_dinar_yugoslav_dinar_global_var = yes
+	money_value_target_dollar_australian_dollar_global_var = yes
+	money_value_target_dollar_canadian_dollar_global_var = yes
+	money_value_target_dollar_caribbean_dollar_global_var = yes
+	money_value_target_dollar_confederate_states_dollar_global_var = yes
+	money_value_target_dollar_liberian_dollar_global_var = yes
+	money_value_target_dollar_new_zealand_dollar_global_var = yes
+	money_value_target_dollar_sierra_leonean_dollar_global_var = yes
+	money_value_target_dollar_united_states_dollar_global_var = yes
+	money_value_target_eco_ariary_global_var = yes
+	money_value_target_eco_central_african_eco_global_var = yes
+	money_value_target_eco_east_african_eco_global_var = yes
+	money_value_target_eco_ethiopian_birr_global_var = yes
+	money_value_target_eco_ghanaian_pound_global_var = yes
+	money_value_target_eco_nigerian_naira_global_var = yes
+	money_value_target_eco_south_african_rand_global_var = yes
+	money_value_target_eco_tuareg_ouguiya_global_var = yes
+	money_value_target_eco_west_african_eco_global_var = yes
+	money_value_target_franc_belgian_franc_global_var = yes
+	money_value_target_franc_french_franc_global_var = yes
+	money_value_target_franc_luxembourgish_franc_global_var = yes
+	money_value_target_franc_swiss_franc_global_var = yes
+	money_value_target_gulden_global_var = yes
+	money_value_target_gulden_bavarian_gulden_global_var = yes
+	money_value_target_gulden_florin_global_var = yes
+	money_value_target_gulden_hungarian_forint_global_var = yes
+	money_value_target_gulden_indies_guilder_global_var = yes
+	money_value_target_gulden_south_german_gulden_global_var = yes
+	money_value_target_krone_czech_koruna_global_var = yes
+	money_value_target_krone_danish_krone_global_var = yes
+	money_value_target_krone_estonian_kroon_global_var = yes
+	money_value_target_krone_icelandic_krona_global_var = yes
+	money_value_target_krone_norwegian_krone_global_var = yes
+	money_value_target_krone_slovak_koruna_global_var = yes
+	money_value_target_krone_swedish_krona_global_var = yes
+	money_value_target_leon_leu_global_var = yes
+	money_value_target_leon_lev_global_var = yes
+	money_value_target_lira_global_var = yes
+	money_value_target_lira_ducato_global_var = yes
+	money_value_target_lira_ottoman_lira_global_var = yes
+	money_value_target_lira_scudo_pontificio_global_var = yes
+	money_value_target_lira_scudo_sardo_global_var = yes
+	money_value_target_lira_toscane_lira_global_var = yes
+	money_value_target_mark_global_var = yes
+	money_value_target_mark_finnish_markka_global_var = yes
+	money_value_target_peso_global_var = yes
+	money_value_target_peso_argentine_peso_global_var = yes
+	money_value_target_peso_bolivien_peso_global_var = yes
+	money_value_target_peso_chilean_peso_global_var = yes
+	money_value_target_peso_colombian_peso_global_var = yes
+	money_value_target_peso_costa_rican_colon_global_var = yes
+	money_value_target_peso_cuban_peso_global_var = yes
+	money_value_target_peso_ecuadorian_peso_global_var = yes
+	money_value_target_peso_el_salvador_colon_global_var = yes
+	money_value_target_peso_guatemalan_quetzal_global_var = yes
+	money_value_target_peso_honduran_lempira_global_var = yes
+	money_value_target_peso_mexican_peso_global_var = yes
+	money_value_target_peso_nicaraguan_cordoba_global_var = yes
+	money_value_target_peso_paraguayan_peso_global_var = yes
+	money_value_target_peso_philippine_peso_global_var = yes
+	money_value_target_peso_sol_de_oro_global_var = yes
+	money_value_target_peso_uruguayan_peso_global_var = yes
+	money_value_target_peso_venezuelan_peso_global_var = yes
+	money_value_target_pound_egyptian_pound_global_var = yes
+	money_value_target_pound_irish_pound_global_var = yes
+	money_value_target_pound_sterling_global_var = yes
+	money_value_target_real_global_var = yes
+	money_value_target_real_brazilian_real_global_var = yes
+	money_value_target_rupee_indian_rupee_global_var = yes
+	money_value_target_rupee_indonesian_rupiah_global_var = yes
+	money_value_target_spe_baht_global_var = yes
+	money_value_target_spe_dong_global_var = yes
+	money_value_target_spe_drachma_global_var = yes
+	money_value_target_spe_korean_won_global_var = yes
+	money_value_target_spe_latvian_lats_global_var = yes
+	money_value_target_spe_lithuanian_litas_global_var = yes
+	money_value_target_spe_peseta_global_var = yes
+	money_value_target_spe_ruble_global_var = yes
+	money_value_target_spe_uni_global_var = yes
+	money_value_target_spe_yen_global_var = yes
+	money_value_target_spe_yuan_global_var = yes
+	money_value_target_spe_zloti_global_var = yes
+	money_value_target_thaler_hannoveraner_thaler_global_var = yes
+	money_value_target_thaler_prussian_thaler_global_var = yes
+	money_value_target_thaler_saxon_thaler_global_var = yes
+
+	money_value_in_gold_dinar_global_var = yes
+	money_value_in_gold_dinar_algerian_dinar_global_var = yes
+	money_value_in_gold_dinar_iraqi_dinar_global_var = yes
+	money_value_in_gold_dinar_libyan_dinar_global_var = yes
+	money_value_in_gold_dinar_moroccan_dirham_global_var = yes
+	money_value_in_gold_dinar_omanian_rial_global_var = yes
+	money_value_in_gold_dinar_qiran_global_var = yes
+	money_value_in_gold_dinar_saudi_riyal_global_var = yes
+	money_value_in_gold_dinar_serbian_dinar_global_var = yes
+	money_value_in_gold_dinar_tunisian_dinar_global_var = yes
+	money_value_in_gold_dinar_yugoslav_dinar_global_var = yes
+	money_value_in_gold_dollar_australian_dollar_global_var = yes
+	money_value_in_gold_dollar_canadian_dollar_global_var = yes
+	money_value_in_gold_dollar_caribbean_dollar_global_var = yes
+	money_value_in_gold_dollar_confederate_states_dollar_global_var = yes
+	money_value_in_gold_dollar_liberian_dollar_global_var = yes
+	money_value_in_gold_dollar_new_zealand_dollar_global_var = yes
+	money_value_in_gold_dollar_sierra_leonean_dollar_global_var = yes
+	money_value_in_gold_dollar_united_states_dollar_global_var = yes
+	money_value_in_gold_eco_ariary_global_var = yes
+	money_value_in_gold_eco_central_african_eco_global_var = yes
+	money_value_in_gold_eco_east_african_eco_global_var = yes
+	money_value_in_gold_eco_ethiopian_birr_global_var = yes
+	money_value_in_gold_eco_ghanaian_pound_global_var = yes
+	money_value_in_gold_eco_nigerian_naira_global_var = yes
+	money_value_in_gold_eco_south_african_rand_global_var = yes
+	money_value_in_gold_eco_tuareg_ouguiya_global_var = yes
+	money_value_in_gold_eco_west_african_eco_global_var = yes
+	money_value_in_gold_franc_belgian_franc_global_var = yes
+	money_value_in_gold_franc_french_franc_global_var = yes
+	money_value_in_gold_franc_luxembourgish_franc_global_var = yes
+	money_value_in_gold_franc_swiss_franc_global_var = yes
+	money_value_in_gold_gulden_global_var = yes
+	money_value_in_gold_gulden_bavarian_gulden_global_var = yes
+	money_value_in_gold_gulden_florin_global_var = yes
+	money_value_in_gold_gulden_hungarian_forint_global_var = yes
+	money_value_in_gold_gulden_indies_guilder_global_var = yes
+	money_value_in_gold_gulden_south_german_gulden_global_var = yes
+	money_value_in_gold_krone_czech_koruna_global_var = yes
+	money_value_in_gold_krone_danish_krone_global_var = yes
+	money_value_in_gold_krone_estonian_kroon_global_var = yes
+	money_value_in_gold_krone_icelandic_krona_global_var = yes
+	money_value_in_gold_krone_norwegian_krone_global_var = yes
+	money_value_in_gold_krone_slovak_koruna_global_var = yes
+	money_value_in_gold_krone_swedish_krona_global_var = yes
+	money_value_in_gold_leon_leu_global_var = yes
+	money_value_in_gold_leon_lev_global_var = yes
+	money_value_in_gold_lira_global_var = yes
+	money_value_in_gold_lira_ducato_global_var = yes
+	money_value_in_gold_lira_ottoman_lira_global_var = yes
+	money_value_in_gold_lira_scudo_pontificio_global_var = yes
+	money_value_in_gold_lira_scudo_sardo_global_var = yes
+	money_value_in_gold_lira_toscane_lira_global_var = yes
+	money_value_in_gold_mark_global_var = yes
+	money_value_in_gold_mark_finnish_markka_global_var = yes
+	money_value_in_gold_peso_global_var = yes
+	money_value_in_gold_peso_argentine_peso_global_var = yes
+	money_value_in_gold_peso_bolivien_peso_global_var = yes
+	money_value_in_gold_peso_chilean_peso_global_var = yes
+	money_value_in_gold_peso_colombian_peso_global_var = yes
+	money_value_in_gold_peso_costa_rican_colon_global_var = yes
+	money_value_in_gold_peso_cuban_peso_global_var = yes
+	money_value_in_gold_peso_ecuadorian_peso_global_var = yes
+	money_value_in_gold_peso_el_salvador_colon_global_var = yes
+	money_value_in_gold_peso_guatemalan_quetzal_global_var = yes
+	money_value_in_gold_peso_honduran_lempira_global_var = yes
+	money_value_in_gold_peso_mexican_peso_global_var = yes
+	money_value_in_gold_peso_nicaraguan_cordoba_global_var = yes
+	money_value_in_gold_peso_paraguayan_peso_global_var = yes
+	money_value_in_gold_peso_philippine_peso_global_var = yes
+	money_value_in_gold_peso_sol_de_oro_global_var = yes
+	money_value_in_gold_peso_uruguayan_peso_global_var = yes
+	money_value_in_gold_peso_venezuelan_peso_global_var = yes
+	money_value_in_gold_pound_egyptian_pound_global_var = yes
+	money_value_in_gold_pound_irish_pound_global_var = yes
+	money_value_in_gold_pound_sterling_global_var = yes
+	money_value_in_gold_real_global_var = yes
+	money_value_in_gold_real_brazilian_real_global_var = yes
+	money_value_in_gold_rupee_indian_rupee_global_var = yes
+	money_value_in_gold_rupee_indonesian_rupiah_global_var = yes
+	money_value_in_gold_spe_baht_global_var = yes
+	money_value_in_gold_spe_dong_global_var = yes
+	money_value_in_gold_spe_drachma_global_var = yes
+	money_value_in_gold_spe_korean_won_global_var = yes
+	money_value_in_gold_spe_latvian_lats_global_var = yes
+	money_value_in_gold_spe_lithuanian_litas_global_var = yes
+	money_value_in_gold_spe_peseta_global_var = yes
+	money_value_in_gold_spe_ruble_global_var = yes
+	money_value_in_gold_spe_uni_global_var = yes
+	money_value_in_gold_spe_yen_global_var = yes
+	money_value_in_gold_spe_yuan_global_var = yes
+	money_value_in_gold_spe_zloti_global_var = yes
+	money_value_in_gold_thaler_hannoveraner_thaler_global_var = yes
+	money_value_in_gold_thaler_prussian_thaler_global_var = yes
+	money_value_in_gold_thaler_saxon_thaler_global_var = yes
+   
 }
 update_modifiers_bc_fc_ns = {
 	#si il n'a pas le batiment il ne délanche pas

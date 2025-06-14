@@ -265,16 +265,14 @@ country_credit_rating = {
 		remove_modifier = country_credit_rating_D
 	}
 
-
 	#############################################################################
-	#exit_from_crisis
-
+	#exit_from_crisis -> réinitialise les compteur 
 
 	#declared_bankruptcy
 	if = {
 		limit  = {
-			var:economic_instability_count >= 2
-			var:country_bankruptcy = 1
+			#var:economic_instability_count >= 2
+			var:country_bankruptcy = 1 #country_bankruptcy & central_bank_bankruptcy n'ont pas d'avertissement il déclanche directement la crise donc ils doivent etre reset automatiquement aprs avoir perdu le modificateur
 			not = {
 				has_modifier = declared_bankruptcy
 			}
@@ -303,7 +301,7 @@ country_credit_rating = {
 	#central_bank_bankruptcy_country
 	if = {
 		limit  = {
-			var:economic_instability_count >= 2
+			#var:economic_instability_count >= 2
 			var:central_bank_bankruptcy = 1
 			not = {
 				has_modifier = central_bank_bankruptcy_country
@@ -348,7 +346,9 @@ country_credit_rating = {
 
 	############################################################################
 
-	#economic_instability
+	#economic_instability 
+	# -> attribu les notation en fonction des crise en court 
+	# -> normalement si un pays sort d'une crise (fin des moddifier) -> les compteur sont réinitialiser avant d'ariver içi
 	if = {
 		limit  = {
 			has_modifier = declared_bankruptcy
@@ -425,7 +425,7 @@ country_credit_rating = {
 		}
 	}
 	if = {
-		limit  = {
+		limit  = { #country_credit_rating_D notation D deja attribué pour 23 mois pas de renotation entre temps
 			has_modifier = economic_instability
 			or = {
 				var:currency_crisis = 1
@@ -449,6 +449,7 @@ country_credit_rating = {
 		remove_modifier = country_credit_rating_D
 		add_modifier = {
 			name = country_credit_rating_D
+			months = 12 #à verif lors d'une currency crisisi
 		}
 	}
 	if = {
@@ -468,7 +469,31 @@ country_credit_rating = {
 		remove_modifier = country_credit_rating_D
 		add_modifier = {
 			name = country_credit_rating_D
+			months = 12 #à verif lors d'une currency crisisi
 		}
+	}
+
+	#economic_instability reset by year if nothing appen in year #probleme car si reset chaque anné peut plus y avoir de crise donc voir pour abaissé de 0.5/an
+	if = {
+		limit  = {
+			var:economic_instability_count >= 1
+			var:economic_crisis = 0
+			var:financial_crash = 0
+			var:central_bank_bankruptcy = 0
+			var:currency_crisis = 0
+			#var:country_bankruptcy = 0
+			not = {
+				has_modifier = declared_bankruptcy
+				has_modifier = currency_crisis_country
+				has_modifier = central_bank_bankruptcy_country
+				has_modifier = financial_crash_country
+				has_modifier = economic_crisis_country
+			}
+		}
+		set_variable = {
+			name = economic_instability_count
+			value = 0 
+		} 
 	}
 }
 sovereign_bond_yields = {
@@ -562,16 +587,21 @@ sovereign_bond_yields = {
 			value = { 0.13 0.15 }
 		}
 	}
-	set_variable = {
-		name = interest_value_5Y_variation
-		value = { 0.1 0.9 }
+
+	#test 
+	else_if = {
+		limit  = {
+			not = {
+				country_credit_rating_national_debt_compared_gdp_malus_100_on_interest_rate = 1
+			}
+		}
+		change_variable = {
+			name = target_interest_rate
+			multiply = country_credit_rating_national_debt_compared_gdp_malus_100_on_interest_rate
+		}
 	}
 }
 economic_instability_count_reset = {
-	# set_variable = {
-	# 	name = economic_instability_count
-	# 	value = 100
-	# }
 	if = {
 		limit  = {
 			var:economic_instability_count >= 2
@@ -579,7 +609,7 @@ economic_instability_count_reset = {
 			var:financial_crash = 0
 			var:central_bank_bankruptcy = 0
 			var:currency_crisis = 0
-			var:country_bankruptcy = 0
+			#var:country_bankruptcy = 0
 		}
 		set_variable = {
 			name = economic_instability_count
@@ -989,7 +1019,8 @@ ai_buy_bond_1 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -1053,7 +1084,7 @@ ai_buy_bond_1 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_1
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -1297,7 +1328,8 @@ ai_buy_bond_2 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -1361,7 +1393,7 @@ ai_buy_bond_2 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_2
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -1605,7 +1637,8 @@ ai_buy_bond_3 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -1669,7 +1702,7 @@ ai_buy_bond_3 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_3
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -1913,7 +1946,8 @@ ai_buy_bond_4 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -1977,7 +2011,7 @@ ai_buy_bond_4 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_4
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -2221,7 +2255,8 @@ ai_buy_bond_5 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -2285,7 +2320,7 @@ ai_buy_bond_5 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_5
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -2529,7 +2564,8 @@ ai_buy_bond_6 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -2593,7 +2629,7 @@ ai_buy_bond_6 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_6
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -2837,7 +2873,8 @@ ai_buy_bond_7 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -2901,7 +2938,7 @@ ai_buy_bond_7 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_7
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -3145,7 +3182,8 @@ ai_buy_bond_8 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -3209,7 +3247,7 @@ ai_buy_bond_8 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_8
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -3453,7 +3491,8 @@ ai_buy_bond_9 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -3517,7 +3556,7 @@ ai_buy_bond_9 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_9
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -3761,7 +3800,8 @@ ai_buy_bond_10 = {
 
 	random_country = {
 		limit = {
-			has_central_bank_SS_BS_GS_GES_NISO = yes
+			has_central_bank_SS_BS_GS_GES_NISO = yes #has bc
+			has_financial_center = yes #has fc
 			remaining_debt > 0
 			market_owner_is_root_4 = yes
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
@@ -3825,7 +3865,7 @@ ai_buy_bond_10 = {
                         #interret lors de l'achat
                         set_variable = {
                             name = ai_interest_purchasing_10
-                            value = scope:seller.interest_value_10Y
+                            value = scope:seller.interest_value_5Y
                         }
 
                         #valeur de la quantité
@@ -14730,13 +14770,13 @@ central_bank_bankruptcy = {
 			is_subject_custom_trigger = no
 			is_revolutionary =  no
 			has_modifier = has_central_bank
-			# not = {
-			# 	has_modifier = economic_instability
-			# }
-			or = {
-				is_at_war = yes
-				var:economic_instability_count >= 1
+			not = {
+				has_modifier = economic_instability
 			}
+			# or = {
+			# 	is_at_war = yes
+			# 	var:economic_instability_count >= 1
+			# }
 		}
 		every_country = {
 			limit = {
@@ -14836,7 +14876,7 @@ economic_instability = {
 		limit  = {
 			var:economic_instability_count = 1
 		}
-		every_country = {
+		every_country = { #notif for player
 			limit = {
 				is_player = yes
 				has_interest_marker_in_region = root.capital.region
@@ -14865,15 +14905,14 @@ economic_instability = {
 	if = {
 		limit  = {
 			or  = {
-				var:economic_instability_count >= 2
-				# is_at_war = yes
-				# is_revolutionary = yes
+				var:economic_instability_count >= 2 
 				var:country_bankruptcy >= 1
+				var:central_bank_bankruptcy >= 1
 			}
 		}
 		if = {
 			limit  = {
-				var:economic_instability_count = 1
+				var:economic_instability_count = 1 #en cas de country_bankruptcy ou de central_bank_bankruptcy l'évenement economic_instability ce déclanche meme si l'instabilité est que de 1
 			}
 			set_variable = {
 				name = economic_instability_count
@@ -14937,9 +14976,14 @@ economic_instability = {
 				months = 23
 			}
 
+			#déplacé dans le currency_strength_modifier pour etre sure de déétruire la masse monetaire dans la balance si jamais
+			#mais je le laisse ici pour le currency_crisis
 			if = {
 				limit  = {
 					has_modifier = has_central_bank
+					not = {
+						has_modifier = central_bank_bankruptcy_country
+					}
 				}
 				every_country = {
 					if = {
@@ -14955,6 +14999,7 @@ economic_instability = {
 					}
 				}
 			}
+
 			#-> création d'hyper inflation scripté
 
 			remove_modifier = country_credit_rating_AAA
@@ -14969,8 +15014,9 @@ economic_instability = {
 			remove_modifier = country_credit_rating_D
 			add_modifier = {
 				name = country_credit_rating_D
+				months = 23
 				#-> blocage des route de commerce qui devrai rester grace au extreme weak currency (pas besoins d'un modificateur siupplémentaire)
-				#-> nécessité d'atribué le extrem weak currency oui ou non ?
+				#-> nécessité d'atribué le extrem weak currency oui ou non ? -> deja présent pour la bank central bankrupcy car c'est le ex xeak qui le déclanche
 			}
 
 			remove_modifier = economic_instability
@@ -14998,6 +15044,10 @@ economic_instability = {
 					months = 23
 				}
 			}
+
+			#passage en fiat currency car plus d'import possible d'or ou d'argznt
+			activate_law = law_type:law_fiat_standard
+			central_bank_production_methods = yes
 		}
 
 		#financial_crash

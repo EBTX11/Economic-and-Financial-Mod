@@ -1,3 +1,49 @@
+test_level = {
+	# any_scope_building = {
+	# 	is_building_type = building_ef_private_construction
+	# 	level < state.b:building_urban_center.level
+	# } 
+	every_scope_state = {
+		limit  = {
+			any_scope_building = {
+				is_building_type = building_urban_center
+				add = level #= 1
+			}
+		}
+		#add = 1
+	}
+
+
+	# every_scope_state = {
+	# 	limit  = {
+	# 		is_incorporated = yes
+
+
+	# 		any_neighbouring_state = {
+	# 			not = {
+	# 				owner = root
+	# 			}
+	# 		}
+	# 		# or = {
+	# 		# 	any_neighbouring_state = {
+	# 		# 		not = {
+	# 		# 			owner = root
+	# 		# 		}
+	# 		# 	}
+	# 		# 	is_capital = yes
+	# 		# }
+	# 		any_scope_building = {
+	# 			is_building_type = building_land_fort
+	# 			level = 1
+	# 		}
+	# 	}
+	# 	add = 1
+	# }
+
+
+}
+
+
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -151,6 +197,89 @@ market_owner_is_root_3 = {
 	}
 }
 
+
+
+
+test_state = {
+	value = 0
+
+	every_scope_state = {
+		limit  = {
+			is_incorporated = yes
+
+
+			any_neighbouring_state = {
+				not = {
+					owner = root
+				}
+			}
+			# or = {
+			# 	any_neighbouring_state = {
+			# 		not = {
+			# 			owner = root
+			# 		}
+			# 	}
+			# 	is_capital = yes
+			# }
+			any_scope_building = {
+				is_building_type = building_land_fort
+				level = 1
+			}
+		}
+		add = 1
+	}
+
+	# any_scope_state = {
+	# 	limit = {
+	# 		any_neighbouring_state = {
+	# 			not = {
+	# 				owner = root
+	# 			}
+	# 		}
+	# 	}
+	# 	add = 1
+	# }
+
+
+	# if  = {
+	# 	limit = {
+
+
+	# 		every_scope_state = {
+	# 			any_neighbouring_state = {
+	# 				owner = ROOT
+
+	# 			}
+	# 		}
+
+	# 		#is_adjacent_to_country = c:TUR
+
+	# 		#is_adjacent_to_state = ROOT
+	# 		# any_neighbouring_state = {
+	# 		# 	not = {
+	# 		# 		owner = root
+	# 		# 	}
+	# 		# }
+	# 		# any_neighbouring_state = {
+	# 		# 	owner = ROOT
+	# 		# }
+	# 		#neighbors_any_power_bloc = yes
+	# 		#is_coastal = yes
+	# 		#is_split_state
+	# 		#is_coastal = no
+	# 		#is_sea_adjacent
+	# 		#is_adjacent_to_strategic_objective = yes
+	# 		any_neighbouring_state_root = yes
+	# 		# any_neighbouring_state = {
+	# 		# 	c:PRU ?= owner
+	# 		# }
+	# 	}
+	# 	add = 1
+	# }
+}
+
+
+
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -287,7 +416,17 @@ value_for_has_financial_center = {
 	multiply = private_bank_borrowings_year_var_2
 }
 
-num_states_var   = {
+bg_building_urban_center_lvl = {
+	value = 0
+	every_scope_building = {
+		limit = {
+			is_building_type = building_urban_center
+		}
+		add = level
+	}
+}
+
+num_states_var = {
 	add = root.num_states
 }
 
@@ -939,7 +1078,7 @@ money_value = {
 				#min = 0.01
 			}
 
-			#no market.owner 
+			#no market.owner
 			if = {
 				limit = {
 					is_subject_custom_trigger = no
@@ -1049,6 +1188,10 @@ money_value_no_bc = {
 money_value_raported_to_overrlord = {
 	value = money_value_rapported_inflation
 	divide = overlord.money_value
+}
+overrlord_money_value_in_subject_currency = {
+	value = overlord.money_value
+	divide = money_value_rapported_inflation
 }
 money_value_rapported_inflation = {
 	value = money_value
@@ -1463,6 +1606,98 @@ bimetallic_state_native_for_stockpile = {
 	add = silver_state_native_for_stockpile
 }
 
+trade_balance_gold_to_silver_rate = { 
+    add = var:trade_balance_in_gold_fixe
+    multiply = gold_to_silver_rate
+}
+trade_balance_bimetallic_rate_gold_to_silver = { 
+    add = var:trade_balance_in_gold_fixe
+    multiply = bimetallic_rate_gold_to_silver
+}
+trade_balance_bimetallic_rate_silver_to_gold = { 
+    add = var:trade_balance_in_gold_fixe
+	divide = gold_to_silver_rate
+	multiply = bimetallic_rate_gold_to_silver #normal tkt c'est inversé car le calcule e la trade balance concidére que c'est de l'or que l'on scale à de la argent -> dont on fait l'invese pour avoir la bonne quantité
+}
+
+trade_balance_fiat_to_silver = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+   		multiply = gold_to_silver_rate
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+trade_balance_fiat_to_bimetallic = { 
+	value = { 
+		add = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+		multiply = bimetallic_rate_gold_to_silver
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+
+trade_balance_fiat_to_gold = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+
+trade_balance_silver_to_gold = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+   		divide = gold_to_silver_rate
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+trade_balance_silver_to_bimetallic = { 
+	value = { 
+		add = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+   		divide = gold_to_silver_rate
+		multiply = bimetallic_rate_gold_to_silver
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+
+trade_balance_bimetallic_to_gold = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+   		divide = bimetallic_rate_gold_to_silver 
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+trade_balance_bimetallic_to_silver = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+   		divide = bimetallic_rate_gold_to_silver
+		multiply = gold_to_silver_rate
+		add = excess_in_gold_sc  
+	} 
+	subtract = import_value_in_gold
+} 
+
+trade_balance_gold_to_bimetallic = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+		multiply = bimetallic_rate_gold_to_silver
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+trade_balance_gold_to_silver = { 
+	value = { 
+		value = excess_foreign_state_currency_in_gold_no_excess_in_gold_sc
+		multiply = gold_to_silver_rate
+		add = excess_in_gold_sc 
+	} 
+	subtract = import_value_in_gold
+} 
+
 ##############
 #monetary_systeme_silver_standard
 ##############
@@ -1472,7 +1707,38 @@ central_bank_metal_reserves_state_silver_standard = {
 central_bank_reserves_silver_standard = {
 	value = central_bank_metal_reserves_state_silver_standard
 	add = var:gold_loaned_to_central_bank_fix
-	add = var:trade_balance_in_gold_fixe
+
+	#trade balance 
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_fiat_standard
+				has_law = law_type:law_no_monetary_system
+			}
+		}
+		add = trade_balance_fiat_to_silver 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_silver_standard
+		}
+		add = var:trade_balance_in_gold_fixe 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}  
+		add = trade_balance_bimetallic_to_silver
+	}
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		}
+		add = trade_balance_gold_to_silver
+	}
 }
 central_bank_reserves_silver_standard_in_gold = {
 	value = central_bank_metal_reserves_state_silver_standard
@@ -1511,8 +1777,39 @@ central_bank_metal_reserves_state_bimetallism_standard = {
 }
 central_bank_reserves_bimetallism_standard = {
 	value = central_bank_metal_reserves_state_bimetallism_standard
-	add = var:gold_loaned_to_central_bank_fix
-	add = var:trade_balance_in_gold_fixe
+	add = var:gold_loaned_to_central_bank_fix 
+
+	#trade balance 
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_fiat_standard
+				has_law = law_type:law_no_monetary_system
+			}
+		}
+		add = trade_balance_fiat_to_bimetallic 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_silver_standard
+		}
+		add = trade_balance_silver_to_bimetallic 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}  
+		add = var:trade_balance_in_gold_fixe
+	}
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		}
+		add = trade_balance_gold_to_bimetallic
+	}
 }
 central_bank_reserves_bimetallism_standard_in_gold = {
 	value = central_bank_reserves_bimetallism_standard
@@ -1553,11 +1850,43 @@ stockpiling_central_bank_metal_reserves_bimetallism_standard = {
 central_bank_metal_reserves_state_gold_standard = {
 	value = gold_state_native_for_stockpile
 }
-central_bank_reserves_gold_standard = {
-	value = central_bank_metal_reserves_state_gold_standard
+central_bank_reserves_gold_standard = { 
+	value = central_bank_metal_reserves_state_gold_standard 
 	add = var:gold_loaned_to_central_bank_fix
-	add = var:trade_balance_in_gold_fixe
-}
+
+	#trade balance
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_fiat_standard
+				has_law = law_type:law_no_monetary_system
+			}
+		}
+		add = trade_balance_fiat_to_gold 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_silver_standard
+		}
+		add = trade_balance_silver_to_gold 
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}  
+		add = trade_balance_bimetallic_to_gold  
+	}
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		}
+		add = var:trade_balance_in_gold_fixe
+	}
+} 
+
 money_value_gold_standard = {
 	value = central_bank_reserves_gold_standard
 	divide = money_supply
@@ -2191,6 +2520,10 @@ national_debt_compared_gdp = {
 	divide = gdp_var
 }
 
+national_debt_compared_gdp_test = {
+	value = national_debt
+	divide = gdp
+}
 ########################
 #debt_issued_relative_GDP
 ########################
@@ -2361,6 +2694,10 @@ bimetallic_rate_gold_to_silver = {
 	value = 1
 	divide = bimetallic_rate_silver_to_gold
 }
+bimetallic_rate_gold_to_silver_x_2 = {
+	value = bimetallic_rate_gold_to_silver
+	multiply = 2
+}
 
 gold_to_silver_law = {
 	value = 1
@@ -2514,19 +2851,11 @@ country_interest = {
     }
 }
 interest_value_5Y = {
-	value = interest_value_10Y
+	value = var:target_interest_rate
 	multiply = 0.5 #var:interest_value_5Y_variation
 }
 interest_value_10Y = {
 	value = var:target_interest_rate
-	if = {
-		limit  = {
-			not = {
-				country_credit_rating_national_debt_compared_gdp_malus_100_on_interest_rate = 1
-			}
-		}
-		multiply = country_credit_rating_national_debt_compared_gdp_malus_100_on_interest_rate
-	}
 }
 
 ############################################################################################################################################################
@@ -3286,7 +3615,7 @@ devaluation_money_value_target = {
 	# 	multiply = 0.75
 	# 	multiply = rate_by_law_metal_type
 	# }
-	# if = { 
+	# if = {
 	# 	limit = { #cherche àà attendre 75% de la médiane //  fera cerrtainement augmennté le central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent
 	# 		money_value_in_gold < money_value_median_0_5
 	# 	}
@@ -3298,7 +3627,7 @@ devaluation_money_value_target = {
 
 	# 	#unniquemennt si la  valeur est  de  base inféérieur  à  valeur moyennne cherche  à révalué le plus proche de la valauer médiuane enn avançannt de 5%
 
-	# if = { 
+	# if = {
 	# 	#0.9
 	# 	limit = {
 	# 		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.9
@@ -3310,7 +3639,7 @@ devaluation_money_value_target = {
 
 	# 	multiply = rate_by_law_metal_type
 
-	if = { 
+	if = {
 		#1.1
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1
@@ -3319,7 +3648,7 @@ devaluation_money_value_target = {
 		value = global_var:money_value_median
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.1
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.1
@@ -3328,7 +3657,7 @@ devaluation_money_value_target = {
 		multiply = 1
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.2
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.2
@@ -3337,7 +3666,7 @@ devaluation_money_value_target = {
 		multiply = 1.1
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.3
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.3
@@ -3346,7 +3675,7 @@ devaluation_money_value_target = {
 		multiply = 1.2
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.4
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.4
@@ -3355,7 +3684,7 @@ devaluation_money_value_target = {
 		multiply = 1.3
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.5
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.5
@@ -3364,7 +3693,7 @@ devaluation_money_value_target = {
 		multiply = 1.4
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.6
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.6
@@ -3373,7 +3702,7 @@ devaluation_money_value_target = {
 		multiply = 1.5
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.7
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.7
@@ -3382,7 +3711,7 @@ devaluation_money_value_target = {
 		multiply = 1.6
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#1.8
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio > 1.8
@@ -3392,27 +3721,27 @@ devaluation_money_value_target = {
 		multiply = rate_by_law_metal_type
 	}
 
-	if = { 
+	if = {
 		#
 		limit = {
-			var:money_value_target_1 > revaluation_money_value_max  
+			var:money_value_target_1 > revaluation_money_value_max
 		}
-		value = revaluation_money_value_max  
+		value = revaluation_money_value_max
 	}
 }
 revaluation_money_value_target = {
 	value = 0
 
-	if = { 
+	if = {
 		limit = {
-			money_value_median_and_money_value_in_gold_ratio <  1 
+			money_value_median_and_money_value_in_gold_ratio <  1
 			money_value_median_and_money_value_in_gold_ratio > 0.9
 		}
 		value = global_var:money_value_median
 		multiply = rate_by_law_metal_type
 	}
 
-	if = { 
+	if = {
 		#0.8
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.9
@@ -3421,7 +3750,7 @@ revaluation_money_value_target = {
 		multiply = 1
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.8
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.8
@@ -3430,7 +3759,7 @@ revaluation_money_value_target = {
 		multiply = 0.9
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.7
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.7
@@ -3439,7 +3768,7 @@ revaluation_money_value_target = {
 		multiply = 0.8
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.6
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.6
@@ -3448,7 +3777,7 @@ revaluation_money_value_target = {
 		multiply = 0.7
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.5
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.5
@@ -3457,7 +3786,7 @@ revaluation_money_value_target = {
 		multiply = 0.6
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.4
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.4
@@ -3466,7 +3795,7 @@ revaluation_money_value_target = {
 		multiply = 0.5
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.3
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.3
@@ -3475,7 +3804,7 @@ revaluation_money_value_target = {
 		multiply = 0.4
 		multiply = rate_by_law_metal_type
 	}
-	if = { 
+	if = {
 		#0.2
 		limit = {
 			money_value_median_and_money_value_in_gold_ratio < 0.2
@@ -4092,6 +4421,12 @@ base_rate_percentage_revers = {
 
 	}
 }
+
+base_rate_percentage_decimal = {
+	value = var:base_rate_percentage
+	multiply = 100
+}
+
 private_bank_borrowings_year_var_2 = {
 	if  = {
 		limit  = {
