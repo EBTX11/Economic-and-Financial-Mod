@@ -1,0 +1,1109 @@
+# COPY-PASTED FOR NOW
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+types panel_military {
+	type tab_army = top_illu {
+		size = { @panel_width_plus_20 180 }
+
+		background = {
+			block "illu" {
+				texture = "gfx/interface/illustrations/top_illus/top_illu_army.dds"
+			}
+			using = top_illu_properties
+		}
+
+		vbox = {
+			parentanchor = hcenter
+			margin_top = 10
+			margin_bottom = 20
+		
+			hbox = {
+				visible = "[InformationPanel.IsTabSelected('army')]"
+				layoutpolicy_horizontal = expanding
+				margin = { 10 15 }
+				
+				# Cost
+				vbox = {
+					layoutpolicy_vertical = expanding
+					using = military_total_expense_tooltip_with_graph
+
+					textbox = {
+						autoresize = yes
+						default_format = "#title"
+						text = "EXPENSES"
+						margin_bottom = 10
+					}
+
+					hbox = {
+						textbox = {
+							raw_text = "#v #n [GetPlayer.GetCustom('currency_symbol')]-[Country.PredictTotalMilitaryExpenses|D]#!#!"
+							autoresize = yes
+							align = left|nobaseline
+							using = fontsize_mega
+						}
+					}
+
+					widget = {
+						layoutpolicy_vertical = expanding
+						layoutpolicy_horizontal = expanding
+					}
+				}
+
+				# Battalions
+				vbox = {
+					layoutpolicy_vertical = expanding
+					tooltip = "PANEL_MILITARY_ARMY_OVERVIEW_TOOLTIP"
+
+					textbox = {
+						autoresize = yes
+						margin_bottom = 10
+						default_format = "#title"
+						text = "REGULARS_AND_CONSCRIPTS"
+					}
+
+					hbox = {
+						spacing = 30
+
+						### ARMY / FORCELIMIT
+						textbox = {
+							raw_text = "@battalions![Country.GetRegularBattalions|v]"
+							autoresize = yes
+							align = left|nobaseline
+							using = fontsize_mega
+						}
+
+						### ARMY / FORCELIMIT
+						textbox = {
+							raw_text = "@conscripts!#v [Country.CalcConscriptableBattalions]"
+							autoresize = yes
+							align = left|nobaseline
+							using = fontsize_mega
+						}
+					}
+
+					widget = {
+						layoutpolicy_vertical = expanding
+						layoutpolicy_horizontal = expanding
+					}
+				}
+			}
+			
+			big_mobilize_all_button = {}
+		}
+		
+	}
+
+	type tab_navy = top_illu {
+		size = { @panel_width_plus_20 230 }
+
+		background = {
+			texture = "gfx/interface/illustrations/top_illus/top_illu_navy.dds"
+			using = top_illu_properties
+		}
+		
+		flowcontainer = {
+			margin = { 0 20 }
+			parentanchor = hcenter
+			direction = vertical
+
+			military_panel_flotilla_info = {
+			}
+
+			widget = { size = { 1 10 } }
+
+			supply_network_information_small = {}
+
+			widget = { size = { 1 10 } }
+		}
+	}
+
+	type supply_network_information_small = widget {
+		onmousehierarchyenter = "[AccessHighlightManager.HighlightSupplyNetwork(Country.Self)]"
+		onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+		alwaystransparent = no
+		size = { 410 110 }
+	
+		using = entry_bg_fancy_solid_bg
+
+		vbox = {
+			margin = { 20 20 }
+			
+			hbox = {
+				tooltip = "SUPPLY_NETWORK_STRENGTH_TOOLTIP"
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "SUPPLY_NETWORK_STRENGTH_TEXT"
+					align = left|nobaseline
+				}	
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "SUPPLY_NETWORK_STRENGTH_VALUE"
+					align = right|nobaseline
+				}
+			}
+
+			hbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				tooltip = "NUM_SEA_NODES_TOOLTIP"
+
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "NUM_SEA_NODES_TEXT"
+					align = left|nobaseline
+				}
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "NUM_SEA_NODES_VALUE"
+					align = right|nobaseline
+				}
+			}
+
+			hbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				tooltip = "NUM_CONVOYS_TOOLTIP_EXTENDED"
+				
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "USED_AVAILABE_CONVOYS_TEXT"
+					align = left|nobaseline
+				}
+				textbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					text = "USED_AVAILABE_CONVOYS_VALUE"
+					align = right|nobaseline
+				}
+			}
+		
+		}
+	}
+
+	type military_panel_flotilla_info = flowcontainer {
+		parentanchor = hcenter
+		direction = vertical 
+		spacing = 5
+
+		### ARMY / FORCELIMIT
+		textbox = {
+			text = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS"
+			tooltip = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP"
+			autoresize = yes
+			align = left|nobaseline
+			parentanchor = hcenter
+			using = fontsize_mega
+		}
+
+		textbox = {
+			text = TOTAL_FLOTILLAS
+			parentanchor = hcenter
+			autoresize = yes
+			align = left|nobaseline
+		}
+
+	}
+
+	### MOBILIZATION CONTROLS
+	type mobilization_icon = widget {
+		visible = no
+		size = { 22 22 }
+		
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/backgrounds/round_button_bg.dds"
+		}
+		icon = {
+			size = { 100% 100% }
+			framesize = { 120 120 }
+			texture = "gfx/interface/icons/generic_icons/mobilize_icon.dds"
+			block "frame" {
+				frame = 0
+			}
+		}
+	}
+	
+	type icon_with_background_big = widget {
+		size = { 60 60 }
+		
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/backgrounds/round_button_bg.dds"
+		}
+		
+		icon = {
+			parentanchor = center
+			framesize = { 120 120 }
+
+			block "icon_size" {
+				size = { 100% 100% }
+			}
+
+			block "texture" {
+				texture = "gfx/interface/icons/generic_icons/mobilize_icon.dds"
+			}
+
+			block "frame" {
+				frame = 0
+			}
+		}
+	}
+
+	type conscription_icon_big = widget {
+		size = { 60 60 }
+		
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/backgrounds/round_button_bg.dds"
+		}
+		
+		icon = {
+			parentanchor = center
+			framesize = { 120 120 }
+			size = { 70% 70% }
+			texture = "gfx/interface/icons/lens_toolbar_icons/activate_conscription_centers_lens_option.dds"
+		}
+	}
+
+	type mobilization_controls = widget {
+		size = { 535 60 }
+
+		icon = {
+			texture = "gfx/interface/animation/smoke.dds"
+			size = { 560 180 }
+			parentanchor = bottom|hcenter
+			position = { 0 60 }
+			alpha = 0
+			
+			modify_texture = {
+				name = mask_01
+				texture = "gfx/interface/animation/smoke.dds"
+				spriteType = Corneredstretched
+				spriteborder = { 0 0 }
+				blend_mode = alphamultiply
+				
+				translate_uv = { 0 0 }
+			}
+			
+			modify_texture = {
+				name = mask_02
+				texture = "gfx/interface/animation/smoke.dds"
+				spriteType = Corneredstretched
+				spriteborder = { 0 0 }
+				blend_mode = alphamultiply
+				
+				translate_uv = { 0 -0.5 }
+			}
+		
+			state = {
+				name = mobilization_effect
+				next = 2
+				duration = 0.8
+				alpha = 1
+				
+				modify_texture = {
+					name = mask_01
+					translate_uv = { 0 0.4 }
+				}
+				modify_texture = {
+					name = mask_02
+					translate_uv = { 0 0 }
+				}
+			}
+		
+			state = {
+				name = 2
+				next = reset
+				duration = 2.5
+				using = Animation_Curve_EaseOut
+				alpha = 0
+				
+				modify_texture = {
+					name = mask_01
+					translate_uv = { 0 0.8 }
+				}
+				modify_texture = {
+					name = mask_02
+					translate_uv = { 0 1 }
+				}
+			}
+			
+			state = {
+				name = reset
+				
+				modify_texture = {
+					name = mask_01
+					translate_uv = { 0 0 }
+				}
+				modify_texture = {
+					name = mask_02
+					translate_uv = { 0 -0.5 }
+				}
+			}		
+		}
+		
+		margin_widget = {
+			parentanchor = center
+			margin = { 0 6 }
+			size = { 0 50 }
+			alpha = 0
+			
+			state = { 
+				name = mobilization_effect
+				next = effect2
+				size = { 530 50 }
+				duration = 0.2
+				alpha = 0.5
+				using = Animation_Curve_Default
+			}
+			state = { 
+				name = effect2
+				next = reset
+				size = { 530 50 }
+				duration = 0.4
+				alpha = 0
+				using = Animation_Curve_Default
+			}
+			state = { 
+				name = reset
+				size = { 0 50 }
+			}
+			
+			icon = {
+				size = { 50% 100% }
+				texture = "gfx/interface/animation/mobilize_effect.dds"
+			}
+			icon = {				
+				parentanchor = right
+				mirror = horizontal
+				size = { 50% 100% }
+				texture = "gfx/interface/animation/mobilize_effect.dds"				
+			}
+			
+			icon = {				
+				parentanchor = hcenter
+				size = { 60% 100% }
+				texture = "gfx/interface/animation/mobilize_effect2.dds"
+				alpha = 0.5
+			}
+		}
+		
+		icon_with_background_big = {
+			parentanchor = vcenter
+		}
+	}
+
+	type military_panel_army_content = flowcontainer {
+		direction = vertical
+
+		tab_army = {
+			visible = "[Country.IsCommittedInDiplomaticPlay]"
+		}
+
+		tab_army = {
+			visible = "[Not(Country.IsCommittedInDiplomaticPlay)]"
+			size = { @panel_width_plus_20 120 }
+		}
+
+		default_header_2texts = {
+			using = default_list_position
+			
+			blockoverride "text1" {
+				text = "MILITARY_FORMATIONS_ARMY_HEADER"
+			}
+		}
+
+		widget = { size = { 1 5 }}
+
+		military_formation_list = {}
+
+		widget = { size = { 1 5 }}
+	}
+
+	type military_panel_navy_content = flowcontainer {
+		direction = vertical
+
+		tab_navy = {}
+
+		textbox = {
+			margin_top = 10
+			margin_bottom = 20
+			parentanchor = hcenter
+			autoresize = yes
+			maximumsize = { @panel_width -1 }
+			minimumsize = { @panel_width -1 }
+			multiline = yes
+			#visible = "[Not(StringIsEmpty(Country.GetSeaNodesMightBeConvoyRaidedInDesc))]"
+			visible = no # todo PRCAL-32539 - Remove this textbox and implement the dynamicgridbox specified in the Jira.
+			text = "[Country.GetSeaNodesMightBeConvoyRaidedInDesc]"
+		}
+
+		default_header_2texts = {
+			using = default_list_position
+			
+			blockoverride "text1" {
+				text = "MILITARY_FORMATIONS_FLEET_HEADER"
+			}
+		}
+
+		widget = { size = { 1 10 }}
+
+		military_formation_list = {
+			blockoverride "datamodel" {
+				datamodel = "[Country.GetMilitaryFormationsFleet]"
+			}
+		}
+
+		widget = { size = { 1 10 }}
+	}
+
+	type panel_military = default_block_window {
+		name = "panel_military"
+		datacontext = "[PanelMilitary.AccessCountry]"
+			
+		blockoverride "animation_state_block" {
+			state = {
+				name = _show
+				start_sound = {
+					soundeffect = "event:/SFX/UI/SideBar/military"
+				}
+			}
+
+			state = {
+				name = _hide
+				start_sound = {
+					soundeffect = "event:/SFX/UI/SideBar/military_stop"
+				}
+			}
+		}
+		
+		blockoverride "window_header_name"
+		{
+			text = "MILITARY_PANEL"
+		}
+
+		blockoverride "map_modes_button" {
+			map_modes_single_button_minimized = {
+				datacontext = "[PanelMilitary.GetMapModeList]"
+				using = map_modes_button_position
+			}
+		}
+
+		blockoverride "fixed_top"
+		{
+			tab_buttons = {
+				# Army
+				blockoverride "first_button" {
+					text = "MILITARY_PANEL_TAB_ARMY"
+				}
+				blockoverride "first_button_tooltip" {
+					tooltip = "MILITARY_PANEL_TAB_ARMY"
+				}
+				blockoverride "first_button_click" {
+					onclick = "[InformationPanel.SelectTab('army')]"
+				}
+				blockoverride "first_button_visibility" {
+					visible = "[InformationPanel.IsTabSelected('army')]"
+				}
+				blockoverride "first_button_visibility_checked" {
+					visible = "[Not( InformationPanel.IsTabSelected('army') )]"
+				}
+				blockoverride "first_button_selected" {
+					text = "MILITARY_PANEL_TAB_ARMY_SELECTED"
+				}
+
+				# Mobilization
+				blockoverride "second_button" {
+					text = "MILITARY_FORMATION_PANEL_MOBILIZATION_TAB"
+				}
+				blockoverride "second_button_tooltip" {
+					tooltip = "MILITARY_FORMATION_PANEL_MOBILIZATION_TAB"
+				}
+				blockoverride "second_button_click" {
+					onclick = "[InformationPanel.SelectTab('mobilization')]"
+				}
+				blockoverride "second_button_visibility" {
+					visible = "[InformationPanel.IsTabSelected('mobilization')]"
+				}
+				blockoverride "second_button_visibility_checked" {
+					visible = "[Not( InformationPanel.IsTabSelected('mobilization') )]"
+				}
+				blockoverride "second_button_selected" {
+					text = "MILITARY_FORMATION_PANEL_MOBILIZATION_TAB_SELECTED"
+				}
+				
+				# Navy
+				blockoverride "third_button" {
+					text = "MILITARY_PANEL_TAB_NAVY"
+				}
+				blockoverride "third_button_tooltip" {
+					tooltip = "MILITARY_PANEL_TAB_NAVY"
+				}
+				blockoverride "third_button_click" {
+					onclick = "[InformationPanel.SelectTab('navy')]"
+				}
+				blockoverride "third_button_visibility" {
+					visible = "[InformationPanel.IsTabSelected('navy')]"
+				}
+				blockoverride "third_button_visibility_checked" {
+					visible = "[Not( InformationPanel.IsTabSelected('navy') )]"
+				}
+				blockoverride "third_button_selected" {
+					text = "MILITARY_PANEL_TAB_NAVY_SELECTED"
+				}
+			}
+		}
+
+		blockoverride "scrollarea_content" {
+			flowcontainer = {
+				using = default_list_position
+				direction = vertical
+				
+				military_panel_army_content = {
+					visible = "[InformationPanel.IsTabSelected('army')]"
+					using = default_fade_in_out
+				}
+
+				military_panel_navy_content = {
+					visible = "[InformationPanel.IsTabSelected('navy')]"
+					using = default_fade_in_out
+				}
+
+				flowcontainer = {
+					visible = "[InformationPanel.IsTabSelected('mobilization')]"
+					direction = vertical
+
+					flowcontainer = {
+						direction = vertical
+						spacing = 5
+						parentanchor = hcenter
+						datamodel = "[Country.GetMilitaryFormationsArmy]"
+						margin_top = 10
+						margin_bottom = 5
+						
+						item = {
+							mobilization_widget = {}
+						}
+					}
+				}
+			}
+		}
+
+		blockoverride "fixed_bottom" {
+
+			flowcontainer = {
+				visible = "[Or(InformationPanel.IsTabSelected('army'), InformationPanel.IsTabSelected('navy'))]"
+				direction = vertical
+				spacing = 5
+
+				divider_clean = {
+					size = { @panel_width_plus_14 4 }
+				}
+
+				background = {
+					using = dark_area
+				}
+
+				widget = {
+					size = { 1 1 }
+				}
+				
+				### UPGRADE ALL UNITS IN ALL FORMATIONS
+				button = {
+					using = default_button_map_interaction
+					parentanchor = hcenter
+					size = { 520 50 }
+					onclick = "[Execute( PanelMilitary.GetUpgradeAllUnitsInAllFormationsCommand)]"
+					enabled = "[IsValid( PanelMilitary.GetUpgradeAllUnitsInAllFormationsCommand)]"
+					visible = [PanelMilitary.CanAnyUnitInAnyPlayerFormationBeUpgraded]
+					
+					textbox = {
+						parentanchor = center
+						autoresize = yes
+						align = center|nobaseline
+						text = "MILITARY_FORMATION_UNITS_UPGRADE_ALL"
+					}
+					
+					tooltip = "MILITARY_FORMATION_UNITS_UPGRADE_ALL_ALL"
+				}
+
+				### CREATE FORMATIONS
+				button = {
+					name = "tutorial_highlight_create_army"
+					using = default_button_map_interaction
+					parentanchor = hcenter
+					size = { 520 50 }
+					using = fontsize_large
+					onclick = "[PanelMilitary.OnClickRecruitArmyFormation]"
+					enabled = yes
+					visible = "[InformationPanel.IsTabSelected('army')]"
+					using = default_content_fade
+
+					flowcontainer = {
+						parentanchor = center
+
+						icon = {
+							size = { 30 30 }
+							texture = "gfx/interface/buttons/button_icons/plus.dds"
+							parentanchor = vcenter
+						}
+						
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							align = center|nobaseline
+							text = "CREATE_ARMY_FORMATION"
+						}
+
+					}
+				}
+				
+				button = {
+					using = default_button_map_interaction
+					parentanchor = hcenter
+					size = { 520 50 }
+					using = fontsize_large
+					onclick = "[PanelMilitary.OnClickRecruitFleetFormation]"
+					enabled = yes
+					visible = "[InformationPanel.IsTabSelected('navy')]"
+					using = default_content_fade
+
+					flowcontainer = {
+						parentanchor = center
+
+						icon = {
+							size = { 30 30 }
+							texture = "gfx/interface/buttons/button_icons/plus.dds"
+							parentanchor = vcenter
+						}
+						
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							align = center|nobaseline
+							text = "CREATE_FLEET_FORMATION"
+						}
+
+					}
+				}
+
+
+				widget = {
+					size = { 5 5 }
+				}
+			}
+
+			flowcontainer = {
+				visible = "[And(InformationPanel.IsTabSelected('mobilization'), Country.IsCommittedInDiplomaticPlay)]"
+				margin_bottom = 10
+				direction = vertical
+				spacing = 10
+
+				divider_clean = {
+					size = { @panel_width_plus_14 4 }
+				}
+
+				background = {
+					using = dark_area
+				}
+
+				big_mobilize_all_button = {
+					parentanchor = hcenter
+				}
+			}
+		}
+
+		blockoverride "bottom_spacing" {}
+	}
+}
+
+types mobilization_options {
+	type mobilization_option_small = widget {
+		alpha = "[TransparentIfFalse(Or(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf),IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))))]"
+		#visible = "[Or(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf),IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+		size = { 50 50 }
+
+		widget = {
+			size = { 50 50 }
+
+			# Activate
+			widget = {
+				visible = "[Not(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf))]"
+				size = { 100% 100% }
+
+				# Activate button - show confirmation popup
+				button = {
+					using = default_button
+					size = { 100% 100% }
+					visible = "[ShouldAskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					
+					enabled = "[And(Not(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf)), IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					onclick = "[PopupManager.AskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					tooltip = "ACTIVATE_MOBILIZATION_OPTION_BUTTON_TOOLTIP"
+				}
+				
+				# Activate button - no confirmation popup
+				button = {
+					using = default_button
+					size = { 100% 100% }
+					visible = "[Not(ShouldAskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					
+					enabled = "[And(Not(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf)), IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					onclick = "[Execute(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					tooltip = "ACTIVATE_MOBILIZATION_OPTION_BUTTON_TOOLTIP"
+				}
+			}
+
+			# Deactivate
+			widget = {
+				visible = "[MobilizationOption.IsActivated(MilitaryFormation.AccessSelf)]"
+				size = { 100% 100% }
+				
+				# Deactivate button - show confirmation popup
+				button = {
+					using = default_button
+					size = { 100% 100% }
+					visible = "[ShouldAskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					
+					enabled = "[And(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf), IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					onclick = "[PopupManager.AskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					tooltip = "DEACTIVATE_MOBILIZATION_OPTION_BUTTON_TOOLTIP"
+				}
+
+				# Deactivate button - no confirmation popup
+				button = {
+					using = default_button
+					size = { 100% 100% }
+					visible = "[Not(ShouldAskConfirmation(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					
+					enabled = "[And(MobilizationOption.IsActivated(MilitaryFormation.AccessSelf), IsValid(MobilizationOption.Toggle(MilitaryFormation.AccessSelf)))]"
+					onclick = "[Execute(MobilizationOption.Toggle(MilitaryFormation.AccessSelf))]"
+					tooltip = "DEACTIVATE_MOBILIZATION_OPTION_BUTTON_TOOLTIP"
+				}
+			}
+		}
+
+		icon = {
+			size = { 38 38 }
+			texture = "[MobilizationOption.GetTexture]"
+			parentanchor = center
+		}
+
+		icon = {
+			visible = "[MobilizationOption.IsActivated(MilitaryFormation.AccessSelf)]"
+			using = highlighted_square_selection
+		}
+	}
+
+	type big_mobilize_all_button = container {
+		### Mobilize button
+		widget = {
+			size = { 500 50 }
+			visible = "[And(IsValid( Country.MobilizeAllArmies ), Country.IsCommittedInDiplomaticPlay)]"
+
+			button = {
+				enabled = "[IsValid( Country.MobilizeAllArmies )]"
+
+				parentanchor = right|vcenter
+				using = default_button
+				using = diplomatic_play_mobilize_button_sound
+				size = { 470 50 }
+				using = fontsize_large
+
+				onclick = "[PopupManager.AskConfirmation( Country.MobilizeAllArmies )]"
+				tooltip = "MOBILIZE_ALL_MILITARY_FORMATIONS_BUTTON_TOOLTIP"
+
+				textbox = {
+					text = "MOBILIZE_ALL_MILITARY_FORMATIONS"
+					align = center|nobaseline
+					parentanchor = center
+					margin_right = 30
+					size = { 470 30 }
+					fontsize_min = 12
+					elide = right
+					using = fontsize_large
+				}
+			}
+
+			icon_with_background_big = {
+				parentanchor = left|vcenter
+			}
+		}
+
+		### Demobilize button
+		widget = {
+			size = { 500 50 }
+			visible = "[And(Not(IsValid( Country.MobilizeAllArmies )), Country.IsCommittedInDiplomaticPlay)]"
+
+			button = {
+				enabled = "[IsValid( Country.DemobilizeAllArmies )]"
+
+				parentanchor = right|vcenter
+				using = default_button
+				using = diplomatic_play_mobilize_button_sound
+				size = { 470 50 }
+				using = fontsize_large
+
+				onclick = "[PopupManager.AskConfirmation( Country.DemobilizeAllArmies )]"
+				tooltip = "DEMOBILIZE_ALL_MILITARY_FORMATIONS_BUTTON_TOOLTIP"
+
+				textbox = {
+					text = "DEMOBILIZE_ALL_MILITARY_FORMATIONS"
+					align = center|nobaseline
+					parentanchor = center
+					margin_right = 30
+					size = { 470 30 }
+					fontsize_min = 12
+					elide = right
+					using = fontsize_large
+				}
+			}
+
+			icon_with_background_big = {
+				parentanchor = left|vcenter
+			}
+		}
+	}
+
+	type mobilization_widget = flowcontainer {
+		direction = vertical
+		minimumsize = { 540 -1 }
+		margin_bottom = 10
+
+		using = entry_bg_fancy
+
+		# Name and info header
+		container = {
+			minimumsize = { @panel_width 35 }
+
+			background = {
+				using = fade_right_entry_fancy_header_colored
+				color = "[MilitaryFormation.GetCountry.GetMapColor]"
+			}
+			
+			flowcontainer = {
+				position = { 12 0 }
+				parentanchor = vcenter
+				spacing = 2
+
+				icon = {
+					size = { 30 30 }
+					texture = "[MilitaryFormation.GetFlag]"
+					color = "[MilitaryFormation.GetFlagColor]"
+					parentanchor = vcenter
+				}
+
+				textbox = {
+					maximumsize = { 200 -1 }
+					parentanchor = vcenter
+					multiline = yes
+					autoresize = yes
+					text = "[MilitaryFormation.GetName]"
+					align = nobaseline
+					elide = right
+					margin_right = 3
+				}
+
+				button_icon_goto = {
+					parentanchor = vcenter
+					size = { 25 25 }
+					tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+					onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
+				}
+			}
+
+			# Formation status
+			flowcontainer = {
+				position = { -15 0 }
+				parentanchor = right|vcenter
+
+				block "estimated_costs_visibility" {}
+
+				textbox = {
+					autoresize = yes
+					text = "[MilitaryFormation.GetEstimatedMobilizationCostFormatted]"
+					parentanchor = vcenter
+					align = right|nobaseline
+				}
+			}
+		}
+
+		dynamicgridbox = {
+			datamodel = "[GetMobilizationOptionGroups]"
+			datamodel_wrap = 3
+			flipdirection = yes
+			parentanchor = hcenter
+
+			item = {
+				flowcontainer = {
+					direction = vertical
+
+					textbox = {
+						text = "[MobilizationOptionGroup.GetNameNoFormatting]"
+						autoresize = yes
+						align = nobaseline
+						default_format = "#title"
+						margin_left = 2
+					}
+
+					flowcontainer = {
+						datamodel = "[MobilizationOptionGroup.GetMobilizationOptions]"
+						margin_right = 5
+						margin_bottom = 5
+
+						item = {
+							mobilization_option_small = {}
+						}
+					}
+				}
+			}
+		}
+
+		widget = { size = { 5 5 }}
+		divider_clean = {
+			parentanchor = hcenter
+			size = { 520 2 }
+		}
+		widget = { size = { 5 5 }}
+
+		flowcontainer = {
+			parentanchor = hcenter
+			spacing = 10
+
+			### UNIT NUMBERS AND MANPOWER
+			flowcontainer = {
+				parentanchor = vcenter
+				spacing = 5
+				tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+				minimumsize = { 120 -1 }
+				margin_left = 5
+
+				### ARMY ICON
+				icon = {
+					visible = "[MilitaryFormation.IsArmy]"
+					size = { 23 23 }
+					parentanchor = vcenter
+					texture = "gfx/interface/icons/generic_icons/battalions.dds"
+				}
+
+				### FLEET ICON
+				icon = {
+					visible = "[MilitaryFormation.IsFleet]"
+					size = { 23 23 }
+					parentanchor = vcenter
+					texture = "gfx/interface/icons/generic_icons/flotillas.dds"
+				}
+
+				### ARMY - NUMBER OF UNITS
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS"
+					using = fontsize_large
+					maximumsize = { 90 -1 }
+					fontsize_min = 12
+				}
+
+				widget = { size = { 1 1 }}
+
+				manpower_bar = {}
+			}
+
+			flowcontainer = {
+				minimumsize = { 80 -1 }
+				spacing = 10 
+				tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+				parentanchor = vcenter
+
+				### MORALE VALUE
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = right|nobaseline
+
+					text = "MILITARY_FORMATION_MORALE"
+					minimumsize = { 70 -1 }
+				}
+
+				### MORALE BAR
+				morale_bar = {
+					size = { 6 24 }
+					parentanchor = vcenter
+
+					blockoverride "morale_value" {
+						value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
+					}
+					blockoverride "morale_color" {
+						color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
+					}
+				}
+			}
+
+			flowcontainer = {
+				tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+				spacing = 10
+				parentanchor = vcenter
+
+				### ORGANIZATION
+				textbox = {
+					raw_text = "@organization! [MilitaryFormation.GetOrganizationPercentage|%v0]"
+					parentanchor = vcenter
+					align = right|nobaseline
+					minimumsize = { 70 -1 }
+				}
+
+				### ORGANIZATION BAR
+				organization_bar = {
+					size = { 6 24 }
+					parentanchor = vcenter
+					
+					blockoverride "organization_value" {
+						value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+					}
+					blockoverride "organization_color" {
+						color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+					}
+				}
+			}
+
+			widget = { size = { 1 1 }}
+			vertical_divider = {}
+
+			military_formation_mobilize_button = {
+				parentanchor = vcenter
+				visible = "[MilitaryFormation.IsArmy]"
+
+				blockoverride "size" {
+					size = { 180 50 }
+				}
+
+				blockoverride "button_size" {
+					size = { 160 75% }
+				}
+
+				blockoverride "fontsize" {}
+
+				blockoverride "mobilization_icon_size" {
+					size = { 50 50 }
+				}
+			}
+		}
+	}
+}

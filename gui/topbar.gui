@@ -11,12 +11,6 @@ template hud_visibility {
 
 types topbar_components
 {
-
-	#####################################################################################################################
-	#####################################################################################################################
-	#####################################################################################################################
-	#####################################################################################################################
-
 	### SECONDARY ICONS
 	type topbar_secondary_icons = container {
 		position = { 130 40 }
@@ -54,38 +48,36 @@ types topbar_components
 				}
 
 				#Pop
-				button = {
-					name = "population_button"
-					size = { 90 28 }
-					onclick = "[InformationPanelBar.OpenPanelTab('pops_overview', 'default')]"
-					flowcontainer = {
-						minimumsize = { 90 28 }
-						maximumsize = { 90 28 }
-						spacing = 2
-						using = population_tooltip_with_graph
-						using = tooltip_below
-						onmousehierarchyenter = "[SetTempMapModeByKey('mm_population')]"
-						onmousehierarchyleave = "[RemoveTempMapMode]"
-						alwaystransparent = no
+				flowcontainer = {
+					minimumsize = { 78 30 }
+					maximumsize = { 78 30 }
+					spacing = 2
+					using = population_tooltip_with_graph
+					using = tooltip_below
+					onmousehierarchyenter = "[SetTempMapModeByKey('mm_population')]"
+					onmousehierarchyleave = "[RemoveTempMapMode]"
+					alwaystransparent = no
 
-						icon = {
-							texture = "gfx/interface/icons/generic_icons/population.dds"
-							size = { @secondary_icon_size @secondary_icon_size }
-							parentanchor = vcenter
-						}
-						textbox = {
-							parentanchor = vcenter
-							text = "#variable [Country.GetTotalPopulation|D]#!"
-							autoresize = yes
-							align = left|nobaseline
-						}
+					icon = {
+						texture = "gfx/interface/icons/generic_icons/population.dds"
+						size = { @secondary_icon_size @secondary_icon_size }
+						parentanchor = vcenter
+					}
+					textbox = {
+						parentanchor = vcenter
+						raw_text = "#variable [Country.GetTotalPopulation|D]#!"
+						autoresize = yes
+						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
+						margin_right = 3
 					}
 				}
 
 				#Sol
 				flowcontainer = {
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 68 30 }
+					maximumsize = { 68 30 }
 					spacing = 2
 					using = average_standard_of_living_tooltip_with_graph
 					using = tooltip_below
@@ -106,15 +98,17 @@ types topbar_components
 						text = "[Country.GetFormattedStandardOfLivingAll|v]"
 						autoresize = yes
 						align = left|nobaseline
-						margin_left = 3
+						elide = right
+						fontsize_min = 12
+						margin_right = 3
 					}
 				}
 
 				#Innovation
 				flowcontainer = {
 				 	name = "innovation"
-				 	minimumsize = { 90 28 }
-				 	maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 				 	spacing = 2
 				 	tooltip = "INNOVATION_TOOLTIP"
 				 	using = tooltip_below
@@ -129,17 +123,41 @@ types topbar_components
 				 	textbox = {
 				 		parentanchor = vcenter
 				 		text = "[Country.GetWeeklyInnovation|1v]"
-				 		alpha = "[TransparentIfZero_int32(Country.GetWeeklyInnovation)]"
 				 		autoresize = yes
 				 		align = left|nobaseline
 				 	}
 				}
 
+				# Prestige 
+				flowcontainer = {
+					name = "prestige"
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
+					spacing = 2
+					tooltip = "COUNTRY_PRESTIGE_BREAKDOWN"
+					using = tooltip_below
+
+					icon = {
+						size = { @secondary_icon_size @secondary_icon_size }
+						name = prestige_icon
+						texture = "gfx/interface/icons/generic_icons/prestige.dds"
+						parentanchor = vcenter
+					}
+
+					textbox = {
+						parentanchor = vcenter
+						text = "[Country.GetPrestige|1v]"
+						alpha = "[TransparentIfZero_int32(Country.GetPrestige)]"
+						autoresize = yes
+						align = left|nobaseline
+					}
+				} 
+
 				#GDP
 				flowcontainer = {
 					name = "tutorial_highlight_gdp"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					spacing = 2
 					using = GDP_tooltip_with_graph
 					using = tooltip_below
@@ -165,64 +183,12 @@ types topbar_components
 
 				### Inflation/deflation
 				flowcontainer = {
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 
 					name = "tutorial_highlight_influence"
 					using = glow_button
-					tooltip = "INFLATION_TITLE"
-					# tooltipwidget = {
-					# 	TooltipWidgetType = {
-					# 		blockoverride "tooltip_content_after" {
-					# 			v3_plotline = {
-					# 				using = default_list_position
-
-					# 				blockoverride "header" {
-					# 					text = ""
-					# 				}
-					# 				blockoverride "line_color" {
-					# 					color = "[Pop.GetPopType.GetColor]"
-					# 				}
-					# 				blockoverride "size" {
-					# 					size = { 280 100 }
-					# 				}
-					# 				blockoverride "line_plotpoints" {
-					# 					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.MakeScope.ScriptValue('inflation_value'), '(CFixedPoint)0', '(CFixedPoint)0.3' )]"
-					# 				}
-					# 				blockoverride "maxvalue" {
-					# 					text = "100%"
-					# 				}
-					# 				blockoverride "minvalue" {
-					# 					raw_text = "-100%"
-					# 				}
-					# 				blockoverride "startdate" {
-					# 					text = "[GetOldestDate(Country.GetRadicalsTrend)]"
-					# 				}
-					# 				blockoverride "enddate" {
-					# 					text = "[GetLatestDate(Country.GetRadicalsTrend)]"
-					# 				}
-					# 				blockoverride "extra_plotlines" {
-					# 					### Base Price line
-					# 					plotline = {
-					# 						size = { 100% 100% }
-					# 						using = plot_line
-					# 						width = 2
-					# 						color = { 1 0 0 0.5 }
-					# 						plotpoints = "[(CFixedPoint)0]"
-					# 					}
-					# 				}
-					# 				blockoverride "multiitem" {}
-
-					# 				blockoverride "empty_state_visibility" {
-					# 					visible = "[IsEmpty(Pop.GetSizeTrend)]"
-					# 				}
-					# 				blockoverride "empty_state_text" {
-					# 					text = "GRAPH_NOT_INITIALIZED"
-					# 				}
-					# 			}
-					# 		}
-					# 	}
-					# }
+					tooltip = "INFLATION_TITLE" 
 					using = tooltip_below
 					onclick = "[InformationPanelBar.OpenPanelTab('diplomatic_overview', 'default')]"
 					enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
@@ -247,8 +213,8 @@ types topbar_components
 					visible = "[GetScriptedGui('law_fiat_standard_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "law_fiat_standard_visibility"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_fiat_standard"
 
 					using = tooltip_below
@@ -268,8 +234,8 @@ types topbar_components
 					visible = "[GetScriptedGui('law_silver_standard_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "law_silver_standard_visibility"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_silver_standard"
 
 					using = tooltip_below
@@ -288,8 +254,8 @@ types topbar_components
 					visible = "[GetScriptedGui('law_bimetallism_standard_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "law_bimetallism_standard_visibility"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_bimetallism_standard"
 
 					using = tooltip_below
@@ -309,8 +275,8 @@ types topbar_components
 					visible = "[GetScriptedGui('law_gold_standard_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "law_gold_standard_visibility"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_gold_standard"
 
 					using = tooltip_below
@@ -330,8 +296,8 @@ types topbar_components
 					visible = "[GetScriptedGui('law_gold_exchange_standard_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "law_gold_exchange_standard_visibility"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_gold_exchange_standard"
 
 					using = tooltip_below
@@ -353,8 +319,8 @@ types topbar_components
 					visible = "[GetScriptedGui('subject_country_country_top_bar').IsShown( GuiScope.SetRoot(GetPlayer.MakeScope).End)]"
 
 					name = "subject_country"
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					tooltip = "MONEY_VALUE_subject"
 
 					using = tooltip_below
@@ -383,14 +349,14 @@ types topbar_components
 
 				# Loyalist
 				flowcontainer = {
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 76 30 }
+					maximumsize = { 76 30 }
 					spacing = 2
 					using = radicals_tooltip_with_graph
 					using = tooltip_below
 					onmousehierarchyenter = "[SetTempMapModeByKey('mm_radicals')]"
 					onmousehierarchyleave = "[RemoveTempMapMode]"
-					alpha = "[TransparentIfZero_int32(Country.GetNumRadicals)]"
+					alpha = "[TransparentIfZero_int64(Country.GetNumRadicals)]"
 					alwaystransparent = no
 
 					icon = {
@@ -400,21 +366,23 @@ types topbar_components
 					}
 					textbox = {
 						parentanchor = vcenter
-						text = "#variable [Country.GetNumRadicals|D]#!"
+						raw_text = "#variable [Country.GetNumRadicals|D]#!"
 						autoresize = yes
 						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
 					}
 				}
 				# Radical
 				flowcontainer = {
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 76 30 }
+					maximumsize = { 76 30 }
 					spacing = 2
 					using = loyalists_tooltip_with_graph
 					using = tooltip_below
 					onmousehierarchyenter = "[SetTempMapModeByKey('mm_loyalists')]"
 					onmousehierarchyleave = "[RemoveTempMapMode]"
-					alpha = "[TransparentIfZero_int32(Country.GetNumLoyalists)]"
+					alpha = "[TransparentIfZero_int64(Country.GetNumLoyalists)]"
 					alwaystransparent = no
 
 					icon = {
@@ -424,18 +392,23 @@ types topbar_components
 					}
 					textbox = {
 						parentanchor = vcenter
-						text = "#variable [Country.GetNumLoyalists|D]#!"
+						raw_text = "#variable [Country.GetNumLoyalists|D]#!"
 						autoresize = yes
 						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
 					}
 				}
 				# Litteracy
 				flowcontainer = {
-					minimumsize = { 90 28 }
-					maximumsize = { 90 28 }
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
 					spacing = 2
-					tooltip = "LITERACY_TOOLTIP"
+					using = literacy_tooltip_with_graph
 					using = tooltip_below
+					onmousehierarchyenter = "[SetTempMapModeByKey('mm_literacy')]"
+					onmousehierarchyleave = "[RemoveTempMapMode]"
+					alwaystransparent = no
 
 					icon = {
 						texture = "gfx/interface/icons/generic_icons/literacy.dds"
@@ -444,120 +417,127 @@ types topbar_components
 					}
 					textbox = {
 						parentanchor = vcenter
-						text = "#variable [Country.GetIncorporatedLiteracyRate|%1]#!"
+						raw_text = "#variable [Country.GetIncorporatedLiteracyRate|%1]#!"
+						autoresize = yes
+						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
+					}
+				} 
+				# Legitimacy
+				flowcontainer = {
+					name = "legitimacy"
+					minimumsize = { 60 30 }
+					maximumsize = { 60 30 }
+					spacing = 2
+					datacontext = "[Country.GetGovernmentLegitimacyLevel]"
+					#tooltip = "SULIUS_LEGITIMACY_LEVEL_ACTIVE_TOOLTIP"
+					using = tooltip_below
+
+					icon = {
+						size = { @secondary_icon_size @secondary_icon_size }
+						name = legitimacy_icon
+						texture = "gfx/interface/icons/generic_icons/legitimacy.dds"
+						parentanchor = vcenter
+					}
+
+					textbox = {
+						parentanchor = vcenter
+						text = "[Country.GetGovernmentLegitimacy|1v]"
+						alpha = "[TransparentIfZero_int32(Country.GetPrestige)]"
 						autoresize = yes
 						align = left|nobaseline
 					}
-				}
-				# Battalions
-				button = {
-					name = "battalions_button"
-					size = { 90 28 }
-					onclick = "[InformationPanelBar.OpenPanelTab('military', 'army')]"
+				} 
+				# Battalions 
+				flowcontainer = {
+					name = "battalions"
+					minimumsize = { 95 30 }
+					maximumsize = { 95 30 }
+					spacing = 2
+					tooltip = "PANEL_MILITARY_ARMY_OVERVIEW_TOOLTIP"
+					using = tooltip_below
 
-					flowcontainer = {
-						name = "battalions"
-						minimumsize = { 90 28 }
-						maximumsize = { 90 28 }
-						spacing = 2
-						tooltip = "PANEL_MILITARY_ARMY_OVERVIEW_TOOLTIP"
-						using = tooltip_below
-
-						icon = {
-							size = { @secondary_icon_size @secondary_icon_size }
-							name = battalions_icon
-							texture = "gfx/interface/icons/generic_icons/battalions.dds"
-							parentanchor = vcenter
-						}
-
-						textbox = {
-							parentanchor = vcenter
-							text = "[Country.GetBattalions|v]+[Country.CalcConscriptableBattalions|v]"
-							alpha = "[TransparentIfZero_int32(Country.GetBattalions)]"
-							autoresize = yes
-							align = left|nobaseline
-							margin_left = -1
-						}
+					icon = {
+						size = { @secondary_icon_size @secondary_icon_size }
+						name = battalions_icon
+						texture = "gfx/interface/icons/generic_icons/battalions.dds"
+						parentanchor = vcenter
 					}
-				}
-				# Flotillas
-				button = {
-					name = "flotillas_button"
-					size = { 90 28 }
-					onclick = "[InformationPanelBar.OpenPanelTab('military', 'navy')]"
 
-					flowcontainer = {
-						name = "Flotillas"
-						minimumsize = { 90 28 }
-						maximumsize = { 90 28 }
-						spacing = 2
-						tooltip = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP"
-						using = tooltip_below
-						margin_left = 3
-
-						icon = {
-							size = { @secondary_icon_size @secondary_icon_size }
-							name = flotillas_icon
-							texture = "gfx/interface/icons/generic_icons/flotillas.dds"
-							parentanchor = vcenter
-						}
-
-						textbox = {
-							parentanchor = vcenter
-							text = "#variable [Country.GetWarships|0]#!"
-							alpha = "[TransparentIfZero_int32(Country.GetWarships)]"
-							autoresize = yes
-							align = left|nobaseline
-							margin_left = 2
-						}
+					textbox = {
+						parentanchor = vcenter
+						text = "[Country.GetBattalions|v]+[Country.CalcConscriptableBattalions|v]"
+						alpha = "[TransparentIfZero_int32(Country.GetBattalions)]"
+						autoresize = yes
+						align = left|nobaseline
+						margin_left = -1
 					}
-				}
-				# Prestige
-				button = {
-					name = "prestige_button"
-					size = { 90 28 }
-					onclick = "[InformationPanelBar.OpenCountryPanel(Country.Self)]"
+				} 
+				# Flotillas 
+				flowcontainer = {
+					name = "Flotillas"
+					minimumsize = { 84 30 }
+					maximumsize = { 84 30 }
+					spacing = 2
+					tooltip = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP"
+					using = tooltip_below
+					margin_left = 3
 
-					flowcontainer = {
-						name = "prestige"
-						minimumsize = { 90 28 }
-						maximumsize = { 90 28 }
-						spacing = 2
-						tooltip = "COUNTRY_PRESTIGE_BREAKDOWN"
-						using = tooltip_below
+					icon = {
+						size = { @secondary_icon_size @secondary_icon_size }
+						name = flotillas_icon
+						texture = "gfx/interface/icons/generic_icons/flotillas.dds"
+						parentanchor = vcenter
+					}
 
-						icon = {
-							size = { @secondary_icon_size @secondary_icon_size }
-							name = prestige_icon
-							texture = "gfx/interface/icons/generic_icons/prestige.dds"
-							parentanchor = vcenter
-						}
+					textbox = {
+						parentanchor = vcenter
+						text = "#variable [Country.GetWarships|0]#!"
+						alpha = "[TransparentIfZero_int32(Country.GetWarships)]"
+						autoresize = yes
+						align = left|nobaseline
+						margin_left = 2
+					}
+				} 
+				# infamy 
+				flowcontainer = {
+					minimumsize = { 66 30 }
+					maximumsize = { 66 30 }
+					spacing = 2
+					tooltip = "[Country.GetInfamyDesc]"
+					using = tooltip_below
+					onmousehierarchyenter = "[SetTempMapModeByKey('mm_infamy')]"
+					onmousehierarchyleave = "[RemoveTempMapMode]"
+					alpha = "[TransparentIfZero(Country.GetInfamy)]"
+					alwaystransparent = no
 
-						textbox = {
-							parentanchor = vcenter
-							text = "[Country.GetPrestige|1v]"
-							alpha = "[TransparentIfZero_int32(Country.GetPrestige)]"
-							autoresize = yes
-							align = left|nobaseline
-						}
+					icon = {
+						size = { @secondary_icon_size @secondary_icon_size }
+						texture = "[Country.GetInfamyIconTexture]"
+						parentanchor = vcenter
+					}
+					textbox = {
+						parentanchor = vcenter
+						raw_text = "#variable [Country.GetInfamy|0]#!"
+						autoresize = yes
+						align = left|nobaseline
+						elide = right
+						fontsize_min = 12
 					}
 				}
 			}
 		}
 	}
 
-	#####################################################################################################################
-	#####################################################################################################################
-	#####################################################################################################################
-	#####################################################################################################################
-
 	type topbar = widget {
 		widget = {
 			name = "topbar"
+			max_update_rate = 8
 			using = hud_visibility
 			datacontext = "[AccessMetaPlayer.AccessPlayedOrObservedCountry]"
 			using = clickthrough_blocker
-			size = { 705 100 }
+			size = { 705 80 }
 			allow_outside = yes
 			resizeparent = yes
 
@@ -703,6 +683,7 @@ types topbar_components
 										}
 									}
 								}
+
 								### AUTHORITY
 								button = {
 									name = "tutorial_highlight_authority"
@@ -744,6 +725,7 @@ types topbar_components
 										}
 									}
 								}
+
 								### INFLUENCE
 								button = {
 									name = "tutorial_highlight_influence"
@@ -794,7 +776,7 @@ types topbar_components
 									size = { 100 40 }
 									tooltip = "CONVOY_TOPBAR_TOOLTIP"
 									using = tooltip_below
-									onclick = "[InformationPanelBar.OpenMarketPanelTab(AccessPlayer.AccessFirstMarket, 'trade_routes')]"
+									onclick = "[InformationPanelBar.OpenMarketPanel(AccessPlayer.AccessFirstMarket.Self)]"
 									enabled = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
 									alpha = "[TransparentIfZero(GetPlayer.GetSupplyNetworkStrength)]"
 
@@ -807,7 +789,7 @@ types topbar_components
 										icon = {
 											parentanchor = center
 											size = { 28 28 }
-											texture = "gfx/interface/icons/generic_icons/convoys.dds"
+											texture = "gfx/interface/icons/topbar/convoys.dds"
 										}
 
 									}
@@ -922,9 +904,7 @@ types topbar_components
 													max = 1
 												}
 											}
-										}
-
-										
+										} 
 									}
 								}
 							}
@@ -932,8 +912,7 @@ types topbar_components
 							#####################################################################################################################
 							#####################################################################################################################
 							#####################################################################################################################
-							#####################################################################################################################
-
+							##################################################################################################################### 
 						}
 
 						#shows only on hover
@@ -946,58 +925,58 @@ types topbar_components
 							visible = "[Not(GetVariableSystem.Exists('more_topbar_info'))]"
 
 							blockoverride "animation" {
-								position = { 0 0 }
+								position = { 0 44 }
 							}
 						}
 					}
 				}
 			}
 
-			### LOCK TOGGLE FOR SECONDARY ROW OF ICONS
-			button_icon_round_toggle = {
-				visible = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
-				size = { 24 24 }
-				parentanchor = bottom|right
-				position = { -3 15 }
+			# ### LOCK TOGGLE FOR SECONDARY ROW OF ICONS
+			# button_icon_round_toggle = {
+			# 	visible = "[GetMetaPlayer.GetPlayedOrObservedCountry.IsValid]"
+			# 	size = { 24 24 }
+			# 	parentanchor = bottom|right
+			# 	position = { -25 -9 }
 
-				alpha = 0
+			# 	alpha = 0
 
-				state = {
-					name = show_topbar_secondary_stats
-					delay = 0.15
-					alpha = 1
-					duration = 0.15
-					using = Animation_Curve_Default
-				}
-				state = {
-					name = hide_topbar_secondary_stats
-					alpha = 0
-					duration = 0
-					using = Animation_Curve_Default
-				}
+			# 	state = {
+			# 		name = show_topbar_secondary_stats
+			# 		delay = 0.15
+			# 		alpha = 1
+			# 		duration = 0.15
+			# 		using = Animation_Curve_Default
+			# 	}
+			# 	state = {
+			# 		name = hide_topbar_secondary_stats
+			# 		alpha = 0
+			# 		duration = 0
+			# 		using = Animation_Curve_Default
+			# 	}
 
-				blockoverride "on_click" {
-					onclick = "[GetVariableSystem.Toggle('more_topbar_info')]"
-				}
-				blockoverride "view_1" {
-					visible = "[GetVariableSystem.Exists('more_topbar_info')]"
-				}
-				blockoverride "view_2" {
-					visible = "[Not(GetVariableSystem.Exists('more_topbar_info'))]"
-				}
-				blockoverride "icon_1" {
-					texture = "gfx/interface/buttons/button_icons/unlock.dds"
-				}
-				blockoverride "icon_2" {
-					texture = "gfx/interface/buttons/button_icons/lock.dds"
-				}
-				blockoverride "tooltip_1" {
-					tooltip = "LOCK_TOPBAR"
-				}
-				blockoverride "tooltip_2" {
-					tooltip = "UNLOCK_TOPBAR"
-				}
-			}
+			# 	blockoverride "on_click" {
+			# 		onclick = "[GetVariableSystem.Toggle('more_topbar_info')]"
+			# 	}
+			# 	blockoverride "view_1" {
+			# 		visible = "[GetVariableSystem.Exists('more_topbar_info')]"
+			# 	}
+			# 	blockoverride "view_2" {
+			# 		visible = "[Not(GetVariableSystem.Exists('more_topbar_info'))]"
+			# 	}
+			# 	blockoverride "icon_1" {
+			# 		texture = "gfx/interface/buttons/button_icons/unlock.dds"
+			# 	}
+			# 	blockoverride "icon_2" {
+			# 		texture = "gfx/interface/buttons/button_icons/lock.dds"
+			# 	}
+			# 	blockoverride "tooltip_1" {
+			# 		tooltip = "LOCK_TOPBAR"
+			# 	}
+			# 	blockoverride "tooltip_2" {
+			# 		tooltip = "UNLOCK_TOPBAR"
+			# 	}
+			# }
 
 			### FLAG
 			fancy_flag = {
@@ -1029,34 +1008,34 @@ types topbar_components
 		size = { 57 57 }
 		position = { -4 78 }
 
-		onclick = "[MapListPanelManager.ToggleCurrentPanel]"
+		onclick = "[MapListPanelManager.OpenCurrentPanel]"
 		onclick = "[SetTempMapModeByKey('mm_default')]"
 
 		### RANK
 		rank_badge = {
 			size = { 57 57 }
 		}
-		#Panel_1
-		button_icon_round = {
-			name = "Panel_1"
-			size = { 33 33 }
+		# #Panel_1
+		# button_icon_round = {
+		# 	name = "Panel_1"
+		# 	size = { 33 33 }
 
 
-			onclick = "[ExecuteConsoleCommand( Select_CString( GetVariableSystem.Exists('my_ef_custom_windows'), 'gui.ClearWidgets ef_custom_windows', 'gui.createwidget gui/ef_dev_and_custom_windows/ef_custom_windows.gui ef_custom_windows' ) )]"
-			onclick = "[GetVariableSystem.Toggle('my_ef_custom_windows')]"
+		# 	onclick = "[ExecuteConsoleCommand( Select_CString( GetVariableSystem.Exists('my_ef_custom_windows'), 'gui.ClearWidgets ef_custom_windows', 'gui.createwidget gui/ef_dev_and_custom_windows/ef_custom_windows.gui ef_custom_windows' ) )]"
+		# 	onclick = "[GetVariableSystem.Toggle('my_ef_custom_windows')]"
 
-			sing = shimmer
-			position = { 0 33 }
-			textbox = {
-				text = "1"
-				align = center|nobaseline
-				default_format = "#white #bold"
-				autoresize = yes
-				fontsize = 25
-				allow_outside = no
-				ignoreinvisible = yes
-				margin_left = 10
-			}
-		}
+		# 	sing = shimmer
+		# 	position = { 0 33 }
+		# 	textbox = {
+		# 		text = "1"
+		# 		align = center|nobaseline
+		# 		default_format = "#white #bold"
+		# 		autoresize = yes
+		# 		fontsize = 25
+		# 		allow_outside = no
+		# 		ignoreinvisible = yes
+		# 		margin_left = 10
+		# 	}
+		# }
 	}
 }

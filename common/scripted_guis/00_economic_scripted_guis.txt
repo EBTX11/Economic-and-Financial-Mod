@@ -8,6 +8,7 @@ test_execute = {
 
 PL_actualize = {
 	effect  = {
+		list_generation_when_player_open_tab = yes
 		currency_law_list = yes
 		test_1_c_global_stokpile_variable_list = yes
 		test_2_c_global_stokpile_variable_list = yes
@@ -21,10 +22,12 @@ PL_actualize = {
 		test_10_c_global_stokpile_variable_list = yes
 		test_11_c_global_stokpile_variable_list = yes
 		test_12_c_global_stokpile_variable_list = yes
+		test_13_c_global_stokpile_variable_list = yes
+		test_14_c_global_stokpile_variable_list = yes
+		test_15_c_global_stokpile_variable_list = yes
 
-
-
-
+test_16_c_global_stokpile_variable_list = yes
+		central_bank_debt_privat_bank_buyer_list_1_clear = yes
 		
 		global_monetary_reference_flux = yes
 		national_capacity_variable_list = yes
@@ -365,68 +368,6 @@ modifier_inflation = {
 ############################################################################################################################################################
 ############################################################################################################################################################
 
-silver_standard_law = {
-	is_shown = {
-	}
-	is_valid = {
-		# var:revaluation_on = 0
-		# var:devaluation_on = 0
-		# has_technology_researched = central_banking
-		# has_modifier = has_central_bank
-		has_technology_researched = metalique_standard
-		NOT = {
-			has_law = law_type:law_silver_standard
-			is_not_market_owner = yes
-			has_law = law_type:law_isolationism
-			has_modifier = central_bank_bankruptcy_country
-			has_modifier = currency_crisis_country
-		}
-	}
-	effect = {
-		activate_law = law_type:law_silver_standard
-		central_bank_production_methods = yes
-		remove_modifier = foreign_exchange_controls
-		add_modifier = {
-			name = foreign_exchange_controls
-			months = 12
-		}
-		set_variable = { #correct money_value calcule
-			name = trade_balance_in_gold_fixe
-			value = trade_balance_in_gold
-		}
-	}
-}
-bimetallism_standard_law = {
-	is_shown = {
-	}
-	is_valid = {
-		# var:revaluation_on = 0
-		# var:devaluation_on = 0
-		# has_technology_researched = central_banking
-		# has_modifier = has_central_bank
-		has_technology_researched = metalique_standard
-		NOT = {
-			has_law = law_type:law_bimetallism_standard
-			is_not_market_owner = yes
-			has_law = law_type:law_isolationism
-			has_modifier = central_bank_bankruptcy_country
-			has_modifier = currency_crisis_country
-		}
-	}
-	effect = {
-		activate_law = law_type:law_bimetallism_standard
-		central_bank_production_methods = yes
-		remove_modifier = foreign_exchange_controls
-		add_modifier = {
-			name = foreign_exchange_controls
-			months = 12
-		}
-		set_variable = { #correct money_value calcule
-			name = trade_balance_in_gold_fixe
-			value = trade_balance_in_gold
-		}
-	}
-}
 fiat_standard_law = {
 	is_shown = {
 	}
@@ -442,18 +383,112 @@ fiat_standard_law = {
 			has_law = law_type:law_isolationism
 			has_modifier = central_bank_bankruptcy_country
 			has_modifier = currency_crisis_country
+			#has_modifier = monetary_systeme_transition
 		}
 	}
 	effect = {
+		money_value_target_pre_set = yes
 		activate_law = law_type:law_fiat_standard
 		central_bank_production_methods = yes
 		remove_modifier = foreign_exchange_controls
 		add_modifier = {
 			name = foreign_exchange_controls
 		}
-		set_variable = { #correct money_value calcule
-			name = trade_balance_in_gold_fixe
-			value = trade_balance_in_gold
+		set_variable = {
+			name = money_value_target_1
+			value = money_value_target_pre_set
+		}
+		trade_balance = yes
+		remove_modifier = monetary_systeme_transition
+		add_modifier = { 
+			name = monetary_systeme_transition
+			months = 12
+		}
+	}
+}
+silver_standard_law = {
+	is_shown = {
+	}
+	is_valid = {
+		# var:revaluation_on = 0
+		# var:devaluation_on = 0
+		# has_technology_researched = central_banking
+		# has_modifier = has_central_bank
+		has_technology_researched = metalique_standard
+		or = {
+			has_law = law_type:law_fiat_standard
+			has_law = law_type:law_bimetallism_standard
+		}
+		NOT = {
+			has_law = law_type:law_silver_standard
+			is_not_market_owner = yes
+			has_law = law_type:law_isolationism
+			has_modifier = central_bank_bankruptcy_country
+			has_modifier = currency_crisis_country
+			#has_modifier = monetary_systeme_transition
+		}
+	}
+	effect = {
+		money_value_target_pre_set = yes
+		activate_law = law_type:law_silver_standard
+		central_bank_production_methods = yes
+		remove_modifier = foreign_exchange_controls
+		add_modifier = {
+			name = foreign_exchange_controls
+			months = 12
+		}
+		set_variable = {
+			name = money_value_target_1
+			value = money_value_target_pre_set
+		}
+		trade_balance = yes
+		remove_modifier = monetary_systeme_transition
+		add_modifier = { 
+			name = monetary_systeme_transition
+			months = 12
+		}
+	}
+}
+bimetallism_standard_law = {
+	is_shown = {
+	}
+	is_valid = {
+		# var:revaluation_on = 0
+		# var:devaluation_on = 0
+		# has_technology_researched = central_banking
+		# has_modifier = has_central_bank
+		has_technology_researched = metalique_standard
+		or = {
+			has_law = law_type:law_silver_standard
+			has_law = law_type:law_gold_standard
+		} 
+		NOT = {
+			has_law = law_type:law_bimetallism_standard
+			is_not_market_owner = yes
+			has_law = law_type:law_isolationism
+			has_modifier = central_bank_bankruptcy_country
+			has_modifier = currency_crisis_country
+			#has_modifier = monetary_systeme_transition
+		}
+	}
+	effect = {
+		money_value_target_pre_set = yes
+		activate_law = law_type:law_bimetallism_standard
+		central_bank_production_methods = yes
+		remove_modifier = foreign_exchange_controls
+		add_modifier = {
+			name = foreign_exchange_controls
+			months = 12
+		}
+		set_variable = {
+			name = money_value_target_1
+			value = money_value_target_pre_set
+		}
+		trade_balance = yes
+		remove_modifier = monetary_systeme_transition
+		add_modifier = { 
+			name = monetary_systeme_transition
+			months = 12
 		}
 	}
 }
@@ -465,6 +500,10 @@ gold_standard_standard_law = {
 		# var:devaluation_on = 0
 		# has_technology_researched = central_banking
 		# has_modifier = has_central_bank
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_gold_exchange_standard
+		} 
 		has_technology_researched = metalique_standard
 		NOT = {
 			has_law = law_type:law_gold_standard
@@ -472,19 +511,27 @@ gold_standard_standard_law = {
 			has_law = law_type:law_isolationism
 			has_modifier = central_bank_bankruptcy_country
 			has_modifier = currency_crisis_country
+			#has_modifier = monetary_systeme_transition
 		}
 	}
 	effect = {
+		money_value_target_pre_set = yes
 		activate_law = law_type:law_gold_standard
 		central_bank_production_methods = yes
 		remove_modifier = foreign_exchange_controls
 		add_modifier = {
 			name = foreign_exchange_controls
 			months = 12
+		} 
+		set_variable = {
+			name = money_value_target_1
+			value = money_value_target_pre_set
 		}
-		set_variable = { #correct money_value calcule
-			name = trade_balance_in_gold_fixe
-			value = trade_balance_in_gold
+		trade_balance = yes
+		remove_modifier = monetary_systeme_transition
+		add_modifier = { 
+			name = monetary_systeme_transition
+			months = 12
 		}
 	}
 }
@@ -497,15 +544,18 @@ gold_exchange_standard_standard_law = {
 		# has_modifier = has_central_bank
 
 		has_technology_researched = gold_exchange_standard
+		has_law = law_type:law_gold_exchange_standard
 		NOT = {
 			has_law = law_type:law_gold_exchange_standard
 			is_not_market_owner = yes
 			has_law = law_type:law_isolationism
 			has_modifier = central_bank_bankruptcy_country
 			has_modifier = currency_crisis_country
+			#has_modifier = monetary_systeme_transition
 		}
 	}
 	effect = {
+		money_value_target_pre_set = yes
 		activate_law = law_type:law_gold_exchange_standard
 		central_bank_production_methods = yes
 		central_bank_production_methods_3 = yes
@@ -513,10 +563,16 @@ gold_exchange_standard_standard_law = {
 		add_modifier = {
 			name = foreign_exchange_controls
 			months = 12
+		}  
+		set_variable = {
+			name = money_value_target_1
+			value = money_value_target_pre_set
 		}
-		set_variable = { #correct money_value calcule
-			name = trade_balance_in_gold_fixe
-			value = trade_balance_in_gold
+		trade_balance = yes
+		remove_modifier = monetary_systeme_transition
+		add_modifier = { 
+			name = monetary_systeme_transition
+			months = 12
 		}
 	}
 }
@@ -1182,7 +1238,40 @@ purchase_of_bond_debt_visibility = {
 		}
 	}
 }
-
+interest_rate_policy_on = {
+	effect  = {
+		set_variable = {
+			name = interest_rate_policy_on
+			value = 1
+		}
+		set_variable = {
+			name = refinancing_operations_on
+			value = 0
+		}
+	}
+}
+refinancing_operations_on = {
+	effect  = {
+		set_variable = {
+			name = interest_rate_policy_on
+			value = 0
+		}
+		set_variable = {
+			name = refinancing_operations_on
+			value = 1
+		}
+	}
+}
+interest_rate_policy_on_button_visibility = {
+	is_shown = {
+		var:interest_rate_policy_on = 1
+	}
+}
+refinancing_operations_on_button_visibility = {
+	is_shown = {
+		var:refinancing_operations_on = 1
+	}
+}
 #autre
 has_gold_exchange_standard_tech_more_button_visibility = {
 	is_valid = {
@@ -1356,6 +1445,93 @@ set_money_value_target_with_the_reference_currency = {
 	}
 }
 
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+
+#new currency 
+
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+ 
+extreme_weak_currency_visible = {
+	is_shown = {
+		has_modifier = extreme_weak_currency
+	}
+}
+currency_introduction = {
+	is_valid = {
+		has_modifier = extreme_weak_currency #çà veux dire çà money_value_in_gold < 0.01
+		#on exclu les pays qui sont deja entré dans la bankruptcy :
+		has_central_bank_FS_NISO = yes #un  pays  en  fiat  standart  à cause  d'une première  crise ne refera pas de crise en boucle, il sera bloqué en fiat  standart
+		not = {
+			or = {
+				has_modifier = economic_instability_country
+				has_modifier = currency_crisis_country
+				has_modifier = central_bank_bankruptcy_country
+				has_modifier = financial_crash_country
+				has_modifier = economic_crisis_country 
+				#has_modifier = declared_bankruptcy
+			} 
+		}
+		#var:extreme_weak_currency_solution_count_player >= 3 # à 2ans tout pil donc un peu bof bof mais à voir
+		extreme_weak_currency_solution_count_sc >= 3
+	}
+	effect = {
+		root = {
+			save_scope_as = target_country
+		}
+		currency_law_list = yes
+
+		#Reset de la balance une nouvelle fois pour etre sure de tout clean
+		set_variable = {
+			name = central_bank_bankruptcy
+			value = 1
+		} 
+		every_country = {
+			if = {
+				limit  = {
+					has_modifier = has_central_bank
+					not = {
+						this = root
+					}
+				}
+				save_scope_as = seller
+				all_currency_resold = yes
+			}
+		}
+		reset_law_event_currency = yes
+		reset_debt_currency_reserve_and_export_value = yes #uniquement pour le joueur
+		set_variable = {
+			name = central_bank_bankruptcy
+			value = 0
+		} 
+		##################################
+
+		activate_law = law_type:law_no_market_liquidity
+		introduction_new_currency = yes
+		activate_law = law_type:law_silver_standard
+		set_variable = {
+			name = extreme_weak_currency_solution_count
+			value = 0
+		}
+		change_variable = {
+			name = new_currency_count
+			add = 1 #0
+		}		
+		remove_modifier = new_currency
+		add_modifier = { 
+			name = new_currency
+			months = 60
+		}	
+		money_value_global_var = yes
+ 		reset_balance = yes
+	}
+}
+ 
 ################################################################################################
 ################################################################################################
 ################################################################################################
@@ -82562,6 +82738,7 @@ update_import_export_value_in_currency_liste = {
         #gold
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gold > 0
 					export_to_gold > 0
@@ -82572,9 +82749,11 @@ update_import_export_value_in_currency_liste = {
 				target = global_var:currency_import_export_value_gold_03
 			}
 		}
-        #dinar
+
+		        #dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar > 0
 					export_to_dinar > 0
@@ -82588,6 +82767,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_algerian_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_algerian_dinar > 0
 					export_to_dinar_algerian_dinar > 0
@@ -82601,6 +82781,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_iraqi_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_iraqi_dinar > 0
 					export_to_dinar_iraqi_dinar > 0
@@ -82614,6 +82795,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_libyan_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_libyan_dinar > 0
 					export_to_dinar_libyan_dinar > 0
@@ -82627,6 +82809,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_moroccan_dirham
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_moroccan_dirham > 0
 					export_to_dinar_moroccan_dirham > 0
@@ -82640,6 +82823,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_omanian_rial
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_omanian_rial > 0
 					export_to_dinar_omanian_rial > 0
@@ -82653,6 +82837,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_qiran
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_qiran > 0
 					export_to_dinar_qiran > 0
@@ -82666,6 +82851,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_saudi_riyal
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_saudi_riyal > 0
 					export_to_dinar_saudi_riyal > 0
@@ -82679,6 +82865,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_serbian_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_serbian_dinar > 0
 					export_to_dinar_serbian_dinar > 0
@@ -82692,6 +82879,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_tunisian_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_tunisian_dinar > 0
 					export_to_dinar_tunisian_dinar > 0
@@ -82705,6 +82893,7 @@ update_import_export_value_in_currency_liste = {
         #dinar_yugoslav_dinar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dinar_yugoslav_dinar > 0
 					export_to_dinar_yugoslav_dinar > 0
@@ -82718,6 +82907,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_australian_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_australian_dollar > 0
 					export_to_dollar_australian_dollar > 0
@@ -82731,6 +82921,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_canadian_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_canadian_dollar > 0
 					export_to_dollar_canadian_dollar > 0
@@ -82744,6 +82935,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_caribbean_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_caribbean_dollar > 0
 					export_to_dollar_caribbean_dollar > 0
@@ -82757,6 +82949,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_confederate_states_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_confederate_states_dollar > 0
 					export_to_dollar_confederate_states_dollar > 0
@@ -82770,6 +82963,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_liberian_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_liberian_dollar > 0
 					export_to_dollar_liberian_dollar > 0
@@ -82783,6 +82977,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_new_zealand_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_new_zealand_dollar > 0
 					export_to_dollar_new_zealand_dollar > 0
@@ -82796,6 +82991,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_sierra_leonean_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_sierra_leonean_dollar > 0
 					export_to_dollar_sierra_leonean_dollar > 0
@@ -82809,6 +83005,7 @@ update_import_export_value_in_currency_liste = {
         #dollar_united_states_dollar
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_dollar_united_states_dollar > 0
 					export_to_dollar_united_states_dollar > 0
@@ -82822,6 +83019,7 @@ update_import_export_value_in_currency_liste = {
         #eco_ariary
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_ariary > 0
 					export_to_eco_ariary > 0
@@ -82835,6 +83033,7 @@ update_import_export_value_in_currency_liste = {
         #eco_central_african_eco
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_central_african_eco > 0
 					export_to_eco_central_african_eco > 0
@@ -82848,6 +83047,7 @@ update_import_export_value_in_currency_liste = {
         #eco_east_african_eco
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_east_african_eco > 0
 					export_to_eco_east_african_eco > 0
@@ -82861,6 +83061,7 @@ update_import_export_value_in_currency_liste = {
         #eco_ethiopian_birr
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_ethiopian_birr > 0
 					export_to_eco_ethiopian_birr > 0
@@ -82874,6 +83075,7 @@ update_import_export_value_in_currency_liste = {
         #eco_ghanaian_pound
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_ghanaian_pound > 0
 					export_to_eco_ghanaian_pound > 0
@@ -82887,6 +83089,7 @@ update_import_export_value_in_currency_liste = {
         #eco_nigerian_naira
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_nigerian_naira > 0
 					export_to_eco_nigerian_naira > 0
@@ -82900,6 +83103,7 @@ update_import_export_value_in_currency_liste = {
         #eco_south_african_rand
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_south_african_rand > 0
 					export_to_eco_south_african_rand > 0
@@ -82913,6 +83117,7 @@ update_import_export_value_in_currency_liste = {
         #eco_tuareg_ouguiya
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_tuareg_ouguiya > 0
 					export_to_eco_tuareg_ouguiya > 0
@@ -82926,6 +83131,7 @@ update_import_export_value_in_currency_liste = {
         #eco_west_african_eco
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_eco_west_african_eco > 0
 					export_to_eco_west_african_eco > 0
@@ -82939,6 +83145,7 @@ update_import_export_value_in_currency_liste = {
         #franc_belgian_franc
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_franc_belgian_franc > 0
 					export_to_franc_belgian_franc > 0
@@ -82952,6 +83159,7 @@ update_import_export_value_in_currency_liste = {
         #franc_french_franc
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_franc_french_franc > 0
 					export_to_franc_french_franc > 0
@@ -82965,6 +83173,7 @@ update_import_export_value_in_currency_liste = {
         #franc_luxembourgish_franc
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_franc_luxembourgish_franc > 0
 					export_to_franc_luxembourgish_franc > 0
@@ -82978,6 +83187,7 @@ update_import_export_value_in_currency_liste = {
         #franc_swiss_franc
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_franc_swiss_franc > 0
 					export_to_franc_swiss_franc > 0
@@ -82991,6 +83201,7 @@ update_import_export_value_in_currency_liste = {
         #gulden
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden > 0
 					export_to_gulden > 0
@@ -83004,6 +83215,7 @@ update_import_export_value_in_currency_liste = {
         #gulden_bavarian_gulden
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden_bavarian_gulden > 0
 					export_to_gulden_bavarian_gulden > 0
@@ -83017,6 +83229,7 @@ update_import_export_value_in_currency_liste = {
         #gulden_florin
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden_florin > 0
 					export_to_gulden_florin > 0
@@ -83030,6 +83243,7 @@ update_import_export_value_in_currency_liste = {
         #gulden_hungarian_forint
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden_hungarian_forint > 0
 					export_to_gulden_hungarian_forint > 0
@@ -83043,6 +83257,7 @@ update_import_export_value_in_currency_liste = {
         #gulden_indies_guilder
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden_indies_guilder > 0
 					export_to_gulden_indies_guilder > 0
@@ -83056,6 +83271,7 @@ update_import_export_value_in_currency_liste = {
         #gulden_south_german_gulden
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_gulden_south_german_gulden > 0
 					export_to_gulden_south_german_gulden > 0
@@ -83069,6 +83285,7 @@ update_import_export_value_in_currency_liste = {
         #krone_czech_koruna
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_czech_koruna > 0
 					export_to_krone_czech_koruna > 0
@@ -83082,6 +83299,7 @@ update_import_export_value_in_currency_liste = {
         #krone_danish_krone
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_danish_krone > 0
 					export_to_krone_danish_krone > 0
@@ -83095,6 +83313,7 @@ update_import_export_value_in_currency_liste = {
         #krone_estonian_kroon
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_estonian_kroon > 0
 					export_to_krone_estonian_kroon > 0
@@ -83108,6 +83327,7 @@ update_import_export_value_in_currency_liste = {
         #krone_icelandic_krona
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_icelandic_krona > 0
 					export_to_krone_icelandic_krona > 0
@@ -83121,6 +83341,7 @@ update_import_export_value_in_currency_liste = {
         #krone_norwegian_krone
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_norwegian_krone > 0
 					export_to_krone_norwegian_krone > 0
@@ -83134,6 +83355,7 @@ update_import_export_value_in_currency_liste = {
         #krone_slovak_koruna
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_slovak_koruna > 0
 					export_to_krone_slovak_koruna > 0
@@ -83147,6 +83369,7 @@ update_import_export_value_in_currency_liste = {
         #krone_swedish_krona
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_krone_swedish_krona > 0
 					export_to_krone_swedish_krona > 0
@@ -83160,6 +83383,7 @@ update_import_export_value_in_currency_liste = {
         #leon_leu
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_leon_leu > 0
 					export_to_leon_leu > 0
@@ -83173,6 +83397,7 @@ update_import_export_value_in_currency_liste = {
         #leon_lev
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_leon_lev > 0
 					export_to_leon_lev > 0
@@ -83186,6 +83411,7 @@ update_import_export_value_in_currency_liste = {
         #lira
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira > 0
 					export_to_lira > 0
@@ -83199,6 +83425,7 @@ update_import_export_value_in_currency_liste = {
         #lira_ducato
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira_ducato > 0
 					export_to_lira_ducato > 0
@@ -83212,6 +83439,7 @@ update_import_export_value_in_currency_liste = {
         #lira_ottoman_lira
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira_ottoman_lira > 0
 					export_to_lira_ottoman_lira > 0
@@ -83225,6 +83453,7 @@ update_import_export_value_in_currency_liste = {
         #lira_scudo_pontificio
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira_scudo_pontificio > 0
 					export_to_lira_scudo_pontificio > 0
@@ -83238,6 +83467,7 @@ update_import_export_value_in_currency_liste = {
         #lira_scudo_sardo
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira_scudo_sardo > 0
 					export_to_lira_scudo_sardo > 0
@@ -83251,6 +83481,7 @@ update_import_export_value_in_currency_liste = {
         #lira_toscane_lira
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_lira_toscane_lira > 0
 					export_to_lira_toscane_lira > 0
@@ -83264,6 +83495,7 @@ update_import_export_value_in_currency_liste = {
         #mark
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_mark > 0
 					export_to_mark > 0
@@ -83277,6 +83509,7 @@ update_import_export_value_in_currency_liste = {
         #mark_finnish_markka
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_mark_finnish_markka > 0
 					export_to_mark_finnish_markka > 0
@@ -83290,6 +83523,7 @@ update_import_export_value_in_currency_liste = {
         #peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso > 0
 					export_to_peso > 0
@@ -83303,6 +83537,7 @@ update_import_export_value_in_currency_liste = {
         #peso_argentine_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_argentine_peso > 0
 					export_to_peso_argentine_peso > 0
@@ -83316,6 +83551,7 @@ update_import_export_value_in_currency_liste = {
         #peso_bolivien_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_bolivien_peso > 0
 					export_to_peso_bolivien_peso > 0
@@ -83329,6 +83565,7 @@ update_import_export_value_in_currency_liste = {
         #peso_chilean_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_chilean_peso > 0
 					export_to_peso_chilean_peso > 0
@@ -83342,6 +83579,7 @@ update_import_export_value_in_currency_liste = {
         #peso_colombian_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_colombian_peso > 0
 					export_to_peso_colombian_peso > 0
@@ -83355,6 +83593,7 @@ update_import_export_value_in_currency_liste = {
         #peso_costa_rican_colon
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_costa_rican_colon > 0
 					export_to_peso_costa_rican_colon > 0
@@ -83368,6 +83607,7 @@ update_import_export_value_in_currency_liste = {
         #peso_cuban_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_cuban_peso > 0
 					export_to_peso_cuban_peso > 0
@@ -83381,6 +83621,7 @@ update_import_export_value_in_currency_liste = {
         #peso_ecuadorian_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_ecuadorian_peso > 0
 					export_to_peso_ecuadorian_peso > 0
@@ -83394,6 +83635,7 @@ update_import_export_value_in_currency_liste = {
         #peso_el_salvador_colon
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_el_salvador_colon > 0
 					export_to_peso_el_salvador_colon > 0
@@ -83407,6 +83649,7 @@ update_import_export_value_in_currency_liste = {
         #peso_guatemalan_quetzal
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_guatemalan_quetzal > 0
 					export_to_peso_guatemalan_quetzal > 0
@@ -83420,6 +83663,7 @@ update_import_export_value_in_currency_liste = {
         #peso_honduran_lempira
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_honduran_lempira > 0
 					export_to_peso_honduran_lempira > 0
@@ -83433,6 +83677,7 @@ update_import_export_value_in_currency_liste = {
         #peso_mexican_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_mexican_peso > 0
 					export_to_peso_mexican_peso > 0
@@ -83446,6 +83691,7 @@ update_import_export_value_in_currency_liste = {
         #peso_nicaraguan_cordoba
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_nicaraguan_cordoba > 0
 					export_to_peso_nicaraguan_cordoba > 0
@@ -83459,6 +83705,7 @@ update_import_export_value_in_currency_liste = {
         #peso_paraguayan_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_paraguayan_peso > 0
 					export_to_peso_paraguayan_peso > 0
@@ -83472,6 +83719,7 @@ update_import_export_value_in_currency_liste = {
         #peso_philippine_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_philippine_peso > 0
 					export_to_peso_philippine_peso > 0
@@ -83485,6 +83733,7 @@ update_import_export_value_in_currency_liste = {
         #peso_sol_de_oro
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_sol_de_oro > 0
 					export_to_peso_sol_de_oro > 0
@@ -83498,6 +83747,7 @@ update_import_export_value_in_currency_liste = {
         #peso_uruguayan_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_uruguayan_peso > 0
 					export_to_peso_uruguayan_peso > 0
@@ -83511,6 +83761,7 @@ update_import_export_value_in_currency_liste = {
         #peso_venezuelan_peso
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_peso_venezuelan_peso > 0
 					export_to_peso_venezuelan_peso > 0
@@ -83524,6 +83775,7 @@ update_import_export_value_in_currency_liste = {
         #pound_egyptian_pound
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_pound_egyptian_pound > 0
 					export_to_pound_egyptian_pound > 0
@@ -83537,6 +83789,7 @@ update_import_export_value_in_currency_liste = {
         #pound_irish_pound
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_pound_irish_pound > 0
 					export_to_pound_irish_pound > 0
@@ -83550,6 +83803,7 @@ update_import_export_value_in_currency_liste = {
         #pound_sterling
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_pound_sterling > 0
 					export_to_pound_sterling > 0
@@ -83563,6 +83817,7 @@ update_import_export_value_in_currency_liste = {
         #real
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_real > 0
 					export_to_real > 0
@@ -83576,6 +83831,7 @@ update_import_export_value_in_currency_liste = {
         #real_brazilian_real
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_real_brazilian_real > 0
 					export_to_real_brazilian_real > 0
@@ -83589,6 +83845,7 @@ update_import_export_value_in_currency_liste = {
         #rupee_indian_rupee
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_rupee_indian_rupee > 0
 					export_to_rupee_indian_rupee > 0
@@ -83602,6 +83859,7 @@ update_import_export_value_in_currency_liste = {
         #rupee_indonesian_rupiah
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_rupee_indonesian_rupiah > 0
 					export_to_rupee_indonesian_rupiah > 0
@@ -83615,6 +83873,7 @@ update_import_export_value_in_currency_liste = {
         #spe_baht
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_baht > 0
 					export_to_spe_baht > 0
@@ -83628,6 +83887,7 @@ update_import_export_value_in_currency_liste = {
         #spe_dong
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_dong > 0
 					export_to_spe_dong > 0
@@ -83641,6 +83901,7 @@ update_import_export_value_in_currency_liste = {
         #spe_drachma
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_drachma > 0
 					export_to_spe_drachma > 0
@@ -83654,6 +83915,7 @@ update_import_export_value_in_currency_liste = {
         #spe_korean_won
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_korean_won > 0
 					export_to_spe_korean_won > 0
@@ -83667,6 +83929,7 @@ update_import_export_value_in_currency_liste = {
         #spe_latvian_lats
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_latvian_lats > 0
 					export_to_spe_latvian_lats > 0
@@ -83680,6 +83943,7 @@ update_import_export_value_in_currency_liste = {
         #spe_lithuanian_litas
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_lithuanian_litas > 0
 					export_to_spe_lithuanian_litas > 0
@@ -83693,6 +83957,7 @@ update_import_export_value_in_currency_liste = {
         #spe_peseta
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_peseta > 0
 					export_to_spe_peseta > 0
@@ -83706,6 +83971,7 @@ update_import_export_value_in_currency_liste = {
         #spe_ruble
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_ruble > 0
 					export_to_spe_ruble > 0
@@ -83719,6 +83985,7 @@ update_import_export_value_in_currency_liste = {
         #spe_uni
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_uni > 0
 					export_to_spe_uni > 0
@@ -83732,6 +83999,7 @@ update_import_export_value_in_currency_liste = {
         #spe_yen
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_yen > 0
 					export_to_spe_yen > 0
@@ -83745,6 +84013,7 @@ update_import_export_value_in_currency_liste = {
         #spe_yuan
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_yuan > 0
 					export_to_spe_yuan > 0
@@ -83758,6 +84027,7 @@ update_import_export_value_in_currency_liste = {
         #spe_zloti
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_spe_zloti > 0
 					export_to_spe_zloti > 0
@@ -83771,6 +84041,7 @@ update_import_export_value_in_currency_liste = {
         #thaler_hannoveraner_thaler
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_thaler_hannoveraner_thaler > 0
 					export_to_thaler_hannoveraner_thaler > 0
@@ -83784,6 +84055,7 @@ update_import_export_value_in_currency_liste = {
         #thaler_prussian_thaler
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_thaler_prussian_thaler > 0
 					export_to_thaler_prussian_thaler > 0
@@ -83797,6 +84069,7 @@ update_import_export_value_in_currency_liste = {
         #thaler_saxon_thaler
 		if = {
 			limit = {
+				import_export_disable = 0 #désactive l'accumulation de dette si le pays entre en crise
 				or = {
 					import_from_thaler_saxon_thaler > 0
 					export_to_thaler_saxon_thaler > 0

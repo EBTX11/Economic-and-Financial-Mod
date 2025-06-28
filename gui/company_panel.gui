@@ -1,0 +1,2504 @@
+# COPY-PASTED FOR NOW
+@panel_width_minus_20 = 520
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+types company_panel_types
+{
+	type company_panel = default_block_window_two_lines {
+		name = "company_panel"
+		datacontext = "[CompanyPanel.GetCompany]"
+		datacontext = "[Company.GetCompanyType]"
+
+		blockoverride "animation_state_block" {
+			state = {
+				name = _show
+				start_sound = {
+					soundeffect = "event:/SFX/UI/CompanyCharters/company_panel_open"
+				}
+			}
+
+			state = {
+				name = _hide
+				start_sound = {
+					soundeffect = "event:/SFX/UI/CompanyCharters/company_panel_stop"
+				}
+			}
+		}
+
+		blockoverride "window_header_name"
+		{
+			text = "[LabelingHelper.CapitalizeOnlyFirst(Company.GetNameNoFormatting)]"
+		}
+
+		blockoverride "window_header_name_line_two" 
+		{
+			text = "COMPANY_PANEL_SUBHEADER"
+		}
+
+		blockoverride "goto_button" {
+			button_icon_goto = {
+				datacontext = "[Company.GetCountry]"
+				size = { 30 30 }
+				onclick = "[InformationPanelBar.OpenCountryPanel(Company.GetCountry)]"
+				tooltip = "GO_TO_BUTTON_COUNTRY"
+				input_action = "go_to_details"
+			}
+		}
+		
+		blockoverride "fixed_top"
+		{
+			tab_buttons =
+			{
+				blockoverride "first_button"
+				{
+					text = "COMPANY_TAB_OVERVIEW"
+				}
+				blockoverride "first_button_tooltip"
+				{
+					tooltip = "COMPANY_TAB_OVERVIEW"
+				}
+				blockoverride "first_button_click"
+				{
+					onclick = "[InformationPanel.SelectTab('default')]"
+				}
+				blockoverride "first_button_visibility"
+				{
+					visible = "[InformationPanel.IsTabSelected('default')]"
+				}
+				blockoverride "first_button_visibility_checked"
+				{
+					visible = "[Not( InformationPanel.IsTabSelected('default') )]"
+				}
+				blockoverride "first_button_selected"
+				{
+					text = "COMPANY_TAB_OVERVIEW"
+				}
+
+				blockoverride "second_button"
+				{
+					text = "COMPANY_TAB_ASSETS"
+				}
+				blockoverride "second_button_tooltip"
+				{
+					tooltip = "COMPANY_TAB_ASSETS"
+				}
+				blockoverride "second_button_click"
+				{
+					onclick = "[InformationPanel.SelectTab('assets')]"
+				}
+				blockoverride "second_button_visibility"
+				{
+					visible = "[InformationPanel.IsTabSelected('assets')]"
+				}
+				blockoverride "second_button_visibility_checked"
+				{
+					visible = "[Not( InformationPanel.IsTabSelected('assets') )]"
+				}
+				blockoverride "second_button_selected"
+				{
+					text = "COMPANY_TAB_ASSETS"
+				}
+
+				blockoverride "third_button"
+				{
+					text = "COMPANY_TAB_STATISTICS"
+				}
+				blockoverride "third_button_tooltip"
+				{
+					tooltip = "COMPANY_TAB_STATISTICS"
+				}
+				blockoverride "third_button_click"
+				{
+					onclick = "[InformationPanel.SelectTab('statistics')]"
+				}
+				blockoverride "third_button_visibility"
+				{
+					visible = "[InformationPanel.IsTabSelected('statistics')]"
+				}
+				blockoverride "third_button_visibility_checked"
+				{
+					visible = "[Not( InformationPanel.IsTabSelected('statistics') )]"
+				}
+				blockoverride "third_button_selected"
+				{
+					text = "COMPANY_TAB_STATISTICS"
+				}
+			}
+			
+			widget = { size = { 1 10 } }
+		}
+
+		blockoverride "scrollarea_content"
+		{
+			container = {
+				parentanchor = hcenter
+
+				company_panel_overview_tab = {
+					visible = "[InformationPanel.IsTabSelected('default')]"
+				}
+
+				company_panel_assets_tab = {
+					visible = "[InformationPanel.IsTabSelected('assets')]"
+				}
+
+				company_panel_statistics_tab = {
+					visible = "[InformationPanel.IsTabSelected('statistics')]"
+				}
+			}
+		}
+
+		blockoverride "fixed_bottom" {
+			flowcontainer = {
+				visible = "[Company.GetCountry.IsLocalPlayer]"
+				direction = vertical
+				spacing = 5
+
+				divider_clean = {
+					size = { @panel_width_plus_14 4 }
+				}
+
+				background = {
+					using = dark_area
+				}
+
+				widget = {
+					size = { 5 5 }
+				}
+
+				### COMPANY CHARTER BUTTONS - DO NOT OWN DLC
+				flowcontainer = {
+					visible = "[Not(HasDlcFeature('mp1_charter_companies'))]"
+					parentanchor = hcenter
+					direction = vertical
+					datamodel = "[GetCompanyCharterTypes]"
+
+					item = {
+						container = {
+							company_charter_button_horizontal = {
+								visible = "[Or(CompanyCharterType.IsTargettingRegions, CompanyCharterType.IsTargettingBuildings)]"
+
+								blockoverride "onclick" {
+									onclick = "[RightClickMenuManager.ToggleCompanyCharterType(CompanyCharterType.AccessSelf, Company.AccessSelf, PdxGuiWidget.AccessSelf)]"
+								}
+
+								blockoverride "button_style" {
+									using = default_button
+								}
+							}
+
+							container = {
+								visible = "[Not(Or(CompanyCharterType.IsTargettingRegions, CompanyCharterType.IsTargettingBuildings))]"
+
+								company_charter_active_widget_horizontal = {
+									visible = "[Or(And(CompanyCharterType.IsTradeCharter, Company.HasAnyTradeCharterActive), And(CompanyCharterType.IsInvestmentCharter, Company.HasAnyInvestmentCharterActive))]"
+								}
+
+								company_charter_button_horizontal = {
+									visible = "[Not(Or(And(CompanyCharterType.IsTradeCharter, Company.HasAnyTradeCharterActive), And(CompanyCharterType.IsInvestmentCharter, Company.HasAnyInvestmentCharterActive)))]"
+									enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+									
+									blockoverride "onclick" {
+										onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_grant')]"
+										using = icon_toggle_single_on_sound
+									}
+
+									blockoverride "charter_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_CompanyCharterType = {
+												blockoverride "tooltip_content_before" {
+													custom_tooltip_textbox = {
+														visible = "[StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self)))]"
+														text = "GRANT_COMPANY_CHARTER_GENERIC_TOOLTIP"
+													}
+
+													custom_tooltip_textbox_with_empty_line = {
+														visible = "[StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self)))]"
+														text = "COMPANY_CHARTER_AUTHORITY_COST"
+													}
+
+													custom_tooltip_textbox_with_empty_line = {
+														visible = "[Not(StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self))))]"
+														text = "[GetDesc(Company.ToggleCharter(CompanyCharterType.Self))]"
+													}
+
+													custom_tooltip_textbox_with_empty_line = {
+														datacontext = "[Company.GetCountry]"
+														text = "USING_X_FREE_CHARTERS"
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				### COMPANY CHARTER BUTTONS - OWNS DLC
+				flowcontainer = {
+					visible = "[HasDlcFeature('mp1_charter_companies')]"
+					parentanchor = hcenter
+					spacing = 5
+					wrap_count = 5
+					datamodel = "[GetCompanyCharterTypes]"
+
+					item = {
+						container = {
+							company_charter_button = {
+								visible = "[Or(CompanyCharterType.IsTargettingRegions, CompanyCharterType.IsTargettingBuildings)]"
+
+								blockoverride "onclick" {
+									onclick = "[RightClickMenuManager.ToggleCompanyCharterType(CompanyCharterType.AccessSelf, Company.AccessSelf, PdxGuiWidget.AccessSelf)]"
+								}
+
+								blockoverride "button_style" {
+									using = default_button
+								}
+							}
+
+							container = {
+								visible = "[Not(Or(CompanyCharterType.IsTargettingRegions, CompanyCharterType.IsTargettingBuildings))]"
+
+								company_charter_active_widget = {
+									visible = "[Or(And(CompanyCharterType.IsTradeCharter, Company.HasAnyTradeCharterActive), And(CompanyCharterType.IsInvestmentCharter, Company.HasAnyInvestmentCharterActive))]"
+								}
+
+								company_charter_button = {
+									visible = "[Not(Or(And(CompanyCharterType.IsTradeCharter, Company.HasAnyTradeCharterActive), And(CompanyCharterType.IsInvestmentCharter, Company.HasAnyInvestmentCharterActive)))]"
+									enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+									
+									blockoverride "onclick" {
+										onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_grant')]"
+										using = icon_toggle_single_on_sound
+									}
+
+									blockoverride "charter_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_CompanyCharterType = {
+												blockoverride "tooltip_content_before" {
+													custom_tooltip_textbox = {
+														visible = "[StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self)))]"
+														text = "GRANT_COMPANY_CHARTER_GENERIC_TOOLTIP"
+													}
+
+													custom_tooltip_textbox_with_empty_line = {
+														visible = "[StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self)))]"
+														text = "COMPANY_CHARTER_AUTHORITY_COST"
+													}
+
+													custom_tooltip_textbox_with_empty_line = {
+														visible = "[Not(StringIsEmpty(GetDesc(Company.ToggleCharter(CompanyCharterType.Self))))]"
+														text = "[GetDesc(Company.ToggleCharter(CompanyCharterType.Self))]"
+													}
+													custom_tooltip_textbox_with_empty_line = {
+														datacontext = "[Company.GetCountry]"
+														text = "USING_X_FREE_CHARTERS"
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				widget = {
+					size = { 5 5 }
+				}
+			}
+		}
+
+		blockoverride "bottom_spacing" {}
+	}
+
+	type company_info_item = vbox {
+		layoutpolicy_horizontal = expanding
+
+		block "top_expand" {}
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+
+			### HEADER
+			textbox = {
+				autoresize = yes
+				align = nobaseline
+				using = elide_fontsize_min
+				max_width = 200
+
+				block "header" {
+					raw_text = "Info Header"
+				}
+			}
+			block "right_expand" {
+				expand = {}
+			}
+		}
+
+		### MAIN INFO
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			spacing = 5
+
+			block "left_expand" {}
+
+			block "info" {
+				textbox = {
+					autoresize = yes
+					align = nobaseline
+					elide = right
+					fontsize_min = 14
+
+					block "info_text" {
+						raw_text = "Info Text"
+					}
+				}
+			}
+
+			block "after_info" {}
+			
+			block "right_expand" {
+				expand = {}
+			}
+		}
+
+		block "additional_listed_info" {}
+
+		widget = {
+			size = { 5 5 }
+		}
+
+		block "bottom_divider" {
+			divider_clean = {
+
+				blockoverride "size" {
+					#layoutpolicy_horizontal = expanding
+					size = { 220 2 }
+				}
+			}
+		}
+	}
+
+	type company_panel_overview_tab = flowcontainer {
+		direction = vertical
+		using = default_list_position
+		using = default_content_fade
+		spacing = 5
+
+		### DEFAULT TAB
+		widget = {
+			size = { @panel_width_plus_14 470 }
+			using = default_content_fade
+
+			widget = {
+				size = { 100% 100% }
+
+				background = {
+					texture = "[Company.AccessCompanyType.GetBackground]"
+					fittype = centercrop
+					margin_left = 18
+					margin_right = 10
+					margin_bottom = 10
+					
+					modify_texture = {
+						texture = "gfx/interface/masks/fade_vertical_center.dds"
+						spriteType = Corneredstretched
+						spriteborder = { 0 0 }
+						blend_mode = alphamultiply
+					}
+
+					modify_texture = {
+						texture = "gfx/interface/masks/fade_horizontal_center.dds"
+						spriteType = Corneredstretched
+						spriteborder = { 0 0 }
+						blend_mode = alphamultiply
+					}
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = right
+				position = { -20 0 }
+				direction = vertical
+				margin_top = 20
+				spacing = 10
+				allow_outside = yes
+
+				### COMPANY ICON
+				icon = {
+					parentanchor = hcenter
+					size = { 190 190 }
+					allow_outside = yes
+					texture = "[CompanyType.GetIcon]"
+
+					tooltipwidget = {
+						FancyTooltip_Company = {}
+					}
+
+					### DISBAND COMPANY
+					button_icon_round_action = {
+						visible = "[Company.GetCountry.IsLocalPlayer]"
+						parentanchor = right
+						size = { 40 40 }
+						position = { 10 -10 }
+						onclick = "[PopupManager.AskConfirmationCustom(GetPlayer.RemoveCompany(CompanyType.Self), 'company_confirmation_window')]"
+						enabled = "[IsValid(GetPlayer.RemoveCompany(CompanyType.Self))]"
+						tooltip = "REMOVE_COMPANY_DESC"
+
+						blockoverride "icon_size" { size = { 65% 65% } }
+
+						blockoverride "icon" {
+							texture = "gfx/interface/icons/military_icons/disband_formation.dds"
+						}
+					}
+				}	
+
+				### EXECUTIVE CHARACTER
+				container = {
+					parentanchor = hcenter
+					#position = { -350 -70 }
+					maximumsize = { 280 265 } # This maximumsize is to make the button for this portrait not overlap other widgets around it
+					datacontext = "[Company.AccessExecutive]"
+					#visible = no
+					tooltipwidget = {
+						FancyTooltip_Character = {}
+					}
+
+					icon = {
+						texture = "gfx/interface/character_panel/ceo_character_frame.dds"
+						#alwaystransparent = yes
+						size = { 180 240 }
+						alpha = 0.9
+					}
+
+					character_portrait_base = {
+						parentanchor = hcenter
+						size = { 140 240 }
+
+						blockoverride "portrait_size" {
+							block "character_portrait_size" {
+								size = { 100 100  }
+							}
+						}
+
+						blockoverride "portrait_position" {
+							position = { 0 -10 }
+						}
+
+						blockoverride "portrait_texture" {
+							portrait_texture = "[Character.GetAnimatedPortrait('pop_environment', 'camera_body', 'idle', PdxGetWidgetScreenSize(PdxGuiWidget.Self))]"
+						}
+
+						blockoverride "portrait_mask" {
+							mask = "gfx/interface/character_panel/ceo_portrait_mask.dds"
+							size = { 180 240 }
+							alpha = 0.9
+						}
+
+						blockoverride "portrait_icons" {}
+						blockoverride "show_hat" {}
+						blockoverride "highlight" {}
+
+						blockoverride "portrait_button" {
+							button = {
+								parentanchor = hcenter
+								size = { 100% 100% }
+
+								block "portrait_button_onclick" {
+									onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+								}
+
+								block "portrait_button_onrightclick" {
+									onrightclick = "[RightClickMenuManager.ShowForCharacter(Character.AccessSelf)]"
+								}
+
+								onmousehierarchyenter = "[AccessHighlightManager.HighlightCharacter( GetPlayer.GetRuler )]"
+								onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+							}
+						}
+					}
+				}
+
+				
+			}
+
+			### RIGHT SIDE INFO LIST
+			### TOP SCROLL AREA
+			widget = {
+				position = { 10 0 }
+				size = { 320 450 }
+				parentanchor = vcenter
+
+				hbox = {
+					scrollarea = {
+						layoutpolicy_vertical = preferred
+						layoutpolicy_horizontal = preferred
+						maximumsize = { 320 450 }
+
+						scrollbarpolicy_horizontal = always_off
+
+						scrollbar_vertical = {
+							using = vertical_scrollbar
+						}
+
+						scrollwidget = {
+
+							### INFO LIST
+							vbox = {
+								#visible = no
+								layoutpolicy_horizontal = expanding
+								layoutpolicy_vertical = expanding
+								#minimumsize = { 280 80 }
+								spacing = 5
+								margin_top = 20
+								margin_left = 20
+
+								background =  {
+									using = entry_bg_fancy_dark
+									alpha = 0.3
+								}	
+
+								### HQ
+								company_info_item = {
+									datacontext = "[Company.GetBuilding]"
+
+									blockoverride "header" {
+										text = "[concept_company_hq]"
+									}
+
+									blockoverride "info_text" {
+										raw_text = "[Building.GetState.GetCountry.GetFlagTextIcon] [Building.GetState.GetName]"
+									}
+
+									blockoverride "after_info" {
+										button_icon_goto = {
+											size = { 26 26 }
+											using = tooltip_above
+											tooltip = "GO_TO_BUTTON_COMPANY_HQ"
+											onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
+										}
+									}
+								}
+
+								### EXECUTIVE
+								company_info_item = {
+									datacontext = "[Company.GetExecutive]"
+
+									blockoverride "header" {
+										text = "[concept_executive]"
+									}
+
+									blockoverride "info_text" {
+										text = "[Character.GetFullName]"
+									}
+
+									blockoverride "after_info" {
+										button_icon_goto = {
+											size = { 26 26 }
+											using = tooltip_above
+											tooltip = "GO_TO_BUTTON_CHARACTER"
+											onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+										}
+									}
+								}
+
+								### PRESTIGE GOOD
+								company_info_item = {
+									visible = "[Not(IsDataModelEmpty(Company.GetPrestigeGoods))]"
+									tooltip = "COMPANY_PRODUCING_PRESTIGE_GOODS_TOOLTIP"
+									blockoverride "header" {
+										text = "COMPANY_PRODUCING_PRESTIGE_GOODS_HEADER"
+									}
+
+									blockoverride "info" {
+										dynamicgridbox = {
+											flipdirection = yes
+											datamodel_wrap = 6
+											datamodel = "[Company.GetPrestigeGoods]"
+											
+											item = {
+												icon = {
+													size = { 40 40 }
+													alpha = "[TransparentIfFalse(Company.IsProducingPrestigeGoods)]"
+													texture = "[Goods.GetTexture]"
+													
+													tooltipwidget = {
+														FancyTooltip_Goods = {}
+													}
+												}
+											}
+										}
+									}
+								}
+
+								### BUILDING TYPES
+								company_info_item = {
+									blockoverride "header" {
+										text = "COMPANY_AVAILABLE_INDUSTRIES_CONCEPT"
+									}
+
+									blockoverride "bottom_divider" {}
+
+									blockoverride "info" {
+										vbox = {
+											spacing = 2
+
+											### ALL AVAILABLE BUILDING TYPES
+											hbox = {
+												layoutpolicy_horizontal = expanding
+
+												dynamicgridbox = {
+													flipdirection = yes
+													datamodel_wrap = 4
+													datamodel = "[Company.GetBuildingTypes]"
+
+													item = {
+														icon = {
+															size = { 70 70 }
+															texture = "[BuildingType.GetIcon]"
+
+															icon = {
+																visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																parentanchor = right
+																size = { 30 30 }
+																texture = "gfx/interface/backgrounds/round_button_bg.dds"
+															
+
+																icon = {
+																	visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																	parentanchor = center
+																	size = { 75% 75% }
+																	texture = "gfx/interface/icons/company_charter_icons/trade_charter.dds"
+																}
+															}	
+
+															icon = {
+																visible = "[Company.HasAdditionalIndustry(BuildingType.Self)]"
+																parentanchor = right
+																size = { 30 30  }
+																texture = "gfx/interface/backgrounds/round_button_bg.dds"
+															
+
+																icon = {
+																	visible = "[Company.HasAdditionalIndustry(BuildingType.Self)]"
+																	parentanchor = center
+																	size = { 75% 75% }
+																	texture = "gfx/interface/icons/company_charter_icons/industry_charter.dds"
+																}
+															}	
+
+															tooltipwidget = {
+																FancyTooltip_BuildingType = {
+																	blockoverride "tooltip_content_before" {
+																		custom_tooltip_textbox_with_empty_line = {
+																			visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																			text = "BUILDING_TYPE_ICON_TRADE_CHARTER"
+																		}
+
+																		custom_tooltip_textbox_with_empty_line = {
+																			visible = "[Company.HasAdditionalIndustry(BuildingType.Self)]"
+																			text = "BUILDING_TYPE_ICON_ADDITIONAL_INDUSTRY"
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+
+												expand = {}
+											}
+
+											### MONOPOLY BUILDING TYPES
+											hbox = {
+												visible = "[And(Company.HasAnyMonopolyCharterActive, HasDlcFeature('mp1_monopolies'))]"
+												layoutpolicy_horizontal = expanding
+
+												hbox = {
+													margin = { 7 5 }
+													spacing = 5
+													tooltip = "MONOPOLY_CHARTER_BUILDING_TYPES_TOOLTIP"
+
+													background = {
+														using = entry_bg
+													}
+
+													icon = {
+														size = { 40 40 }
+														texture = "gfx/interface/backgrounds/round_button_bg.dds"
+
+														icon = {
+															parentanchor = center
+															size = { 75% 75% }
+															texture = "gfx/interface/icons/company_charter_icons/monopoly_charter.dds"
+														}
+
+													}
+
+													
+
+													dynamicgridbox = {
+														flipdirection = yes
+														datamodel = "[Company.GetMonopolyBuildingTypes]"
+
+														item = {
+															icon = {
+																size = { 40 40 }
+																texture = "[BuildingType.GetIcon]"
+															}
+														}
+													}
+												}
+
+												expand = {}
+											}
+
+											### MONOPOLIES EMPTY STATE
+											hbox = {
+												visible = "[And(Not(Company.HasAnyMonopolyCharterActive), HasDlcFeature('mp1_monopolies'))]"
+												layoutpolicy_horizontal = expanding
+
+												textbox = {
+													align = nobaseline
+													autoresize = yes
+													multiline = yes
+													max_width = 250
+													fontsize_min = 14
+													using = empty_state_text_properties
+													text = "NO_COMPANY_MONOPOLIES"
+												}
+
+												expand = {}
+											}
+										}
+
+										expand = {}
+									}
+								}
+
+								expand = {}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		### HEADER - PROSPERITY & PRODUCTIVITY
+		default_header = {
+			blockoverride "text" {
+				text = "COMPANY_PROSPERITY_AND_PRODUCTIVITY_HEADER"
+			}
+			blockoverride "size" {
+				size = { @panel_width_plus_14 38 }
+			}
+		}
+
+		### PROSPERITY PROGRESSBAR & BONUSES
+		flowcontainer = {
+			parentanchor = hcenter
+			direction = vertical
+
+			flowcontainer = {
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 5
+				tooltip = "COMPANY_PROSPERITY_TOOLTIP"
+
+				widget = {
+					size = { @panel_width_minus_10 20 }
+
+					### PRODUCTIVITY
+					textbox = {
+						parentanchor = vcenter|left
+						align = nobaseline
+						autoresize = yes
+						elide = right
+						fontsize_min = 14
+						max_width = 250
+						text = "COMPANY_PRODUCTIVITY"
+					}
+
+					### PROFIT
+					textbox = {
+						parentanchor = vcenter|right
+						align = nobaseline
+						autoresize = yes
+						elide = right
+						fontsize_min = 14
+						max_width = 250
+						text = "COMPANY_PROFIT"
+						tooltip = "COMPANY_TREND_PROFIT_TOOLTIP"
+					}
+				}
+
+				### PROSPERITY PROGRESSBAR
+				widget = {
+					parentanchor = right
+					size = { @panel_width_minus_10 40 }
+					
+					### PROSPERITY TEXT
+					blockoverride "on_top_of_the_progressbar" {
+						textbox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							elide = right
+							fontsize_min = 14
+							max_width = 520
+							margin_left = 4
+							text = "COMPANY_PROSPERITY_FORMATTED"
+						}
+					}
+
+					changed_value_increased_progressbar_horizontal = {
+						visible = "[And(GreaterThan_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+						size = { 100% 100% }
+
+						blockoverride "values" {
+							min = 0
+							max = "[GetDefine('NEconomy','COMPANY_PROSPERITY_MAX')]"
+							value = "[Company.GetProsperity]"
+						}
+
+						blockoverride "animate_negative_change" {
+							animate_negative_changes = no
+						}
+
+						blockoverride "arrow_texture_density" {
+							texture_density = 4 #use to match height of progressbar
+						}
+					}
+
+					changed_value_decreased_progressbar_horizontal = {
+						visible = "[And(LessThan_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+						size = { 100% 100% }
+
+						blockoverride "values" {
+							min = 0
+							max = "[GetDefine('NEconomy','COMPANY_PROSPERITY_MAX')]"
+							value = "[Company.GetProsperity]"
+						}
+
+						blockoverride "arrow_texture_density" {
+							texture_density = 4 #use to match height of progressbar
+						}
+					}
+
+					default_progressbar_horizontal = {
+						visible = "[Or(EqualTo_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), GreaterThanOrEqualTo_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+						size = { 100% 100% }
+
+						blockoverride "values" {
+							min = 0
+							max = "[GetDefine('NEconomy','COMPANY_PROSPERITY_MAX')]"
+							value = "[Company.GetProsperity]"
+						}
+					}
+
+					default_progressbar_horizontal = {
+						visible = "[NotEqualTo_CFixedPoint(Company.GetProsperity, Company.GetTargetProsperity)]"
+						size = { 100% 100% }
+						alpha = 0.2
+
+						blockoverride "values" {
+							min = 0
+							max = "[GetDefine('NEconomy','COMPANY_PROSPERITY_MAX')]"
+							value = "[Company.GetTargetProsperity]"
+						}
+
+						blockoverride "background" {}
+
+						blockoverride  "frame" {}
+					}
+				}
+			}
+
+			### PROSPERITY BONUS MODIFIERS
+			textbox = {
+				parentanchor = hcenter
+				margin = { 10 10 }
+				autoresize = yes
+				multiline = yes
+				max_width = @panel_width_minus_10
+				minimumsize = { @panel_width_minus_10 20 }
+				elide = right
+				fontsize_min = 14
+				alpha = "[TransparentIfFalse(Company.IsProsperous)]"
+				text = "COMPANY_PROSPERITY_MODIFIER"
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				icon = {
+					visible = "[Company.IsProsperous]"
+					using = highlighted_square_selection
+				}
+			}
+		}
+
+		### HEADER - REGIONAL HQs & COLONIES
+		default_header = {
+			visible = "[HasDlcFeature('mp1_charter_companies')]"
+
+			blockoverride "text" {
+				text = "REGIONAL_HQS_AND_COLONIES"
+			}
+
+			blockoverride "size" {
+				size = { @panel_width_plus_14 38 }
+			}
+		}
+
+		### REGIONAL HQs & COLONIES
+		flowcontainer = {
+			visible = "[HasDlcFeature('mp1_charter_companies')]"
+			parentanchor = hcenter
+			spacing = 10
+
+			### LEFT SIDE - COLONIES AND COUNTRIES
+			flowcontainer = {
+				direction = vertical
+				minimumsize = { 250 -1 }
+				margin = { 10 10 }
+				spacing = 5
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				### COUNTRIES HEADER
+				textbox = {
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					text = "COMPANY_COUNTRIES_HEADER"
+				}
+
+				### COUNTRIES EMPTY STATE
+				textbox = {
+					visible = "[IsDataModelEmpty(Company.GetOwnedCountries)]"
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					using = empty_state_text_properties
+					text = "NO_COMPANY_COUNTRIES"
+				}
+
+				### COUNTRIES
+				flowcontainer = {
+					visible = "[Not(IsDataModelEmpty(Company.GetOwnedCountries))]"
+					spacing = 5
+					wrap_count = 5
+					datamodel = "[Company.GetOwnedCountries]"
+
+					item = {
+						tiny_flag = {}
+					}
+				}
+
+				divider_clean = {
+					blockoverride "size" {
+						size = { 250 2 }
+					}
+				}
+
+				### COLONIES HEADER
+				textbox = {
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					text = "COMPANY_COLONIES_HEADER"
+				}
+
+				### COLONIES EMPTY STATE
+				textbox = {
+					visible = "[IsDataModelEmpty(Company.GetColonies)]"
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					using = empty_state_text_properties
+					text = "NO_OWNED_COLONIES"
+				}
+
+				### COLONIES
+				flowcontainer = {
+					visible = "[Not(IsDataModelEmpty(Company.GetColonies))]"
+					direction = vertical
+					spacing = 5
+					datamodel = "[Company.GetColonies]"
+
+					item = {
+						widget = {
+							size = { 250 30 }
+
+							### STATE NAME & BUTTON
+							button = {
+								size = { 145 30 }
+								using = default_button
+								onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+								tooltip = "GO_TO_BUTTON_STATE"
+								using = tooltip_above
+
+								textbox = {
+									parentanchor = vcenter
+									position = { 10 0 }
+									autoresize = yes
+									align = nobaseline
+									elide = right
+									fontsize_min = 14
+									max_width = 105
+									text = "[State.GetNameNoFormatting]"
+								}
+							}
+
+							### COLONY PROGRESSBAR
+							widget = {
+								parentanchor = vcenter|right
+								size = { 100 30 }
+								tooltip = "STATE_COLONY_TOOLTIP"
+
+								default_progressbar_horizontal = {
+									parentanchor = center
+									size = { 100% 15 }
+									blockoverride "values" {
+										value = "[State.GetColonyProgressAsFloat]"
+										min = 0
+										max = 1
+									}
+								}
+
+								textbox = {
+									visible = "[And(Not(State.IsColonyProgressBlockedByInactiveInterest), GreaterThan_int32(State.GetColonyProgressAsDays, '(int32)-1'))]"
+									parentanchor = center
+									autoresize = yes
+									align = nobaseline
+									elide = right
+									fontsize_min = 12
+									max_width = 100
+									text = "COMPANY_COLONY_DAYS_LEFT"
+								}
+
+								textbox = {
+									visible = "[Or(State.IsColonyProgressBlockedByInactiveInterest, Not(GreaterThan_int32( State.GetColonyProgressAsDays, '(int32)-1')))]"
+									parentanchor = center
+									autoresize = yes
+									align = nobaseline
+									elide = right
+									fontsize_min = 12
+									max_width = 100
+									text = "NO_PROGRESS"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			### RIGHT SIDE - REGIONAL HQS
+			flowcontainer = {
+				direction = vertical
+				minimumsize = { 250 -1 }
+				margin = { 10 10 }
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				### REGIONAL HQS HEADER
+				textbox = {
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					text = "COMPANY_REGIONAL_HQS_HEADER"
+				}
+
+				### REGIONAL HQS EMPTY STATE
+				textbox = {
+					visible = "[IsDataModelEmpty(Company.GetRegionalHQs)]"
+					align = nobaseline
+					autoresize = yes
+					elide = right
+					fontsize_min = 14
+					max_width = 240
+					using = empty_state_text_properties
+					text = "NO_REGIONAL_HQS"
+				}
+
+				### REGIONAL HQS
+				flowcontainer = {
+					visible = "[Not(IsDataModelEmpty(Company.GetRegionalHQs))]"
+					direction = vertical
+					spacing = 5
+					datamodel = "[Company.GetRegionalHQs]"
+
+					item = {
+						widget = {
+							size = { 250 40 }
+
+							button = {
+								size = { 250 40 }
+								using = default_button
+								onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
+								tooltip = "GO_TO_BUTTON_BUILDING"
+
+								tiny_flag_no_interact = {
+									parentanchor = vcenter
+									position = { 10 0 }
+									datacontext = "[Building.GetState.GetOwner]"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									margin_left = 50
+									autoresize = yes
+									align = nobaseline
+									elide = right
+									fontsize_min = 14
+									max_width = 240
+									text = "[Building.GetState.GetNameNoFormatting]"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	type company_panel_assets_tab = flowcontainer {
+		direction = vertical
+		using = default_list_position
+		using = default_content_fade
+		spacing = 5
+
+		### COMPANY HQ
+		flowcontainer = {
+			using = default_list_position
+			direction = vertical
+			datacontext = "[Company.GetBuilding]"
+
+			company_hq_assets_item = {}
+		}
+
+		### REGIONAL HQs
+		flowcontainer = {
+			visible = "[HasDlcFeature('mp1_charter_companies')]"
+			using = default_list_position
+			direction = vertical
+			datamodel = "[Company.GetRegionalHQs]"
+
+			item = {
+				company_hq_assets_item = {
+					blockoverride "header_text" {
+						text = "COMPANY_REGIONAL_HQ_HEADER"
+					}
+				}
+			}
+		}
+
+		### COLONIES & COUNTRIES
+		flowcontainer = {
+			visible = "[HasDlcFeature('mp1_charter_companies')]"
+			using = default_list_position
+			direction = vertical
+			spacing = 10
+
+			default_header = {
+				blockoverride "text" {
+					block "header_text" {
+						text = "COMPANY_COUNTRIES_AND_COLONIES_HEADER"
+					}
+				}
+			}
+
+			empty_state = {
+				blockoverride "visible" {
+					visible = "[And(IsDataModelEmpty(Company.GetColonies), IsDataModelEmpty(Company.GetOwnedCountries))]"
+				}
+
+				blockoverride "text" {
+					text = "NO_COUNTRIES_OR_COLONIES"
+				}
+			}
+
+			### COUNTRIES
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(Company.GetOwnedCountries))]"
+				using = default_list_position
+				direction = vertical
+				spacing = 5
+				datamodel = "[Company.GetOwnedCountries]"
+
+				item = {
+					container = {
+						independent_company_country_item = {
+							visible = "[Not(Country.IsSubject)]"
+						}
+
+						subject_list_item = {
+							visible = "[Country.IsSubject]"
+
+							blockoverride "impose_law_dropdown_visibility" {
+								visible = "[Company.GetCountry.IsLocalPlayer]"
+							}
+						}
+					}
+				}
+			}
+
+			divider_decorative = {
+				visible = "[And(Not(IsDataModelEmpty(Company.GetColonies)), Not(IsDataModelEmpty(Company.GetOwnedCountries)))]"
+			}
+
+			### COLONIES
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(Company.GetColonies))]"
+				using = default_list_position
+				direction = vertical
+				spacing = 5
+				datamodel = "[Company.GetColonies]"
+
+				item = {
+					widget = {
+						size = { @panel_width 40 }
+
+						divider_clean = {
+							parentanchor = bottom|hcenter
+						}
+
+						### STATE NAME & BUTTON
+						button = {
+							size = { 265 30 }
+							position = { 5 0 }
+							using = default_button
+							onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+							tooltip = "GO_TO_BUTTON_STATE"
+							using = tooltip_above
+
+							button = {
+								parentanchor = vcenter
+								size = { 30 30 }
+								alwaystransparent = yes
+								texture = "gfx/interface/icons/lens_toolbar_icons/colony.dds"
+							}
+
+							textbox = {
+								parentanchor = vcenter
+								position = { 32 0 }
+								autoresize = yes
+								align = nobaseline
+								elide = right
+								fontsize_min = 14
+								max_width = 220
+								text = "[State.GetNameNoFormatting]"
+							}
+						}
+
+						### COLONY PROGRESSBAR
+						widget = {
+							parentanchor = right
+							position = { -10 0 }
+							size = { 255 30 }
+							tooltip = "STATE_COLONY_TOOLTIP"
+
+							default_progressbar_horizontal = {
+								parentanchor = center
+								size = { 100% 20 }
+
+								blockoverride "values" {
+									value = "[State.GetColonyProgressAsFloat]"
+									min = 0
+									max = 1
+								}
+							}
+
+							textbox = {
+								visible = "[And(Not(State.IsColonyProgressBlockedByInactiveInterest), GreaterThan_int32(State.GetColonyProgressAsDays, '(int32)-1'))]"
+								parentanchor = center
+								autoresize = yes
+								align = nobaseline
+								elide = right
+								fontsize_min = 12
+								max_width = 200
+								text = "COMPANY_COLONY_DAYS_LEFT"
+							}
+
+							textbox = {
+								visible = "[Or(State.IsColonyProgressBlockedByInactiveInterest, Not(GreaterThan_int32( State.GetColonyProgressAsDays, '(int32)-1')))]"
+								parentanchor = center
+								autoresize = yes
+								align = nobaseline
+								elide = right
+								fontsize_min = 12
+								max_width = 200
+								text = "NO_PROGRESS"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	type independent_company_country_item = flowcontainer {
+		direction = vertical
+		parentanchor = hcenter
+
+		widget = {
+			size = { @panel_width_minus_10 70 }
+
+			background = {
+				using = fade_right_colored
+				color = "[Country.GetMapColor]"
+				using = frame_small_mask
+			}
+
+			using = entry_bg_fancy
+
+			fancy_flag_ui = {
+				parentanchor = vcenter
+				size = { 60 45 }
+				position = { 20 0 }
+
+				blockoverride "overlay_button_and_bg_glow_position" {
+					position = { -9 -4 }
+				}
+
+				blockoverride "rank_badge_block" {}
+			}
+
+			flowcontainer = {
+				parentanchor = vcenter
+				position = { 90 0 }
+				spacing = 15
+
+				flowcontainer = {
+					parentanchor = vcenter
+					direction = vertical
+
+					textbox = {
+						minimumsize = { 225 -1 }
+						maximumsize = { 225 -1 }
+						autoresize = yes
+						align = nobaseline
+						elide = right
+						fontsize_min = 12
+						using = fontsize_large
+						raw_text = "[Country.GetNameNoFlag]"
+					}
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						raw_text = "[Country.GetDefinition.GetTier]"
+					}
+				}
+			}
+
+			### OTHER ACTIVE PACTS WITH THIS SUBJECT
+			flowcontainer = {
+				parentanchor = right|vcenter
+				position = { -10 0 }
+
+				dynamicgridbox = {
+					parentanchor = vcenter
+					layoutanchor = topright
+					flipdirection = yes
+					datamodel_wrap = 4
+					datamodel = "[AccessPlayer.GetNonSubjectDiplomaticPactsWith(Country.Self)]"
+
+					item = {
+						widget = {
+							size = { 40 40 }
+
+							icon = {
+								parentanchor = center
+								size = { 80% 80% }
+								datacontext = "[DiplomaticPact.GetDiplomaticActionType]"
+								texture = "[DiplomaticActionType.GetTexture]"
+
+								tooltipwidget = {
+									FancyTooltip_DiplomaticActionType = {
+										blockoverride "text_before_before" {
+											visible = "[GreaterThan_CFixedPoint(DiplomaticActionType.GetMaintenanceCost(GetPlayer.Self, Country.Self), '(CFixedPoint)0')]"
+											text = "DIPLOMATIC_ACTION_TYPE_COST"
+											margin_bottom = 15
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			rank_badge = {
+				size = { 45 45 }
+				position = { -15 -15 }
+
+				blockoverride "datacontext " {}
+
+				blockoverride "font_size_under_100_rank" {
+					using = fontsize_medium
+				}
+			}
+		}
+	}
+
+	type company_hq_assets_item = flowcontainer {
+		visible = "[Not(IsDataModelEmpty(Building.GetBuildingAssets))]"
+		using = default_list_position
+		direction = vertical
+		minimumsize = { @panel_width -1 }
+
+		default_header = {
+			blockoverride "text" {
+				block "header_text" {
+					text = "COMPANY_HQ_HEADER"
+				}
+			}
+
+			blockoverride "additional_items_right_of_text" {
+				button_icon_goto = {
+					size = { 26 26 }
+					using = tooltip_above
+					tooltip = "GO_TO_BUTTON_COMPANY_HQ"
+					onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
+				}
+			}
+		}
+
+		flowcontainer = {
+			margin_top = 5
+			margin_bottom = 5
+			parentanchor = hcenter
+
+			property_portfolio_stacked_bar_chart = {}
+		}
+
+		# Sorting
+		flowcontainer = {
+			parentanchor = hcenter
+			sort_button = {
+				size = { 280 30 }
+				text = "BUILDING"
+				align = left|nobaseline
+				onclick = "[Building.SortBuildings('name')]"
+			}
+			
+			sort_button = {
+				size = { 120 30 }
+				text = "OWNED"
+				align = left|nobaseline
+				onclick = "[Building.SortBuildings('level')]"
+			}
+			
+			sort_button = {
+				size = { 70 30 }
+				tooltip = "BUILDING_PROFITABILITY_HEADER_TOOLTIP"
+				icon = {
+					texture = "gfx/interface/buttons/sort_button_icons/sort_icon_profitability.dds"
+					size = { 25 25 }
+					parentanchor = center
+				}
+				align = left|nobaseline
+				onclick = "[Building.SortBuildings('earnings_per_employee')]"
+			}
+
+			sort_button = {
+				size = { 70 30 }
+				text = "DIVIDENDS"
+				align = left|nobaseline
+				onclick = "[Building.SortBuildings('dividend')]"
+			}
+		}
+
+		# Assets
+		flowcontainer = {
+			datamodel = "[Building.GetBuildingAssets]"
+			parentanchor = hcenter
+			spacing = 3
+			direction = vertical
+			margin_top = 3
+			margin_bottom = 10
+			
+			item = {
+				container = {
+					background = {
+						using = fade_right_entry_header_colored
+						color = "[Select_CVector4f( BuildingOwnership.GetOwnedBuilding.IsValid, BuildingOwnership.GetOwnedBuilding.GetState.GetOwner.GetMapColor, Building.GetOwner.GetMapColor )]"
+						margin_top = 4
+						margin_left = 5
+					}
+
+					flowcontainer = {
+						visible = "[BuildingOwnership.GetOwnedBuilding.IsValid]"
+						tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
+						margin_bottom = 4
+						icon = {
+							size = { 30 30 }
+							texture = "[BuildingOwnership.GetOwnedBuilding.GetIcon]"
+						}
+						flowcontainer = {
+							spacing = 5
+							minimumsize = { 250 30 }
+							textbox = {
+								maximumsize = { 220 30 }
+								text = "PROPERTY_SHARE_ENTRY_LABEL"
+								align = nobaseline
+								fontsize_min = 12
+								elide = right
+								margin_left = 5
+								autoresize = yes
+								parentanchor = vcenter
+							}
+							button_icon_goto = {
+								size = { 25 25 }
+								onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(BuildingOwnership.GetOwnedBuilding.AccessSelf)]"
+								visible = "[Building.IsValid]"
+								tooltip = "GO_TO_BUTTON_BUILDING"
+								parentanchor = vcenter
+							}
+						}
+						
+						textbox = {
+							size = { 120 30 }
+							text = "[BuildingOwnership.GetLevel|v]"
+							align = right|nobaseline
+							margin_right = 5
+							fontsize_min = 12
+							elide = right
+						}
+						
+						textbox = {
+							datacontext = "[BuildingOwnership.GetOwnedBuilding]"
+							size = { 70 30 }
+							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+							align = left|nobaseline
+							margin_left = 5
+							using = productivity_tooltip_with_graph
+						}
+
+						textbox = {
+							size = { 70 30 }
+							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [BuildingOwnership.GetDividendToOwner|D]"
+							tooltip = "BUILDING_OWNERSHIP_DIVIDENDS_TOOLTIP"
+							align = left|nobaseline
+							default_format = "#v"
+						}
+					}
+					
+					flowcontainer = {
+						visible = "[Not(BuildingOwnership.GetOwnedBuilding.IsValid)]"
+						tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
+						margin_bottom = 4
+						minimumsize = { 250 30 }
+						
+						textbox = {
+							size = { 120 30 }
+							text = "BUILDING_OWNERSHIP_INVALID_ENTRY"
+							align = right|nobaseline
+							margin_right = 5
+							fontsize_min = 12
+							elide = right
+						}
+					}
+					
+					divider_clean = {
+						parentanchor = bottom|hcenter
+						size = { 100% 1 }
+					}
+				}
+			}
+		}
+	}
+
+	type company_panel_statistics_tab = flowcontainer {
+		direction = vertical
+		spacing = 5
+		using = default_content_fade
+
+		flowcontainer = {
+			parentanchor = hcenter
+
+			### PRODUCTIVITY TREND
+			v3_plotline = {
+				blockoverride "size" {
+					size = { 175 100 }
+					tooltip = "COMPANY_PROSPERITY_TOOLTIP"
+				}
+
+				blockoverride "text_max_width" {
+					max_width = 175
+				}
+
+				blockoverride "multiline" {
+					fontsize_min = 12
+					elide = right
+				}
+
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+
+				blockoverride "header" {
+					text = "PRODUCTIVITY_TREND"
+				}
+
+				blockoverride "line_plotpoints" {
+					plotpoints = "[GetTrendPlotPointsNormalized(Company.GetProductivityTrend, '(CFixedPoint)0', GetMax(Company.GetProductivityTrend))]"
+				}
+
+				blockoverride "maxvalue" {
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetMax(Company.GetProductivityTrend)|Dv]"
+				}
+
+				blockoverride "minvalue" {
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')] 0"
+				}
+
+				blockoverride "startdate" {
+					text = "[GetOldestDate(Company.GetProductivityTrend)]"
+				}
+
+				blockoverride "enddate" {
+					text = "[GetLatestDate(Company.GetProductivityTrend)]"
+				}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(Company.GetProductivityTrend)]"
+				}
+
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(Company.GetProductivityTrend))]"
+				}
+
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+
+			### PROSPERITY TREND
+			v3_plotline = {
+				blockoverride "size" {
+					size = { 175 100 }
+					tooltip = "COMPANY_PROSPERITY_TOOLTIP"
+				}
+
+				blockoverride "text_max_width" {
+					max_width = 175
+				}
+
+				blockoverride "multiline" {
+					fontsize_min = 12
+					elide = right
+				}
+
+				blockoverride "line_color" {
+					color = { 1.0 .8 .0 1.0 }
+				}
+
+				blockoverride "header" {
+					text = "PROSPERITY_TREND"
+				}
+
+				blockoverride "line_plotpoints" {
+					plotpoints = "[GetTrendPlotPointsNormalized(Company.GetProsperityTrend, '(CFixedPoint)0', GetMax(Company.GetProsperityTrend))]"
+				}
+
+				blockoverride "maxvalue" {
+					raw_text = "#v [GetMax(Company.GetProsperityTrend)|0]#!"
+				}
+
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+
+				blockoverride "startdate" {
+					text = "[GetOldestDate(Company.GetProsperityTrend)]"
+				}
+
+				blockoverride "enddate" {
+					text = "[GetLatestDate(Company.GetProsperityTrend)]"
+				}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(Company.GetProsperityTrend)]"
+				}
+
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(Company.GetProsperityTrend))]"
+				}
+
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+		}
+
+		### PROFIT TREND
+		v3_plotline = {
+			margin_top = 0
+
+			blockoverride "size" {
+				size = { 430 100 }
+				tooltip = "COMPANY_TREND_PROFIT_TOOLTIP"
+			}
+
+			blockoverride "margins" {
+				margin_bottom = 40
+				margin_left = 70
+				margin_right = 30
+			}
+
+			blockoverride "text_max_width" {
+				max_width = 175
+			}
+
+			blockoverride "multiline" {
+				fontsize_min = 12
+				elide = right
+			}
+
+			blockoverride "header" {
+				text = "PROFIT_TREND"
+			}
+
+			blockoverride "multiitem" {}
+
+			blockoverride "line_color" {
+				color = { 1.0 0.674 0.454 1.0 }
+			}
+
+			blockoverride "line_plotpoints" {
+				plotpoints = "[GetTrendPlotPointsNormalized(Company.GetProfitTrend, Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetProfitTrend)), Max_CFixedPoint(GetMax(Company.GetRevenueTrend), GetMax(Company.GetProfitTrend)))]"
+			}
+
+			blockoverride "maxvalue" {
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Max_CFixedPoint(GetMax(Company.GetRevenueTrend), GetMax(Company.GetProfitTrend))|=+D]"
+			}
+
+			blockoverride "minvalue" {
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetRevenueTrend))|=+D]"
+			}
+
+			blockoverride "startdate" {
+				text = "[GetOldestDate(Company.GetRevenueTrend)]"
+			}
+
+			blockoverride "enddate" {
+				text = "[GetLatestDate(Company.GetRevenueTrend)]"
+			}
+
+			blockoverride "empty_state_visibility" {
+				visible = "[IsEmpty(Company.GetRevenueTrend)]"
+			}
+
+			blockoverride "everything_that_is_not_empty_state_visibility" {
+				visible = "[Not(IsEmpty(Company.GetRevenueTrend))]"
+			}
+
+			blockoverride "empty_state_text" {
+				text = "GRAPH_NOT_INITIALIZED"
+			}
+		}
+
+		### BUILDING TYPES TREND
+		flowcontainer = {
+			parentanchor = hcenter
+			wrap_count = 2
+			datamodel = "[Company.GetBuildingTypesForTrends]"
+
+			### SIZE TREND
+			v3_plotline = {
+				margin_top = 0
+
+				blockoverride "size" {
+					size = { 175 100 }
+					tooltip = "COMPANY_TREND_SIZE_TOOLTIP"
+				}
+
+				blockoverride "header" {
+					text = "SIZE_TREND"
+				}
+
+				blockoverride "text_max_width" {
+					max_width = 175
+				}
+
+				blockoverride "multiline" {
+					fontsize_min = 12
+					elide = right
+				}
+
+				blockoverride "line_color" {
+					color = { .0 0.765 .878 0.5 }
+				}
+
+				blockoverride "line_plotpoints" {
+					plotpoints = "[GetTrendPlotPointsNormalized(Company.GetSizeTrend, '(CFixedPoint)0', GetMax(Company.GetSizeTrend))]"
+				}
+
+				blockoverride "maxvalue" {
+					text = "[GetMax(Company.GetSizeTrend)|0v]"
+				}
+
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+
+				blockoverride "startdate" {
+					text = "[GetOldestDate(Company.GetSizeTrend)]"
+				}
+
+				blockoverride "enddate" {
+					text = "[GetLatestDate(Company.GetSizeTrend)]"
+				}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(Company.GetSizeTrend)]"
+				}
+
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(Company.GetSizeTrend))]"
+				}
+
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+
+			### BUILDING TYPE TREND
+			item = {
+				v3_plotline = {
+					margin_top = 0
+
+					blockoverride "size" {
+						size = { 175 100 }
+						tooltip = "COMPANY_TREND_BUILDING_TYPE_TOOLTIP"
+					}
+
+					blockoverride "text_max_width" {
+						max_width = 175
+					}
+
+					blockoverride "multiline" {
+						fontsize_min = 12
+						elide = right
+					}
+
+					blockoverride "header" {
+						text = "[BuildingType.GetName]"
+					}
+
+					blockoverride "before_text" {
+						margin_bottom = -2.3
+
+						icon = {
+							parentanchor = vcenter
+							size = { 28 28 }
+							texture = "[BuildingType.GetIcon]"
+						}
+					}
+
+					blockoverride "line_color" {
+						color = { .9 .9 .9 1.0 }
+					}
+
+					blockoverride "line_plotpoints" {
+						plotpoints = "[GetTrendPlotPointsNormalized(Company.GetTrendForBuildingType(BuildingType.Self), '(CFixedPoint)0', GetMax(Company.GetTrendForBuildingType(BuildingType.Self)))]"
+					}
+
+					blockoverride "maxvalue" {
+						text = "[GetMax(Company.GetTrendForBuildingType(BuildingType.Self))|0v]"
+					}
+
+					blockoverride "minvalue" {
+						raw_text = "0"
+					}
+
+					blockoverride "startdate" {
+						text = "[GetOldestDate(Company.GetTrendForBuildingType(BuildingType.Self))]"
+					}
+
+					blockoverride "enddate" {
+						text = "[GetLatestDate(Company.GetTrendForBuildingType(BuildingType.Self))]"
+					}
+
+					blockoverride "empty_state_visibility" {
+						visible = "[IsEmpty(Company.GetTrendForBuildingType(BuildingType.Self))]"
+					}
+
+					blockoverride "everything_that_is_not_empty_state_visibility" {
+						visible = "[Not(IsEmpty(Company.GetTrendForBuildingType(BuildingType.Self)))]"
+					}
+
+					blockoverride "empty_state_text" {
+						text = "GRAPH_NOT_INITIALIZED"
+					}
+				}
+			}
+		}
+	}
+
+	### HORIZONTAL COMPANY CHARTER BUTTON
+	type company_charter_button_horizontal = button {
+		size = { 520 60 }
+		using = tooltip_nw
+
+		block "charter_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_CompanyCharterType = {
+					blockoverride "tooltip_content_before" {
+						custom_tooltip_textbox = {
+							visible = "[CompanyCharterType.IsTargettingBuildings]"
+							text = "COMPANY_CHARTER_AVAILABLE_BUILDING_TYPES_NUMBER"
+						}
+
+						custom_tooltip_textbox = {
+							visible = "[CompanyCharterType.IsTargettingRegions]"
+							text = "COMPANY_CHARTER_AVAILABLE_REGIONS_NUMBER"
+						}
+
+						custom_tooltip_textbox_with_empty_line = {
+							visible = "[Or(CompanyCharterType.IsTargettingBuildings, CompanyCharterType.IsTargettingRegions)]"
+							text = "COMPANY_CHARTER_ACTIVE_NUMBER"
+						}
+
+						custom_tooltip_textbox_with_empty_line = {
+							datacontext = "[Company.GetCountry]"
+							text = "USING_X_FREE_CHARTERS"
+						}
+					}
+				}
+			}
+		}
+
+		block "onclick" {
+			onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+		}
+
+		### BOTTOM BUTTON
+		button = {
+			size = { 95% 50 }
+			parentanchor = vcenter|right
+
+			block "button_style" {
+				using = default_button_action
+			}
+
+			block "onclick" {
+				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+			}
+
+			widget = {
+				size = { 100% 100% }
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+						align = nobaseline
+						multiline = yes
+						elide = right
+						using = fontsize_large
+						margin_left = 40
+						fontsize_min = 12
+						text = "[CompanyCharterType.GetNameNoFormatting]"
+					}
+				}
+			}
+
+			icon = {
+				using = highlighted_square_selection
+
+				block "highlight_visibility" {
+					visible = no
+				}
+			}
+
+			### GREEN AVAILABLE NUMBER - BUILDINGS
+			textbox = {
+				visible = "[CompanyCharterType.IsTargettingBuildings]"
+				parentanchor = right
+				default_format = "#b"
+				using = tooltip_above
+				align = hcenter|nobaseline
+				using = fontsize_large
+				autoresize = yes
+				position = { -10 2 }
+				raw_text = "[GetDataModelSize(CompanyCharterType.GetPotentialBuildings(Company.Self))|+]"
+
+				background = {
+					using = blurry_dark_background
+					margin = { 5 5 }
+				}
+			}
+
+			### GREEN AVAILABLE NUMBER - REGIONS
+			textbox = {
+				visible = "[CompanyCharterType.IsTargettingRegions]"
+				parentanchor = right
+				default_format = "#b"
+				using = tooltip_above
+				align = hcenter|nobaseline
+				using = fontsize_large
+				autoresize = yes
+				position = { -10 2 }
+				raw_text = "[GetDataModelSize(CompanyCharterType.GetPotentialRegions(Company.Self))|+]"
+
+				background = {
+					using = blurry_dark_background
+					margin = { 5 5 }
+				}
+			}
+
+			### BLUE ACTIVE NUMBER
+			textbox = {
+				visible = "[And(Or(CompanyCharterType.IsTargettingBuildings, CompanyCharterType.IsTargettingRegions), Not(IsDataModelEmpty(Company.GetActiveCharters(CompanyCharterType.Self))))]"
+				parentanchor = bottom|right
+				default_format = "#b"
+				using = tooltip_above
+				align = hcenter|nobaseline
+				using = fontsize_large
+				autoresize = yes
+				position = { -10 -2 }
+				raw_text = "[GetDataModelSize(Company.GetActiveCharters(CompanyCharterType.Self))|u]"
+
+				background = {
+					using = blurry_dark_background
+					margin = { 5 5 }
+				}
+			}
+		}
+
+		### TOP FRAME - MADE INTO A BUTTON TO MAINTAIN THE BUTTON HIGHLIGHT WHEN HOVERED
+		button = {
+			size = { 60 60 }
+			parentanchor = vcenter
+			alwaystransparent = yes
+			texture = "gfx/interface/backgrounds/round_frame_dec.dds" #ingela
+
+			block "onclick" {
+				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+			}
+			
+			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
+			button = {
+				size = { 75% 75% }
+				parentanchor = center
+				alwaystransparent = yes
+				texture = "[CompanyCharterType.GetIcon]"
+
+				block "onclick" {
+					onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+				}
+			}
+		}
+	}
+
+	### HORIZONTAL COMPANY CHARTER - ACTIVE
+	type company_charter_active_widget_horizontal = widget {
+		size = { 520 60 }
+		using = tooltip_nw
+
+		tooltipwidget = {
+			FancyTooltip_CompanyCharterType = {
+				blockoverride "tooltip_content_before" {
+					custom_tooltip_textbox = {
+						text = "COMPANY_CHARTER_TYPE_IS_ACTIVE"
+					}
+
+					custom_tooltip_textbox_with_empty_line = {
+						text = "COMPANY_CHARTER_AUTHORITY_COST"
+					}
+					custom_tooltip_textbox_with_empty_line = {
+						datacontext = "[Company.GetCountry]"
+						text = "USING_X_FREE_CHARTERS"
+					}
+				}
+			}
+		}
+
+		### BOTTOM BUTTON
+		widget = {
+			size = { 95% 50 }
+			parentanchor = vcenter|right
+
+			background = {
+				using = paper_bg
+			}
+
+			widget = {
+				size = { 100% 100% }
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+						align = hcenter|nobaseline
+						multiline = yes
+						elide = right
+						fontsize_min = 12
+						text = "[CompanyCharterType.GetNameNoFormatting]"
+					}
+				}
+			}
+
+			icon = {
+				using = highlighted_square_selection
+			}
+
+			close_button = {
+				visible = "[CompanyCharterType.IsInvestmentCharter]"
+				parentanchor = vcenter|right
+				position = { -10 0 }
+				enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+				onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_revoke')]"
+				using = tooltip_above
+
+				blockoverride "sound" {
+					using = icon_toggle_single_off_sound
+				}
+
+				blockoverride "tooltip" {
+					tooltip = "REMOVE_COMPANY_CHARTER_INVESTMENT_RIGHTS"
+				}
+			}
+
+			close_button = {
+				visible = "[CompanyCharterType.IsTradeCharter]"
+				parentanchor = vcenter|right
+				position = { -10 0 }
+				enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+				onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_revoke')]"
+				using = tooltip_above
+
+				blockoverride "sound" {
+					using = icon_toggle_single_off_sound
+				}
+
+				blockoverride "tooltip" {
+					tooltip = "REMOVE_COMPANY_CHARTER_TRADE_RIGHTS"
+				}
+			}
+		}
+
+		### TOP FRAME - MADE INTO A BUTTON TO MAINTAIN THE BUTTON HIGHLIGHT WHEN HOVERED
+		icon = {
+			size = { 60 60 }
+			parentanchor = vcenter
+			alwaystransparent = yes
+			texture = "gfx/interface/backgrounds/round_frame_dec.dds" #ingela
+
+			block "onclick" {
+				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+			}
+			
+			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
+			button = {
+				size = { 75% 75% }
+				parentanchor = center
+				alwaystransparent = yes
+				texture = "[CompanyCharterType.GetIcon]"
+
+				block "onclick" {
+					onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+				}
+			}
+		}
+	}
+
+	### COMPANY CHARTER BUTTON
+	type company_charter_button = button {
+		size = { 100 160 }
+		using = tooltip_nw
+
+		block "charter_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_CompanyCharterType = {
+					blockoverride "tooltip_content_before" {
+						custom_tooltip_textbox = {
+							visible = "[CompanyCharterType.IsTargettingBuildings]"
+							text = "COMPANY_CHARTER_AVAILABLE_BUILDING_TYPES_NUMBER"
+						}
+
+						custom_tooltip_textbox = {
+							visible = "[CompanyCharterType.IsTargettingRegions]"
+							text = "COMPANY_CHARTER_AVAILABLE_REGIONS_NUMBER"
+						}
+
+						custom_tooltip_textbox_with_empty_line = {
+							visible = "[Or(CompanyCharterType.IsTargettingBuildings, CompanyCharterType.IsTargettingRegions)]"
+							text = "COMPANY_CHARTER_ACTIVE_NUMBER"
+						}
+
+						custom_tooltip_textbox_with_empty_line = {
+							datacontext = "[Company.GetCountry]"
+							text = "USING_X_FREE_CHARTERS"
+						}
+					}
+				}
+			}
+		}
+
+		block "onclick" {
+			onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+		}
+
+		### BOTTOM BUTTON
+		button = {
+			size = { 100% 70% }
+			parentanchor = hcenter|bottom
+
+			block "button_style" {
+				using = default_button_action
+			}
+
+			block "onclick" {
+				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+			}
+
+			widget = {
+				parentanchor = hcenter|bottom
+				size = { 90 70 }
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+						align = hcenter|nobaseline
+						multiline = yes
+						elide = right
+						fontsize_min = 12
+						text = "[CompanyCharterType.GetNameNoFormatting]"
+					}
+				}
+			}
+
+			icon = {
+				using = highlighted_square_selection
+
+				block "highlight_visibility" {
+					visible = no
+				}
+			}
+		}
+
+		### TOP FRAME - MADE INTO A BUTTON TO MAINTAIN THE BUTTON HIGHLIGHT WHEN HOVERED
+		button = {
+			size = { 100 100 }
+			parentanchor = hcenter
+			alwaystransparent = yes
+			texture = "gfx/interface/backgrounds/round_frame_dec.dds" #ingela
+
+			block "onclick" {
+				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+			}
+			
+			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
+			button = {
+				size = { 75% 75% }
+				parentanchor = center
+				alwaystransparent = yes
+				texture = "[CompanyCharterType.GetIcon]"
+
+				block "onclick" {
+					onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
+				}
+			}
+		}
+
+		### GREEN AVAILABLE NUMBER - BUILDINGS
+		textbox = {
+			visible = "[CompanyCharterType.IsTargettingBuildings]"
+			parentanchor = vcenter
+			default_format = "#b"
+			using = tooltip_above
+			align = hcenter|nobaseline
+			using = fontsize_large
+			autoresize = yes
+			position = { 10 10 }
+			raw_text = "[GetDataModelSize(CompanyCharterType.GetPotentialBuildings(Company.Self))|+]"
+
+			background = {
+				using = blurry_dark_background
+				margin = { 5 5 }
+			}
+		}
+
+		### GREEN AVAILABLE NUMBER - REGIONS
+		textbox = {
+			visible = "[CompanyCharterType.IsTargettingRegions]"
+			parentanchor = vcenter
+			default_format = "#b"
+			using = tooltip_above
+			align = hcenter|nobaseline
+			using = fontsize_large
+			autoresize = yes
+			position = { 10 10 }
+			raw_text = "[GetDataModelSize(CompanyCharterType.GetPotentialRegions(Company.Self))|+]"
+
+			background = {
+				using = blurry_dark_background
+				margin = { 5 5 }
+			}
+		}
+
+		### BLUE ACTIVE NUMBER
+		textbox = {
+			visible = "[And(Or(CompanyCharterType.IsTargettingBuildings, CompanyCharterType.IsTargettingRegions), Not(IsDataModelEmpty(Company.GetActiveCharters(CompanyCharterType.Self))))]"
+			parentanchor = vcenter|right
+			default_format = "#b"
+			using = tooltip_above
+			align = hcenter|nobaseline
+			using = fontsize_large
+			autoresize = yes
+			position = { -10 10 }
+			raw_text = "[GetDataModelSize(Company.GetActiveCharters(CompanyCharterType.Self))|u]"
+
+			background = {
+				using = blurry_dark_background
+				margin = { 5 5 }
+			}
+		}
+	}
+
+	### COMPANY CHARTER ACTIVE
+	type company_charter_active_widget = widget {
+		size = { 100 160 }
+		using = tooltip_nw
+
+		tooltipwidget = {
+			FancyTooltip_CompanyCharterType = {
+				blockoverride "tooltip_content_before" {
+					custom_tooltip_textbox = {
+						text = "COMPANY_CHARTER_TYPE_IS_ACTIVE"
+					}
+
+					custom_tooltip_textbox_with_empty_line = {
+						text = "COMPANY_CHARTER_AUTHORITY_COST"
+					}
+					custom_tooltip_textbox_with_empty_line = {
+						datacontext = "[Company.GetCountry]"
+						text = "USING_X_FREE_CHARTERS"
+					}
+				}
+			}
+		}
+
+		### BOTTOM BUTTON
+		widget = {
+			size = { 100% 70% }
+			parentanchor = hcenter|bottom
+
+			background = {
+				using = paper_bg
+			}
+
+			widget = {
+				parentanchor = hcenter|bottom
+				size = { 90 70 }
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+						align = hcenter|nobaseline
+						multiline = yes
+						elide = right
+						fontsize_min = 12
+						text = "[CompanyCharterType.GetNameNoFormatting]"
+					}
+				}
+			}
+
+			icon = {
+				using = highlighted_square_selection
+			}
+		}
+
+		### TOP FRAME - MADE INTO A BUTTON TO MAINTAIN THE BUTTON HIGHLIGHT WHEN HOVERED
+		icon = {
+			size = { 100 100 }
+			parentanchor = hcenter
+			alwaystransparent = yes
+			texture = "gfx/interface/backgrounds/round_frame_dec.dds" #ingela
+			
+			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
+			icon = {
+				size = { 75% 75% }
+				parentanchor = center
+				alwaystransparent = yes
+				texture = "[CompanyCharterType.GetIcon]"
+			}
+		}
+
+		close_button = {
+			visible = "[CompanyCharterType.IsInvestmentCharter]"
+			position = { -5 -5 }
+			enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+			onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_revoke')]"
+			using = tooltip_above
+
+			blockoverride "sound" {
+				using = icon_toggle_single_off_sound
+			}
+
+			blockoverride "tooltip" {
+				tooltip = "REMOVE_COMPANY_CHARTER_INVESTMENT_RIGHTS"
+			}
+		}
+
+		close_button = {
+			visible = "[CompanyCharterType.IsTradeCharter]"
+			position = { -5 -5 }
+			enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
+			onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_revoke')]"
+			using = tooltip_above
+
+			blockoverride "sound" {
+				using = icon_toggle_single_off_sound
+			}
+
+			blockoverride "tooltip" {
+				tooltip = "REMOVE_COMPANY_CHARTER_TRADE_RIGHTS"
+			}
+		}
+	}
+}

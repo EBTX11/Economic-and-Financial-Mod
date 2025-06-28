@@ -89,11 +89,11 @@ types country_panel_types
 {
 	type country_panel = default_block_window_two_lines {
 		name = "country_panel"
-		datacontext = "[CountryPanel.AccessCountry]"
+		datacontext = "[CountryPanel.GetCountry]"
 
 		blockoverride "window_header_name"
 		{
-			raw_text = "#BOLD [Country.GetNameNoFlag]#!"
+			raw_text = "[LabelingHelper.CapitalizeOnlyFirst(Country.GetNameNoFormatting)]"
 		}
 		blockoverride "window_header_name_line_two"
 		{
@@ -102,9 +102,9 @@ types country_panel_types
 
 		blockoverride "goto_button" {
 			button_icon_goto = {
-				datacontext = "[CountryPanel.AccessCountry.AccessFirstMarket]"
+				datacontext = "[CountryPanel.GetCountry.AccessFirstMarket]"
 				size = { 30 30 }
-				onclick = "[InformationPanelBar.OpenMarketPanel(Market.AccessSelf)]"
+				onclick = "[InformationPanelBar.OpenMarketPanel(Market.Self)]"
 				tooltip = "GO_TO_BUTTON_MARKET"
 				input_action = "go_to_details"
 			}
@@ -124,6 +124,13 @@ types country_panel_types
 			visible = "[Not(Country.IsPinnedInOutliner)]"
 			onclick = "[Country.TogglePinInOutliner]"
 			tooltip = "PIN_COUNTRY"
+		}
+
+		blockoverride "map_modes_button" {
+			map_modes_single_button_minimized = {
+				datacontext = "[CountryPanel.GetMapModeList]"
+				using = map_modes_button_position
+			}
 		}
 
 		blockoverride "fixed_top"
@@ -237,6 +244,62 @@ types country_panel_types
 			}
 		}
 
+		blockoverride "fixed_bottom" {
+			flowcontainer = {
+				visible = "[Not(Country.IsLocalPlayer)]"
+				direction = vertical
+				spacing = 5
+
+				divider_clean = {
+					size = { @panel_width_plus_14 4 }
+				}
+
+				background = {
+					using = dark_area
+				}
+
+				widget = {
+					size = { 5 5 }
+				}
+
+				button = {
+					parentanchor = hcenter
+					size = { 540 50 }
+					using = default_button_primary
+					onclick = "[InformationPanelBar.OpenTreatyDraftPanelForNewDraft(GetPlayer.Self, Country.Self)]"
+					enabled = "[GetPlayer.CanSignTreatyWith(Country.Self)]"
+					tooltip = "TREATY_CAN_SIGN_WITH"
+
+					flowcontainer = {
+						parentanchor = center
+						spacing = 5
+
+						icon = {
+							parentanchor = vcenter
+							size = { 40 40 }
+							texture = "gfx/interface/icons/generic_icons/diplomatic_treaties.dds"
+						}
+
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							align = nobaseline
+							using = elide_fontsize_min
+							max_width = 450
+							using = fontsize_large
+							text = "DRAFT_A_TREATY"
+						}
+					}
+				}
+
+				widget = {
+					size = { 5 5 }
+				}
+			}
+		}
+
+		blockoverride "bottom_spacing" {}
+
 		blockoverride "scrollarea_content"
 		{
 			container = {
@@ -274,11 +337,32 @@ types country_panel_types
 			visible = yes
 		}
 
-		blockoverride "goto_properties" {
-			onclick = "[Country.AccessCapital.ZoomToCapital]"
-			tooltip = "ZOOM_TO_COUNTRY_CAPITAL"
-			enabled = "[Not( Country.AccessCapital.IsZoomingToCapital )]"
+		blockoverride "custom_goto_button" {
+			onmousehierarchyenter = "[SetCanOpenRightClickContextMenu( '(bool)no' )]"
+			onmousehierarchyleave = "[SetCanOpenRightClickContextMenu( '(bool)yes' )]"
+			datacontext = "[Country.AccessCapital]"
+
+			button_icon_zoom = {
+				onclick = "[State.ZoomToCapital]"
+				onrightclick = "[GetVariableSystem.Toggle('zoom_close_to_capital')]"			
+				visible = "[Not(GetVariableSystem.Exists('zoom_close_to_capital'))]"
+
+				tooltip = "ZOOM_TO_STATE"
+				input_action = "zoom_to"
+				size = { 100% 100% }
+			}
+
+			button_icon_zoom = {
+				onclick = "[State.ZoomExtraCloseToCapital]"
+				onrightclick = "[GetVariableSystem.Toggle('zoom_close_to_capital')]"			
+				visible = "[GetVariableSystem.Exists('zoom_close_to_capital')]"
+
+				tooltip = "ZOOM_CLOSE_TO_STATE"
+				input_action = "zoom_to"
+				size = { 100% 100% }
+			}
 		}
+
 	}
 
 	type country_panel_information_content = flowcontainer {
@@ -423,7 +507,7 @@ types country_panel_types
 					}
 
 					dynamicgridbox = {
-						datamodel = "[CountryPanel.AccessCountry.AccessInterestGroupsInGovernment]"
+						datamodel = "[CountryPanel.GetCountry.AccessInterestGroupsInGovernment]"
 						datamodel_wrap = 4
 						flipdirection = yes
 
@@ -570,6 +654,47 @@ types country_panel_types
 					}
 				}
 
+				#COMPANY
+				country_stats_entry = {
+					visible = "[Country.HasOwningCompany]"
+					datacontext = "[Country.GetOwningCompany]"
+
+					blockoverride "stats_tooltip" {
+						tooltipwidget = {
+							FancyTooltip_Company = {}
+						}
+					}
+
+					### COMPANY ICON
+					blockoverride "entire_icon" {
+						button_icon_round = {
+							parentanchor = right|vcenter
+							position = { -5 0 }
+							onclick = "[InformationPanelBar.OpenCompanyPanel(Company.Self)]"
+
+							blockoverride "size" {
+								size = { 45 45 }
+							}
+
+							blockoverride "icon_size" {
+								size = { 65% 65% }
+							}
+
+							blockoverride "icon" {
+								texture = "[Company.GetCompanyType.GetIcon]"
+							}
+						}
+					}
+
+					blockoverride "stats_label" {
+						text = "[concept_company]"
+					}
+
+					blockoverride "stats_value" {
+						text = "[Company.GetNameNoIcon]"
+					}
+				}
+
 				#POWER BLOC
 				country_stats_entry = {
 					visible = "[Country.IsInPowerBloc]"
@@ -588,7 +713,6 @@ types country_panel_types
 							position = { -5 0 }
 							onclick = "[InformationPanelBar.OpenPowerBlocPanelTab( PowerBloc.Self, 'default' )]"
 							onrightclick = "[RightClickMenuManager.ShowForPowerBloc( PowerBloc.AccessSelf )]"
-							onclick = "[PowerBlocPanel.ShowLeverage]"
 
 							blockoverride "size" {
 								size = { 45 45 }
@@ -785,7 +909,7 @@ types country_panel_types
 						text = "COUNTRY_GDP_ONE_LINE"
 					}
 					blockoverride "stats_value" {
-						raw_text = "[Country.GetCustom('currency_symbol')] [Country.GetGDP|Dv]"
+						raw_text = "[Country.GetCustom('currency_symbol')][Country.GetGDP|Dv]"
 					}
 
 					blockoverride "stats_rank" {
@@ -1441,7 +1565,7 @@ types diplomatic
 
 	type overlord = flowcontainer {
 		direction = vertical
-		minimumsize = { @panel_width_plus_14 -1 }
+		minimumsize = { @panel_width -1 }
 
 		background = {
 			texture = "gfx/state_pictures/urban_european_overlord.dds"
@@ -2063,7 +2187,7 @@ types diplomatic
 		flowcontainer = {
 			parentanchor = hcenter
 			direction = vertical
-			spacing = 15
+			spacing = 10
 
 			### WARS
 			default_header = {
@@ -2076,9 +2200,11 @@ types diplomatic
 				blockoverride "visible" {
 					visible = "[And(IsDataModelEmpty(Country.AccessWars), IsDataModelEmpty(Country.AccessActiveDiplomaticPlays))]"
 				}
+
 				blockoverride "text" {
 					text = "NO_WARS_OR_DIPLOMATIC_PLAYS"
 				}
+
 				blockoverride "margin" {
 					margin_top = 10
 					margin_bottom = 10
@@ -2117,14 +2243,16 @@ types diplomatic
 					direction = vertical
 					spacing = 5
 
-				item = {
-					diplomatic_play_item = {
-						visible = yes
+					item = {
+						diplomatic_play_item = {
+							visible = yes
+						}
 					}
 				}
 			}
-		}
 
+			### TREATIES
+			treaties_country_list = {}
 
 			### DIPLOMATIC STATUS
 			flowcontainer = {
@@ -2162,6 +2290,1121 @@ types diplomatic
 	}
 }
 
+types country_panel_treaties_types
+{
+	type treaties_country_list = flowcontainer {
+		parentanchor = hcenter
+		direction = vertical
+		spacing = 5
+
+		default_header = {
+			blockoverride "text" {
+				text = "TREATIES_HEADER"
+			}
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				block "treaties_empty_state_visibility" {
+					visible = "[IsDataModelEmpty(Country.GetInForceTreaties)]"
+				}
+			}
+
+			blockoverride "text" {
+				text = "NO_ACTIVE_TREATIES"
+			}
+
+			blockoverride "margin" {
+				margin_top = 10
+				margin_bottom = 10
+			}
+		}
+
+		block "multiplayer_lobby_treaties" {}
+
+		block "diplomacy_panel_treaties" {}
+
+		flowcontainer = {
+			block "treaties_dropdown_visibility" {
+				visible = "[Not(IsDataModelEmpty(Country.GetInForceTreaties))]"
+			}
+
+			parentanchor = hcenter
+			direction = vertical
+			spacing = 2
+
+			### YOUR TREATIES WITH THIS COUNTRY
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(Country.GetTreatiesWith(GetPlayer.Self)))]"
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 2
+
+				### YOUR TREATIES WITH THIS COUNTRY - DROPDOWN
+				section_header_button = {
+					visible = "[Not(Country.IsLocalPlayer)]"
+
+					blockoverride "layout" {
+						parentanchor = hcenter
+						size = { @panel_width 38 }
+					}
+
+					blockoverride "left_text" {
+						text = "YOUR_TREATIES_WITH_COUNTRY"
+						using = elide_fontsize_min
+					}
+
+					blockoverride "right_text" {
+						flowcontainer = {
+							spacing = 5
+
+							flowcontainer = {
+								visible = "[Not(IsDataModelEmpty(Country.GetEnforcedTreatiesWith(GetPlayer.Self)))]"
+								parentanchor = vcenter
+								spacing = 2
+								margin_right = 10
+
+								icon = {
+									parentanchor = vcenter
+									size = { 30 27 }
+									texture = "gfx/interface/outliner/war_button_icon.dds"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									autoresize = yes
+									elide = right
+									alwaystransparent = yes
+									fontsize_min = 12
+									raw_text = "#v [GetDataModelSize(Country.GetEnforcedTreatiesWith(GetPlayer.Self))]#!"
+								}
+							}
+
+							flowcontainer = {
+								parentanchor = vcenter
+								spacing = 2
+								margin_right = 10
+								alpha = "[TransparentIfTrue(IsDataModelEmpty(Country.GetUnenforcedTreatiesWith(GetPlayer.Self)))]"
+								
+								icon = {
+									parentanchor = vcenter
+									size = { 30 30 }
+									texture = "gfx/interface/icons/generic_icons/diplomatic_treaties.dds"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									autoresize = yes
+									elide = right
+									alwaystransparent = yes
+									fontsize_min = 12
+									raw_text = "#v [GetDataModelSize(Country.GetUnenforcedTreatiesWith(GetPlayer.Self))]#!"
+								}
+							}
+						}
+					}
+
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle(Concatenate(Concatenate('show_treaties_', Country.GetIDString), GetPlayer.GetIDString))]"
+					}
+
+					blockoverride "onclick_showmore" {
+						visible = "[GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), GetPlayer.GetIDString))]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[Not(GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), GetPlayer.GetIDString)))]"
+					}
+				}
+
+				flowcontainer = {
+					visible = "[And(Not(Country.IsLocalPlayer), Not(GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), GetPlayer.GetIDString))))]"
+					parentanchor = hcenter
+					direction = vertical
+					spacing = 2
+
+					### YOUR ENFORCED TREATIES WITH THIS COUNTRY - LIST
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(Country.GetEnforcedTreatiesWith(GetPlayer.Self)))]"
+						parentanchor = hcenter
+						direction = vertical
+						spacing = 2
+						datamodel = "[Country.GetEnforcedTreatiesWith(GetPlayer.Self)]"
+
+						item = {
+							container = {
+								compact_treaty_item = {
+									visible = "[Not(Treaty.IsEnforced)]"
+								}
+
+								compact_war_reparation_treaty_item = {
+									visible = "[Treaty.IsEnforced]"
+								}
+							}
+						}
+					}
+
+					### YOUR ENFORCED TREATIES WITH THIS COUNTRY - LIST
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(Country.GetUnenforcedTreatiesWith(GetPlayer.Self)))]"
+						parentanchor = hcenter
+						direction = vertical
+						spacing = 2
+						datamodel = "[Country.GetUnenforcedTreatiesWith(GetPlayer.Self)]"
+
+						item = {
+							container = {
+								compact_treaty_item = {
+									visible = "[Not(Treaty.IsEnforced)]"
+								}
+
+								compact_war_reparation_treaty_item = {
+									visible = "[Treaty.IsEnforced]"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			### OTHER COUNTRIES - DROPDOWNS
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(CountryPanel.GetCountry.GetCountriesWithTreaties))]"
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 2
+				datamodel = "[CountryPanel.GetCountry.GetCountriesWithTreaties]"
+
+				item = {
+					treaty_country_dropdown = {
+						visible = "[Not(Country.IsLocalPlayer)]"
+					}
+				}
+			}
+		}
+	}
+
+	type treaty_country_dropdown = flowcontainer {
+		direction = vertical
+
+		### COUNTRY NAME DROPDOWN
+		section_header_button = {
+			tooltip = "TREATIES_WITH_COUNTRY_TOOLTIP"
+
+			blockoverride "layout" {
+				parentanchor = hcenter
+				size = { @panel_width 38 }
+			}
+
+			blockoverride "left_text" {
+				text = "TREATIES_WITH_OTHER_COUNTRY_NAME_HEADER"
+				using = elide_fontsize_min
+			}
+
+			blockoverride "right_text" {
+				flowcontainer = {
+					spacing = 10
+
+					flowcontainer = {
+						parentanchor = vcenter
+						spacing = 2
+						datamodel = "[CountryPanel.GetCountry.GetUnenforcedTreatiesWith(Country.Self)]"
+
+						item = {
+							flowcontainer = {
+								datamodel = "[Treaty.GetMutualAgreements]"
+
+								item = {
+									article_icon_all_items = {
+										blockoverride "article_size" {
+											size = { 30 30 }
+										}
+
+										blockoverride "icon_size" {
+											size = { 30 30 }
+										}
+									}
+								}
+							}
+						}
+					}
+
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(CountryPanel.GetCountry.GetEnforcedTreatiesWith(Country.Self)))]"
+						parentanchor = vcenter
+						spacing = 2
+						margin_right = 10
+
+						icon = {
+							parentanchor = vcenter
+							size = { 30 27 }
+							texture = "gfx/interface/outliner/war_button_icon.dds"
+						}
+
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							elide = right
+							alwaystransparent = yes
+							fontsize_min = 12
+							raw_text = "#v [GetDataModelSize(CountryPanel.GetCountry.GetEnforcedTreatiesWith(Country.Self))]#!"
+						}
+					}
+
+					flowcontainer = {
+						parentanchor = vcenter
+						spacing = 2
+						margin_right = 10
+						alpha = "[TransparentIfTrue(IsDataModelEmpty(CountryPanel.GetCountry.GetUnenforcedTreatiesWith(Country.Self)))]"
+						
+						icon = {
+							parentanchor = vcenter
+							size = { 30 30 }
+							texture = "gfx/interface/icons/generic_icons/diplomatic_treaties.dds"
+						}
+						
+						textbox = {
+							parentanchor = vcenter
+							autoresize = yes
+							elide = right
+							alwaystransparent = yes
+							fontsize_min = 12
+							raw_text = "#v [GetDataModelSize(CountryPanel.GetCountry.GetUnenforcedTreatiesWith(Country.Self))]#!"
+						}
+					}
+				}
+			}
+
+			blockoverride "onclick" {
+				onclick = "[GetVariableSystem.Toggle(Concatenate(Concatenate('show_treaties_', Country.GetIDString), CountryPanel.GetCountry.GetIDString))]"
+			}
+
+			blockoverride "onclick_showmore" {
+				visible = "[Not(GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), CountryPanel.GetCountry.GetIDString)))]"
+			}
+
+			blockoverride "onclick_showless" {
+				visible = "[GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), CountryPanel.GetCountry.GetIDString))]"
+			}
+		}
+
+		### TREATIES
+		flowcontainer = {
+			visible = "[GetVariableSystem.Exists(Concatenate(Concatenate('show_treaties_', Country.GetIDString), CountryPanel.GetCountry.GetIDString))]"
+			parentanchor = hcenter
+			direction = vertical
+			spacing = 2
+
+			### ENFORCED TREATIES WITH THIS COUNTRY - LIST
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(CountryPanel.GetCountry.GetEnforcedTreatiesWith(Country.Self)))]"
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 2
+				datamodel = "[CountryPanel.GetCountry.GetEnforcedTreatiesWith(Country.Self)]"
+
+				item = {
+					container = {
+						compact_treaty_item = {
+							visible = "[Not(Treaty.IsEnforced)]"
+						}
+
+						compact_war_reparation_treaty_item = {
+							visible = "[Treaty.IsEnforced]"
+						}
+					}
+				}
+			}
+
+			### NOT ENFORCED TREATIES WITH THIS COUNTRY - LIST
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(CountryPanel.GetCountry.GetUnenforcedTreatiesWith(Country.Self)))]"
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 2
+				datamodel = "[CountryPanel.GetCountry.GetUnenforcedTreatiesWith(Country.Self)]"
+
+				item = {
+					container = {
+						compact_treaty_item = {
+							visible = "[Not(Treaty.IsEnforced)]"
+						}
+
+						compact_war_reparation_treaty_item = {
+							visible = "[Treaty.IsEnforced]"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	type compact_treaty_item = flowcontainer {
+		direction = vertical
+
+		block "full_background" {
+			using = entry_bg_fancy
+		}
+
+		# TREATY NAME & DURATION
+		widget = {
+			block "treaty_item_size" {
+				size = { @panel_width_minus_10 35 }
+			}
+
+			background = {
+				using = fade_center_colored_black
+			}
+
+			### NAME & GOTO BUTTON
+			flowcontainer = {
+				position = { 15 0 }
+				parentanchor = vcenter
+				spacing = 10
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					using = elide_fontsize_min
+					text = "[Treaty.GetName]"
+					
+					block "treaty_name_max_width" {
+						max_width = 300
+					}
+				}
+
+				block "treaty_go_to_button" {
+					button_icon_goto = {
+						parentanchor = vcenter
+						size = { 26 26 }
+						using = tooltip_ne
+						tooltip = "GO_TO_TREATY"
+						onclick = "[InformationPanelBar.OpenTreatyPanel( Treaty.Self )]"
+					}
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = vcenter|right
+				position = { -5 0 }
+				spacing = 5
+
+				block "binding_period" {
+					### BINDING PERIOD
+					textbox = {
+						visible = "[NotZero(Treaty.GetBindingDaysLeft)]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "[Treaty.GetBindingPeriodRemainingFormatted]"
+					}
+
+					### BINDING PERIOD HAS ENDED
+					textbox = {
+						visible = "[And(IsZero(Treaty.GetBindingDaysLeft), NotZero(Treaty.GetBindingDays))]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "TREATY_BINDING_PERIOD_HAS_ENDED_SHORT"
+					}
+
+					### NO BINDING PERIOD SET TO BEGIN WITH
+					textbox = {
+						visible = "[And(IsZero(Treaty.GetBindingDaysLeft), IsZero(Treaty.GetBindingDays))]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "TREATY_NO_BINDING_PERIOD"
+					}
+				}
+
+				block "treaty_pin_button" {
+					# pin button
+					widget = {
+						size = { 26 26 }
+						parentanchor = vcenter
+
+						button_icon_toggle_pin = {
+							name = "treaty_pin_button"
+							parentanchor = center
+
+							blockoverride "view_1" {
+								visible = "[Not(Treaty.IsPinnedInOutliner)]"
+							}
+
+							blockoverride "view_2" {
+								visible = "[Treaty.IsPinnedInOutliner]"
+							}
+
+							blockoverride "on_click" {
+								onclick = "[Treaty.TogglePinInOutliner]"
+							}
+						}
+					}
+				}
+			}
+		}
+
+		container = {
+			block "treaty_item_minimumsize" {
+				minimumsize = { @panel_width_minus_10 50 }
+			}
+
+			### MIDDLE BACKGROUND
+			background = {
+				using = fade_horizontal_center_colored
+				color = { .0 .0 .0 1 }
+			}
+
+			### LEFT BACKGROUND
+			icon = {
+				size = { 60% 100% }
+
+				background = {
+					using = fade_right_colored
+					color = "[Treaty.GetLeftCountry.GetMapColor]"
+
+					modify_texture = {
+						texture = "gfx/interface/backgrounds/entry_bg_mask.dds"
+						spriteType = Corneredstretched
+						spriteborder = { 45 45 }
+						spriteborder_bottom = 0
+						blend_mode = alphamultiply
+						texture_density = 2
+						mirror = vertical
+					}
+				}
+			}
+
+			### RIGHT BACKGROUND
+			icon = {
+				parentanchor = right
+				size = { 60% 100% }
+
+				background = {
+					using = fade_left_colored
+					color = "[Treaty.GetRightCountry.GetMapColor]"
+
+					modify_texture = {
+						texture = "gfx/interface/backgrounds/entry_bg_mask.dds"
+						spriteType = Corneredstretched
+						spriteborder = { 45 45 }
+						spriteborder_bottom = 0
+						blend_mode = alphamultiply
+						texture_density = 2
+						mirror = vertical
+					}
+				}
+			}
+
+			### LEFT SIDE ARTICLES
+			flowcontainer = {
+				margin = { 0 10 }
+				margin_left = 10
+				datacontext = "[Treaty.GetLeftCountry]"
+				alpha = "[TransparentIfTrue(NotZero(GetDataModelSize(Treaty.GetNonFulfilledArticlesFromSource(Treaty.GetOtherCountry(Country.Self).Self))))]"
+
+				dynamicgridbox = {
+					flipdirection = yes
+					datamodel = "[Treaty.GetOffers]"
+
+					block "treaty_item_articles_datamodel_wrap" {
+						datamodel_wrap = 3
+					}
+
+					item = {
+						article_icon_all_items = {}
+					}
+				}
+			}
+
+			### MIDDLE ARTICLES & FLAGS
+			flowcontainer = {
+				parentanchor = hcenter
+				margin = { 0 10 }
+				spacing = 10
+				
+				widget = {
+					visible = "[Treaty.GetLeftCountry.IsPlayer]"
+					parentanchor = vcenter
+					size = { 20 20 }
+				}
+
+				widget = {
+					visible = "[Not(Treaty.GetLeftCountry.IsPlayer)]"
+					size = { 20 20 }
+					parentanchor = vcenter
+					tooltip = "[Treaty.GetAcceptanceBreakdown(Treaty.GetLeftCountry.Self)]"
+
+					icon = {
+						visible = "[LessThan_int32(Treaty.GetAcceptance(Treaty.GetLeftCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
+						position = { -5 0 }
+					}
+
+					icon = {
+						visible = "[EqualTo_int32(Treaty.GetAcceptance(Treaty.GetLeftCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/undecided_icon.dds"
+						position = { -5 0 }
+					}
+
+					icon = {
+						visible = "[GreaterThan_int32(Treaty.GetAcceptance(Treaty.GetLeftCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
+						position = { -5 0 }
+					}
+				}				
+
+				### LEFT COUNTRY FLAG
+				flowcontainer = {
+					margin_top = 5
+
+					small_flag = {
+						datacontext = "[Treaty.GetLeftCountry]"
+
+						icon = {
+							visible = "[And(Treaty.DoesOweObligation(Country.Self), Treaty.AreObligationsEffectuated)]"
+							parentanchor = bottom|right
+							size = { 32 32 }
+							position = { 10 10 }
+							using = tooltip_se
+							tooltip = "TREATY_COUNTRY_HAS_OWED_OBLIGATION_WITH_EXPLANATION"
+							texture = "gfx/interface/icons/generic_icons/obligation_flipped.dds"
+						}
+
+						icon = {
+							visible = "[And(Treaty.DoesOweObligation(Country.Self), Not(Treaty.AreObligationsEffectuated))]"
+							parentanchor = bottom|right
+							size = { 32 32 }
+							position = { 10 10 }
+							using = tooltip_se
+							tooltip = "TREATY_COUNTRY_WILL_OWE_OBLIGATION_WITH_EXPLANATION"
+							texture = "gfx/interface/icons/generic_icons/obligation_flipped.dds"
+						}
+					}
+				}
+
+				### MUTUAL AGREEMENTS
+				dynamicgridbox = {
+					datacontext = "[Treaty.GetLeftCountry]"
+					datamodel = "[Treaty.GetMutualAgreements]"
+
+					item = {
+						article_icon_all_items = {}
+					}
+				}
+
+				### RIGHT COUNTRY FLAG
+				flowcontainer = {
+					margin_top = 5
+
+					small_flag = {
+						datacontext = "[Treaty.GetRightCountry]"
+
+						icon = {
+							visible = "[And(Treaty.DoesOweObligation(Country.Self), Treaty.AreObligationsEffectuated)]"
+							parentanchor = bottom
+							size = { 32 32 }
+							position = { -10 10 }
+							using = tooltip_se
+							tooltip = "TREATY_COUNTRY_HAS_OWED_OBLIGATION_WITH_EXPLANATION"
+							texture = "gfx/interface/icons/generic_icons/obligation_flipped.dds"
+						}
+
+						icon = {
+							visible = "[And(Treaty.DoesOweObligation(Country.Self), Not(Treaty.AreObligationsEffectuated))]"
+							parentanchor = bottom
+							size = { 32 32 }
+							position = { -10 10 }
+							using = tooltip_se
+							tooltip = "TREATY_COUNTRY_WILL_OWE_OBLIGATION_WITH_EXPLANATION"
+							texture = "gfx/interface/icons/generic_icons/obligation_flipped.dds"
+						}
+					}
+				}
+				
+				widget = {
+					visible = "[Treaty.GetRightCountry.IsPlayer]"
+					parentanchor = vcenter
+					size = { 20 20 }
+				}
+
+				widget = {
+					visible = "[Not(Treaty.GetRightCountry.IsPlayer)]"
+					size = { 20 20 }
+					parentanchor = vcenter
+					tooltip = "[Treaty.GetAcceptanceBreakdown(Treaty.GetRightCountry.Self)]"
+
+					icon = {
+						visible = "[LessThan_int32(Treaty.GetAcceptance(Treaty.GetRightCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
+						position = { -5 0 }
+					}
+
+					icon = {
+						visible = "[EqualTo_int32(Treaty.GetAcceptance(Treaty.GetRightCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/undecided_icon.dds"
+						position = { -5 0 }
+					}
+
+					icon = {
+						visible = "[GreaterThan_int32(Treaty.GetAcceptance(Treaty.GetRightCountry.Self), '(int32)0')]"
+						parentanchor = center
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
+						position = { -5 0 }
+					}
+				}				
+			}
+
+			### RIGHT SIDE ARTICLES
+			flowcontainer = {
+				parentanchor = right
+				margin = { 0 10 }
+				margin_right = 10
+				datacontext = "[Treaty.GetRightCountry]"
+				alpha = "[TransparentIfTrue(NotZero(GetDataModelSize(Treaty.GetNonFulfilledArticlesFromSource(Treaty.GetOtherCountry(Country.Self).Self))))]"
+
+				dynamicgridbox = {
+					layoutanchor = topright
+					flipdirection = yes
+					datamodel = "[Treaty.GetDemands]"
+
+					block "treaty_item_articles_datamodel_wrap" {
+						datamodel_wrap = 3
+					}
+
+					item = {
+						article_icon_all_items = {}
+					}
+				}
+			}
+		}
+	}
+
+	type compact_war_reparation_treaty_item = flowcontainer {
+		direction = vertical
+
+		block "full_background" {
+			using = entry_bg_fancy
+		}
+
+		# TREATY NAME & DURATION
+		widget = {
+			block "treaty_item_size" {
+				size = { @panel_width_minus_10 35 }
+			}
+
+			background = {
+				using = default_header_bg_faded
+				alpha = 0.5
+			}
+
+			### NAME & GOTO BUTTON
+			flowcontainer = {
+				position = { 10 0 }
+				parentanchor = vcenter
+				spacing = 5
+
+				icon = {
+					parentanchor = vcenter
+					size = { 30 27 }
+					texture = "gfx/interface/outliner/war_button_icon.dds"
+				}
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					using = elide_fontsize_min
+					text = "[Treaty.GetName]"
+					
+					block "treaty_name_max_width" {
+						max_width = 300
+					}
+				}
+
+				block "treaty_go_to_button" {
+					button_icon_goto = {
+						parentanchor = vcenter
+						size = { 26 26 }
+						using = tooltip_ne
+						tooltip = "GO_TO_TREATY"
+						onclick = "[InformationPanelBar.OpenTreatyPanel( Treaty.Self )]"
+					}
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = vcenter|right
+				position = { -5 0 }
+				spacing = 5
+
+				block "binding_period" {
+					### BINDING PERIOD
+					textbox = {
+						visible = "[NotZero(Treaty.GetBindingDaysLeft)]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "[Treaty.GetBindingPeriodRemainingFormatted]"
+					}
+
+					### BINDING PERIOD HAS ENDED
+					textbox = {
+						visible = "[And(IsZero(Treaty.GetBindingDaysLeft), NotZero(Treaty.GetBindingDays))]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "TREATY_BINDING_PERIOD_HAS_ENDED_SHORT"
+					}
+
+					### NO BINDING PERIOD SET TO BEGIN WITH
+					textbox = {
+						visible = "[And(IsZero(Treaty.GetBindingDaysLeft), IsZero(Treaty.GetBindingDays))]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = 122
+						using = elide_fontsize_min
+						text = "TREATY_NO_BINDING_PERIOD"
+					}
+				}
+
+				block "treaty_pin_button" {
+					# pin button
+					widget = {
+						size = { 26 26 }
+						parentanchor = vcenter
+
+						button_icon_toggle_pin = {
+							name = "treaty_pin_button"
+							parentanchor = center
+
+							blockoverride "view_1" {
+								visible = "[Not(Treaty.IsPinnedInOutliner)]"
+							}
+
+							blockoverride "view_2" {
+								visible = "[Treaty.IsPinnedInOutliner]"
+							}
+
+							blockoverride "on_click" {
+								onclick = "[Treaty.TogglePinInOutliner]"
+							}
+						}
+					}
+				}
+			}
+		}
+
+		### BOTTOM SECTION
+		container = {
+			block "treaty_item_minimumsize" {
+				minimumsize = { @panel_width_minus_10 50 }
+			}
+
+			### BACKGROUND
+			background = {
+				using = fade_top_entry_header_colored
+				color = "[Treaty.GetEnforcerCountry.GetMapColor]"
+			}
+
+			### MIDDLE COUNTRY FLAGS
+			flowcontainer = {
+				parentanchor = vcenter
+				margin = { 0 10 }
+				margin_left = 20
+				spacing = 10
+
+				### ENFORCER COUNTRY FLAG
+				small_flag = {
+					parentanchor = vcenter
+					datacontext = "[Treaty.GetEnforcerCountry]"
+				}
+
+				### ARROW
+				icon = {
+					parentanchor = vcenter
+					size = { 30 30 }
+					texture = "gfx/interface/icons/generic_icons/win_war_against.dds"
+				}
+
+				### ENFORCED COUNTRY FLAG
+				tiny_flag = {
+					parentanchor = vcenter
+					allow_outside = yes
+					datacontext = "[Treaty.GetEnforcedOnCountry]"
+
+					blockoverride "additional_flag_properties" {
+						button = {
+							parentanchor = vcenter|right
+							position = { 15 0 }
+							size = { 25 25 }
+							alwaystransparent = yes
+							texture = "gfx/interface/icons/generic_icons/capitulate.dds"
+						}
+					}
+				}
+			}
+
+			### RIGHT SIDE ARTICLES
+			flowcontainer = {
+				parentanchor = right
+				margin = { 0 10 }
+				margin_right = 10
+				datacontext = "[Treaty.GetEnforcedOnCountry]"
+
+				dynamicgridbox = {
+					visible = "[Country.IsLocalPlayer]"
+					layoutanchor = topright
+					flipdirection = yes
+					datamodel = "[Treaty.GetOffers]"
+
+					block "treaty_item_articles_datamodel_wrap" {
+						datamodel_wrap = 3
+					}
+
+					item = {
+						article_icon_all_items = {}
+					}
+				}
+
+				dynamicgridbox = {
+					visible = "[Not(Country.IsLocalPlayer)]"
+					layoutanchor = topright
+					flipdirection = yes
+					datamodel = "[Treaty.GetDemands]"
+
+					block "treaty_item_articles_datamodel_wrap" {
+						datamodel_wrap = 3
+					}
+
+					item = {
+						article_icon_all_items = {}
+					}
+				}
+			}
+		}
+	}
+
+	type article_icon_item = widget {
+		using = tooltip_ne
+
+		block "article_size" {
+			size = { 44 44 }
+		}
+
+		block "article_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_ArticleWithCountryContext = {}
+			}
+		}
+
+		block "article_icon" {
+			icon = {
+				block "icon_anchor" {
+					parentanchor = center
+				}
+
+				block "article_texture" {
+					texture = "[Article.GetIcon]"
+				}
+				
+				block "icon_size" {
+					size = { 40 40 }
+				}
+			}
+		}
+
+		block "additional_properties" {}
+
+		icon = {
+			visible = "[Article.ExceedsMaxContraventions(Country.Self)]"
+			parentanchor = center
+			size = { 30 30 }
+			texture = "gfx/interface/icons/generic_icons/warning.dds"
+
+			state = {
+				name = 1
+				next = 2
+				alpha = 0.5
+				duration = 1.4
+				using = Animation_Curve_Default
+				trigger_when = "[Article.ExceedsMaxContraventions(Country.Self)]"
+			}
+
+			state = {
+				name = 2
+				next = 1
+				alpha = 1
+				duration = 1.4
+				using = Animation_Curve_Default
+			}
+		}
+	}
+
+	type article_icon_all_items = container {
+
+		### ARTICLE WITH NO INPUT
+		article_icon_item = {
+			visible = "[And(And(And(Not(Article.HasType('goods_transfer')), Not(Article.HasType('money_transfer'))), Not(Article.HasType('acquire_monopoly_for_company'))), Not(Article.HasType('law_commitment')))]"
+		}
+
+		### GOODS TRANSFER
+		article_icon_item = {
+			visible = "[Article.HasType('goods_transfer')]"
+
+			blockoverride "article_texture" {
+				texture = "[Article.GetGoods.GetTexture]"
+			}
+
+			blockoverride "additional_properties" {
+				textbox = {
+					parentanchor = bottom|right
+					align = nobaseline
+					autoresize = yes
+					using = fontsize_small
+					elide = right
+					max_width = 40
+					text = "TREATY_SELECTED_ARTICLE_AMOUNT_WITHOUT_LABEL"
+
+					background = {
+						margin = { 5 2 }
+						using = fade_center_simple
+					}
+				}
+			}
+		}
+
+		### MONEY TRANSFER
+		article_icon_item = {
+			visible = "[Article.HasType('money_transfer')]"
+
+			blockoverride "additional_properties" {
+				textbox = {
+					parentanchor = bottom|right
+					align = nobaseline
+					autoresize = yes
+					using = fontsize_small
+					elide = right
+					max_width = 40
+					text = "TREATY_SELECTED_ARTICLE_AMOUNT_WITHOUT_LABEL"
+
+					background = {
+						margin = { 5 2 }
+						using = fade_center_simple
+					}
+				}
+			}
+		}
+
+		### COMPANY MONOPOLY
+		article_icon_item = {
+			visible = "[Article.HasType('acquire_monopoly_for_company')]"
+
+			blockoverride "article_texture" {
+				texture = "[Article.GetBuildingType.GetIcon]"
+			}
+
+			blockoverride "additional_properties" {
+				icon = {
+					size = { 30 30  }
+					position = { -2 -2 }
+					texture = "gfx/interface/backgrounds/round_button_bg.dds"
+				
+
+					icon = {
+						parentanchor = center
+						size = { 75% 75% }
+						texture = "[Article.GetIcon]"
+					}
+				}
+			}
+		}
+
+		### LAW COMMITMENT
+		article_icon_item = {
+			visible = "[Article.HasType('law_commitment')]"
+
+			blockoverride "article_icon" {
+				icon = {
+					visible = "[Not(ObjectsEqual(Article.GetLaw, Country.GetLawBeingEnacted.GetLawType))]"
+					parentanchor = center
+					size = { 40 40 }
+					texture = "[Article.GetLaw.GetTexture]"
+				}
+
+				icon = {
+					visible = "[ObjectsEqual(Article.GetLaw, Country.GetLawBeingEnacted.GetLawType)]"
+					size = { 40 40 }
+					texture = "gfx/interface/backgrounds/round_button_bg.dds"
+					parentanchor = center
+					datacontext = "[Country.GetLawBeingEnacted]"
+
+					round_progress_default = {
+						visible = "[Country.HasProgressingLawEnactment]"
+						size = { 80% 80% }
+						parentanchor = center
+						value = "[FixedPointToFloat(Country.GetLawEnactmentProgress)]"
+					}
+
+					round_progress_bad = {
+						visible = "[Not(Country.HasProgressingLawEnactment)]"
+						size = { 80% 80% }
+						parentanchor = center
+						value = "[FixedPointToFloat(Country.GetLawEnactmentProgress)]"
+					}
+
+					law_icon = {
+						alpha = "[TransparentIfTrue(Not(Country.HasProgressingLawEnactment))]"
+						size = { 30 30 }
+						parentanchor = center
+					}
+
+					paused_icon_bad = {
+						visible = "[Not(Country.HasProgressingLawEnactment)]"
+						parentanchor = center
+					}
+				}
+			}
+
+
+			blockoverride "additional_properties" {
+				icon = {
+					visible = "[ObjectsEqual(Article.GetLaw, Country.GetActiveLawFromGroup(Article.GetLaw.GetGroup.GetKey).GetLawType)]"
+					parentanchor = bottom|right
+					size = { 30 30  }
+					position = { 2 2 }
+					texture = "gfx/interface/icons/generic_icons/green_checkmark.dds"
+				}
+			}
+		}
+	}
+}
+
+
 types war_panel
 {
 	### WAR ITEM (ALSO USED FOR MAPMARKER)
@@ -2177,7 +3420,6 @@ types war_panel
 			onClick = "[WarManager.ToggleWarPanel( War.AccessSelf )]"
 		}
 
-
 		### ICON
 		button = {
 			texture = "gfx/interface/outliner/war_button_icon.dds"
@@ -2186,8 +3428,6 @@ types war_panel
 			parentanchor = hcenter
 			alwaystransparent = yes
 		}
-
-
 
 		flowcontainer = {
 			direction = vertical
@@ -2307,7 +3547,6 @@ types war_panel
 				############################################################################################################################################################
 				############################################################################################################################################################
 				}
-				
 				size = { 40 40 }
 				position = { -5 0 }
 				parentanchor = right|vcenter

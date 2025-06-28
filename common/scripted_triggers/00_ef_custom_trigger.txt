@@ -140,6 +140,13 @@ has_central_bank_FS_NS_NISO = {
 		has_law = law_type:law_isolationism
 	}
 }
+has_central_bank_FS_NISO = {
+	has_modifier = has_central_bank
+	has_law = law_type:law_fiat_standard #test
+	not = {
+		has_law = law_type:law_isolationism
+	}
+}
 #####################################################################################################################################################
 has_financial_center = {
 	has_modifier = has_financial_center
@@ -249,6 +256,17 @@ market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buidi
 		}
 	}
 }
+
+market_owner_is_root_with_buiding_subject_building_modifier = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente 
+	any_scope_building = {
+		or = {
+			has_modifier = protectora_limit_30
+			has_modifier = dominion_limit_50
+			has_modifier = puppet_limit_75
+		}
+	} 
+}  
+
 market_owner_power_bloc_leader = {
 	is_power_bloc_leader = yes
 }
@@ -281,29 +299,36 @@ is_strong_currency = {
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
+		money_value_in_gold < 0.01
 	}
 	money_value_in_gold > money_value_median_1_25 
+	var:central_bank_bankruptcy = 0
 }
 is_balanced_currency = {
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
+		money_value_in_gold < 0.01
 		money_value_in_gold > money_value_median_1_25 
-	}
+	} 
 	or = { 
-		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
+		#central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
 		and = { 
 			money_value_in_gold < money_value_median_1_25
 			money_value_in_gold > money_value_median_0_75
 		}
 	}
+	var:central_bank_bankruptcy = 0
 }
 is_weak_currency = {
 	has_modifier = has_central_bank
 	not = {
 		has_modifier = global_monetary_reference
-		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
+		money_value_in_gold < 0.01
+		money_value_in_gold > money_value_median_0_75
+		#central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
 	}
+
 	money_value_in_gold < money_value_median_0_75
 	money_value_in_gold > 0.01
 	var:central_bank_bankruptcy = 0
@@ -897,8 +922,8 @@ country_is_in_annexable_territory_NGF = {
 
 # state_is_in_india = {
 # 	OR = {
-# 		region = sr:region_south_india
-# 		region = sr:region_north_india
+# 		region = sr:region_bengal
+# 		region = sr:region_punjab
 # 	}
 # }
 
@@ -1163,8 +1188,7 @@ market_goods_is_financial_product = {
 		goods = g:mining_stock
 		goods = g:railroad_stock
 		goods = g:war_bond
-		goods = g:mutual_funds
-		goods = g:paper_gold
+		goods = g:mutual_funds 
 	}
 }
 
@@ -5554,31 +5578,56 @@ law_thaler_saxon_thaler_monetary_system_FS_trigger = {
 ############################################################################################################################################################
 
 #####################################################################################################################################################
-devaluation_money_value_target_trigger = {
-	or = {
-		central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25
-		var:money_value_target_1 > revaluation_money_value_max  
-	}
-	not = {
-		var:money_value_target_1 = 0
-		or = {
-			is_subject_custom_trigger = yes
-			market_owner_is_root_univ_with_buiding = yes
-		}
-	}
 
-	#####
-	#money_value_in_gold > global_var:money_value_median
-	#root.devaluation_score > root.revaluation_score_2}
-}
+# #2 force opposées
+# - 1: la valeur médian 
+# - 2: la money value target
+# >>>> Il faut essyer de faire aller les 2 dans le meme sans
 
-revaluation_money_value_target_trigger = {
-	or = {
+# grand axe 
+devaluation_money_value_target_trigger = {		
+
+	or = { 
 		AND = {
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
-			revaluation_money_value_target > var:money_value_target_1
+			difference_with_average_gold_exchange_rate_currencies_revers > 0.25 
 		}
-		var:money_value_target_1 = 0
+		AND = {
+			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25
+			difference_with_average_gold_exchange_rate_currencies_revers > 0.25 
+		}
+		 
+	}
+	#devaluation_money_value_target < var:money_value_target_1 >=  #permet de ne pas avoir à dévalué si la target actuel ett deja la vlaur mine atteignable
+
+
+
+	# not = {
+	# 	var:money_value_target_1 = 0 #non car je n'utilise pas la money_value_target_1 pour calculer la nouvelle cible donc çà lui donnera une nouvlle cible, il est peut probable que cela arrive de toute manière
+	# 	or = {
+	# 		is_subject_custom_trigger = yes
+	# 		market_owner_is_root_univ_with_buiding = yes
+	# 	}
+	# } 
+
+	#pas de blocage car les sujet révalue leur taget par rapport à l'overlord
+	# not = { 
+	# 	or = {
+	# 		is_subject_custom_trigger = yes
+	# 		market_owner_is_root_univ_with_buiding = yes
+	# 	}
+	# } 
+}
+
+revaluation_money_value_target_trigger = { 
+	#on peut rajouter quelque chos epour que la valeur de révaluation multiplier par la quantié de devise du à l'import soit supérieur ou élae à 0 quand soustrait à la somme en métaux des export -> empeche de plongé dans la crise le pays
+	#point positif si le pays a une petite target de base la somme du en devise est très faible et c'est les import en métaux only qui représente la majeur partie des due à l'import ce qui fait que la révaluation n'a pas d'impacte sur çà
+	or = { 
+		AND = {
+			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25 #=sur 25% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard 
+			difference_with_average_gold_exchange_rate_currencies_revers < -0.25 #inf de 75% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard 
+		} 
+ 		var:money_value_target_1 = 0 #si jamais un pays ce retrouve avec une target de 0 petit reset de la target
 	} 
 	not = {
 		gold_loaned_to_central_bank_ratio > 0.75
@@ -5586,13 +5635,14 @@ revaluation_money_value_target_trigger = {
 			is_subject_custom_trigger = yes
 			market_owner_is_root_univ_with_buiding = yes
 		}
-	}
-
-	#######
-	# or  = {
-	# 	central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0
-	# 	root.revaluation_score > root.devaluation_score_2
-	# }
+	} 
+	#pas de blocage car les sujet révalue leur taget par rapport à l'overlord
+	# not = { 
+	# 	or = {
+	# 		is_subject_custom_trigger = yes
+	# 		market_owner_is_root_univ_with_buiding = yes
+	# 	}
+	# } 
 }
 
 union_latine = {
@@ -5617,53 +5667,40 @@ union_latine = {
 scripted_money_value_target = {
 	root = {
 		OR = {
+			#Recalibrage si la valeur cible sote et jamaide modification 
 			c:GBR ?= this
 
+			# #union latine
+			# c:FRA ?= this
+			# c:ITA ?= this 
+			# c:BEL ?= this
+			# c:SWI ?= this 
+			# c:GRE ?= this 
+			# c:SAR ?= this 
+			# c:PAR ?= this 
+			# c:MOD ?= this 
+			# c:LUC ?= this 
+			# c:TUS ?= this 
+			# c:PAP ?= this 
+			# c:SIC ?= this 
 
-			#union latine
-			c:FRA ?= this
-			c:ITA ?= this 
-			c:BEL ?= this
-			c:SWI ?= this 
-			c:GRE ?= this 
+			# #Scandinavian Monetary Union
+			# c:SWE ?= this  
+			# c:DEN ?= this  
+			# c:NOR ?= this  
 
-			c:SAR ?= this 
-			c:PAR ?= this 
-			c:MOD ?= this 
-			c:LUC ?= this 
-			c:TUS ?= this 
-			c:PAP ?= this 
-			c:SIC ?= this 
-
-			#Scandinavian Monetary Union
-			c:SWE ?= this  
-			c:DEN ?= this  
-			c:NOR ?= this  
-
-			c:USA ?= this
-
-			c:NET ?= this
-
-			c:AUS ?= this
-			c:GER ?= this
-			c:PRU ?= this
-			
-			c:RUS ?= this
-			c:CHI ?= this
-			
-			c:SPA ?= this
-
-			c:JAP ?= this 
-
+			# c:USA ?= this 
+			# c:NET ?= this 
+			# c:AUS ?= this
+			# c:GER ?= this
+			# c:PRU ?= this 
+			# c:RUS ?= this
+			# c:CHI ?= this
+			# c:SPA ?= this
+			# c:JAP ?= this 
 			c:MEX ?= this
-			c:BRZ ?= this
-
-			c:TUR ?= this
-			#is_valid_country_xxx = yes
-
-			#subject 
-			#c:BIC ?= this
-
+			# c:BRZ ?= this 
+			# c:TUR ?= this 
 		}
 	}
 }
@@ -5788,3 +5825,820 @@ nothing_crisis = {
 		var:financial_crash >= 1
 	}
 }
+
+
+
+is_valid_country_for_currency_accumulation = {  
+	not = {
+		or = {
+			# var:currency_crisis = 1
+			# var:central_bank_bankruptcy = 1
+			has_modifier = central_bank_bankruptcy_country
+			has_modifier = currency_crisis_country 
+			market_owner_is_root_univ_with_buiding = yes
+			is_subject_custom_trigger = yes
+		}
+	} 
+}
+
+############################################################################################################################################################
+
+#####################################################################################################################################################
+
+is_monetary_systeme_transition_valid_country_to_bimetalisme = { 
+	has_law = law_type:law_silver_standard
+	OR = {    
+		AND = { 
+			money_value_silver_standard_in_gold <= money_value_bimetallism_standard_in_gold #shunt la  -> non en fait 
+			NOT = {
+				OR = { 
+					this = c:SER ?= this  
+					this = c:CAN ?= this  
+					this = c:USA ?= this  
+					this = c:BEL ?= this  
+					this = c:FRA ?= this  
+					this = c:SWI ?= this  
+					this = c:AUS ?= this  
+					this = c:BAV ?= this  
+					this = c:NET ?= this  
+					this = c:DEN ?= this  
+					this = c:NOR ?= this  
+					this = c:SWE ?= this  
+					this = c:ROU ?= this  
+					this = c:BUL ?= this  
+					this = c:ITA ?= this  
+					this = c:TUR ?= this  
+					this = c:GER ?= this  
+					this = c:ARG ?= this  
+					this = c:BOL ?= this  
+					this = c:CHL ?= this  
+					this = c:CLM ?= this  
+					this = c:COS ?= this  
+					this = c:CUB ?= this  
+					this = c:ECU ?= this  
+					this = c:ELS ?= this  
+					this = c:GUA ?= this  
+					this = c:HON ?= this  
+					this = c:MEX ?= this  
+					this = c:NIC ?= this  
+					this = c:PRG ?= this  
+					this = c:PHI ?= this  
+					this = c:PER ?= this  
+					this = c:URU ?= this  
+					this = c:VNZ ?= this  
+					this = c:GBR ?= this  
+					this = c:POR ?= this  
+					this = c:BRZ ?= this  
+					this = c:SPA ?= this  
+					this = c:RUS ?= this  
+					this = c:JAP ?= this   
+				} 
+			} 
+		} 
+		is_valid_country_bimetalisme = yes
+	} 
+	not = { #ne passeron jamais au dessus du silver
+		OR = { 
+			this = c:SIC ?= this 
+			this = c:PAP ?= this  
+			this = c:SAR ?= this  
+			this = c:PAR ?= this  
+			this = c:MOD ?= this  
+			this = c:TUS ?= this  
+			this = c:CHI ?= this 
+			this = c:MEX ?= this  
+			this = c:PRU ?= this  
+			this = c:HAN ?= this  
+			this = c:SAX ?= this   
+			
+			# this = c:GER ?= this   
+			# this = c:ITA ?= this   
+		} 
+	} 
+} 
+
+is_monetary_systeme_transition_valid_country_to_gold = { 
+	OR = { 
+		has_law = law_type:law_bimetallism_standard
+		AND = { 
+			has_law = law_type:law_silver_standard #money_value_bimetallism_standard_in_gold <= money_value_gold_standard -> donc il sont obligé de dépssé la datte
+			OR = { #il invalid directement 
+				this = c:GBR ?= this 
+				this = c:AUS ?= this    
+				this = c:DEN ?= this  
+				this = c:SWE ?= this  
+				this = c:NOR ?= this  
+				this = c:RUS ?= this    
+				# this = c:GER ?= this   
+				# this = c:ITA ?= this  
+			} 
+		} 
+	} 
+	OR = {  
+		AND = {  
+			money_value_bimetallism_standard_in_gold <= money_value_gold_standard 
+			NOT = {
+				OR = { 
+					this = c:SER ?= this  
+					this = c:CAN ?= this  
+					this = c:USA ?= this  
+					this = c:BEL ?= this  
+					this = c:FRA ?= this  
+					this = c:SWI ?= this  
+					this = c:AUS ?= this  
+					this = c:BAV ?= this  
+					this = c:NET ?= this  
+					this = c:DEN ?= this  
+					this = c:NOR ?= this  
+					this = c:SWE ?= this  
+					this = c:ROU ?= this  
+					this = c:BUL ?= this  
+					this = c:ITA ?= this  
+					this = c:TUR ?= this  
+					this = c:GER ?= this  
+					this = c:ARG ?= this  
+					this = c:BOL ?= this  
+					this = c:CHL ?= this  
+					this = c:CLM ?= this  
+					this = c:COS ?= this  
+					this = c:CUB ?= this  
+					this = c:ECU ?= this  
+					this = c:ELS ?= this  
+					this = c:GUA ?= this  
+					this = c:HON ?= this  
+					this = c:MEX ?= this  
+					this = c:NIC ?= this  
+					this = c:PRG ?= this  
+					this = c:PHI ?= this  
+					this = c:PER ?= this  
+					this = c:URU ?= this  
+					this = c:VNZ ?= this  
+					this = c:GBR ?= this  
+					this = c:POR ?= this  
+					this = c:BRZ ?= this  
+					this = c:SPA ?= this  
+					this = c:RUS ?= this  
+					this = c:JAP ?= this   
+				} 
+			} 
+		} 
+		is_valid_country_gold = yes 
+	} 
+} 
+
+is_monetary_systeme_transition_valid_country_to_gold_exchange_standard = { 
+	or = {
+		has_law = law_type:law_gold_standard
+		has_law = law_type:law_bimetallism_standard
+		has_law = law_type:law_silver_standard
+	}
+	
+	or = { 
+		AND = {  
+			has_law = law_type:law_silver_standard
+			money_value_silver_standard_in_gold <= money_value_by_reference_currency
+		} 
+		AND = {  
+			has_law = law_type:law_bimetallism_standard
+			money_value_bimetallism_standard_in_gold <= money_value_by_reference_currency
+		} 
+		AND = {  
+			has_law = law_type:law_gold_standard
+			money_value_gold_standard <= money_value_by_reference_currency
+		}  
+	}  
+	has_technology_researched = gold_exchange_standard  
+	global_country_ranking > 15
+}   
+ 
+###################
+###################
+###################
+
+is_valid_country_bimetalisme = { 
+	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent 
+	money_value_bimetallism_standard_in_gold >= money_value_silver_standard_in_gold_33 
+	OR = { 
+		is_valid_country_SER_bimetalisme = yes
+		is_valid_country_CAN_bimetalisme = yes
+		is_valid_country_USA_bimetalisme = yes
+		is_valid_country_BEL_bimetalisme = yes
+		is_valid_country_FRA_bimetalisme = yes
+		is_valid_country_SWI_bimetalisme = yes
+		is_valid_country_AUS_bimetalisme = yes
+		is_valid_country_BAV_bimetalisme = yes
+		is_valid_country_NET_bimetalisme = yes
+		is_valid_country_DEN_bimetalisme = yes
+		is_valid_country_NOR_bimetalisme = yes
+		is_valid_country_SWE_bimetalisme = yes
+		is_valid_country_ROU_bimetalisme = yes
+		is_valid_country_BUL_bimetalisme = yes
+		is_valid_country_ITA_bimetalisme = yes
+		is_valid_country_TUR_bimetalisme = yes
+		is_valid_country_GER_bimetalisme = yes
+		is_valid_country_ARG_bimetalisme = yes
+		is_valid_country_BOL_bimetalisme = yes
+		is_valid_country_CHL_bimetalisme = yes
+		is_valid_country_CLM_bimetalisme = yes
+		is_valid_country_COS_bimetalisme = yes
+		is_valid_country_CUB_bimetalisme = yes
+		is_valid_country_ECU_bimetalisme = yes
+		is_valid_country_ELS_bimetalisme = yes
+		is_valid_country_GUA_bimetalisme = yes
+		is_valid_country_HON_bimetalisme = yes
+		is_valid_country_MEX_bimetalisme = yes
+		is_valid_country_NIC_bimetalisme = yes
+		is_valid_country_PRG_bimetalisme = yes
+		is_valid_country_PHI_bimetalisme = yes
+		is_valid_country_PER_bimetalisme = yes
+		is_valid_country_URU_bimetalisme = yes
+		is_valid_country_VNZ_bimetalisme = yes
+		is_valid_country_GBR_bimetalisme = yes
+		is_valid_country_POR_bimetalisme = yes
+		is_valid_country_BRZ_bimetalisme = yes
+		is_valid_country_SPA_bimetalisme = yes
+		is_valid_country_RUS_bimetalisme = yes
+		is_valid_country_JAP_bimetalisme = yes
+	} 
+} 
+
+is_valid_country_SER_bimetalisme = {
+	root = {
+		c:SER ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_CAN_bimetalisme = {
+	root = {
+		c:CAN ?= this  #1858
+		game_date > 1858.1.1
+	}
+}
+is_valid_country_USA_bimetalisme = {
+	root = {
+		c:USA ?= this  #1792  environ
+		game_date > 1792.1.1
+	}
+}
+is_valid_country_BEL_bimetalisme = {
+	root = {
+		c:BEL ?= this  #1865
+		game_date > 1865.1.1
+	}
+}
+is_valid_country_FRA_bimetalisme = {
+	root = {
+		c:FRA ?= this  #1803
+		game_date > 1803.1.1
+	}
+}
+is_valid_country_SWI_bimetalisme = {
+	root = {
+		c:SWI ?= this  #1850
+		game_date > 1850.1.1
+	}
+}
+is_valid_country_AUS_bimetalisme = {
+	root = {
+		c:AUS ?= this  #1872
+		always = no
+	}
+}
+is_valid_country_BAV_bimetalisme = {
+	root = {
+		c:BAV ?= this  #1871
+		always = no
+	}
+}
+is_valid_country_NET_bimetalisme = {
+	root = {
+		c:NET ?= this  #1816
+		game_date > 1816.1.1
+	}
+}
+is_valid_country_DEN_bimetalisme = {
+	root = {
+		c:DEN ?= this  #1871
+		always = no
+	}
+}
+is_valid_country_NOR_bimetalisme = {
+	root = {
+		c:NOR ?= this  #1871
+		always = no
+	}
+}
+is_valid_country_SWE_bimetalisme = {
+	root = {
+		c:SWE ?= this  #1871
+		always = no
+	}
+}
+is_valid_country_ROU_bimetalisme = {
+	root = {
+		c:ROU ?= this  #1867
+		game_date > 1867.1.1
+	}
+}
+is_valid_country_BUL_bimetalisme = {
+	root = {
+		c:BUL ?= this  #1881
+		game_date > 1881.1.1
+	}
+}
+is_valid_country_ITA_bimetalisme = {
+	root = {
+		c:ITA ?= this  #1865
+		game_date > 1865.1.1
+	}
+}
+is_valid_country_TUR_bimetalisme = {
+	root = {
+		c:TUR ?= this  #1844
+		game_date > 1844.1.1
+	}
+}
+is_valid_country_GER_bimetalisme = {
+	root = {
+		c:GER ?= this  #1871
+		game_date > 1871.1.1
+	}
+}
+is_valid_country_ARG_bimetalisme = {
+	root = {
+		c:ARG ?= this  #1881
+		game_date > 1881.1.1
+	}
+}
+is_valid_country_BOL_bimetalisme = {
+	root = {
+		c:BOL ?= this  #1874
+		game_date > 1874.1.1
+	}
+}
+is_valid_country_CHL_bimetalisme = {
+	root = {
+		c:CHL ?= this  #1868
+		game_date > 1868.1.1
+	}
+}
+is_valid_country_CLM_bimetalisme = {
+	root = {
+		c:CLM ?= this  #1870
+		game_date > 1870.1.1
+	}
+}
+is_valid_country_COS_bimetalisme = {
+	root = {
+		c:COS ?= this  #1881
+		game_date > 1881.1.1
+	}
+}
+is_valid_country_CUB_bimetalisme = {
+	root = {
+		c:CUB ?= this  #1869
+		game_date > 1869.1.1
+	}
+}
+is_valid_country_ECU_bimetalisme = {
+	root = {
+		c:ECU ?= this  #1884
+		game_date > 1884.1.1
+	}
+}
+is_valid_country_ELS_bimetalisme = {
+	root = {
+		c:ELS ?= this  #1883
+		game_date > 1883.1.1
+	}
+}
+is_valid_country_GUA_bimetalisme = {
+	root = {
+		c:GUA ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_HON_bimetalisme = {
+	root = {
+		c:HON ?= this  #1882
+		game_date > 1882.1.1
+	}
+}
+is_valid_country_MEX_bimetalisme = {
+	root = {
+		c:MEX ?= this  #1863
+		game_date > 1863.1.1
+	}
+}
+is_valid_country_NIC_bimetalisme = {
+	root = {
+		c:NIC ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_PRG_bimetalisme = {
+	root = {
+		c:PRG ?= this  #1875
+		game_date > 1875.1.1
+	}
+}
+is_valid_country_PHI_bimetalisme = {
+	root = {
+		c:PHI ?= this  #1851
+		game_date > 1851.1.1
+	}
+}
+is_valid_country_PER_bimetalisme = {
+	root = {
+		c:PER ?= this  #1863
+		game_date > 1863.1.1
+	}
+}
+is_valid_country_URU_bimetalisme = {
+	root = {
+		c:URU ?= this  #1867
+		game_date > 1867.1.1
+	}
+}
+is_valid_country_VNZ_bimetalisme = {
+	root = {
+		c:VNZ ?= this  #1870
+		game_date > 1870.1.1
+	}
+}
+is_valid_country_GBR_bimetalisme = {
+	root = {
+		c:GBR ?= this  #1871
+		always = no
+	}
+}
+is_valid_country_POR_bimetalisme = {
+	root = {
+		c:POR ?= this  #1855
+		game_date > 1855.1.1
+	}
+}
+is_valid_country_BRZ_bimetalisme = {
+	root = {
+		c:BRZ ?= this  #1883
+		game_date > 1883.1.1
+	}
+}
+is_valid_country_SPA_bimetalisme = {
+	root = {
+		c:SPA ?= this  #1868
+		game_date > 1868.1.1
+	}
+}
+is_valid_country_RUS_bimetalisme = {
+	root = {
+		c:RUS ?= this  #1897
+		game_date > 1897.1.1
+	}
+}
+is_valid_country_JAP_bimetalisme = {
+	root = {
+		c:JAP ?= this  #1871
+		game_date > 1871.1.1
+	}
+}
+ 
+is_valid_country_gold = {
+	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent 
+	money_value_gold_standard >= money_value_bimetallism_standard_in_gold_50 #money_value_bimetallism_standard_in_gold_33 
+	OR = { 
+		is_valid_country_SER_gold_standard = yes
+		is_valid_country_CAN_gold_standard = yes
+		is_valid_country_USA_gold_standard = yes
+		is_valid_country_BEL_gold_standard = yes
+		is_valid_country_FRA_gold_standard = yes
+		is_valid_country_SWI_gold_standard = yes 
+		is_valid_country_AUS_gold_standard = yes
+		is_valid_country_BAV_gold_standard = yes
+		is_valid_country_NET_gold_standard = yes
+		is_valid_country_DEN_gold_standard = yes
+		is_valid_country_NOR_gold_standard = yes
+		is_valid_country_SWE_gold_standard = yes
+		is_valid_country_ROU_gold_standard = yes
+		is_valid_country_BGR_gold_standard = yes
+		is_valid_country_ITA_gold_standard = yes
+		is_valid_country_TUR_gold_standard = yes
+		is_valid_country_GER_gold_standard = yes
+		is_valid_country_ARG_gold_standard = yes
+		is_valid_country_BOL_gold_standard = yes
+		is_valid_country_CHL_gold_standard = yes
+		is_valid_country_CLM_gold_standard = yes
+		is_valid_country_COS_gold_standard = yes
+		is_valid_country_CUB_gold_standard = yes
+		is_valid_country_ECU_gold_standard = yes
+		is_valid_country_ELS_gold_standard = yes
+		is_valid_country_GUA_gold_standard = yes
+		is_valid_country_HON_gold_standard = yes
+		is_valid_country_MEX_gold_standard = yes
+		is_valid_country_NIC_gold_standard = yes
+		is_valid_country_PRG_gold_standard = yes
+		is_valid_country_PHI_gold_standard = yes
+		is_valid_country_PER_gold_standard = yes
+		is_valid_country_URU_gold_standard = yes
+		is_valid_country_VNZ_gold_standard = yes
+		is_valid_country_GBR_gold_standard = yes
+		is_valid_country_POR_gold_standard = yes
+		is_valid_country_BRZ_gold_standard = yes
+		is_valid_country_SPA_gold_standard = yes
+		is_valid_country_RUS_gold_standard = yes
+		is_valid_country_JAP_gold_standard = yes
+	} 
+} 
+
+is_valid_country_SER_gold_standard = {
+	root = {
+		c:SER ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_CAN_gold_standard = {
+	root = {
+		c:CAN ?= this  #1871
+		game_date > 1871.1.1
+	}
+}
+is_valid_country_USA_gold_standard = {
+	root = {
+		c:USA ?= this  #1900 environ
+		game_date > 1900.1.1
+	}
+}
+is_valid_country_BEL_gold_standard = {
+	root = {
+		c:BEL ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_FRA_gold_standard = {
+	root = {
+		c:FRA ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_SWI_gold_standard = {
+	root = {
+		c:SWI ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_AUS_gold_standard = {
+	root = {
+		c:AUS ?= this  #1872
+		game_date > 1872.1.1
+	}
+}
+is_valid_country_BAV_gold_standard = {
+	root = {
+		c:BAV ?= this  #1871
+		game_date > 1871.1.1
+	}
+}
+is_valid_country_NET_gold_standard = {
+	root = {
+		c:NET ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_DEN_gold_standard = {
+	root = {
+		c:DEN ?= this  #1875
+		game_date > 1875.1.1
+	}
+}
+is_valid_country_NOR_gold_standard = {
+	root = {
+		c:NOR ?= this  #1875
+		game_date > 1875.1.1
+	}
+}
+is_valid_country_SWE_gold_standard = {
+	root = {
+		c:SWE ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_ROU_gold_standard = {
+	root = {
+		c:ROU ?= this  #1890
+		game_date > 1890.1.1
+	}
+}
+is_valid_country_BGR_gold_standard = {
+	root = {
+		c:BUL ?= this  #1890
+		game_date > 1890.1.1
+	}
+}
+is_valid_country_ITA_gold_standard = {
+	root = {
+		c:ITA ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_TUR_gold_standard = {
+	root = {
+		c:TUR ?= this  #1900
+		game_date > 1900.1.1
+	}
+}
+is_valid_country_GER_gold_standard = {
+	root = {
+		c:GER ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_ARG_gold_standard = {
+	root = {
+		c:ARG ?= this  #1899
+		game_date > 1899.1.1
+	}
+}
+is_valid_country_BOL_gold_standard = {
+	root = {
+		c:BOL ?= this  #1898
+		game_date > 1898.1.1
+	}
+}
+is_valid_country_CHL_gold_standard = {
+	root = {
+		c:CHL ?= this  #1885
+		game_date > 1885.1.1
+	}
+}
+is_valid_country_CLM_gold_standard = {
+	root = {
+		c:CLM ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_COS_gold_standard = {
+	root = {
+		c:COS ?= this  #1896
+		game_date > 1896.1.1
+	}
+}
+is_valid_country_CUB_gold_standard = {
+	root = {
+		c:CUB ?= this  #1880
+		game_date > 1880.1.1
+	}
+}
+is_valid_country_ECU_gold_standard = {
+	root = {
+		c:ECU ?= this  #1895
+		game_date > 1895.1.1
+	}
+}
+is_valid_country_ELS_gold_standard = {
+	root = {
+		c:ELS ?= this  #1873 # Vérifier cette date (anomalie)
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_GUA_gold_standard = {
+	root = {
+		c:GUA ?= this  #1896
+		game_date > 1896.1.1
+	}
+}
+is_valid_country_HON_gold_standard = {
+	root = {
+		c:HON ?= this  #1896
+		game_date > 1896.1.1
+	}
+}
+is_valid_country_MEX_gold_standard = {
+	root = {
+		c:MEX ?= this  #1881
+		game_date > 1881.1.1
+	}
+}
+is_valid_country_NIC_gold_standard = {
+	root = {
+		c:NIC ?= this  #1896
+		game_date > 1896.1.1
+	}
+}
+is_valid_country_PRG_gold_standard = {
+	root = {
+		c:PRG ?= this  #1897
+		game_date > 1897.1.1
+	}
+}
+is_valid_country_PHI_gold_standard = {
+	root = {
+		c:PHI ?= this  #1900
+		game_date > 1900.1.1
+	}
+}
+is_valid_country_PER_gold_standard = {
+	root = {
+		c:PER ?= this  #1899
+		game_date > 1899.1.1
+	}
+}
+is_valid_country_URU_gold_standard = {
+	root = {
+		c:URU ?= this  #1897
+		game_date > 1897.1.1
+	}
+}
+is_valid_country_VNZ_gold_standard = {
+	root = {
+		c:VNZ ?= this  #1899
+		game_date > 1899.1.1
+	}
+}
+is_valid_country_GBR_gold_standard = {
+	root = {
+		c:GBR ?= this  #1820
+		game_date > 1820.1.1
+	}
+}
+is_valid_country_POR_gold_standard = {
+	root = {
+		c:POR ?= this  #1868
+		game_date > 1868.1.1
+	}
+}
+is_valid_country_BRZ_gold_standard = {
+	root = {
+		c:BRZ ?= this  #1900
+		game_date > 1900.1.1
+	}
+}
+is_valid_country_SPA_gold_standard = {
+	root = {
+		c:SPA ?= this  #1873
+		game_date > 1873.1.1
+	}
+}
+is_valid_country_RUS_gold_standard = {
+	root = {
+		c:RUS ?= this  #1897
+		game_date > 1897.1.1
+	}
+}
+is_valid_country_JAP_gold_standard = {
+	root = {
+		c:JAP ?= this  #1897
+		game_date > 1897.1.1
+	}
+}
+
+# dinar_moroccan_dirham #1912
+# dinar_serbian_dinar #1873 #1880
+# dinar_serbian_dinar #1873 #1880
+# dollar_canadian_dollar #1858 #1871
+# dollar_united_states_dollar 
+# franc_belgian_franc #1865 #1873 #standart argent debut de partie
+# franc_french_franc #1803 #1873
+# franc_luxembourgish_franc #1865 #1873
+# franc_swiss_franc #1850 #1880 #standart argent debut de partie
+# gulden #1872 #standart argent debu de partie
+# gulden_bavarian_gulden #1871 or
+# gulden_florin #1816 #1873 
+# krone_danish_krone #1875 or
+# krone_norwegian_krone #1875 or
+# krone_swedish_krona #1873 or
+# leon_leu #1867 #1890
+# leon_lev #1881 #1890
+# lira #1865 #1880  
+# lira_ducato -> blocage argent 
+# lira_ottoman_lira #1844 #1900
+# lira_scudo_pontificio -> blocage argent 
+# lira_scudo_sardo -> blocage argent 
+# lira_toscane_lira -> blocage argent 
+# mark #1873 or
+# peso_argentine_peso #1881 #1899 
+# peso_bolivien_peso #1874 #1898
+# peso_chilean_peso #1868 #1885
+# peso_colombian_peso #1870 #1880
+# peso_costa_rican_colon #1881 #1896
+# peso_cuban_peso #1869 #1880
+# peso_ecuadorian_peso #1884 #1895
+# peso_el_salvador_colon #1883 #1873
+# peso_guatemalan_quetzal #1880 #1896
+# peso_honduran_lempira #1882 #1896
+# peso_mexican_peso #1863 #1881
+# peso_nicaraguan_cordoba #1880 #1896
+# peso_paraguayan_peso #1875 #1897
+# peso_philippine_peso #1851 #1900
+# peso_sol_de_oro #1863 #1899
+# peso_uruguayan_peso #1867 #1897
+# peso_venezuelan_peso #1870 #1899
+# pound_sterling #1820 or
+# real #1850 #1867
+# real_brazilian_real #1883 #1900
+# spe_peseta #1868 #1873
+# spe_ruble #1897 or #standart argent debut de partie
+# spe_yen #1871 #1897
+# spe_yuan -> blocage argent 
+# thaler_hannoveraner_thaler -> blocage argent 
+# thaler_prussian_thaler -> blocage argent 
+# thaler_saxon_thaler -> blocage argent 

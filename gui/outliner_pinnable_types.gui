@@ -181,7 +181,7 @@ types pinnable_outliner_items {
 		datacontext = "[OutlinerEntry.AccessScope.AccessCompany]"
 
 		blockoverride "text" {
-			text = "[Company.GetName]"
+			text = "[Company.GetNameNoFormatting]"
 		}
 
 		blockoverride "outliner_item_tooltip" {
@@ -193,7 +193,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenPanelDontToggle('companies')]"
+			onclick = "[InformationPanelBar.OpenCompanyPanel(Company.Self)]"
 		}
 
 		blockoverride "icon" {
@@ -218,7 +218,7 @@ types pinnable_outliner_items {
 				
 				changed_value_increased_progressbar_horizontal = {
 					size = { 100% 100% }
-					visible = "[And(GreaterThan_CFixedPoint(Company.CalcProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+					visible = "[And(GreaterThan_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
 					blockoverride "values" {
 						min = 0
 						max = "[GetDefine('NEconomy','COMPANY_PROSPERITY_MAX')]"
@@ -234,7 +234,7 @@ types pinnable_outliner_items {
 
 				changed_value_decreased_progressbar_horizontal = {
 					size = { 100% 100% }
-					visible = "[And(LessThan_CFixedPoint(Company.CalcProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+					visible = "[And(LessThan_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
 
 					blockoverride "values" {
 						min = 0
@@ -248,7 +248,7 @@ types pinnable_outliner_items {
 
 				default_progressbar_horizontal = {
 					size = { 100% 100% }
-					visible = "[Or(EqualTo_CFixedPoint(Company.CalcProsperityChange,'(CFixedPoint)0'), GreaterThanOrEqualTo_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
+					visible = "[Or(EqualTo_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), GreaterThanOrEqualTo_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
 
 					blockoverride "values" {
 						min = 0
@@ -259,7 +259,7 @@ types pinnable_outliner_items {
 			}
 
 			textbox = {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Company.GetFormattedProductivity]"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Company.GetFormattedProductivity]"
 				autoresize = yes
 				align = right|nobaseline
 				parentanchor = vcenter
@@ -271,8 +271,182 @@ types pinnable_outliner_items {
 		}
 	}
 
+	type treaty_outliner_item = pinnable_expandable_outliner_entry {
+		datacontext = "[OutlinerEntry.AccessScope.AccessTreaty]"
+
+		blockoverride "entry_size" {
+			size = { @entry_width 30 }
+		}
+
+		blockoverride "pinnable_expand_buttons" {}
+
+		blockoverride "text" {
+			text = "[Treaty.GetName]"
+		}
+
+		blockoverride "outliner_item_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_Treaty = {}
+			}
+		}
+
+		blockoverride "onclick" {
+			onclick = "[InformationPanelBar.OpenTreatyPanel(Treaty.Self)]"
+		}
+
+		blockoverride "widget" {
+			flowcontainer = {
+				direction = vertical
+
+				outliner_compact_treaty_item = {
+					visible = "[Not(Treaty.IsEnforced)]"
+				}
+
+				outliner_compact_enforced_treaty_item = {
+					visible = "[Treaty.IsEnforced]"
+				}
+			}
+		}
+	}
+
+	type outliner_compact_treaty_item = flowcontainer {
+		direction = vertical
+
+		tooltipwidget = {
+			FancyTooltip_Treaty = {}
+		}
+
+		# TREATY NAME & DURATION
+		widget = {
+			block "size" {
+				size = { @entry_width 30 }
+			}
+
+			background = {
+				using = fade_center_colored_black
+			}
+
+			### NAME
+			flowcontainer = {
+				position = { 5 0 }
+				parentanchor = vcenter
+				spacing = 5
+
+				### LEFT COUNTRY FLAG
+				tiny_flag_no_interact = {
+					parentanchor = vcenter
+					datacontext = "[Treaty.GetLeftCountry]"
+
+					blockoverride "tooltip" {}
+				}
+
+				### RIGHT COUNTRY FLAG
+				tiny_flag_no_interact = {
+					parentanchor = vcenter
+					datacontext = "[Treaty.GetRightCountry]"
+
+					blockoverride "tooltip" {}
+				}
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					using = elide_fontsize_min
+					max_width = 255
+					margin_left = 2
+					text = "[Treaty.GetNameNoFormatting]"
+				}
+				
+			}
+		}
+	}
+
+	type outliner_compact_enforced_treaty_item = flowcontainer {
+		direction = vertical
+
+		tooltipwidget = {
+			FancyTooltip_Treaty = {}
+		}
+
+		# TREATY NAME & DURATION
+		widget = {
+			block "size" {
+				size = { @entry_width 30 }
+			}
+
+			background = {
+				using = fade_center_colored_black
+			}
+
+			### NAME
+			flowcontainer = {
+				position = { 5 0 }
+				parentanchor = vcenter
+				spacing = 2
+
+				### BACKGROUND
+				background = {
+					using = fade_right_colored
+					color = "[Treaty.GetFirstCountry.GetMapColor]"
+				}
+
+				### LEFT COUNTRY FLAGS
+				flowcontainer = {
+					parentanchor = vcenter
+					margin = { 0 2 }
+					spacing = 8
+
+					### ENFORCER COUNTRY FLAG
+					tiny_flag_no_interact = {
+						parentanchor = vcenter
+						datacontext = "[Treaty.GetFirstCountry]"
+
+						blockoverride "tooltip" {}
+					}
+
+					### ARROW
+					icon = {
+						parentanchor = vcenter
+						size = { 20 20 }
+						texture = "gfx/interface/icons/generic_icons/win_war_against.dds"
+					}
+
+					### ENFORCED COUNTRY FLAG
+					tiny_flag_no_interact = {
+						parentanchor = vcenter
+						datacontext = "[Treaty.GetSecondCountry]"
+
+						blockoverride "tooltip" {}
+
+						icon = {
+							position = { 10 0 }
+							parentanchor = vcenter|right
+							size = { 22 22 }
+							texture = "gfx/interface/icons/generic_icons/capitulate.dds"
+						}
+					}
+				}
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					using = elide_fontsize_min
+					max_width = 235
+					margin_left = 5
+					text = "[Treaty.GetNameNoFormatting]"
+				}
+			}
+		}
+	}
+
 	type country_outliner_item = pinnable_expandable_outliner_entry {
 		datacontext = "[OutlinerEntry.AccessScope.AccessCountry]"
+
+		tooltipwidget = {
+			FancyTooltip_Country = {}
+		}
 
 		# Override the entire item so we can make it responsive using an hbox
 		blockoverride "widget" {
@@ -455,7 +629,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "text" {
-			text = "[MilitaryFormation.GetNameNoFormatting]"
+			raw_text = "[MilitaryFormation.GetNameNoFormatting][Nbsp][AddLocalizationIf(MilitaryFormation.IsExiled, '@exiled_state!')]"
 		}
 
 		blockoverride "outliner_item_tooltip" {
@@ -465,7 +639,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.AccessSelf, 'default' )]"
+			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
 			onrightclick = "[RightClickMenuManager.ShowForMilitaryFormation(MilitaryFormation.AccessSelf)]"
 
 			click_modifiers = {
@@ -917,11 +1091,20 @@ types pinnable_outliner_items {
 				maximumsize = { @entry_width -1 }
 
 				flowcontainer = {
-
 					icon = {
+						visible = "[Not(PoliticalMovement.HasSeparateUprisingDefinition)]"
 						parentanchor = vcenter
 						size = { 25 25 }
 						texture = "[PoliticalMovement.GetTexture]"
+					}
+					
+					flag_icon = {
+						visible = "[PoliticalMovement.HasSeparateUprisingDefinition]"
+						size = { 28 20 }
+						framesize = "[GetSmallFlagFrameSize]"
+						blockoverride "flag_tooltip" {}
+						frame = "[PoliticalMovement.GetUprisingDefinition.GetFlag('release').GetSmallFlagFrame]"
+						texture = "[PoliticalMovement.GetUprisingDefinition.GetFlag('release').GetSmallFlagTexture]"
 					}
 				}
 
@@ -969,6 +1152,7 @@ types pinnable_outliner_items {
 
 				flowcontainer = {
 					spacing = 2
+					alpha = "[TransparentIfZero(PoliticalMovement.GetRadicalism)]"
 
 					icon = {
 						visible = "[LessThan_CFixedPoint(PoliticalMovement.GetRadicalism, '(CFixedPoint)0.5')]"
@@ -1183,6 +1367,19 @@ types pinnable_outliner_items {
 		}
 	}
 
+	type outliner_treaties = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('treaties')]"
+
+		blockoverride "fixedgridbox_cell_size" {
+			addcolumn = @entry_width
+			addrow = 30
+		}
+
+		blockoverride "item" {
+			treaty_outliner_item = {}
+		}
+	}
+
 	type market_item = pinnable_outliner_entry {
 		datacontext = "[OutlinerEntry.AccessScope.AccessMarket]"
 
@@ -1210,6 +1407,9 @@ types pinnable_outliner_items {
 							datacontext = "[Market.GetOwner]"
 
 							blockoverride "tooltip" {}
+							blockoverride "is_player_glow" {
+								visible = no
+							}
 						}
 					}
 
@@ -1234,7 +1434,7 @@ types pinnable_outliner_items {
 							scissor = yes
 							datamodel = "[Market.GetTopGoodsByLowestBalance('(int32)3')]"
 
-							item = {
+							item = { 
 								button = {
 									visible = "[Not(Goods.IsLocal)]"
 									size = { 23 23 }
@@ -1255,8 +1455,8 @@ types pinnable_outliner_items {
 							scissor = yes
 							datamodel = "[Market.GetTopGoodsByHighestBalance('(int32)3')]"
 
-							item = {
-								button = {
+							item = { 
+								button = { 
 									visible = "[Not(Goods.IsLocal)]"
 									size = { 23 23 }
 									texture = "[Goods.GetTexture]"
@@ -1332,7 +1532,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenMarketPanel( Market.AccessSelf )]"
+			onclick = "[InformationPanelBar.OpenMarketPanel(Market.Self)]"
 		}
 
 		blockoverride "onhover" {
@@ -1395,7 +1595,7 @@ types pinnable_outliner_items {
 					autoresize = yes
 					minimumsize = { 70 -1 }
 					maximumsize = { 70 -1 }
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
 					align = right|nobaseline
 					using = market_price_tooltip_with_graph
 				}
@@ -1632,7 +1832,7 @@ types pinnable_outliner_items {
 					parentanchor = vcenter
 					elide = right
 					fontsize_min = 12
-					visible = "[Not(GetVariableSystem.HasValue('hide_jobseekers', 'true'))]"
+					visible = "[GetVariableSystem.HasValue('show_jobseekers', 'true')]"
 				}
 
 				### SETTING - PEASANTS
@@ -1643,7 +1843,7 @@ types pinnable_outliner_items {
 					parentanchor = vcenter
 					elide = right
 					fontsize_min = 12
-					visible = "[GetVariableSystem.HasValue('show_peasants', 'true')]"
+					visible = "[Not(GetVariableSystem.HasValue('hide_peasants', 'true'))]"
 				}
 
 				### SETTING - UNEMPLOYED
@@ -1935,7 +2135,7 @@ types pinnable_outliner_items {
 					textbox = {
 						visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
 						size = { 55 25 }
-						raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+						raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
 						align = right|nobaseline
 						fontsize_min = 12
 						using = productivity_tooltip_with_graph	

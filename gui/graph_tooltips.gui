@@ -429,6 +429,14 @@ template market_price_tooltip_with_graph
 	}
 }
 
+template world_market_price_tooltip_with_graph 
+{
+	tooltip = "[Goods.GetWorldMarketBasePriceDesc]"
+	tooltipwidget = {
+		GraphTooltip_GoodsWorldPrice = {}
+	}
+}
+
 template tax_income_tooltip_with_graph
 {
 	tooltip = "INCOME_TAXES_BREAKDOWN"
@@ -591,6 +599,15 @@ template military_wages_expense_tooltip_with_graph
     }
 }
 
+template military_total_expense_tooltip_with_graph
+{
+    tooltip = "MILITARY_TOTAL_EXPENSES_BREAKDOWN"
+
+    tooltipwidget = {
+        GraphTooltip_MilitaryTotalExpense = {}
+    }
+}
+
 template construction_goods_expense_tooltip_with_graph
 {
     tooltip = "CONSTRUCTION_GOODS_EXPENSES_BREAKDOWN"
@@ -609,6 +626,14 @@ template subsidies_expense_tooltip_with_graph
     }
 }
 
+template subventions_expense_tooltip_with_graph
+{
+    tooltip = "SUBVENTIONS_EXPENSES_BREAKDOWN"
+
+    tooltipwidget = {
+        GraphTooltip_SubventionsExpense = {}
+    }
+}
 
 template welfare_payments_expense_tooltip_with_graph
 {
@@ -686,10 +711,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')] [Goods.GetMaxPrice]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')] [Goods.GetMinPrice]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Goods.GetPriceTrend)]"
@@ -721,6 +746,61 @@ types graph_tooltips {
 			}
 		}
 	}
+	
+	type GraphTooltip_GoodsWorldPrice = TooltipWidgetType {
+		blockoverride "tooltip_content_after" {
+			v3_plotline = {
+				using = default_list_position
+
+				blockoverride "size" {
+					size = { 260 100 }
+				}
+				blockoverride "header" {
+					text = "WORLD_MARKET_PRICE"
+				}
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+				blockoverride "line_plotpoints" {
+					visible = "[Not(IsEmpty(Goods.GetWorldPriceTrend))]"
+					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetWorldPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
+				}
+				blockoverride "maxvalue" {
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+				}
+				blockoverride "minvalue" {
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+				}
+				blockoverride "startdate" {
+					text = "[GetOldestDate(Goods.GetWorldPriceTrend)]"
+				}
+				blockoverride "enddate" {
+					text = "[GetLatestDate(Goods.GetWorldPriceTrend)]"
+				}
+				blockoverride "multiitem" {}
+				
+				blockoverride "extra_plotlines" {
+					### Base Price line
+					plotline = {
+						size = { 100% 100% }
+						using = plot_line
+						width = 2
+						color = { 1 0 0 0.5 }
+						plotpoints = "[Goods.GetBasePricePlotPoints]"
+					}
+				}
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(Goods.GetWorldPriceTrend)]"
+				}
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(Goods.GetWorldPriceTrend))]"
+				}
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+		}
+	}	
 
 	type GraphTooltip_WorldProfitability = TooltipWidgetType {
 		blockoverride "tooltip_content_after" {
@@ -831,10 +911,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetEarningsPerEmployeeTrend, '(CFixedPoint)0', GetMax(Building.GetEarningsPerEmployeeTrend) )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')] [GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0.0"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')] 0.0"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Building.GetEarningsPerEmployeeTrend)]"
@@ -1802,6 +1882,91 @@ types graph_tooltips {
 		}
 	}
 
+	type GraphTooltip_MilitaryTotalExpense = TooltipWidgetType {
+		blockoverride "tooltip_content_after" {
+			v3_plotline = {
+				using = default_list_position
+
+				blockoverride "header" {
+					text = "[concept_budget_military_wages]"
+				}
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+				blockoverride "size" {
+					size = { 280 100 }
+				}
+				blockoverride "line_plotpoints" {
+					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryWagesExpenseTrend))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryWagesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryWagesExpenseTrend) )]"
+				}
+				blockoverride "maxvalue" {
+					text = "[GetMax(GetPlayer.GetMilitaryWagesExpenseTrend)|D]"
+				}
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+				blockoverride "startdate" {
+					text = "[GetOldestDate(GetPlayer.GetMilitaryWagesExpenseTrend)]"
+				}
+				blockoverride "enddate" {
+					text = "[GetLatestDate(GetPlayer.GetMilitaryWagesExpenseTrend)]"
+				}
+				blockoverride "multiitem" {}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(GetPlayer.GetMilitaryWagesExpenseTrend)]"
+				}
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryWagesExpenseTrend))]"
+				}
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+			v3_plotline = {
+				using = default_list_position
+
+				blockoverride "header" {
+					text = "[concept_budget_goods_for_military_buildings]"
+				}
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+				blockoverride "size" {
+					size = { 280 100 }
+				}
+				blockoverride "line_plotpoints" {
+					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryGoodsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend) )]"
+				}
+				blockoverride "maxvalue" {
+					text = "[GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend)|D]"
+				}
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+				blockoverride "startdate" {
+					text = "[GetOldestDate(GetPlayer.GetMilitaryGoodsExpenseTrend)]"
+				}
+				blockoverride "enddate" {
+					text = "[GetLatestDate(GetPlayer.GetMilitaryGoodsExpenseTrend)]"
+				}
+				blockoverride "multiitem" {}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(GetPlayer.GetMilitaryGoodsExpenseTrend)]"
+				}
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
+				}
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+		}
+	}
+
 	type GraphTooltip_ConstructionGoodsExpense = TooltipWidgetType {
 		blockoverride "tooltip_content_after" {
 			v3_plotline = {
@@ -1884,6 +2049,51 @@ types graph_tooltips {
 				}
 				blockoverride "everything_that_is_not_empty_state_visibility" {
 					visible = "[Not(IsEmpty(GetPlayer.GetSubsidiesExpenseTrend))]"
+				}
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+		}
+	}
+	
+	type GraphTooltip_SubventionsExpense = TooltipWidgetType {
+		blockoverride "tooltip_content_after" {
+			v3_plotline = {
+				using = default_list_position
+
+				blockoverride "header" {
+					text = "[concept_subventions]"
+				}
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+				blockoverride "size" {
+					size = { 280 100 }
+				}
+				blockoverride "line_plotpoints" {
+					visible = "[Not(IsEmpty(GetPlayer.GetSubventionsExpenseTrend))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetSubventionsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetSubventionsExpenseTrend) )]"
+				}
+				blockoverride "maxvalue" {
+					text = "[GetMax(GetPlayer.GetSubventionsExpenseTrend)|D]"
+				}
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+				blockoverride "startdate" {
+					text = "[GetOldestDate(GetPlayer.GetSubventionsExpenseTrend)]"
+				}
+				blockoverride "enddate" {
+					text = "[GetLatestDate(GetPlayer.GetSubventionsExpenseTrend)]"
+				}
+				blockoverride "multiitem" {}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(GetPlayer.GetSubventionsExpenseTrend)]"
+				}
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(GetPlayer.GetSubventionsExpenseTrend))]"
 				}
 				blockoverride "empty_state_text" {
 					text = "GRAPH_NOT_INITIALIZED"

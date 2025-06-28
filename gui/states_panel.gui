@@ -343,7 +343,11 @@ types state_panel_types
 
 		blockoverride "window_header_name"
 		{
-			raw_text = "#BOLD [State.GetName]#!"
+			raw_text = "[LabelingHelper.CapitalizeOnlyFirst(State.GetNameNoFormatting)]"
+
+			tooltipwidget = {
+				FancyTooltip_State = {}
+			}
 		}
 
 		blockoverride "window_header_name_line_two" {
@@ -534,6 +538,7 @@ types state_panel_types
 
 						sort_button = {
 							size = { 55 20 }
+							tooltip = "SORT_BY_MARKET_GOODS"
 							button = {
 								texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
 								size = { 25 25 }
@@ -546,30 +551,49 @@ types state_panel_types
 
 						sort_button = {
 							align = hcenter|nobaseline
-							text = "concept_good_production"
-							tooltip = "concept_good_production"
+							tooltip = "SORT_BY_PRODUCTION"
 							size = { 55 20 }
 
 							onclick = "[StatesPanel.Sort('production')]"
+
+							button = {
+								texture = "gfx/interface/buttons/sort_button_icons/sort_production.dds"
+								size = { 25 25 }
+								parentanchor = center
+								alwaystransparent = yes
+							}
 						}
 
 						sort_button = {
 							align = hcenter|nobaseline
-							text = "concept_good_consumption"
-							tooltip = "concept_good_consumption"
+							tooltip = "SORT_BY_CONSUMPTION"
 							size = { 60 20 }
 							margin_right = 7
 
 							onclick = "[StatesPanel.Sort('consumption')]"
+
+							button = {
+								texture = "gfx/interface/buttons/sort_button_icons/sort_consumption.dds"
+								size = { 25 25 }
+								parentanchor = center
+								alwaystransparent = yes
+							}
 						}
 
 						sort_button = {
 							align = hcenter|nobaseline
-							text = "BALANCE"
 							size = { 90 20 }
 							margin_right = 7
+							tooltip = "SORT_BY_BALANCE_TOOLTIP"
 
 							onclick = "[StatesPanel.Sort('balance')]"
+
+							button = {
+								texture = "gfx/interface/buttons/sort_button_icons/sort_balance.dds"
+								size = { 25 25 }
+								parentanchor = center
+								alwaystransparent = yes
+							}
 						}
 
 						sort_button = {
@@ -621,25 +645,82 @@ types state_panel_types
 
 									using = goods_list_item
 
-									textbox = {
-										align = right|nobaseline
-										text = "[Goods.GetStateProductionWithTooltip|Dv]"
-										size = { 55 40 }
-										margin_right = 10
-										parentanchor = vcenter
-										alpha = "[TransparentIfZero(Goods.GetStateProduction)]"
-									}
+									flowcontainer = {
+											direction = vertical
+											spacing =  3
+											parentanchor = vcenter
+											
+											textbox = {
+												text = "[Goods.GetStateProductionWithTooltip|Dv]"
+												alpha = "[TransparentIfZero(Goods.GetStateProduction)]"
+												align = hcenter|nobaseline
+												size = { 60 23 }
+												margin_right = 3
+												margin_left = 3
+												fontsize_min = 12
+											}
 
-									vertical_divider = {}
+											widget = {
+												tooltip = "STATE_GOODS_IMPORT_DEPENDENCE"
+												tooltipwidget = {
+													RegularTooltip_StateWorldMarketImportDependence = {}
+												}
 
-									textbox = {
-										align = right|nobaseline
-										text = "[Goods.GetStateConsumptionWithTooltip|Dv]"
-										size = { 60 40 }
-										margin_right = 10
-										parentanchor = vcenter
-										alpha = "[TransparentIfZero(Goods.GetStateConsumption)]"
-									}
+												visible = "[NotZero_CFixedPoint(Goods.GetStateImports)]"
+												
+												parentanchor = hcenter
+												size = { 46 6 }
+
+												gold_progressbar_horizontal = {
+													size = { 100% 100% }
+													
+													blockoverride "values" {
+														min = 0
+														max = "[Goods.GetStateProduction]"
+														value = "[Goods.GetStateImports]"
+													}
+												}
+											}
+										}
+
+										vertical_divider = {}
+										
+										flowcontainer = {
+											direction = vertical
+											spacing =  3
+											parentanchor = vcenter
+											
+											textbox = {
+												align = hcenter|nobaseline
+												text = "[Goods.GetStateConsumptionWithTooltip|Dv]"
+												size = { 60 23 }
+												fontsize_min = 12
+												margin_right = 3
+												margin_left = 3
+												alpha = "[TransparentIfZero(Goods.GetStateConsumption)]"
+											}
+
+											widget = {
+												tooltip = "STATE_GOODS_EXPORT_DEPENDENCE"
+												tooltipwidget = {
+													RegularTooltip_StateWorldMarketExportDependence = {}
+												}
+												visible = "[NotZero_CFixedPoint(Goods.GetStateExports)]"
+												parentanchor = hcenter
+												size = { 46 6 }
+
+												gold_progressbar_horizontal = {
+													size = { 100% 100% }
+													
+													blockoverride "values" {
+														min = 0
+														max = "[Goods.GetStateConsumption]"
+														value = "[Goods.GetStateExports]"
+													}
+												}
+											}
+										}
+
 
 									vertical_divider = {}
 
@@ -908,10 +989,30 @@ types state_panel_types
 			visible = yes
 		}
 
-		blockoverride "goto_properties" {
-			onclick = "[State.ZoomToCapital]"
-			tooltip = "ZOOM_TO_STATE"
-			enabled = "[Not( State.IsZoomingToCapital )]"
+		blockoverride "custom_goto_button" {
+			onmousehierarchyenter = "[SetCanOpenRightClickContextMenu( '(bool)no' )]"
+			onmousehierarchyleave = "[SetCanOpenRightClickContextMenu( '(bool)yes' )]"
+
+			button_icon_zoom = {
+				onclick = "[State.ZoomToCapital]"
+				onrightclick = "[GetVariableSystem.Toggle('zoom_close_to_capital')]"			
+				visible = "[Not(GetVariableSystem.Exists('zoom_close_to_capital'))]"
+
+				tooltip = "ZOOM_TO_STATE"
+				input_action = "zoom_to"
+				size = { 100% 100% }
+			}
+
+			button_icon_zoom = {
+				onclick = "[State.ZoomExtraCloseToCapital]"
+				onrightclick = "[GetVariableSystem.Toggle('zoom_close_to_capital')]"			
+				visible = "[GetVariableSystem.Exists('zoom_close_to_capital')]"
+
+				tooltip = "ZOOM_CLOSE_TO_STATE"
+				input_action = "zoom_to"
+				size = { 100% 100% }
+			}
+			
 		}
 	}
 
@@ -928,18 +1029,17 @@ types state_panel_types
 			button = {
 				size = { @panel_width_plus_14 274 }
 				texture = "[State.GetBestTexture]"
+				onrightclick = "[RightClickMenuManager.ShowForState(State.AccessSelf)]"
+				effectname = "NoHighlight"
+				distribute_visual_state = no
+				inherit_visual_state = no
+				using = fade_top_illus
+
 				vfx = {
 					blockoverride "entity_instance" {
 						entity_instance = "[State.GetBestTextureEffect]"
 					}
 				}
-
-				onrightclick = "[RightClickMenuManager.ShowForState(State.AccessSelf)]"
-				effectname = "NoHighlight"
-				distribute_visual_state = no
-				inherit_visual_state = no
-
-				using = fade_top_illus
 
 				toggle_condensed = {
 					visible = "[InDebugMode]"
@@ -964,10 +1064,15 @@ types state_panel_types
 					blockoverride "flag_tooltip" {}
 				}
 				flag = {
-					datacontext = "[State.GetOccupant]"
+					datacontext = "[State.GetEnemyWithHighestOccupation]"
+					visible = "[Country.IsValid]"
 					tooltip = "[State.GetOccupantsTooltip]"
-					visible = "[And(State.HasOccupant, State.IsFullyOccupied)]"
 					blockoverride "flag_tooltip" {}
+
+					blockoverride "onhover" {
+						onmousehierarchyenter = "[AccessHighlightManager.HighlightStateOccupation(State.Self,State.GetOccupant.Self)]"
+						onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+					}
 				}
 				chart = {
 					blockoverride "datamodel" {
@@ -993,7 +1098,7 @@ types state_panel_types
 					}
 
 					blockoverride = "chart_visible" {
-						visible = "[And(State.HasOccupant, Not(State.IsFullyOccupied))]"
+						visible = "[GreaterThan_int32(GetDataModelSize(State.GetOccupationPiechartData),'(int32)1')]"
 					}
 
 					blockoverride "title" {}
@@ -1121,18 +1226,18 @@ types state_panel_types
 			}
 		}
 
-		### NAVAL INVASIONS
+		### INVASIONS
 		flowcontainer = {
-			visible = "[Not(IsDataModelEmpty(State.GetActiveNavalInvasions))]"
+			visible = "[Not(IsDataModelEmpty(State.GetInvasions))]"
 			spacing = 10
 			direction = vertical
 			parentanchor = hcenter
 			margin = { 0 10 }
 
-			datamodel = "[State.GetActiveNavalInvasions]"
+			datamodel = "[State.GetInvasions]"
 
 			item = {
-				naval_invasion_list_item = {}
+				invasion_list_item = {}
 			}
 		}
 
@@ -1173,9 +1278,8 @@ types state_panel_types
 				}
 
 				blockoverride "goto" {
-					datacontext = "[State.AccessMarket]"
 					tooltip = "GO_TO_BUTTON_MARKET"
-					onclick = "[InformationPanelBar.OpenMarketPanelTab(State.AccessMarket, 'default')]"
+					onclick = "[InformationPanelBar.OpenMarketPanelTab(State.GetMarket, 'default')]"
 				}
 			}
 
@@ -1197,9 +1301,8 @@ types state_panel_types
 				}
 
 				blockoverride "goto" {
-					datacontext = "[State.AccessMarket]"
 					tooltip = "GO_TO_BUTTON_MARKET"
-					onclick = "[InformationPanelBar.OpenMarketPanel(State.AccessMarket)]"
+					onclick = "[InformationPanelBar.OpenMarketPanel(State.GetMarket)]"
 				}
 			}
 		}
@@ -1358,7 +1461,7 @@ types state_panel_types
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
-		
+		 
 		flowcontainer = {
 			parentanchor = hcenter
 			margin = { 10 10 }
@@ -1727,6 +1830,143 @@ types state_panel_types
 					text = "STATE_DEVASTATION"
 				}
 			}
+			
+			state_panel_status_item_small = {
+				visible = "[GreaterThan_CFixedPoint(State.GetBlockadeLevel, '(CFixedPoint)0')]"
+				datacontext = "[State.GetStateRegion]"
+				tooltip = "TOOLTIP_STATE_BLOCKADE_LEVEL"
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/state_status_icons/blockaded.dds"
+				}
+
+				blockoverride "name" {
+					text = "STATE_BLOCKADE_LEVEL"
+				}
+			}			
+			
+			state_panel_status_item_small = {
+				tooltip = "STATE_WORLD_MARKET_ACCESS_DESC"
+				alwaystransparent = no
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/state_status_icons/world_market_access.dds"
+				}
+
+				blockoverride "name" {
+					text = "STATE_WORLD_MARKET_ACCESS"
+				}
+
+				blockoverride "alpha" {
+					alpha = "[TransparentIfZero_int32(State.GetTradeCapacity)]"
+				}
+
+				blockoverride "navigation_button" {
+					datacontext = "[State.AccessBuilding('building_trade_center')]"
+					
+					# BUILD IF TRADE CAPACITY IS ZERO
+					button_icon_plus_action = {
+						visible = "[And(IsValid( Building.QueueConstruction ), EqualTo_int32(State.GetTradeCapacity,'(int32)0'))]"
+						tooltip = "[Building.GetQueueConstructionTooltip]"
+						onclick = "[Execute( Building.QueueConstruction )]"
+						
+						position = { -5 5 }
+						size = { 25 25 }
+						parentanchor = top|right
+					}
+
+					# GOTO IF TRADE CAPACITY IS ABOVE ZERO
+					button_icon_goto = {
+						visible = "[GreaterThan_int32(State.GetTradeCapacity,'(int32)0')]"
+						onclick = "[InformationPanelBar.OpenPanel('world_market')]"
+						tooltip = "GOTO_WORLD_MARKET"
+						
+						position = { -5 5 }
+						size = { 25 25 }
+						parentanchor = top|right
+					}
+				}
+			}			
+			
+			state_panel_status_item_small = {
+				tooltip = "STATE_TRADE_CAPACITY_DESC"
+				visible = "[GreaterThan_int32(State.GetTradeCapacity,'(int32)0')]"
+				alwaystransparent = no
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/state_status_icons/trade_capacity.dds"
+				}
+
+				blockoverride "name" {
+					text = "STATE_TRADE_CAPACITY"
+				}
+
+				blockoverride "goto" {
+					
+				}
+
+				blockoverride "navigation_button" {
+					flowcontainer = {
+						position = { -5 5 }
+						parentanchor = top|right
+						datacontext = "[State.AccessBuilding('building_trade_center')]"
+						spacing = 1
+
+						button_icon_plus_action = {
+							size = { 25 25 }
+							visible = "[IsValid( Building.QueueConstruction )]"
+							tooltip = "[Building.GetQueueConstructionTooltip]"
+							onclick = "[Execute( Building.QueueConstruction )]"
+						}
+
+						button_icon_goto = {
+							size = { 25 25 }
+							tooltip = "GO_TO_BUTTON_BUILDING"
+							onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
+						}
+					}
+				}
+
+				blockoverride "extra_widget" {
+					flowcontainer = {
+						datacontext = "[State.AccessBuilding('building_trade_center')]"
+						spacing = 5
+						overlappingitembox = {
+							block "trade_center_extra_info_size" {
+								size = { 70 23 }
+							}
+							
+							datamodel = "[DataModelFirst(Building.AccessState.GetImports, '(int32)3')]"
+							
+							item = {
+								small_goods_button = {
+									blockoverride "tooltip" {
+										tooltip = "[Goods.GetStateImportsDesc]"
+									}
+								}		
+							}
+						}
+
+						vertical_divider = {}
+
+						overlappingitembox = {
+							block "trade_center_extra_info_size" {
+								size = { 70 23 }
+							}
+							
+							datamodel = "[DataModelFirst(Building.AccessState.GetExports, '(int32)3')]"
+							
+							item = {
+								small_goods_button = {
+									blockoverride "tooltip" {
+										tooltip = "[Goods.GetStateExportsDesc]"
+									}
+								}		
+							}
+						}
+					}
+				}
+			}			
 
 			state_panel_status_item_small = {
 				name = "tutorial_highlight_state_infrastructure"
@@ -1823,7 +2063,7 @@ types state_panel_types
 				tooltip = "STATE_STRATEGIC_OBJECTIVE_TOOLTIP"
 
 				blockoverride "texture" {
-					texture = "gfx/interface/icons/lens_toolbar_icons/designate_strategic_objective_lens_option.dds"
+					texture = "gfx/interface/icons/formation_order_icons/strategic_objective.dds"
 				}
 
 				blockoverride "name" {
@@ -1845,7 +2085,7 @@ types state_panel_types
 			}
 
 			state_panel_status_item_small = {
-				visible = "[State.IsFunctioningTreatyPort]"
+				visible = "[State.IsTreatyPort]"
 				tooltip = "TOOLTIP_TREATY_PORT"
 
 				blockoverride "texture" {
@@ -1856,20 +2096,7 @@ types state_panel_types
 					text = "[concept_treaty_port]"
 				}
 			}
-
-			state_panel_status_item_small = {
-				visible = "[And(Not(State.IsFunctioningTreatyPort),State.IsTreatyPort)]"
-				tooltip = "TOOLTIP_INACTIVE_TREATY_PORT"
-
-				blockoverride "texture" {
-					texture = "gfx/interface/icons/state_status_icons/treaty_port_icon.dds"
-				}
-
-				blockoverride "name" {
-					text = "TREATY_PORT_INACTIVE"
-				}
-			}
-
+			
 			state_panel_status_item_small = {
 				visible = "[State.HasClaims]"
 
@@ -1921,7 +2148,11 @@ types state_panel_types
 				item = {
 					container = {
 						state_panel_status_item_small = {
-							tooltip = "[Decree.GetTooltip]"
+							tooltipwidget = {
+								FancyTooltip_DecreeType = {
+									datacontext = "[Decree.GetType]"
+								}
+							}
 							
 							blockoverride "texture" {
 								texture = "[Decree.GetTexture]"
@@ -2573,6 +2804,7 @@ types state_panel_types
 			block "icon" {
 				icon = {
 					block "texture" {}
+					block "alpha" {}
 					size = { 70 70 }
 					parentanchor = vcenter
 				}
@@ -2586,6 +2818,7 @@ types state_panel_types
 				}
 				textbox = {
 					block "name" {}
+					block "alpha" {}
 					autoresize = yes
 					block "maximumsize" {
 						minimumsize = { 160 -1 }
@@ -2737,8 +2970,8 @@ types state_panel_types
 					}
 					small_flag = {
 						datacontext = "[State.GetOccupant]"
+						visible = "[State.HasOccupation]"
 						tooltip = "[State.GetOccupantsTooltip]"
-						visible = "[State.HasOccupant]"
 						blockoverride "flag_tooltip" {}
 					}
 				}
@@ -2922,7 +3155,7 @@ types state_panel_types
 					}
 
 					state_panel_status_item_condensed_icon = {
-						visible = "[State.IsFunctioningTreatyPort]"
+						visible = "[State.IsTreatyPort]"
 						tooltip = "TOOLTIP_TREATY_PORT"
 
 						blockoverride "texture" {
@@ -2931,19 +3164,6 @@ types state_panel_types
 
 						blockoverride "name" {
 							text = "[concept_treaty_port]"
-						}
-					}
-
-					state_panel_status_item_condensed_icon = {
-						visible = "[And(Not(State.IsFunctioningTreatyPort),State.IsTreatyPort)]"
-						tooltip = "TOOLTIP_INACTIVE_TREATY_PORT"
-
-						blockoverride "texture" {
-							texture = "gfx/interface/icons/state_status_icons/treaty_port_icon.dds"
-						}
-
-						blockoverride "name" {
-							text = "INACTIVE_TREATY_PORT"
 						}
 					}
 				}
@@ -3008,9 +3228,8 @@ types state_panel_types
 					}
 
 					blockoverride "goto" {
-						datacontext = "[State.AccessMarket]"
 						tooltip = "GO_TO_BUTTON_MARKET"
-						onclick = "[InformationPanelBar.OpenMarketPanelTab(State.AccessMarket, 'default')]"
+						onclick = "[InformationPanelBar.OpenMarketPanelTab(State.GetMarket, 'default')]"
 					}
 				}
 				state_panel_status_item_condensed = {
@@ -3029,9 +3248,8 @@ types state_panel_types
 					}
 
 					blockoverride "goto" {
-						datacontext = "[State.AccessMarket]"
 						tooltip = "GO_TO_BUTTON_MARKET"
-						onclick = "[InformationPanelBar.OpenMarketPanel(State.AccessMarket)]"
+						onclick = "[InformationPanelBar.OpenMarketPanel(State.GetMarket)]"
 					}
 				}
 
@@ -3815,7 +4033,7 @@ types building_item_types
 					align = right|nobaseline
 					max_width = 52
 					fontsize_min = 12
-					raw_text = "#v[State.GetOwner.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|1+]#!"
+					raw_text = "#v [State.GetOwner.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|1+]#!"
 				}
 				
 				textbox = {
@@ -3836,7 +4054,7 @@ types building_item_types
 					autoresize = yes
 					alpha = "[TransparentIfFalse(Building.IsActive)]"
 					align = right|nobaseline
-					raw_text = "#N [State.GetOwner.GetCustom('currency_symbol')]-[Building.GetGovernmentExpenses|D-]#!"
+					raw_text = "#N [State.GetOwner.GetCustom('currency_symbol')] -[Building.GetGovernmentExpenses|D-]#!"
 				}
 			}
 		}
