@@ -1,0 +1,181 @@
+﻿financial_center_je_1 = {
+	icon = "gfx/interface/icons/event_icons/financial_center.dds"
+
+	group = je_group_ef
+ 	should_be_pinned_by_default = yes
+ 
+	is_shown_when_inactive = {
+		always = yes
+	}
+	possible = {
+		has_financial_center = yes
+	}
+  
+	status_desc = {
+		first_valid = {
+			triggered_desc = { 
+				desc = status_financial_center_1     # Exceptionnel / euphorique
+				trigger = { economic_sentiment_index_base_JE_fixe >= 4 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_2     # Très bon
+				trigger = { economic_sentiment_index_base_JE_fixe < 4 economic_sentiment_index_base_JE_fixe >= 3 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_3     # Bon
+				trigger = { economic_sentiment_index_base_JE_fixe < 3 economic_sentiment_index_base_JE_fixe >= 2 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_4     # Modérément positif
+				trigger = { economic_sentiment_index_base_JE_fixe < 2 economic_sentiment_index_base_JE_fixe >= 1 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_5     # Neutre / stable
+				trigger = { economic_sentiment_index_base_JE_fixe < 1 economic_sentiment_index_base_JE_fixe >= 0 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_6     # Léger ralentissement
+				trigger = { economic_sentiment_index_base_JE_fixe < 0 economic_sentiment_index_base_JE_fixe >= -1 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_7     # Dégradation claire
+				trigger = { economic_sentiment_index_base_JE_fixe < -1 economic_sentiment_index_base_JE_fixe >= -2 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_8     # Crise émergente
+				trigger = { economic_sentiment_index_base_JE_fixe < -2 economic_sentiment_index_base_JE_fixe >= -3 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_9     # Crise grave
+				trigger = { economic_sentiment_index_base_JE_fixe < -3 economic_sentiment_index_base_JE_fixe >= -4 }
+			}
+			triggered_desc = { 
+				desc = status_financial_center_10    # Effondrement total
+				trigger = { economic_sentiment_index_base_JE_fixe < -4 }
+			}
+		}
+	} 
+
+	scripted_button = economic_sentiment_index_base_1_button 
+	scripted_button = economic_sentiment_index_base_2_button 
+	scripted_button = economic_sentiment_index_base_3_button 
+	scripted_button = economic_sentiment_index_base_4_button 
+	scripted_button = economic_sentiment_index_base_5_button 
+	scripted_button = economic_sentiment_index_base_6_button 
+
+	scripted_progress_bar = financial_center_progress_bar
+	
+	#progressbar and var
+	on_monthly_pulse = {
+		effect = {   
+			je:financial_center_je_1 ?= { 
+				set_bar_progress = {
+					value = owner.economic_sentiment_index_base_JE_fixe
+					name = financial_center_progress_bar
+				}  
+			}  
+			remove_modifier = economic_sentiment_index_modifier_2 
+			if = { 
+				limit = {
+					economic_sentiment_index_malus_factor > 0
+				}  
+				remove_modifier = economic_sentiment_index_modifier_2 
+				add_modifier = {
+					name = economic_sentiment_index_modifier_2 
+					multiplier = economic_sentiment_index_malus_factor
+				}
+			} 
+		}  
+	}  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+}
+ 
+financial_center_je_2 = {
+	icon = "gfx/interface/icons/event_icons/financial_center.dds"
+
+	group = je_group_ef
+ 	should_be_pinned_by_default = yes
+ 
+	is_shown_when_inactive = {
+		always = yes
+	}
+	possible = {
+		has_financial_center = yes
+	}
+  
+	status_desc = {
+		first_valid = {
+			triggered_desc = { 
+				desc = status_speculative_share_1     # 🟥 Exceptionnel / Euphorique — Bulle systémique
+				trigger = { financial_centre_total_gdp_product_ratio >= 0.40 }
+			}
+			triggered_desc = { 
+				desc = status_speculative_share_2     # 🟧 Élevé / Bulle localisée
+				trigger = { financial_centre_total_gdp_product_ratio < 0.40 financial_centre_total_gdp_product_ratio >= 0.25 }
+			}
+			triggered_desc = { 
+				desc = status_speculative_share_3     # 🟨 Modéré / Tension spéculative
+				trigger = { financial_centre_total_gdp_product_ratio < 0.25 financial_centre_total_gdp_product_ratio >= 0.15 }
+			}
+			triggered_desc = { 
+				desc = status_speculative_share_4     # 🟩 Faible / Marché sain
+				trigger = { financial_centre_total_gdp_product_ratio < 0.15 }
+			}
+		}
+	}
+
+	scripted_button = economic_sentiment_index_base_1_button 
+	scripted_button = economic_sentiment_index_base_2_button 
+	scripted_button = economic_sentiment_index_base_3_button 
+	scripted_button = economic_sentiment_index_base_4_button 
+	scripted_button = economic_sentiment_index_base_5_button 
+	scripted_button = economic_sentiment_index_base_6_button 
+
+	scripted_progress_bar = speculative_share_progress_bar
+	
+	#progressbar and var
+	on_monthly_pulse = {
+		effect = {   
+			je:financial_center_je_2 ?= { 
+				set_bar_progress = {
+					value = owner.financial_centre_total_gdp_product_ratio
+					name = speculative_share_progress_bar
+				}  
+			}  
+			# remove_modifier = economic_sentiment_index_modifier_2 
+			# if = { 
+			# 	limit = {
+			# 		economic_sentiment_index_malus_factor > 0
+			# 	}  
+			# 	remove_modifier = economic_sentiment_index_modifier_2 
+			# 	add_modifier = {
+			# 		name = economic_sentiment_index_modifier_2 
+			# 		multiplier = economic_sentiment_index_malus_factor
+			# 	}
+			# } 
+		}  
+	}   
+}  

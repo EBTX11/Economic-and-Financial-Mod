@@ -1,0 +1,954 @@
+# COPY-PASTED FOR NOW
+@panel_width_minus_30 = 510
+@panel_width_minus_20 = 520			# used to be 450
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+types MilitaryPanelCharacters {
+
+	### MOBILIZATION CONTROLS
+	type rank_icon = widget {
+		block "icon_size" {
+			size = { 34 34 }
+		}
+	
+		# Background 
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/backgrounds/round_button_bg.dds"
+		}
+
+		# Rank
+		icon = {
+			size = { 75% 75% }
+			parentanchor = center
+			texture = "[Character.GetCommanderRank.GetTexture]"
+			datacontext = "[Character]"
+			datacontext = "[Character.GetCommanderRank]"
+			tooltipwidget = {
+				FancyTooltip_CommanderRank = {}
+			}
+		}
+	}
+
+	type morale_bar = white_progressbar_vertical {
+		size = { 6 24 }
+
+		blockoverride "values" {
+			min = 0
+			max = 1
+			block "morale_value" {
+			}
+		}
+		blockoverride "color" {
+			block "morale_color" {
+			}
+		}
+	}
+
+	### MILITARY FORMATIONS LIST
+	type military_panel_formation_entry = flowcontainer {
+		parentanchor = hcenter
+		minimumsize = { @panel_width  90 }
+		maximumsize = { @panel_width -1 }
+		direction = vertical
+
+		using = entry_bg_fancy
+		
+		# Name and info header
+		container = {
+			minimumsize = { @panel_width 35 }
+
+			background = {
+				using = fade_top_entry_header_colored
+				color = "[MilitaryFormation.GetCountry.GetMapColor]"
+			}
+			
+
+			flowcontainer = {
+				position = { 12 1 }
+				parentanchor = vcenter
+				margin_top = 7
+				margin_bottom = 5
+				margin_left = -3
+
+				button = {
+					visible = "[MilitaryFormation.GetCountry.IsPlayer]"
+					onclick = "[PopupManager.ShowMilitaryFormationChangeName(MilitaryFormation.Self)]"
+					parentanchor = vcenter
+					size = { 46 46 }
+					using = tooltip_ne
+					tooltip = "CUSTOMIZE_NAME_AND_EMBLEM"
+				
+					button = {
+						size = { 46 46 }
+						texture = "[MilitaryFormation.GetFlag]"
+						color = "[MilitaryFormation.GetFlagColor]"
+						alwaystransparent = yes
+					}
+				}
+
+				icon = {
+					visible = "[Not(MilitaryFormation.GetCountry.IsPlayer)]"
+					size = { 46 46 }
+					parentanchor = vcenter
+					texture = "[MilitaryFormation.GetFlag]"
+					color = "[MilitaryFormation.GetFlagColor]"
+				}
+
+				button = {
+					widgetid = "[Concatenate('tutorial_highlight_formation_go_to_', MilitaryFormation.GetIDString)]"
+					parentanchor = vcenter
+					size = { 340 50 }
+					using = default_button
+					using = tooltip_ne
+					tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+					onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
+					onrightclick = "[RightClickMenuManager.ToggleMilitaryFormation(MilitaryFormation.AccessSelf, PdxGuiWidget.AccessSelf)]"
+					onmousehierarchyenter = "[AccessHighlightManager.HighlightMilitaryFormation( MilitaryFormation.Self )]"
+					onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+
+					flowcontainer = {
+						parentanchor = vcenter
+						position = { 10 0 }
+						direction = vertical
+
+						textbox = {
+							autoresize = yes
+							default_format = "#header"
+							align = nobaseline
+							elide = right
+							max_width = 320
+							text = "[MilitaryFormation.GetNameNoFormatting]"
+						}
+
+						flowcontainer = {
+							spacing = 7
+
+							icon = {
+								visible = "[MilitaryFormation.IsExiled]"
+								size = { 23 23 }
+								parentanchor = vcenter
+								tooltip = "MILITARY_FORMATION_EXILED_ARMY_EFFECT_TOOLTIP"
+								texture = "gfx/interface/icons/military_icons/exiled_state_no_bg.dds"
+							}
+
+							textbox = {
+								maximumsize = { 320 -1 }
+								minimumsize = { 320 -1 }
+								multiline = yes
+								autoresize = yes
+								using = fontsize_small
+								align = nobaseline
+								text = "[MilitaryFormation.GetShortFormationStatusDesc]"
+							}
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				position = { -10 1 }
+				parentanchor = right|vcenter
+				spacing = 2
+
+				button_icon_edit = {
+					size = { 28 28 }
+					visible = "[MilitaryFormation.GetCountry.IsPlayer]"
+					using = tooltip_ne
+					tooltip = "CUSTOMIZE_NAME_AND_EMBLEM"
+					onclick = "[PopupManager.ShowMilitaryFormationChangeName(MilitaryFormation.Self)]"
+				}
+
+				# Zoom-to button
+				button_icon_zoom = {
+					parentanchor = vcenter
+					size = { 28 28 }
+
+					block "goto_properties" {
+						onclick = "[MilitaryFormation.ZoomToMapMarkerPosition]"
+						using = tooltip_ne
+						tooltip = "ZOOM_TO_MILITARY_FORMATION"
+						enabled = "[Not( MilitaryFormation.IsZoomingToMapMarkerPosition )]"
+					}
+				}
+
+				# pin button
+				widget = {
+					size = { 28 28 }
+					parentanchor = vcenter
+
+					button_icon_toggle_pin = {
+						name = "military_formation_pin_button"
+						parentanchor = center
+
+						blockoverride "view_1" {
+							visible = "[Not(MilitaryFormation.IsPinnedInOutliner)]"
+							using = tooltip_ne
+						}
+
+						blockoverride "view_2" {
+							visible = "[MilitaryFormation.IsPinnedInOutliner]"
+							using = tooltip_ne
+						}
+
+						blockoverride "on_click" {
+							onclick = "[MilitaryFormation.TogglePinInOutliner]"
+						}
+					}
+				}
+
+				### DELETE FORMATION
+				button_icon_round_action = {
+					onclick = "[PopupManager.AskConfirmation( MilitaryFormation.Disband )]"
+					tooltip = "MILITARY_FORMATION_DISBAND_TOOLTIP"
+					parentanchor = vcenter
+
+					size = { 28 28 }
+					using = tooltip_ne
+					enabled = "[IsValid( MilitaryFormation.Disband )]"
+					blockoverride "icon_size" { size = { 65% 65% } }
+
+					blockoverride "icon" {
+						texture = "gfx/interface/icons/military_icons/disband_formation.dds"
+					}
+				}
+			}
+		}
+
+		# MILITARY FORMATION INFO
+		container = {
+			minimumsize = { @panel_width_minus_20 -1 }
+			maximumsize = { @panel_width_minus_20 -1 }
+			parentanchor = hcenter
+
+			flowcontainer = {
+				direction = vertical
+				parentanchor = vcenter
+
+				flowcontainer = {
+					minimumsize = { 520 40 }
+					maximumsize = { 520 40 }
+
+					flowcontainer = {
+						spacing = 5
+						margin_right = 5
+						parentanchor = vcenter
+						margin_left = 10
+
+						flowcontainer = {
+							spacing = 9
+
+							### NUMBER OF UNITS
+							header_grid_item = {
+								size = { 132 30 }
+								tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+
+								blockoverride "text" {
+									text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS"
+								}
+
+								blockoverride "text_maximumsize" {
+									maximumsize = { 78 -1 }
+								}
+
+								blockoverride "icon_size" {
+									using = fontsize_large
+								}
+
+								blockoverride "icon" {
+									text = "[MilitaryFormation.GetCombatUnitsTypeIcon]"
+								}
+
+								blockoverride "progressbar" {
+									manpower_bar = {
+										using = formation_item_progressbar_size
+										parentanchor = vcenter
+									}
+								}
+							}
+
+							header_grid_item = {
+								size = { 85 30 }
+								tooltip = "MILITARY_FORMATION_EXPENSE_TOOLTIP_TAG"
+
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetGoodsConsumptionCostRaw|0-K]"
+								}
+
+								blockoverride "text_maximumsize" {
+									maximumsize = { 48 -1 }
+								}
+
+								blockoverride "icon_size" {}
+
+								blockoverride "icon" {
+									raw_text = "[GetPlayer.GetCustom('currency_symbol')]"
+								}
+
+								blockoverride "icon_position" {
+									position = { 3 0 }
+								}
+							}
+
+							### ATTRITION
+							header_grid_item = {
+								size = { 85 30 }
+								tooltip = "[MilitaryFormation.GetAttritionRiskDesc]"
+								visible = "[MilitaryFormation.IsArmy]"
+
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetAverageAttritionPerWeek|%1^-]"
+								}
+
+								blockoverride "text_maximumsize" {
+									maximumsize = { 48 -1 }
+								}
+
+								blockoverride "icon_size" {}
+
+								blockoverride "icon_position" {
+									position = { 4 0 }
+								}
+
+								blockoverride "icon" {
+									text = "MILITARY_FORMATION_ATTRITION_RISK_ICON"
+								}
+								alpha = "[TransparentIfZero(MilitaryFormation.GetAttritionRaw)]"
+							}
+
+							### MORALE
+							header_grid_item = {
+								size = { 85 30 }
+								tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+
+								blockoverride "text" {
+									raw_text = "MILITARY_FORMATION_MORALE_NO_ICON"
+								}
+
+								blockoverride "text_maximumsize" {
+									maximumsize = { 48 -1 }
+								}
+
+								blockoverride "icon_size" {}
+
+								blockoverride "icon" {
+									raw_text = "@morale!"
+								}
+
+								blockoverride "icon_position" {
+									position = { 4 -1 }
+								}
+
+								blockoverride "progressbar" {
+									morale_bar = {
+										using = formation_item_progressbar_size
+										parentanchor = vcenter
+										
+										blockoverride "morale_value" {
+											value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
+										}
+										blockoverride "morale_color" {
+											color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
+										}
+									}
+								}
+							}
+
+
+							### ORGANIZATION
+							header_grid_item = {
+								size = { 85 30 }
+								tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+
+								blockoverride "text" {
+									raw_text = "[MilitaryFormation.GetOrganizationPercentage|%v0]"
+								}
+
+								blockoverride "text_maximumsize" {
+									maximumsize = { 48 -1 }
+								}
+
+								blockoverride "icon_size" {}
+
+								blockoverride "icon" {
+									raw_text = "@organization!"
+								}
+
+								blockoverride "icon_position" {
+									position = { 4 0 }
+								}
+
+								blockoverride "progressbar" {
+									organization_bar = {
+										using = formation_item_progressbar_size
+										parentanchor = vcenter
+										
+										blockoverride "organization_value" {
+											value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+										}
+										blockoverride "organization_color" {
+											color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				# ORDERS + GENERALS
+				flowcontainer = {
+					spacing = 10
+					parentanchor = hcenter
+					minimumsize = { @panel_width_minus_20 -1 }
+					margin = { 0 4 }
+					margin_left = 2
+
+
+					### If not Player and no commanders - Show empty state
+					empty_state = {
+						blockoverride "visible" {
+							visible = "[And(IsDataModelEmpty(MilitaryFormation.GetCommanders), Not(MilitaryFormation.GetCountry.IsPlayer))]"
+						}
+
+						blockoverride "size" {
+							minimumsize = { 330 -1 }
+							maximumsize = { 330 -1 }
+						}
+
+						blockoverride "fontsize" {
+							using = fontsize_large
+						}
+
+						block "margin" {
+							margin_top = 10
+							margin_bottom = 10
+						}
+						blockoverride "text" {
+							text = "NO_COMMANDERS_IN_MILITARY_FORMATION"
+						}
+					}
+
+					### If not Player - Only show commanders
+					dynamicgridbox = {
+						visible = "[And( Not(MilitaryFormation.GetCountry.IsPlayer), Not(IsDataModelEmpty(MilitaryFormation.GetCommanders)))]"
+						datamodel = "[MilitaryFormation.GetCommanders]"
+						parentanchor = vcenter
+						datamodel_wrap = 2
+						flipdirection = yes
+						minimumsize = { 310 -1 }
+
+						item = {
+							widget = {
+								size = { 155 45 }
+
+								### COMMANDER
+								military_formation_commander_small = {
+									visible = "[Character.IsValid]"
+								}
+							}
+						}
+					}
+
+					### If Player - Show commanders + extra slot
+					dynamicgridbox = {
+						visible = "[MilitaryFormation.GetCountry.IsPlayer]"
+						datamodel = "[MilitaryFormation.GetCommandersWithRecruitableSlot]"
+						parentanchor = vcenter
+						datamodel_wrap = 2
+						flipdirection = yes
+						minimumsize = { 310 -1 }
+
+						item = {
+							widget = {
+								size = { 155 45 }
+
+								### COMMANDER
+								military_formation_commander_small = {
+									visible = "[Character.IsValid]"
+								}
+
+								### RECRUIT GENERAL
+								add_character_button_long = {
+									visible = "[And(And(Not(Character.IsValid), MilitaryFormation.IsArmy), MilitaryFormation.GetCountry.IsPlayer)]"
+									parentanchor = center
+
+									blockoverride "tooltip" {
+										tooltip = "RECRUIT_CHARACTER_GENERAL"
+									}
+
+									blockoverride "onclick" {
+										onclick = "[PopupManager.ToggleRecruitFormationGeneral( MilitaryFormation.Self )]"
+									}
+								}
+
+								### RECRUIT ADMIRAL
+								add_character_button_long = {
+									visible = "[And(And(Not(Character.IsValid), MilitaryFormation.IsFleet), MilitaryFormation.GetCountry.IsPlayer)]"
+									parentanchor = center
+
+									blockoverride "tooltip" {
+										tooltip = "RECRUIT_CHARACTER_ADMIRAL"
+									}
+
+									blockoverride "onclick" {
+										onclick = "[PopupManager.ToggleRecruitFormationAdmiral( MilitaryFormation.Self )]"
+									}
+
+									blockoverride "recruit_character_text" {
+										text = "RECRUIT_ADMIRAL_BUTTON"
+									}
+								}
+							}
+						}
+					}
+
+					widget = {
+						visible = "[MilitaryFormation.IsFleet]"
+						size = { 50 50 }
+					}
+
+					vertical_divider = {
+						visible = "[MilitaryFormation.IsArmy]"
+						parentanchor = vcenter
+					}
+
+					# FORMATION ORDERS
+					flowcontainer = {
+						spacing = 2
+
+						# station
+						button_icon_round_map_interaction = {
+							visible = "[MilitaryFormation.IsArmy]"
+							size = { 45 45 }
+							tooltip = "STATION_MILITARY_FORMATION_TOOLTIP"
+							onclick = "[MilitaryFormation.OnStationClicked]"
+							using = tooltip_ne
+							
+							blockoverride "icon_size" { 
+								size = { 75% 75% }
+							}
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/station_armies.dds"
+							}
+
+							action_selection_number = {
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumStationSelections|+]"
+								}
+							}
+						}
+
+						# deploy to front
+						button_icon_round_map_interaction = {
+							visible = "[MilitaryFormation.IsArmy]"
+							size = { 45 45 }
+							tooltip = "DEPLOY_MILITARY_FORMATION_TO_FRONT_TOOLTIP"
+							onclick = "[MilitaryFormation.OnDeployToFrontClicked]"
+							enabled = "[MilitaryFormation.IsMobilized]"
+							using = tooltip_ne
+
+							blockoverride "icon_size" { 
+								size = { 75% 75% }
+							}
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/send_to_front.dds"
+							}
+
+							action_selection_number = {
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumDeployToFrontSelections|+]"
+								}
+							}
+						}
+
+						# station
+						button_icon_round_map_interaction = {
+							visible = "[MilitaryFormation.IsFleet]"
+							blockoverride "icon_size" { size = { 75% 75% } }
+							size = { 45 45 }
+							tooltip = "STATION_MILITARY_FORMATION_TOOLTIP"
+							enabled = "[MilitaryFormation.CanStation]"
+							onclick = "[MilitaryFormation.OnStationClicked]"
+							using = tooltip_ne
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/station_fleet.dds"
+							}
+
+							action_selection_number = {
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumStationSelections|+]"
+								}
+							}
+						}
+
+						# deploy to sea node
+						button_icon_round_map_interaction = {
+							visible = "[MilitaryFormation.IsFleet]"
+							blockoverride "icon_size" { size = { 75% 75% } }
+							size = { 45 45 }
+							datacontext = "[MilitaryFormation]" # needed for the tooltip
+							tooltip = "DEPLOY_MILITARY_FORMATION_TO_SEA_NODE_TOOLTIP"
+                            enabled = "[MilitaryFormation.CanDeployToSeaNode]"
+							onclick = "[MilitaryFormation.OnDeployToSeaNodeClicked]"
+							using = tooltip_ne
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/deploy_to_sea.dds"
+							}
+
+							action_selection_number = {
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumDeployToSeaNodeSelections|+]"
+								}
+							}
+						}
+
+						### INVASION
+						button_icon_round_map_interaction = {
+							size = { 45 45 }
+							tooltip = "MILITARY_FORMATION_INVASION_TOOLTIP"
+							onclick = "[MilitaryFormation.OnInvasionClicked]"
+							using = tooltip_ne
+							enabled = "[MilitaryFormation.CanInvade]"
+							
+							blockoverride "icon_size" { 
+								size = { 75% 75% }
+							}
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/invasion_land_and_naval.dds"
+							}
+						}
+
+						### STRATEGIC OBJECTIVE
+						button_icon_round_map_interaction = {
+							visible = "[MilitaryFormation.IsArmy]"
+							blockoverride "icon_size" { size = { 75% 75% } }
+							size = { 45 45 }
+							parentanchor = vcenter
+							tooltip = "MILITARY_FORMATION_SET_STRATEGIC_OBJECTIVE_TOOLTIP"
+							onclick = "[MilitaryFormation.OnSetStrategicObjectiveClicked]"
+							using = tooltip_ne
+
+							blockoverride "icon" {
+								texture = "gfx/interface/icons/formation_order_icons/strategic_objective.dds"
+							}
+
+							action_selection_number = {
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumStrategicObjectiveSelections|+]"
+								}
+							}
+
+							action_selection_number = {
+								parentanchor = right
+
+								blockoverride "position" {
+							        position = { -5 0 }
+							    }
+
+								blockoverride "text" {
+									text = "[MilitaryFormation.GetNumStrategicObjectiveActive|;]"
+								}
+							}
+						}
+					}
+				}
+
+				flowcontainer = {
+					spacing = 6
+					parentanchor = hcenter
+
+					military_formation_mobilize_button = {
+						visible = "[MilitaryFormation.IsArmy]"
+
+						blockoverride "size" {
+							size = { 257 45 }
+						}
+
+						blockoverride "button_size" {
+							size = { 250 75% }
+						}
+
+						blockoverride "fontsize" {}
+
+						blockoverride "mobilization_icon_size" {
+							size = { 45 45 }
+						}
+					}
+
+					raise_conscripts_button = {
+						visible = "[MilitaryFormation.IsArmy]"
+						
+						using = tooltip_below
+
+						blockoverride "size" {
+							size = { 257 45 }
+						}
+
+						blockoverride "button_size" {
+							size = { 250 75% }
+						}
+
+						blockoverride "mobilization_icon_size" {
+							size = { 45 45 }
+						}
+
+						blockoverride "fontsize" {}
+					}
+				}
+			}
+		}
+		
+		# BATTALIONS / FLOTILLAS
+		section_header_button = {
+			parentanchor = hcenter
+			size = { 520 38 }
+		
+			visible = "[GreaterThan_int32(GetDataModelSize(MilitaryFormation.GetCombatUnitEntries), '(int32)0')]"
+			enabled = "[Not(IsDataModelEmpty( MilitaryFormation.GetCombatUnitEntries ))]"
+			
+			blockoverride "onclick" {
+				onclick = "[GetVariableSystem.Toggle( MilitaryFormation.GetIDString )]"
+			}
+
+			blockoverride "onclick_showmore" {
+				visible = "[Not(GetVariableSystem.Exists( MilitaryFormation.GetIDString ))]"
+			}
+
+			blockoverride "onclick_showless" {
+				visible = "[GetVariableSystem.Exists( MilitaryFormation.GetIDString )]"
+			}
+
+			flowcontainer = {
+				visible = "[MilitaryFormation.IsArmy]"
+				parentanchor = vcenter
+				margin_left = 35
+				spacing = 10
+
+				textbox = {
+					visible = "[MilitaryFormation.IsFullyMobilized]"
+					parentanchor = vcenter
+					max_width = 190
+					align = nobaseline
+					autoresize = yes
+					text = "MILITARY_FORMATION_MOBILIZED_COMBAT_UNIT_GROUPS"
+					tooltip = "MILITARY_FORMATION_MOBILIZED_TOOLTIP"
+					using = elide_fontsize_min
+				}
+
+				textbox = {
+					visible = "[MilitaryFormation.IsMobilizing]" 
+					parentanchor = vcenter
+					max_width = 190
+					align = nobaseline
+					autoresize = yes
+					text = "MILITARY_FORMATION_IS_MOBILIZING_COMBAT_UNIT_GROUPS"
+					tooltip = "MILITARY_FORMATION_IS_MOBILIZING_TOOLTIP"
+					using = elide_fontsize_min
+				}
+
+				textbox = {
+					visible = "[Not(MilitaryFormation.IsMobilized)]"
+					parentanchor = vcenter
+					max_width = 190
+					align = nobaseline
+					autoresize = yes
+					text = "MILITARY_FORMATION_DEMOBILIZED_COMBAT_UNIT_GROUPS"
+					using = elide_fontsize_min
+				}
+			}
+
+			flowcontainer = {
+				visible = "[MilitaryFormation.IsFleet]"
+				parentanchor = vcenter
+				margin_left = 35
+				spacing = 10
+
+				textbox = {
+					parentanchor = vcenter
+					elide = right
+					align = nobaseline
+					autoresize = yes
+					text = "MILITARY_FORMATION_NUMBER_OF_FLEET_COMBAT_UNIT_GROUPS"
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = right|vcenter
+				spacing = 10
+
+				textbox = {
+					visible = "[MilitaryFormation.HasShippingLane]"
+					parentanchor = vcenter
+					elide = right
+					align = right|nobaseline
+					autoresize = yes
+					text = "[MilitaryFormation.GetShippingLane.GetConvoyCostFormattedShort]"
+				}
+
+				### UNIT TYPES - 5 or less
+				flowcontainer = {
+					visible = "[LessThan_int32(GetDataModelSize(MilitaryFormation.GetCombatUnitEntries), '(int32)6')]"
+					datamodel = "[MilitaryFormation.GetCombatUnitEntries]"
+					spacing = 7
+					
+					item = {
+						flowcontainer = {
+							visible = "[NotZero(MilitaryFormationUnitEntry.GetCurrentNumTotalUnits)]"
+							datacontext = "[MilitaryFormationUnitEntry.GetUnitType]"
+							datacontext = "[CombatUnitType.GetGroup]"
+							datacontext = "[MilitaryFormation.GetPrimaryCultureForType(CombatUnitType.Self)]"
+
+							tooltipwidget = {
+								FancyTooltip_CombatUnitTypeWithCulture = {
+									datacontext = "[MilitaryFormation.GetPrimaryCultureForType( CombatUnitType.Self )]"
+
+									blockoverride "text_before_before" {
+										text = "DATA_COMBAT_UNIT_TYPE_WITH_FORMATION_CONTEXT"
+										margin_bottom = 15
+									}
+								}
+							}
+
+							textbox = {
+								text = "[MilitaryFormationUnitEntry.GetCurrentNumTotalUnits|v]"
+								autoresize = yes
+								align = nobaseline
+								parentanchor = vcenter
+								margin_right = 3
+							}
+
+							widget = {
+								size = { 28 28 }
+
+								background = {
+									texture = "[CombatUnitType.GetTextureForCulture( Culture.Self )]"
+
+									modify_texture = {
+										using = simple_frame_mask
+									}
+								}
+							}
+						}
+					}
+				}
+
+				### UNIT TYPES - More than 5
+				flowcontainer = {
+					visible = "[GreaterThan_int32(GetDataModelSize(MilitaryFormation.GetCombatUnitEntries), '(int32)5')]"
+					datamodel = "[DataModelFirst(MilitaryFormation.GetCombatUnitEntries, '(int32)5')]"
+					spacing = 7
+
+					item = {
+						flowcontainer = {
+							visible = "[NotZero(MilitaryFormationUnitEntry.GetCurrentNumTotalUnits)]"
+							datacontext = "[MilitaryFormationUnitEntry.GetUnitType]"
+							datacontext = "[CombatUnitType.GetGroup]"
+							datacontext = "[MilitaryFormation.GetPrimaryCultureForType(CombatUnitType.Self)]"
+
+							tooltipwidget = {
+								FancyTooltip_CombatUnitTypeWithCulture = {
+									datacontext = "[MilitaryFormation.GetPrimaryCultureForType( CombatUnitType.Self )]"
+
+									blockoverride "text_before_before" {
+										text = "DATA_COMBAT_UNIT_TYPE_WITH_FORMATION_CONTEXT"
+										margin_bottom = 15
+									}
+								}
+							}
+
+							textbox = {
+								text = "[MilitaryFormationUnitEntry.GetCurrentNumTotalUnits|v]"
+								autoresize = yes
+								align = nobaseline
+								parentanchor = vcenter
+								margin_right = 3
+							}
+
+							widget = {
+								size = { 28 28 }
+
+								background = {
+									texture = "[CombatUnitType.GetTextureForCulture( Culture.Self )]"
+
+									modify_texture = {
+										using = simple_frame_mask
+									}
+								}
+							}
+						}
+					}
+				}
+
+				textbox = {
+					visible = "[GreaterThan_int32(GetDataModelSize(MilitaryFormation.GetCombatUnitEntries), '(int32)5')]"
+					raw_text = "#v [GetDataModelSize(DataModelSkipFirst(MilitaryFormation.GetCombatUnitEntries, '(int32)5'))|=]#!"
+					autoresize = yes
+					align = nobaseline
+					parentanchor = vcenter
+				}
+			}
+		}
+
+		### UNIT TYPES
+		flowcontainer = {
+			parentanchor = hcenter
+			direction = vertical
+			minimumsize = { @panel_width_minus_10 -1 }
+			maximumsize = { @panel_width_minus_10 -1 }
+			margin = { 10 6 }
+			margin_bottom = 10
+
+			visible = "[GetVariableSystem.Exists( MilitaryFormation.GetIDString )]"
+
+			background = {
+				using = dark_area
+			}
+		
+			dynamicgridbox = {
+				datamodel = "[MilitaryFormation.GetCombatUnitEntries]"
+				flipdirection = yes
+				parentanchor = left
+				datamodel_wrap = 4
+
+				item = {
+					military_formation_unit_group_simple = {}
+				}
+			}
+		}
+	} 
+
+	type military_formation_list = flowcontainer {
+		direction = vertical
+		parentanchor = hcenter
+
+		flowcontainer = {
+			direction = vertical
+			spacing = 10
+			parentanchor = hcenter
+			
+			block "datamodel" {
+				datamodel = "[Country.GetMilitaryFormationsArmy]"
+			}
+
+			item = {
+				container = {
+					military_panel_formation_entry = {}
+				}
+			}
+		}
+	}
+}

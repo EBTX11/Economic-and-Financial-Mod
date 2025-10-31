@@ -44,6 +44,10 @@ ef_on_monthly_pulse_recurence = {
 		subject_currency = yes
 		central_bank_production_methods = yes
 	}
+ 
+	is_at_war_monthly_pulse = yes
+	is_in_revolution_monthly_pulse = yes
+	maximum_number_companies_exceeded_monthly_pulse = yes
 
 	#for new country by revolution
 	if = {
@@ -319,6 +323,7 @@ ef_on_half_yearly_pulse_recurence = {
 	#########################################
 	ai_building_strategy = yes
 	fluctuations_gdp_1_year = yes
+	economic_sentiment_index_base_JE_fixe_half_year_pulse = yes
 }
 # ef_on_half_yearly_pulse_reset = {
 # }
@@ -408,6 +413,7 @@ ef_on_yearly_pulse_recurence = {
 	#GDP var -> limité ? 100 premier pays uniquement
 	fluctuations_gdp_5_year = yes
 	fluctuations_gdp_10_year = yes
+	is_at_war_years_pulse = yes
 }
 ef_on_yearly_pulse_reset = {
 
@@ -16778,3 +16784,111 @@ economic_crisis_count_reset = {
 		}
 	}
 } 
+
+#is_at_war_monthly_pulse
+economic_sentiment_index_base_JE_fixe_half_year_pulse = {    
+	set_variable = {
+		name = economic_sentiment_index_base_JE_fixe
+		value = economic_sentiment_index_base_JE
+	}  
+}
+#is_at_war_monthly_pulse
+is_at_war_monthly_pulse = {    
+	if = {
+		limit = {
+			is_at_war = yes  
+			var:is_at_war_monthly_pulse < 30
+		}	
+		change_variable = {
+			name = is_at_war_monthly_pulse
+			add = 1
+		}  
+	}
+	if = {
+		limit = {
+			is_at_war = no 
+			var:is_at_war_monthly_pulse > 0
+		}	
+		change_variable = {
+			name = is_at_war_monthly_pulse
+			subtract = 1
+		}  
+		set_variable = {
+			name = is_at_war_monthly_pulse
+			value = 0
+		}  
+	}
+}
+#is_in_revolution_monthly_pulse
+is_in_revolution_monthly_pulse = {    
+	if = {
+		limit = {
+			is_revolutionary = yes  
+		}	
+		change_variable = {
+			name = is_in_revolution_monthly_pulse
+			add = 1
+		}  
+	}
+	if = {
+		limit = {
+			is_revolutionary = yes  
+		}	
+		change_variable = {
+			name = is_in_revolution_monthly_pulse
+			subtract = 1
+		}  
+		# set_variable = {
+		# 	name = is_in_revolution_monthly_pulse
+		# 	value = 0
+		# }  
+	}
+}
+#maximum_number_companies_exceeded_monthly_pulse
+maximum_number_companies_exceeded_monthly_pulse = {    
+	if = {
+		limit = { 
+			maximum_number_companies_exceeded_monthly_pulse < 0 
+			var:maximum_number_companies_exceeded_monthly_pulse < 30
+		}	
+		change_variable = {
+			name = maximum_number_companies_exceeded_monthly_pulse
+			add = 1
+		}   
+	}
+	if = {
+		limit = { 
+			maximum_number_companies_exceeded_monthly_pulse >= 0
+			var:maximum_number_companies_exceeded_monthly_pulse > 0
+		}	
+		change_variable = {
+			name = maximum_number_companies_exceeded_monthly_pulse
+			subtract = 1
+		}    
+	}
+}
+
+is_at_war_years_pulse = {    
+	if = {
+		limit = {
+			is_at_war = yes 
+			var:is_at_war_years_pulse <= 5
+		}	
+		change_variable = {
+			name = is_at_war_years_pulse
+			add = 1
+		}  
+	}
+	if = {
+		limit = {
+			is_at_war = no 
+			var:is_at_war_years_pulse > 0
+		}	
+		set_variable = {
+			name = is_at_war_years_pulse
+			value = 0
+		}  
+	}
+}
+
+

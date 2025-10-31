@@ -1742,6 +1742,93 @@ container = {
 	}
 }
 
+### OBSTINANCE
+container = {
+	name = "obstinance_marker"
+	datacontext = "[ObstinanceMarker.GetState]"
+	using = clickthrough_blocker
+	alwaystransparent = no
+	ignoreinvisible = yes
+	layer = layer_map_markers
+	max_update_rate = 8
+	parentanchor = bottom|hcenter
+	tooltip = "TOOLTIP_STATE_OBSTINANCE"
+
+	widget = {
+		visible = "[IsZoomLevelNear]"
+		size = { 40 40 }
+		allow_outside = yes
+
+		flowcontainer = {
+			margin = { 5 2 }
+			margin_left = 15
+			parentanchor = vcenter
+			position = { 27 0 }
+			allow_outside = yes
+			using = clickthrough_blocker
+			alwaystransparent = no
+
+			background = {
+				using = entry_bg_simple_solid
+			}
+
+			textbox = {
+				parentanchor = vcenter
+				autoresize = yes
+				align = nobaseline
+				raw_text = "STATE_OBSTINANCE_CONDENSED"
+			}
+		}
+
+		button = {
+			parentanchor = hcenter
+			size = { 40 40 }
+			onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+			texture = "gfx/interface/icons/state_status_icons/state_obstinance.dds"
+		}
+	}
+
+	widget = {
+		visible = "[IsZoomLevelMid]"
+		size = { 40 40 }
+		allow_outside = yes
+
+		flowcontainer = {
+			margin = { 5 2 }
+			margin_left = 15
+			parentanchor = vcenter
+			position = { 27 0 }
+			using = clickthrough_blocker
+			alwaystransparent = no
+
+			background = {
+				using = entry_bg_simple_solid
+			}
+
+			textbox = {
+				parentanchor = vcenter
+				autoresize = yes
+				align = nobaseline
+				raw_text = "#v [State.GetObstinance|%r1]#!"
+			}
+		}
+
+		button = {
+			parentanchor = hcenter
+			size = { 40 40 }
+			onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+			texture = "gfx/interface/icons/state_status_icons/state_obstinance.dds"
+		}
+	}
+
+	button = {
+		visible = "[IsZoomLevelFar]"
+		size = { 30 30 }
+		onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+		texture = "gfx/interface/icons/state_status_icons/state_obstinance.dds"
+	}
+}
+
 ### PRODUCTION STATE (small)
 flowcontainer = {
 	name = "production_marker"
@@ -2518,7 +2605,6 @@ container = {
 		tooltip = "FRONT_MARKER_TOOLTIP"
 		onclick = "[FrontMarker.OnClick]"
 		parentanchor = bottom|hcenter
-		using = tooltip_below
 		size = { 70 70 }
 	}
 
@@ -2527,7 +2613,6 @@ container = {
 		tooltip = "FRONT_MARKER_TOOLTIP"
 		onclick = "[FrontMarker.OnClick]"
 		parentanchor = bottom|hcenter
-		using = tooltip_below
 		size = { 45 45 }
 	}
 
@@ -2536,7 +2621,6 @@ container = {
 		tooltip = "FRONT_MARKER_TOOLTIP"
 		onclick = "[FrontMarker.OnClick]"
 		parentanchor = bottom|hcenter
-		using = tooltip_below
 		size = { 30 30 }
 	}
 }
@@ -2605,7 +2689,6 @@ container = {
 		onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 		size = { 70 70 }
 		tooltip = "FRONT_MOVEMENT_MARKER_TOOLTIP"
-		using = tooltip_below
 		onclick = "[InformationPanelBar.OpenFrontPanel(FrontMovementMarker.GetFront.Self)]"
 	}
 
@@ -2616,7 +2699,6 @@ container = {
 		onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 		size = { 70 70 }
 		tooltip = "FRONT_MOVEMENT_MARKER_TOOLTIP"
-		using = tooltip_below
 		onclick = "[InformationPanelBar.OpenFrontPanel(FrontMovementMarker.GetFront.Self)]"
 		onrightclick = "[Execute( Front.GetDeploySelectedFormationsCommand )]"
 		onrightclick = "[PdxGuiWidget.AccessParent.FindChild('onrightclick_vfx').TriggerAnimation('show')]"
@@ -2913,6 +2995,37 @@ container = {
 			texture = "gfx/interface/map_markers/revolutionary_movement_frame.dds"
 		}
 
+	}
+}
+
+### NATIONAL AWAKENING
+container = {
+	name = "national_awakening_marker"
+	datacontext = "[NationalAwakeningMarker.GetCulture]"
+	using = clickthrough_blocker
+	alwaystransparent = no
+	ignoreinvisible = yes
+	layer = layer_map_markers
+	max_update_rate = 8
+	parentanchor = bottom|hcenter
+
+
+	button_icon_round = {
+		using = small_nib
+		size = { 40 40 }
+		onclick = "[InformationPanelBar.OpenCultureInfoPanel(Culture.AccessSelf)]"
+		
+		tooltipwidget = {
+			FancyTooltip_Culture = {}
+		}
+
+		blockoverride "icon" {
+			texture = "gfx/interface/icons/generic_icons/national_awakening.dds"
+		}
+
+		blockoverride "icon_size" {
+			size = { 75% 75% }
+		}
 	}
 }
 
@@ -3350,7 +3463,7 @@ container = {
 			onclick = "[InformationPanelBar.OpenInvasionPanel(Invasion.Self)]"
 			size = { 100% 100% }
 		}
-		
+
 		button = {
 			visible = "[InvasionMarker.CanDeploySelectedFormationsToDefend]"
 			onclick = "[InformationPanelBar.OpenInvasionPanel(Invasion.Self)]"
@@ -4156,7 +4269,7 @@ widget = {
 		alpha = "[TransparentIfFalse(Or(GreaterThan_CFixedPoint(Goods.GetStateProduction, '(CFixedPoint)0'), GreaterThan_CFixedPoint(Goods.GetStateConsumption, '(CFixedPoint)0')))]"
 
 		textbox = {
-			raw_text = "[SelectLocalization(Goods.HasGoodsShortage, '@goods_shortage!', '')][GetPlayer.GetCustom('currency_symbol')][Goods.GetStatePrice|v0] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )]"
+			raw_text = "[SelectLocalization(Goods.HasGoodsShortage, '@goods_shortage!', '')][State.GetOwner.GetCustom('currency_symbol')][Goods.GetStatePrice|v0] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )]"
 			autoresize = yes
 			align = nobaseline
 			parentanchor = hcenter

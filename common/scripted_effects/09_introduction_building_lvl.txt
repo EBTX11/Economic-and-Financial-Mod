@@ -22230,7 +22230,7 @@ financial_center_modifier = {
 			}
 			add_modifier = {
 				name = financial_center_place_spe
-				multiplier = var:gdp_view_fc
+				multiplier = max_building_financial_center_by_number_in_market # var:gdp_view_fc
 			}
 			if = {
 				limit = {
@@ -22371,6 +22371,19 @@ financial_center_modifier = {
 			}
 			set_subsidized = no
 		}
+		
+		#economic_sentiment_index_malus
+		remove_modifier = economic_sentiment_index_malus_mutual_fund
+		if = {
+			limit = {
+				owner.economic_sentiment_index_base_JE_fixe < 0
+			} 
+			remove_modifier = economic_sentiment_index_malus_mutual_fund
+			add_modifier = {
+				name = economic_sentiment_index_malus_mutual_fund
+				multiplier = economic_sentiment_index_malus_factor
+			}   
+		}    
 	}
 
 	#####################################################################################################################################################
@@ -22723,7 +22736,10 @@ building_ef_private_construction_modifier = {
 			is_building_type = building_ef_private_construction  
 		}   
 		remove_modifier = overbuilding_regulation  
+        remove_modifier = economic_sentiment_index_malus 
 	} 
+
+	#overbuilding_regulation
 	if = {
 		limit = {
 			manufacture_stock_product_by_pcs_rate > 0.1
@@ -22739,6 +22755,22 @@ building_ef_private_construction_modifier = {
 			}  
 		} 
 	}  
+	#economic_sentiment_index_malus
+	if = {
+		limit = {
+			economic_sentiment_index_base_JE_fixe < 0
+		}
+		every_scope_building = {
+			limit = {
+				is_building_type = building_ef_private_construction  
+			}   
+            remove_modifier = economic_sentiment_index_malus 
+			add_modifier = {
+				name = economic_sentiment_index_malus
+				multiplier = economic_sentiment_index_malus_factor
+			}  
+		} 
+	}   
 } 
 
 #####################################################################################################################################################

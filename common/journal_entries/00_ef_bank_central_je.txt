@@ -1,24 +1,130 @@
 ﻿bank_je_central_1 = {
-	icon = "gfx/interface/icons/event_icons/event_industry.dds"
+	icon = "gfx/interface/icons/event_icons/central_bank.dds"
 
-	group = je_group_technology
-
+	group = je_group_ef 
+	should_be_pinned_by_default = yes
+  
 	is_shown_when_inactive = {
-		has_technology_researched = urbanization
+		always = yes
+	}
+	possible = {
+		is_player = yes
+	}
+
+	status_desc = {
+		first_valid = {
+			triggered_desc = { # Cementing the Rightful Dynasty is active
+				desc = status_central_bank_1
+				trigger = {
+					not  = { 
+						has_technology_researched = banking 
+						has_technology_researched = currency_standards 
+					}
+				}
+			}
+			triggered_desc = { # Cementing the Rightful Dynasty is active
+				desc = status_central_bank_2
+				trigger = { 
+					has_technology_researched = currency_standards 
+				}
+			}
+		} 
 	}
 
 	complete = {
-		has_technology_researched = central_banking
+		has_technology_researched = currency_standards
+		has_technology_researched = central_banking 
 		any_scope_state = {
 			any_scope_building = {
-				is_building_type = building_bank
-				level = 1000
+				is_building_type = building_bank 
 			}
+		}  
+	}
+	
+	scripted_progress_bar = currency_standards_progress_bar
+	scripted_progress_bar = central_banking_progress_bar
+
+	#progressbar and var
+	on_monthly_pulse = {
+		effect = {  
+			# set_variable = {
+			# 	name = gdp_var_fix
+			# 	value = gdp_var
+			# }  
+			je:bank_je_central_1 ?= { 
+				set_bar_progress = {
+					value = owner.gdp_var
+					name = currency_standards_progress_bar
+				} 
+				set_bar_progress = {
+					value = owner.gdp_var
+					name = central_banking_progress_bar
+				} 
+			}
+			#banking & currency_standards
+			if = {
+				limit = {
+					gdp_var >= 25000000
+					not  = { 
+						has_technology_researched = banking 
+					}
+				}
+				add_technology_researched = banking
+				add_technology_researched = currency_standards
+			}
+			# if = {
+			# 	limit = {
+			# 		gdp_var >= 25000000
+			# 		not  = { 
+			# 			has_technology_researched = currency_standards 
+			# 		}
+			# 	}
+			# }
+			#central_banking
+			if = {
+				limit = {
+					gdp_var >= 50000000
+					not  = { 
+						has_technology_researched = central_banking 
+					}
+				}
+				add_technology_researched = central_banking
+			} 
 		}
 	}
 	
+ 	on_complete = { 
+		add_journal_entry = {
+			type = bank_je_central_2 
+		}
+	}
+
+	# invalid = {
+	# 	is_ai = yes
+	# }  
+	# possible = {
+	# 	is_player = yes
+	# }
+}
+
+bank_je_central_2 = {
+	icon = "gfx/interface/icons/event_icons/central_bank.dds"
+
+	group = je_group_ef
 	should_be_pinned_by_default = yes
 
-	on_complete = {
+	is_shown_when_inactive = {
+		always = yes
 	}
+	possible = {
+		has_modifier = has_central_bank
+	} 
+
+	complete = {
+		not = {
+			has_technology_researched = currency_standards
+		}
+	 
+	} 
 }
+ 
