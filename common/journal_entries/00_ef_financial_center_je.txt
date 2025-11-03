@@ -1,118 +1,117 @@
 ﻿financial_center_je_1 = {
 	icon = "gfx/interface/icons/event_icons/financial_center.dds"
 
-	group = je_group_ef
- 	should_be_pinned_by_default = yes
- 
-	is_shown_when_inactive = {
-		always = yes
-	}
-	possible = {
-		has_financial_center = yes
-	}
+	group = je_group_ef 
+	should_be_pinned_by_default = yes
   
-	status_desc = {
-		first_valid = {
-			triggered_desc = { 
-				desc = status_financial_center_1     # Exceptionnel / euphorique
-				trigger = { economic_sentiment_index_base_JE_fixe >= 4 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_2     # Très bon
-				trigger = { economic_sentiment_index_base_JE_fixe < 4 economic_sentiment_index_base_JE_fixe >= 3 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_3     # Bon
-				trigger = { economic_sentiment_index_base_JE_fixe < 3 economic_sentiment_index_base_JE_fixe >= 2 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_4     # Modérément positif
-				trigger = { economic_sentiment_index_base_JE_fixe < 2 economic_sentiment_index_base_JE_fixe >= 1 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_5     # Neutre / stable
-				trigger = { economic_sentiment_index_base_JE_fixe < 1 economic_sentiment_index_base_JE_fixe >= 0 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_6     # Léger ralentissement
-				trigger = { economic_sentiment_index_base_JE_fixe < 0 economic_sentiment_index_base_JE_fixe >= -1 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_7     # Dégradation claire
-				trigger = { economic_sentiment_index_base_JE_fixe < -1 economic_sentiment_index_base_JE_fixe >= -2 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_8     # Crise émergente
-				trigger = { economic_sentiment_index_base_JE_fixe < -2 economic_sentiment_index_base_JE_fixe >= -3 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_9     # Crise grave
-				trigger = { economic_sentiment_index_base_JE_fixe < -3 economic_sentiment_index_base_JE_fixe >= -4 }
-			}
-			triggered_desc = { 
-				desc = status_financial_center_10    # Effondrement total
-				trigger = { economic_sentiment_index_base_JE_fixe < -4 }
-			}
+	is_shown_when_inactive = { 
+		not = {
+			has_financial_center = yes
 		}
 	} 
+	possible = {
+		is_player = yes
+		not = {
+			has_financial_center = yes
+		}
+	}
 
-	scripted_button = economic_sentiment_index_base_1_button 
-	scripted_button = economic_sentiment_index_base_2_button 
-	scripted_button = economic_sentiment_index_base_3_button 
-	scripted_button = economic_sentiment_index_base_4_button 
-	scripted_button = economic_sentiment_index_base_5_button 
-	scripted_button = economic_sentiment_index_base_6_button 
+	status_desc = {
+		first_valid = {
+			triggered_desc = { # Cementing the Rightful Dynasty is active
+				desc = status_financial_center_je_1
+				trigger = {
+					not  = {  
+						has_technology_researched = stock_exchange 
+					}
+				}
+			}
+			triggered_desc = { # Cementing the Rightful Dynasty is active
+				desc = status_financial_center_je_2
+				trigger = { 
+					has_technology_researched = stock_exchange 
+				}
+			}
+		} 
+	}
 
+	complete = {
+		has_technology_researched = stock_exchange
+		has_technology_researched = financial_center 
+		any_scope_state = {
+			any_scope_building = {
+				is_building_group = bg_financial_centre
+			}
+		}   
+	}
+	  
+	scripted_progress_bar = stock_exchange_progress_bar
 	scripted_progress_bar = financial_center_progress_bar
-	
+
 	#progressbar and var
 	on_monthly_pulse = {
 		effect = {   
-			je:financial_center_je_1 ?= { 
-				set_bar_progress = {
-					value = owner.economic_sentiment_index_base_JE_fixe
-					name = financial_center_progress_bar
-				}  
-			}  
-			remove_modifier = economic_sentiment_index_modifier_2 
-			if = { 
-				limit = {
-					economic_sentiment_index_malus_factor > 0
-				}  
-				remove_modifier = economic_sentiment_index_modifier_2 
-				add_modifier = {
-					name = economic_sentiment_index_modifier_2 
-					multiplier = economic_sentiment_index_malus_factor
+			je:financial_center_je_1 ?= {   
+				if = {
+					limit = {
+						owner = {
+							has_technology_researched = stock_exchange
+						} 
+					} 
+					set_bar_progress = {
+						value = 2500000
+						name = stock_exchange_progress_bar
+					} 
 				}
+				if = {
+					limit = {
+						not = {
+							owner = {
+								has_technology_researched = stock_exchange
+							} 
+						} 
+					} 
+					set_bar_progress = {
+						value = owner.gdp_var
+						name = stock_exchange_progress_bar
+					}  
+				} 
+				set_bar_progress = {
+					value = owner.gdp_var
+					name = financial_center_progress_bar
+				} 
 			} 
-		}  
-	}  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
+			#stock_exchange
+			if = {
+				limit = {
+					gdp_var >= 25000000
+					not  = { 
+						has_technology_researched = stock_exchange 
+					}
+				} 
+				add_technology_researched = stock_exchange
+			} 
+			#financial_center
+			if = {
+				limit = {
+					gdp_var >= 50000000
+					not  = { 
+						has_technology_researched = financial_center 
+					}
+				}
+				add_technology_researched = financial_center
+			} 
+		}
+	}
+	
+ 	on_complete = { 
+		add_journal_entry = {
+			type = financial_center_je_2 
+		}
+	} 
 }
- 
+
+#faire des évnement spéciaux qui permet de débloquer des projet férroviere ou portuaire de grande enpleur de la meme manière que les pcs en bloquant du cach de coté
 financial_center_je_2 = {
 	icon = "gfx/interface/icons/event_icons/financial_center.dds"
 
@@ -129,53 +128,347 @@ financial_center_je_2 = {
 	status_desc = {
 		first_valid = {
 			triggered_desc = { 
-				desc = status_speculative_share_1     # 🟥 Exceptionnel / Euphorique — Bulle systémique
-				trigger = { financial_centre_total_gdp_product_ratio >= 0.40 }
-			}
+				desc = status_speculative_share_1_5
+				trigger = { var:speculative_share_1 > 75 }
+			} 
 			triggered_desc = { 
-				desc = status_speculative_share_2     # 🟧 Élevé / Bulle localisée
-				trigger = { financial_centre_total_gdp_product_ratio < 0.40 financial_centre_total_gdp_product_ratio >= 0.25 }
-			}
+				desc = status_speculative_share_1_4
+				trigger = { var:speculative_share_1 <= 75 var:speculative_share_1 > 50 }
+			} 
 			triggered_desc = { 
-				desc = status_speculative_share_3     # 🟨 Modéré / Tension spéculative
-				trigger = { financial_centre_total_gdp_product_ratio < 0.25 financial_centre_total_gdp_product_ratio >= 0.15 }
-			}
+				desc = status_speculative_share_1_3
+				trigger = { var:speculative_share_1 <= 50 var:speculative_share_1 > 25 }
+			} 
 			triggered_desc = { 
-				desc = status_speculative_share_4     # 🟩 Faible / Marché sain
-				trigger = { financial_centre_total_gdp_product_ratio < 0.15 }
+				desc = status_speculative_share_1_2
+				trigger = { var:speculative_share_1 <= 25 var:speculative_share_1 > 0 }
+			} 
+			triggered_desc = { 
+				desc = status_speculative_share_1_1
+				trigger = { var:speculative_share_1 <= 0 }
 			}
 		}
-	}
+		first_valid = {
+			triggered_desc = { 
+				desc = status_speculative_share_2_5 
+				trigger = { var:speculative_share_2 > 75 }
+			} 
+			triggered_desc = { 
+				desc = status_speculative_share_2_4
+				trigger = { var:speculative_share_2 <= 75 var:speculative_share_2 > 50 }
+			} 
+			triggered_desc = { 
+				desc = status_speculative_share_2_3
+				trigger = { var:speculative_share_2 <= 50 var:speculative_share_2 > 25 }
+			} 
+			triggered_desc = { 
+				desc = status_speculative_share_2_2
+				trigger = { var:speculative_share_2 <= 25 var:speculative_share_2 > 0 }
+			} 
+			triggered_desc = { 
+				desc = status_speculative_share_2_1
+				trigger = { var:speculative_share_2 <= 0 }
+			}
+		}
+	} 
 
-	scripted_button = economic_sentiment_index_base_1_button 
-	scripted_button = economic_sentiment_index_base_2_button 
-	scripted_button = economic_sentiment_index_base_3_button 
-	scripted_button = economic_sentiment_index_base_4_button 
-	scripted_button = economic_sentiment_index_base_5_button 
-	scripted_button = economic_sentiment_index_base_6_button 
-
+	scripted_button = speculative_share_1_button 
+	scripted_button = speculative_share_2_button 
+	scripted_button = speculative_share_3_button 
+	scripted_button = speculative_share_4_button  
+ 
+	scripted_button = speculative_share_5_button 
+	scripted_button = speculative_share_6_button 
+	scripted_button = speculative_share_7_button 
+	scripted_button = speculative_share_8_button 
+ 
+	scripted_button = speculative_share_9_button 
+	scripted_button = speculative_share_10_button 
+	scripted_button = speculative_share_11_button 
+	scripted_button = speculative_share_12_button 
+ 
 	scripted_progress_bar = speculative_share_progress_bar
+	scripted_progress_bar = overbuilt_economy_progress_bar
 	
 	#progressbar and var
 	on_monthly_pulse = {
 		effect = {   
+			
+			####################################################################################
+			#Fiancial part
+			if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio < 0.10
+					var:speculative_share_1 > 0
+				}
+				change_variable = { name = speculative_share_1 add = -3 }
+			}
+			# 10–20% → -2
+			else_if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio >= 0.10
+					fiancial_center_week_balance_in_ratio < 0.20
+					var:speculative_share_1 > 0
+				}
+				change_variable = { name = speculative_share_1 add = -2 }
+			}
+			# 20–30% → -1
+			else_if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio >= 0.20
+					fiancial_center_week_balance_in_ratio < 0.30
+					var:speculative_share_1 > 0
+				}
+				change_variable = { name = speculative_share_1 add = -1 }
+			}
+			# 30–40% → +1
+			else_if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio >= 0.30
+					fiancial_center_week_balance_in_ratio < 0.40
+					var:speculative_share_1 < 100
+				}
+				change_variable = { name = speculative_share_1 add = 1 }
+			}
+			# 40–50% → +2
+			else_if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio >= 0.40
+					fiancial_center_week_balance_in_ratio < 0.50
+					var:speculative_share_1 < 100
+				}
+				change_variable = { name = speculative_share_1 add = 2 }
+			}
+			# ≥50% → +3
+			else_if = {
+				limit = {
+					fiancial_center_week_balance_in_ratio >= 0.50
+					var:speculative_share_1 < 100
+				}
+				change_variable = { name = speculative_share_1 add = 3}
+			}
+
+			#Regulation
+			if = {
+				limit = { 
+					var:speculative_share_1 > 100
+				}
+				set_variable = { name = speculative_share_1 value = 100 }
+			} 
+			if = {
+				limit = { 
+					var:speculative_share_1 < 0
+				}
+				set_variable = { name = speculative_share_1 value = 0 }
+			}
+
 			je:financial_center_je_2 ?= { 
 				set_bar_progress = {
-					value = owner.financial_centre_total_gdp_product_ratio
+					value = owner.var:speculative_share_1
 					name = speculative_share_progress_bar
 				}  
-			}  
-			# remove_modifier = economic_sentiment_index_modifier_2 
-			# if = { 
-			# 	limit = {
-			# 		economic_sentiment_index_malus_factor > 0
-			# 	}  
-			# 	remove_modifier = economic_sentiment_index_modifier_2 
-			# 	add_modifier = {
-			# 		name = economic_sentiment_index_modifier_2 
-			# 		multiplier = economic_sentiment_index_malus_factor
-			# 	}
-			# } 
+			}   
+			remove_modifier = speculative_bubble_modifier  
+			every_scope_character = {
+				limit = {
+					has_role = executive
+				}   
+				remove_modifier = speculative_bubble_character_modifier 
+			}
+			if = {
+				limit = { 
+					var:speculative_share_1 > 0
+				}
+				add_modifier = {
+					name = speculative_bubble_modifier
+					multiplier = speculative_share_1_penality #var:speculative_share_1 negativé
+					#months = 12
+				}  
+				every_scope_character = {
+					limit = {
+						has_role = executive
+					} 
+					add_modifier = {
+						name = speculative_bubble_character_modifier
+						multiplier = speculative_share_1_penality
+					} 
+				} 
+			} 
+			####################################################################################
+ 
+			####################################################################################
+			#Construction part
+			if = {
+				limit = {
+					building_ef_private_construction_lvl > building_urban_center_lvl_by_base_rate
+				}
+				change_variable = { name = speculative_share_2 add = 1 }
+			} 
+			if = {
+				limit = {
+					building_ef_private_construction_lvl < building_urban_center_lvl_by_base_rate
+					var:speculative_share_2 > 0
+				}
+				change_variable = { name = speculative_share_2 subtract = 1 }
+			} 
+			je:financial_center_je_2 ?= { 
+				set_bar_progress = {
+					value = owner.var:speculative_share_2
+					name = overbuilt_economy_progress_bar
+				}  
+			}     
+			#trouver un moyen de détruit les PCS en trop pour equilibré pour l'IA 
+			#################################################################################### 
 		}  
 	}   
 }  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# financial_center_je_1 = {
+# 	icon = "gfx/interface/icons/event_icons/financial_center.dds"
+
+# 	group = je_group_ef
+#  	should_be_pinned_by_default = yes
+ 
+# 	is_shown_when_inactive = {
+# 		always = yes
+# 	}
+# 	possible = {
+# 		has_financial_center = yes
+# 	}
+  
+# 	status_desc = {
+# 		first_valid = {
+# 			triggered_desc = { 
+# 				desc = status_financial_center_1     # Exceptionnel / euphorique
+# 				trigger = { economic_sentiment_index_base_JE_fixe >= 4 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_2     # Très bon
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 4 economic_sentiment_index_base_JE_fixe >= 3 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_3     # Bon
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 3 economic_sentiment_index_base_JE_fixe >= 2 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_4     # Modérément positif
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 2 economic_sentiment_index_base_JE_fixe >= 1 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_5     # Neutre / stable
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 1 economic_sentiment_index_base_JE_fixe >= 0 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_6     # Léger ralentissement
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 0 economic_sentiment_index_base_JE_fixe >= -1 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_7     # Dégradation claire
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -1 economic_sentiment_index_base_JE_fixe >= -2 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_8     # Crise émergente
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -2 economic_sentiment_index_base_JE_fixe >= -3 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_9     # Crise grave
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -3 economic_sentiment_index_base_JE_fixe >= -4 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_10    # Effondrement total
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -4 }
+# 			}
+# 		}
+# 	} 
+ 
+
+# 	scripted_progress_bar = financial_center_progress_bar
+	
+# 	# #progressbar and var
+# 	# on_monthly_pulse = {
+# 	# 	effect = {   
+# 	# 		je:financial_center_je_1 ?= { 
+# 	# 			set_bar_progress = {
+# 	# 				value = owner.economic_sentiment_index_base_JE_fixe
+# 	# 				name = financial_center_progress_bar
+# 	# 			}  
+# 	# 		}  
+# 	# 		remove_modifier = economic_sentiment_index_modifier_2 
+# 	# 		if = { 
+# 	# 			limit = {
+# 	# 				economic_sentiment_index_malus_factor > 0
+# 	# 			}  
+# 	# 			remove_modifier = economic_sentiment_index_modifier_2 
+# 	# 			add_modifier = {
+# 	# 				name = economic_sentiment_index_modifier_2 
+# 	# 				multiplier = economic_sentiment_index_malus_factor
+# 	# 			}
+# 	# 		} 
+# 	# 	}  
+# 	# }   
+# }

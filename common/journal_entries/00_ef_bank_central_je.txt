@@ -4,11 +4,28 @@
 	group = je_group_ef 
 	should_be_pinned_by_default = yes
   
-	is_shown_when_inactive = {
-		always = yes
+	is_shown_when_inactive = { 
+		not = { 
+			has_modifier = has_central_bank
+			# any_scope_state = {
+			# 	any_scope_building = {
+			# 		is_building_type = building_bank 
+			# 	}
+			# }  
+		}  
 	}
 	possible = {
 		is_player = yes
+		not = { 
+			has_modifier = has_central_bank
+		}  
+		# not = {
+		# 	any_scope_state = {
+		# 		any_scope_building = {
+		# 			is_building_type = building_bank 
+		# 		}
+		# 	}  
+		# }  
 	}
 
 	status_desc = {
@@ -46,21 +63,38 @@
 
 	#progressbar and var
 	on_monthly_pulse = {
-		effect = {  
-			# set_variable = {
-			# 	name = gdp_var_fix
-			# 	value = gdp_var
-			# }  
-			je:bank_je_central_1 ?= { 
-				set_bar_progress = {
-					value = owner.gdp_var
-					name = currency_standards_progress_bar
+		effect = { 
+			je:bank_je_central_1 ?= {     
+				if = {
+					limit = {
+						owner = {
+							has_technology_researched = currency_standards
+						} 
+					} 
+					set_bar_progress = {
+						value = 2500000
+						name = currency_standards_progress_bar
+					} 
+				}
+				if = {
+					limit = {
+						not = {
+							owner = {
+								has_technology_researched = currency_standards
+							} 
+						} 
+					} 
+					set_bar_progress = {
+						value = owner.gdp_var
+						name = currency_standards_progress_bar
+					}  
 				} 
 				set_bar_progress = {
 					value = owner.gdp_var
 					name = central_banking_progress_bar
 				} 
 			}
+
 			#banking & currency_standards
 			if = {
 				limit = {
@@ -71,15 +105,7 @@
 				}
 				add_technology_researched = banking
 				add_technology_researched = currency_standards
-			}
-			# if = {
-			# 	limit = {
-			# 		gdp_var >= 25000000
-			# 		not  = { 
-			# 			has_technology_researched = currency_standards 
-			# 		}
-			# 	}
-			# }
+			} 
 			#central_banking
 			if = {
 				limit = {
@@ -97,34 +123,139 @@
 		add_journal_entry = {
 			type = bank_je_central_2 
 		}
-	}
-
-	# invalid = {
-	# 	is_ai = yes
-	# }  
-	# possible = {
-	# 	is_player = yes
-	# }
+	} 
 }
 
-bank_je_central_2 = {
-	icon = "gfx/interface/icons/event_icons/central_bank.dds"
+# bank_je_central_2 = {
+# 	icon = "gfx/interface/icons/event_icons/central_bank.dds"
 
-	group = je_group_ef
-	should_be_pinned_by_default = yes
+# 	group = je_group_ef
+# 	should_be_pinned_by_default = yes
 
-	is_shown_when_inactive = {
-		always = yes
-	}
-	possible = {
-		has_modifier = has_central_bank
-	} 
+# 	is_shown_when_inactive = {
+# 		#always = yes
+# 		c:USA ?= root
+# 	}
+# 	possible = { 
+# 		has_modifier = has_central_bank
+# 	} 
 
-	complete = {
-		not = {
-			has_technology_researched = currency_standards
-		}
+# 	complete = {
+# 		not = {
+# 			has_technology_researched = currency_standards
+# 		}
 	 
-	} 
-}
+# 	} 
+# }
+
+
+# bank_je_central_peso_mexican_peso = {
+# 	icon = "gfx/interface/icons/event_icons/bank_je_central_peso_mexican_peso.dds"
+
+# 	group = je_group_ef
+# 	should_be_pinned_by_default = yes
+
+# 	is_shown_when_inactive = {
+# 		#always = yes
+# 		c:MEX ?= root
+# 	}
+# 	possible = { 
+# 		has_modifier = has_central_bank
+# 	}  
+# 	status_desc = {
+# 		first_valid = {
+# 			triggered_desc = { 
+# 				desc = status_financial_center_1     # Exceptionnel / euphorique
+# 				trigger = { economic_sentiment_index_base_JE_fixe >= 4 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_2     # Très bon
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 4 economic_sentiment_index_base_JE_fixe >= 3 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_3     # Bon
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 3 economic_sentiment_index_base_JE_fixe >= 2 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_4     # Modérément positif
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 2 economic_sentiment_index_base_JE_fixe >= 1 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_5     # Neutre / stable
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 1 economic_sentiment_index_base_JE_fixe >= 0 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_6     # Léger ralentissement
+# 				trigger = { economic_sentiment_index_base_JE_fixe < 0 economic_sentiment_index_base_JE_fixe >= -1 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_7     # Dégradation claire
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -1 economic_sentiment_index_base_JE_fixe >= -2 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_8     # Crise émergente
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -2 economic_sentiment_index_base_JE_fixe >= -3 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_9     # Crise grave
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -3 economic_sentiment_index_base_JE_fixe >= -4 }
+# 			}
+# 			triggered_desc = { 
+# 				desc = status_financial_center_10    # Effondrement total
+# 				trigger = { economic_sentiment_index_base_JE_fixe < -4 }
+# 			}
+# 		}
+# 	} 
+
+# 	scripted_progress_bar = bank_je_central_progress_bar
+	
+# 	#progressbar and var
+# 	on_monthly_pulse = {
+# 		effect = {   
+# 			je:bank_je_central_peso_mexican_peso ?= { 
+# 				set_bar_progress = {
+# 					value = gdp_var
+# 					name = bank_je_central_progress_bar
+# 				}  
+# 			}  
+# 			# remove_modifier = economic_sentiment_index_modifier_2 
+# 			# if = { 
+# 			# 	limit = {
+# 			# 		economic_sentiment_index_malus_factor > 0
+# 			# 	}  
+# 			# 	remove_modifier = economic_sentiment_index_modifier_2 
+# 			# 	add_modifier = {
+# 			# 		name = economic_sentiment_index_modifier_2 
+# 			# 		multiplier = economic_sentiment_index_malus_factor
+# 			# 	}
+# 			# } 
+# 		}  
+# 	}    
+
+
+
+
+
+
+
+
+
+# 	création de plusieur indicateur qui oriente naturelement la currency vers la devaluation ou la révaluation 
+
+
+
+# 	- balance commerciale (défecitaire cherche à dévaluation/Un exédent cherche à révalué )
+# 	- une money value target superieur de 75% de la valeur de la monaier -> dévaluation/ inverse supeieur à 125% de la monaie target alors tendence à la révaluation 
+# 	- inflation actuel 
+# 	- inflation longterme
+# 	- 
+
+
+
  
+
+
+# }
+
+
+

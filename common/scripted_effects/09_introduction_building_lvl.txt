@@ -22251,8 +22251,74 @@ financial_center_modifier = {
 				value = 1
 			}
 		}
-    }
-
+    } 
+	#Leader Stock Exchange
+	every_scope_state = {
+        if = {
+			limit = {
+				or = {
+					has_building = building_financial_centre
+					has_building = building_financial_centre_arg
+					has_building = building_financial_centre_aus
+					has_building = building_financial_centre_bav
+					has_building = building_financial_centre_bel
+					has_building = building_financial_centre_bic
+					has_building = building_financial_centre_brz
+					has_building = building_financial_centre_chi
+					has_building = building_financial_centre_chl
+					has_building = building_financial_centre_den
+					has_building = building_financial_centre_dei
+					has_building = building_financial_centre_egy
+					has_building = building_financial_centre_fra
+					has_building = building_financial_centre_frm
+					has_building = building_financial_centre_gbr
+					has_building = building_financial_centre_gbr_2
+					has_building = building_financial_centre_gre
+					has_building = building_financial_centre_hkh
+					has_building = building_financial_centre_han
+					has_building = building_financial_centre_ita
+					has_building = building_financial_centre_jap
+					has_building = building_financial_centre_mex
+					has_building = building_financial_centre_net
+					has_building = building_financial_centre_nsw
+					has_building = building_financial_centre_ont
+					has_building = building_financial_centre_peu
+					has_building = building_financial_centre_por
+					has_building = building_financial_centre_pru
+					has_building = building_financial_centre_que
+					has_building = building_financial_centre_rus
+					has_building = building_financial_centre_saf
+					has_building = building_financial_centre_sar
+					has_building = building_financial_centre_sic
+					has_building = building_financial_centre_spa
+					has_building = building_financial_centre_swe
+					has_building = building_financial_centre_swi
+					has_building = building_financial_centre_tus
+					has_building = building_financial_centre_tur
+					has_building = building_financial_centre_uru
+					has_building = building_financial_centre_usa
+					has_building = building_financial_centre_usa_2
+					has_building = building_financial_centre_sax
+				}
+				or = {
+					has_building = building_bank
+					has_building = building_financial_centre_usa
+					has_building = building_financial_centre_chi
+					has_building = building_financial_centre_jap
+					has_building = building_financial_centre_frm
+				}
+			}
+			if = {
+				limit = {
+					has_modifier = financial_center_place_main_stock_exchange
+				}
+				remove_modifier = financial_center_place_main_stock_exchange
+			}
+			add_modifier = {
+				name = financial_center_place_main_stock_exchange
+			}
+		}
+	}
 	#####################################################################################################################################################
 	# boucle pour les modificateur
 
@@ -22311,79 +22377,154 @@ financial_center_modifier = {
     }
 
 	financial_center_production_methods = yes
-	#building - # supply demand for financial product
-	random_scope_building = {
+
+    every_scope_state = {
 		limit = {
-			is_building_group = bg_financial_centre
+			has_modifier = financial_center_place_main_stock_exchange
 		}
 
-		remove_modifier = bond_deemande
-        add_modifier = {
-            name = bond_deemande
-			multiplier = target_demand_bond_for_modifier
-        }
-		remove_modifier = manufacture_stock_deemande
-        add_modifier = {
-            name = manufacture_stock_deemande
-			multiplier = target_demand_manufacture_stock_for_modifier
-        }
-		remove_modifier = agricultural_stock_deemande
-        add_modifier = {
-            name = agricultural_stock_deemande
-			multiplier = target_demand_agricultural_stock_for_modifier
-        }
-		remove_modifier = mining_stock_deemande
-        add_modifier = {
-            name = mining_stock_deemande
-			multiplier = target_demand_mining_stock_for_modifier
-        }
-		remove_modifier = railroad_stock_deemande
-        add_modifier = {
-            name = railroad_stock_deemande
-			multiplier = target_demand_railroad_stock_for_modifier
-        }
-
-		remove_modifier = mutual_fund_supply
-        add_modifier = {
-            name = mutual_fund_supply
-			multiplier = target_supply_mutual_fund_for_modifier
-        }
-
-		if = {
+		#building - # supply demand for financial product
+		random_scope_building = {
 			limit = {
-				occupancy  < 0.75
-				not = {
-					owner = {
-						is_player = yes
-					}
-				}
+				is_building_group = bg_financial_centre
 			}
-			set_subsidized = yes
-		}
-		if = {
-			limit = {
-				occupancy > 0.75
-				not = {
-					owner = {
-						is_player = yes
-					}
-				}
-			}
-			set_subsidized = no
-		}
-		
-		#economic_sentiment_index_malus
-		remove_modifier = economic_sentiment_index_malus_mutual_fund
-		if = {
-			limit = {
-				owner.economic_sentiment_index_base_JE_fixe < 0
+			save_scope_as = financial_center_scope
+
+			root = {
+				financial_center_modifier_fixed_var = yes
 			} 
-			remove_modifier = economic_sentiment_index_malus_mutual_fund
+			
+			remove_modifier = bond_deemande
 			add_modifier = {
-				name = economic_sentiment_index_malus_mutual_fund
-				multiplier = economic_sentiment_index_malus_factor
-			}   
-		}    
+				name = bond_deemande
+				multiplier = target_demand_bond_for_modifier
+			}
+			remove_modifier = manufacture_stock_deemande
+			add_modifier = {
+				name = manufacture_stock_deemande
+				multiplier = target_demand_manufacture_stock_for_modifier
+			}
+			remove_modifier = agricultural_stock_deemande
+			add_modifier = {
+				name = agricultural_stock_deemande
+				multiplier = target_demand_agricultural_stock_for_modifier
+			}
+			remove_modifier = mining_stock_deemande
+			add_modifier = {
+				name = mining_stock_deemande
+				multiplier = target_demand_mining_stock_for_modifier
+			}
+			remove_modifier = railroad_stock_deemande
+			add_modifier = {
+				name = railroad_stock_deemande
+				multiplier = target_demand_railroad_stock_for_modifier
+			}
+
+			remove_modifier = mutual_fund_supply
+			add_modifier = {
+				name = mutual_fund_supply
+				multiplier = target_supply_mutual_fund_for_modifier
+			}
+
+			if = {
+				limit = {
+					occupancy < 0.75
+					not = {
+						owner = {
+							is_player = yes
+						}
+					}
+				}
+				set_subsidized = yes
+			}
+			if = {
+				limit = {
+					occupancy > 0.75
+					not = {
+						owner = {
+							is_player = yes
+						}
+					}
+				}
+				set_subsidized = no
+			}
+		}
+	}
+    every_scope_state = {
+		limit = {
+			or = {
+				has_modifier = financial_center_place_spe
+				has_modifier = financial_center_place
+			}
+			not = {
+				has_modifier = financial_center_place_main_stock_exchange
+			}
+		}
+		random_scope_building = {
+			limit = {
+				is_building_group = bg_financial_centre
+			}
+			save_scope_as = financial_center_scope
+
+			root = {
+				financial_center_modifier_fixed_var = yes
+			}
+
+			remove_modifier = bond_deemande
+			add_modifier = {
+				name = bond_deemande
+				multiplier = target_demand_bond_for_modifier
+			}
+			remove_modifier = manufacture_stock_deemande
+			add_modifier = {
+				name = manufacture_stock_deemande
+				multiplier = target_demand_manufacture_stock_for_modifier
+			}
+			remove_modifier = agricultural_stock_deemande
+			add_modifier = {
+				name = agricultural_stock_deemande
+				multiplier = target_demand_agricultural_stock_for_modifier
+			}
+			remove_modifier = mining_stock_deemande
+			add_modifier = {
+				name = mining_stock_deemande
+				multiplier = target_demand_mining_stock_for_modifier
+			}
+			remove_modifier = railroad_stock_deemande
+			add_modifier = {
+				name = railroad_stock_deemande
+				multiplier = target_demand_railroad_stock_for_modifier
+			}
+
+			remove_modifier = mutual_fund_supply
+			add_modifier = {
+				name = mutual_fund_supply
+				multiplier = target_supply_mutual_fund_for_modifier
+			}
+
+			if = {
+				limit = {
+					occupancy < 0.75
+					not = {
+						owner = {
+							is_player = yes
+						}
+					}
+				}
+				set_subsidized = yes
+			}
+			if = {
+				limit = {
+					occupancy > 0.75
+					not = {
+						owner = {
+							is_player = yes
+						}
+					}
+				}
+				set_subsidized = no
+			}
+		}
 	}
 
 	#####################################################################################################################################################
@@ -22399,6 +22540,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:bond.market_goods_imports < bond_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:bond
 	}
@@ -22414,6 +22558,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:manufacture_stock.market_goods_imports < manufacture_stock_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:manufacture_stock
 	}
@@ -22429,6 +22576,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:manufacture_stock.market_goods_imports < manufacture_stock_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:manufacture_stock
 	}
@@ -22444,6 +22594,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:agricultural_stock.market_goods_imports < agricultural_stock_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:agricultural_stock
 	}
@@ -22459,6 +22612,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:mining_stock.market_goods_imports < mining_stock_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:mining_stock
 	}
@@ -22474,6 +22630,9 @@ financial_center_modifier = {
 	if = {
 		limit = {
 			market.mg:railroad_stock.market_goods_imports < railroad_stock_market_goods_sell_orders_ratio
+			not = {
+				has_modifier = speculative_share_modifier_1
+			}
 		}
 		remove_banned_goods = g:railroad_stock
 	}
@@ -22726,52 +22885,63 @@ destroy_building_not_allowed = {
         }
 	}
 }
-building_ef_private_construction_modifier = { 
-	set_variable = {
-		name = overbuilding_regulation_factor_revers_fix
-		value = overbuilding_regulation_factor_revers
-	}
+building_ef_private_construction_modifier = {
+	# set_variable = {
+	# 	name = overbuilding_regulation_factor_revers_fix
+	# 	value = overbuilding_regulation_factor_revers
+	# }
 	every_scope_building = {
 		limit = {
-			is_building_type = building_ef_private_construction  
-		}   
-		remove_modifier = overbuilding_regulation  
-        remove_modifier = economic_sentiment_index_malus 
-	} 
+			is_building_type = building_ef_private_construction
+		}
+		remove_modifier = overbuilt_economy_modifier
+	}
 
 	#overbuilding_regulation
 	if = {
 		limit = {
-			manufacture_stock_product_by_pcs_rate > 0.1
+			#manufacture_stock_product_by_pcs_rate > 0.1
+			speculative_share_2_penality < 0
 		}
 		every_scope_building = {
 			limit = {
-				is_building_type = building_ef_private_construction  
-			}   
-            remove_modifier = overbuilding_regulation 
+				is_building_type = building_ef_private_construction
+			}
+            remove_modifier = overbuilt_economy_modifier
 			add_modifier = {
-				name = overbuilding_regulation
-				multiplier = overbuilding_regulation_factor
-			}  
-		} 
-	}  
-	#economic_sentiment_index_malus
-	if = {
-		limit = {
-			economic_sentiment_index_base_JE_fixe < 0
+				name = overbuilt_economy_modifier
+				multiplier = speculative_share_2_penality
+			}
 		}
-		every_scope_building = {
-			limit = {
-				is_building_type = building_ef_private_construction  
-			}   
-            remove_modifier = economic_sentiment_index_malus 
-			add_modifier = {
-				name = economic_sentiment_index_malus
-				multiplier = economic_sentiment_index_malus_factor
-			}  
-		} 
-	}   
-} 
+	} 
+}
+
+financial_center_modifier_fixed_var = {
+	set_variable = {
+		name = base_supply_mutual_fund_fix
+		value = base_supply_mutual_fund
+	}
+	set_variable = {
+		name = base_demande_bond_fix
+		value = base_demande_bond
+	}
+	set_variable = {
+		name = base_demande_manufacture_stock_fix
+		value = base_demande_manufacture_stock
+	}
+	set_variable = {
+		name = base_demande_agricultural_stock_fix
+		value = base_demande_agricultural_stock
+	}
+	set_variable = {
+		name = base_demande_mining_stock_fix
+		value = base_demande_mining_stock
+	}
+	set_variable = {
+		name = base_demande_railroad_stock_fix
+		value = base_demande_railroad_stock
+	}
+}
 
 #####################################################################################################################################################
 #####################################################################################################################################################
@@ -22813,7 +22983,7 @@ initialize_historic_macro_facilities_bc = { #history
 				value = $CTRL_BANK_SITE$
 			}
 		}
-	} 
+	}
 	central_bank_modifier = yes
 }
 initialize_historic_macro_facilities_fc = { #history
@@ -37746,14 +37916,14 @@ economic_crisis_destroy_central_bank = {
 ###########################################################################################################################################################################################
 
 introduction_new_currency = {
-	if = { 
+	if = {
 		limit = {
 			not = {
 				any_scope_state = {
 					has_building = building_bank
 				}
 			}
-		}  
+		}
 		# gdp_view_on_action = yes
 		# macro_facilities_on_action_bc = yes #pas le choix que de le codé en dure car trop d'interaction
 		capital = {
@@ -37767,9 +37937,9 @@ introduction_new_currency = {
 			}
 		}
 		central_bank_modifier = yes
-		central_bank_production_methods = yes  
+		central_bank_production_methods = yes
 	}
- 
+
 	#Event for spe currency -> ef_introduction_events
 	introduction_of_dinar = yes
 	introduction_of_dinar_algerian_dinar = yes
@@ -37892,7 +38062,7 @@ introduction_new_currency = {
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
-#dinar 
+#dinar
 introduction_of_dinar = {
 	if = {
 		limit = { #Introduction of dinar
@@ -37942,7 +38112,7 @@ introduction_of_dinar = {
 		activate_law = law_type:law_dinar_currency
 	}
 }
-#dinar_algerian_dinar 
+#dinar_algerian_dinar
 introduction_of_dinar_algerian_dinar = {
 	if = {
 		limit = { #Introduction of dinar_algerian_dinar
@@ -37992,7 +38162,7 @@ introduction_of_dinar_algerian_dinar = {
 		activate_law = law_type:law_dinar_algerian_dinar_currency
 	}
 }
-#dinar_iraqi_dinar 
+#dinar_iraqi_dinar
 introduction_of_dinar_iraqi_dinar = {
 	if = {
 		limit = { #Introduction of dinar_iraqi_dinar
@@ -38042,7 +38212,7 @@ introduction_of_dinar_iraqi_dinar = {
 		activate_law = law_type:law_dinar_iraqi_dinar_currency
 	}
 }
-#dinar_libyan_dinar 
+#dinar_libyan_dinar
 introduction_of_dinar_libyan_dinar = {
 	if = {
 		limit = { #Introduction of dinar_libyan_dinar
@@ -38092,7 +38262,7 @@ introduction_of_dinar_libyan_dinar = {
 		activate_law = law_type:law_dinar_libyan_dinar_currency
 	}
 }
-#dinar_moroccan_dirham 
+#dinar_moroccan_dirham
 introduction_of_dinar_moroccan_dirham = {
 	if = {
 		limit = { #Introduction of dinar_moroccan_dirham
@@ -38142,7 +38312,7 @@ introduction_of_dinar_moroccan_dirham = {
 		activate_law = law_type:law_dinar_moroccan_dirham_currency
 	}
 }
-#dinar_omanian_rial 
+#dinar_omanian_rial
 introduction_of_dinar_omanian_rial = {
 	if = {
 		limit = { #Introduction of dinar_omanian_rial
@@ -38192,7 +38362,7 @@ introduction_of_dinar_omanian_rial = {
 		activate_law = law_type:law_dinar_omanian_rial_currency
 	}
 }
-#dinar_qiran 
+#dinar_qiran
 introduction_of_dinar_qiran = {
 	if = {
 		limit = { #Introduction of dinar_qiran
@@ -38242,7 +38412,7 @@ introduction_of_dinar_qiran = {
 		activate_law = law_type:law_dinar_qiran_currency
 	}
 }
-#dinar_saudi_riyal 
+#dinar_saudi_riyal
 introduction_of_dinar_saudi_riyal = {
 	if = {
 		limit = { #Introduction of dinar_saudi_riyal
@@ -38292,7 +38462,7 @@ introduction_of_dinar_saudi_riyal = {
 		activate_law = law_type:law_dinar_saudi_riyal_currency
 	}
 }
-#dinar_serbian_dinar 
+#dinar_serbian_dinar
 introduction_of_dinar_serbian_dinar = {
 	if = {
 		limit = { #Introduction of dinar_serbian_dinar
@@ -38342,7 +38512,7 @@ introduction_of_dinar_serbian_dinar = {
 		activate_law = law_type:law_dinar_serbian_dinar_currency
 	}
 }
-#dinar_tunisian_dinar 
+#dinar_tunisian_dinar
 introduction_of_dinar_tunisian_dinar = {
 	if = {
 		limit = { #Introduction of dinar_tunisian_dinar
@@ -38392,7 +38562,7 @@ introduction_of_dinar_tunisian_dinar = {
 		activate_law = law_type:law_dinar_tunisian_dinar_currency
 	}
 }
-#dinar_yugoslav_dinar 
+#dinar_yugoslav_dinar
 introduction_of_dinar_yugoslav_dinar = {
 	if = {
 		limit = { #Introduction of dinar_yugoslav_dinar
@@ -38442,7 +38612,7 @@ introduction_of_dinar_yugoslav_dinar = {
 		activate_law = law_type:law_dinar_yugoslav_dinar_currency
 	}
 }
-#dollar_australian_dollar 
+#dollar_australian_dollar
 introduction_of_dollar_australian_dollar = {
 	if = {
 		limit = { #Introduction of dollar_australian_dollar
@@ -38492,7 +38662,7 @@ introduction_of_dollar_australian_dollar = {
 		activate_law = law_type:law_dollar_australian_dollar_currency
 	}
 }
-#dollar_canadian_dollar 
+#dollar_canadian_dollar
 introduction_of_dollar_canadian_dollar = {
 	if = {
 		limit = { #Introduction of dollar_canadian_dollar
@@ -38542,7 +38712,7 @@ introduction_of_dollar_canadian_dollar = {
 		activate_law = law_type:law_dollar_canadian_dollar_currency
 	}
 }
-#dollar_caribbean_dollar 
+#dollar_caribbean_dollar
 introduction_of_dollar_caribbean_dollar = {
 	if = {
 		limit = { #Introduction of dollar_caribbean_dollar
@@ -38592,7 +38762,7 @@ introduction_of_dollar_caribbean_dollar = {
 		activate_law = law_type:law_dollar_caribbean_dollar_currency
 	}
 }
-#dollar_confederate_states_dollar 
+#dollar_confederate_states_dollar
 introduction_of_dollar_confederate_states_dollar = {
 	if = {
 		limit = { #Introduction of dollar_confederate_states_dollar
@@ -38642,7 +38812,7 @@ introduction_of_dollar_confederate_states_dollar = {
 		activate_law = law_type:law_dollar_confederate_states_dollar_currency
 	}
 }
-#dollar_liberian_dollar 
+#dollar_liberian_dollar
 introduction_of_dollar_liberian_dollar = {
 	if = {
 		limit = { #Introduction of dollar_liberian_dollar
@@ -38692,7 +38862,7 @@ introduction_of_dollar_liberian_dollar = {
 		activate_law = law_type:law_dollar_liberian_dollar_currency
 	}
 }
-#dollar_new_zealand_dollar 
+#dollar_new_zealand_dollar
 introduction_of_dollar_new_zealand_dollar = {
 	if = {
 		limit = { #Introduction of dollar_new_zealand_dollar
@@ -38742,7 +38912,7 @@ introduction_of_dollar_new_zealand_dollar = {
 		activate_law = law_type:law_dollar_new_zealand_dollar_currency
 	}
 }
-#dollar_sierra_leonean_dollar 
+#dollar_sierra_leonean_dollar
 introduction_of_dollar_sierra_leonean_dollar = {
 	if = {
 		limit = { #Introduction of dollar_sierra_leonean_dollar
@@ -38792,7 +38962,7 @@ introduction_of_dollar_sierra_leonean_dollar = {
 		activate_law = law_type:law_dollar_sierra_leonean_dollar_currency
 	}
 }
-#dollar_united_states_dollar 
+#dollar_united_states_dollar
 introduction_of_dollar_united_states_dollar = {
 	if = {
 		limit = { #Introduction of dollar_united_states_dollar
@@ -38842,7 +39012,7 @@ introduction_of_dollar_united_states_dollar = {
 		activate_law = law_type:law_dollar_united_states_dollar_currency
 	}
 }
-#eco_ariary 
+#eco_ariary
 introduction_of_eco_ariary = {
 	if = {
 		limit = { #Introduction of eco_ariary
@@ -38892,7 +39062,7 @@ introduction_of_eco_ariary = {
 		activate_law = law_type:law_eco_ariary_currency
 	}
 }
-#eco_central_african_eco 
+#eco_central_african_eco
 introduction_of_eco_central_african_eco = {
 	if = {
 		limit = { #Introduction of eco_central_african_eco
@@ -38942,7 +39112,7 @@ introduction_of_eco_central_african_eco = {
 		activate_law = law_type:law_eco_central_african_eco_currency
 	}
 }
-#eco_east_african_eco 
+#eco_east_african_eco
 introduction_of_eco_east_african_eco = {
 	if = {
 		limit = { #Introduction of eco_east_african_eco
@@ -38992,7 +39162,7 @@ introduction_of_eco_east_african_eco = {
 		activate_law = law_type:law_eco_east_african_eco_currency
 	}
 }
-#eco_ethiopian_birr 
+#eco_ethiopian_birr
 introduction_of_eco_ethiopian_birr = {
 	if = {
 		limit = { #Introduction of eco_ethiopian_birr
@@ -39042,7 +39212,7 @@ introduction_of_eco_ethiopian_birr = {
 		activate_law = law_type:law_eco_ethiopian_birr_currency
 	}
 }
-#eco_ghanaian_pound 
+#eco_ghanaian_pound
 introduction_of_eco_ghanaian_pound = {
 	if = {
 		limit = { #Introduction of eco_ghanaian_pound
@@ -39092,7 +39262,7 @@ introduction_of_eco_ghanaian_pound = {
 		activate_law = law_type:law_eco_ghanaian_pound_currency
 	}
 }
-#eco_nigerian_naira 
+#eco_nigerian_naira
 introduction_of_eco_nigerian_naira = {
 	if = {
 		limit = { #Introduction of eco_nigerian_naira
@@ -39142,7 +39312,7 @@ introduction_of_eco_nigerian_naira = {
 		activate_law = law_type:law_eco_nigerian_naira_currency
 	}
 }
-#eco_south_african_rand 
+#eco_south_african_rand
 introduction_of_eco_south_african_rand = {
 	if = {
 		limit = { #Introduction of eco_south_african_rand
@@ -39192,7 +39362,7 @@ introduction_of_eco_south_african_rand = {
 		activate_law = law_type:law_eco_south_african_rand_currency
 	}
 }
-#eco_tuareg_ouguiya 
+#eco_tuareg_ouguiya
 introduction_of_eco_tuareg_ouguiya = {
 	if = {
 		limit = { #Introduction of eco_tuareg_ouguiya
@@ -39242,7 +39412,7 @@ introduction_of_eco_tuareg_ouguiya = {
 		activate_law = law_type:law_eco_tuareg_ouguiya_currency
 	}
 }
-#eco_west_african_eco 
+#eco_west_african_eco
 introduction_of_eco_west_african_eco = {
 	if = {
 		limit = { #Introduction of eco_west_african_eco
@@ -39292,7 +39462,7 @@ introduction_of_eco_west_african_eco = {
 		activate_law = law_type:law_eco_west_african_eco_currency
 	}
 }
-#franc_belgian_franc 
+#franc_belgian_franc
 introduction_of_franc_belgian_franc = {
 	if = {
 		limit = { #Introduction of franc_belgian_franc
@@ -39342,7 +39512,7 @@ introduction_of_franc_belgian_franc = {
 		activate_law = law_type:law_franc_belgian_franc_currency
 	}
 }
-#franc_french_franc 
+#franc_french_franc
 introduction_of_franc_french_franc = {
 	if = {
 		limit = { #Introduction of franc_french_franc
@@ -39392,7 +39562,7 @@ introduction_of_franc_french_franc = {
 		activate_law = law_type:law_franc_french_franc_currency
 	}
 }
-#franc_luxembourgish_franc 
+#franc_luxembourgish_franc
 introduction_of_franc_luxembourgish_franc = {
 	if = {
 		limit = { #Introduction of franc_luxembourgish_franc
@@ -39442,7 +39612,7 @@ introduction_of_franc_luxembourgish_franc = {
 		activate_law = law_type:law_franc_luxembourgish_franc_currency
 	}
 }
-#franc_swiss_franc 
+#franc_swiss_franc
 introduction_of_franc_swiss_franc = {
 	if = {
 		limit = { #Introduction of franc_swiss_franc
@@ -39492,7 +39662,7 @@ introduction_of_franc_swiss_franc = {
 		activate_law = law_type:law_franc_swiss_franc_currency
 	}
 }
-#gulden 
+#gulden
 introduction_of_gulden = {
 	if = {
 		limit = { #Introduction of gulden
@@ -39542,7 +39712,7 @@ introduction_of_gulden = {
 		activate_law = law_type:law_gulden_currency
 	}
 }
-#gulden_bavarian_gulden 
+#gulden_bavarian_gulden
 introduction_of_gulden_bavarian_gulden = {
 	if = {
 		limit = { #Introduction of gulden_bavarian_gulden
@@ -39592,7 +39762,7 @@ introduction_of_gulden_bavarian_gulden = {
 		activate_law = law_type:law_gulden_bavarian_gulden_currency
 	}
 }
-#gulden_florin 
+#gulden_florin
 introduction_of_gulden_florin = {
 	if = {
 		limit = { #Introduction of gulden_florin
@@ -39642,7 +39812,7 @@ introduction_of_gulden_florin = {
 		activate_law = law_type:law_gulden_florin_currency
 	}
 }
-#gulden_hungarian_forint 
+#gulden_hungarian_forint
 introduction_of_gulden_hungarian_forint = {
 	if = {
 		limit = { #Introduction of gulden_hungarian_forint
@@ -39692,7 +39862,7 @@ introduction_of_gulden_hungarian_forint = {
 		activate_law = law_type:law_gulden_hungarian_forint_currency
 	}
 }
-#gulden_indies_guilder 
+#gulden_indies_guilder
 introduction_of_gulden_indies_guilder = {
 	if = {
 		limit = { #Introduction of gulden_indies_guilder
@@ -39742,7 +39912,7 @@ introduction_of_gulden_indies_guilder = {
 		activate_law = law_type:law_gulden_indies_guilder_currency
 	}
 }
-#gulden_south_german_gulden 
+#gulden_south_german_gulden
 introduction_of_gulden_south_german_gulden = {
 	if = {
 		limit = { #Introduction of gulden_south_german_gulden
@@ -39792,7 +39962,7 @@ introduction_of_gulden_south_german_gulden = {
 		activate_law = law_type:law_gulden_south_german_gulden_currency
 	}
 }
-#krone_czech_koruna 
+#krone_czech_koruna
 introduction_of_krone_czech_koruna = {
 	if = {
 		limit = { #Introduction of krone_czech_koruna
@@ -39842,7 +40012,7 @@ introduction_of_krone_czech_koruna = {
 		activate_law = law_type:law_krone_czech_koruna_currency
 	}
 }
-#krone_danish_krone 
+#krone_danish_krone
 introduction_of_krone_danish_krone = {
 	if = {
 		limit = { #Introduction of krone_danish_krone
@@ -39892,7 +40062,7 @@ introduction_of_krone_danish_krone = {
 		activate_law = law_type:law_krone_danish_krone_currency
 	}
 }
-#krone_estonian_kroon 
+#krone_estonian_kroon
 introduction_of_krone_estonian_kroon = {
 	if = {
 		limit = { #Introduction of krone_estonian_kroon
@@ -39942,7 +40112,7 @@ introduction_of_krone_estonian_kroon = {
 		activate_law = law_type:law_krone_estonian_kroon_currency
 	}
 }
-#krone_icelandic_krona 
+#krone_icelandic_krona
 introduction_of_krone_icelandic_krona = {
 	if = {
 		limit = { #Introduction of krone_icelandic_krona
@@ -39992,7 +40162,7 @@ introduction_of_krone_icelandic_krona = {
 		activate_law = law_type:law_krone_icelandic_krona_currency
 	}
 }
-#krone_norwegian_krone 
+#krone_norwegian_krone
 introduction_of_krone_norwegian_krone = {
 	if = {
 		limit = { #Introduction of krone_norwegian_krone
@@ -40042,7 +40212,7 @@ introduction_of_krone_norwegian_krone = {
 		activate_law = law_type:law_krone_norwegian_krone_currency
 	}
 }
-#krone_slovak_koruna 
+#krone_slovak_koruna
 introduction_of_krone_slovak_koruna = {
 	if = {
 		limit = { #Introduction of krone_slovak_koruna
@@ -40092,7 +40262,7 @@ introduction_of_krone_slovak_koruna = {
 		activate_law = law_type:law_krone_slovak_koruna_currency
 	}
 }
-#krone_swedish_krona 
+#krone_swedish_krona
 introduction_of_krone_swedish_krona = {
 	if = {
 		limit = { #Introduction of krone_swedish_krona
@@ -40142,7 +40312,7 @@ introduction_of_krone_swedish_krona = {
 		activate_law = law_type:law_krone_swedish_krona_currency
 	}
 }
-#leon_leu 
+#leon_leu
 introduction_of_leon_leu = {
 	if = {
 		limit = { #Introduction of leon_leu
@@ -40192,7 +40362,7 @@ introduction_of_leon_leu = {
 		activate_law = law_type:law_leon_leu_currency
 	}
 }
-#leon_lev 
+#leon_lev
 introduction_of_leon_lev = {
 	if = {
 		limit = { #Introduction of leon_lev
@@ -40242,7 +40412,7 @@ introduction_of_leon_lev = {
 		activate_law = law_type:law_leon_lev_currency
 	}
 }
-#lira 
+#lira
 introduction_of_lira = {
 	if = {
 		limit = { #Introduction of lira
@@ -40292,7 +40462,7 @@ introduction_of_lira = {
 		activate_law = law_type:law_lira_currency
 	}
 }
-#lira_ducato 
+#lira_ducato
 introduction_of_lira_ducato = {
 	if = {
 		limit = { #Introduction of lira_ducato
@@ -40342,7 +40512,7 @@ introduction_of_lira_ducato = {
 		activate_law = law_type:law_lira_ducato_currency
 	}
 }
-#lira_ottoman_lira 
+#lira_ottoman_lira
 introduction_of_lira_ottoman_lira = {
 	if = {
 		limit = { #Introduction of lira_ottoman_lira
@@ -40392,7 +40562,7 @@ introduction_of_lira_ottoman_lira = {
 		activate_law = law_type:law_lira_ottoman_lira_currency
 	}
 }
-#lira_scudo_pontificio 
+#lira_scudo_pontificio
 introduction_of_lira_scudo_pontificio = {
 	if = {
 		limit = { #Introduction of lira_scudo_pontificio
@@ -40442,7 +40612,7 @@ introduction_of_lira_scudo_pontificio = {
 		activate_law = law_type:law_lira_scudo_pontificio_currency
 	}
 }
-#lira_scudo_sardo 
+#lira_scudo_sardo
 introduction_of_lira_scudo_sardo = {
 	if = {
 		limit = { #Introduction of lira_scudo_sardo
@@ -40492,7 +40662,7 @@ introduction_of_lira_scudo_sardo = {
 		activate_law = law_type:law_lira_scudo_sardo_currency
 	}
 }
-#lira_toscane_lira 
+#lira_toscane_lira
 introduction_of_lira_toscane_lira = {
 	if = {
 		limit = { #Introduction of lira_toscane_lira
@@ -40542,7 +40712,7 @@ introduction_of_lira_toscane_lira = {
 		activate_law = law_type:law_lira_toscane_lira_currency
 	}
 }
-#mark 
+#mark
 introduction_of_mark = {
 	if = {
 		limit = { #Introduction of mark
@@ -40592,7 +40762,7 @@ introduction_of_mark = {
 		activate_law = law_type:law_mark_currency
 	}
 }
-#mark_finnish_markka 
+#mark_finnish_markka
 introduction_of_mark_finnish_markka = {
 	if = {
 		limit = { #Introduction of mark_finnish_markka
@@ -40642,7 +40812,7 @@ introduction_of_mark_finnish_markka = {
 		activate_law = law_type:law_mark_finnish_markka_currency
 	}
 }
-#peso 
+#peso
 introduction_of_peso = {
 	if = {
 		limit = { #Introduction of peso
@@ -40692,7 +40862,7 @@ introduction_of_peso = {
 		activate_law = law_type:law_peso_currency
 	}
 }
-#peso_argentine_peso 
+#peso_argentine_peso
 introduction_of_peso_argentine_peso = {
 	if = {
 		limit = { #Introduction of peso_argentine_peso
@@ -40742,7 +40912,7 @@ introduction_of_peso_argentine_peso = {
 		activate_law = law_type:law_peso_argentine_peso_currency
 	}
 }
-#peso_bolivien_peso 
+#peso_bolivien_peso
 introduction_of_peso_bolivien_peso = {
 	if = {
 		limit = { #Introduction of peso_bolivien_peso
@@ -40792,7 +40962,7 @@ introduction_of_peso_bolivien_peso = {
 		activate_law = law_type:law_peso_bolivien_peso_currency
 	}
 }
-#peso_chilean_peso 
+#peso_chilean_peso
 introduction_of_peso_chilean_peso = {
 	if = {
 		limit = { #Introduction of peso_chilean_peso
@@ -40842,7 +41012,7 @@ introduction_of_peso_chilean_peso = {
 		activate_law = law_type:law_peso_chilean_peso_currency
 	}
 }
-#peso_colombian_peso 
+#peso_colombian_peso
 introduction_of_peso_colombian_peso = {
 	if = {
 		limit = { #Introduction of peso_colombian_peso
@@ -40892,7 +41062,7 @@ introduction_of_peso_colombian_peso = {
 		activate_law = law_type:law_peso_colombian_peso_currency
 	}
 }
-#peso_costa_rican_colon 
+#peso_costa_rican_colon
 introduction_of_peso_costa_rican_colon = {
 	if = {
 		limit = { #Introduction of peso_costa_rican_colon
@@ -40942,7 +41112,7 @@ introduction_of_peso_costa_rican_colon = {
 		activate_law = law_type:law_peso_costa_rican_colon_currency
 	}
 }
-#peso_cuban_peso 
+#peso_cuban_peso
 introduction_of_peso_cuban_peso = {
 	if = {
 		limit = { #Introduction of peso_cuban_peso
@@ -40992,7 +41162,7 @@ introduction_of_peso_cuban_peso = {
 		activate_law = law_type:law_peso_cuban_peso_currency
 	}
 }
-#peso_ecuadorian_peso 
+#peso_ecuadorian_peso
 introduction_of_peso_ecuadorian_peso = {
 	if = {
 		limit = { #Introduction of peso_ecuadorian_peso
@@ -41042,7 +41212,7 @@ introduction_of_peso_ecuadorian_peso = {
 		activate_law = law_type:law_peso_ecuadorian_peso_currency
 	}
 }
-#peso_el_salvador_colon 
+#peso_el_salvador_colon
 introduction_of_peso_el_salvador_colon = {
 	if = {
 		limit = { #Introduction of peso_el_salvador_colon
@@ -41092,7 +41262,7 @@ introduction_of_peso_el_salvador_colon = {
 		activate_law = law_type:law_peso_el_salvador_colon_currency
 	}
 }
-#peso_guatemalan_quetzal 
+#peso_guatemalan_quetzal
 introduction_of_peso_guatemalan_quetzal = {
 	if = {
 		limit = { #Introduction of peso_guatemalan_quetzal
@@ -41142,7 +41312,7 @@ introduction_of_peso_guatemalan_quetzal = {
 		activate_law = law_type:law_peso_guatemalan_quetzal_currency
 	}
 }
-#peso_honduran_lempira 
+#peso_honduran_lempira
 introduction_of_peso_honduran_lempira = {
 	if = {
 		limit = { #Introduction of peso_honduran_lempira
@@ -41192,7 +41362,7 @@ introduction_of_peso_honduran_lempira = {
 		activate_law = law_type:law_peso_honduran_lempira_currency
 	}
 }
-#peso_mexican_peso 
+#peso_mexican_peso
 introduction_of_peso_mexican_peso = {
 	if = {
 		limit = { #Introduction of peso_mexican_peso
@@ -41242,7 +41412,7 @@ introduction_of_peso_mexican_peso = {
 		activate_law = law_type:law_peso_mexican_peso_currency
 	}
 }
-#peso_nicaraguan_cordoba 
+#peso_nicaraguan_cordoba
 introduction_of_peso_nicaraguan_cordoba = {
 	if = {
 		limit = { #Introduction of peso_nicaraguan_cordoba
@@ -41292,7 +41462,7 @@ introduction_of_peso_nicaraguan_cordoba = {
 		activate_law = law_type:law_peso_nicaraguan_cordoba_currency
 	}
 }
-#peso_paraguayan_peso 
+#peso_paraguayan_peso
 introduction_of_peso_paraguayan_peso = {
 	if = {
 		limit = { #Introduction of peso_paraguayan_peso
@@ -41342,7 +41512,7 @@ introduction_of_peso_paraguayan_peso = {
 		activate_law = law_type:law_peso_paraguayan_peso_currency
 	}
 }
-#peso_philippine_peso 
+#peso_philippine_peso
 introduction_of_peso_philippine_peso = {
 	if = {
 		limit = { #Introduction of peso_philippine_peso
@@ -41392,7 +41562,7 @@ introduction_of_peso_philippine_peso = {
 		activate_law = law_type:law_peso_philippine_peso_currency
 	}
 }
-#peso_sol_de_oro 
+#peso_sol_de_oro
 introduction_of_peso_sol_de_oro = {
 	if = {
 		limit = { #Introduction of peso_sol_de_oro
@@ -41442,7 +41612,7 @@ introduction_of_peso_sol_de_oro = {
 		activate_law = law_type:law_peso_sol_de_oro_currency
 	}
 }
-#peso_uruguayan_peso 
+#peso_uruguayan_peso
 introduction_of_peso_uruguayan_peso = {
 	if = {
 		limit = { #Introduction of peso_uruguayan_peso
@@ -41492,7 +41662,7 @@ introduction_of_peso_uruguayan_peso = {
 		activate_law = law_type:law_peso_uruguayan_peso_currency
 	}
 }
-#peso_venezuelan_peso 
+#peso_venezuelan_peso
 introduction_of_peso_venezuelan_peso = {
 	if = {
 		limit = { #Introduction of peso_venezuelan_peso
@@ -41542,7 +41712,7 @@ introduction_of_peso_venezuelan_peso = {
 		activate_law = law_type:law_peso_venezuelan_peso_currency
 	}
 }
-#pound_egyptian_pound 
+#pound_egyptian_pound
 introduction_of_pound_egyptian_pound = {
 	if = {
 		limit = { #Introduction of pound_egyptian_pound
@@ -41592,7 +41762,7 @@ introduction_of_pound_egyptian_pound = {
 		activate_law = law_type:law_pound_egyptian_pound_currency
 	}
 }
-#pound_irish_pound 
+#pound_irish_pound
 introduction_of_pound_irish_pound = {
 	if = {
 		limit = { #Introduction of pound_irish_pound
@@ -41642,7 +41812,7 @@ introduction_of_pound_irish_pound = {
 		activate_law = law_type:law_pound_irish_pound_currency
 	}
 }
-#pound_sterling 
+#pound_sterling
 introduction_of_pound_sterling = {
 	if = {
 		limit = { #Introduction of pound_sterling
@@ -41692,7 +41862,7 @@ introduction_of_pound_sterling = {
 		activate_law = law_type:law_pound_sterling_currency
 	}
 }
-#real 
+#real
 introduction_of_real = {
 	if = {
 		limit = { #Introduction of real
@@ -41742,7 +41912,7 @@ introduction_of_real = {
 		activate_law = law_type:law_real_currency
 	}
 }
-#real_brazilian_real 
+#real_brazilian_real
 introduction_of_real_brazilian_real = {
 	if = {
 		limit = { #Introduction of real_brazilian_real
@@ -41792,7 +41962,7 @@ introduction_of_real_brazilian_real = {
 		activate_law = law_type:law_real_brazilian_real_currency
 	}
 }
-#rupee_indian_rupee 
+#rupee_indian_rupee
 introduction_of_rupee_indian_rupee = {
 	if = {
 		limit = { #Introduction of rupee_indian_rupee
@@ -41842,7 +42012,7 @@ introduction_of_rupee_indian_rupee = {
 		activate_law = law_type:law_rupee_indian_rupee_currency
 	}
 }
-#rupee_indonesian_rupiah 
+#rupee_indonesian_rupiah
 introduction_of_rupee_indonesian_rupiah = {
 	if = {
 		limit = { #Introduction of rupee_indonesian_rupiah
@@ -41892,7 +42062,7 @@ introduction_of_rupee_indonesian_rupiah = {
 		activate_law = law_type:law_rupee_indonesian_rupiah_currency
 	}
 }
-#spe_baht 
+#spe_baht
 introduction_of_spe_baht = {
 	if = {
 		limit = { #Introduction of spe_baht
@@ -41942,7 +42112,7 @@ introduction_of_spe_baht = {
 		activate_law = law_type:law_spe_baht_currency
 	}
 }
-#spe_dong 
+#spe_dong
 introduction_of_spe_dong = {
 	if = {
 		limit = { #Introduction of spe_dong
@@ -41992,7 +42162,7 @@ introduction_of_spe_dong = {
 		activate_law = law_type:law_spe_dong_currency
 	}
 }
-#spe_drachma 
+#spe_drachma
 introduction_of_spe_drachma = {
 	if = {
 		limit = { #Introduction of spe_drachma
@@ -42042,7 +42212,7 @@ introduction_of_spe_drachma = {
 		activate_law = law_type:law_spe_drachma_currency
 	}
 }
-#spe_korean_won 
+#spe_korean_won
 introduction_of_spe_korean_won = {
 	if = {
 		limit = { #Introduction of spe_korean_won
@@ -42092,7 +42262,7 @@ introduction_of_spe_korean_won = {
 		activate_law = law_type:law_spe_korean_won_currency
 	}
 }
-#spe_latvian_lats 
+#spe_latvian_lats
 introduction_of_spe_latvian_lats = {
 	if = {
 		limit = { #Introduction of spe_latvian_lats
@@ -42142,7 +42312,7 @@ introduction_of_spe_latvian_lats = {
 		activate_law = law_type:law_spe_latvian_lats_currency
 	}
 }
-#spe_lithuanian_litas 
+#spe_lithuanian_litas
 introduction_of_spe_lithuanian_litas = {
 	if = {
 		limit = { #Introduction of spe_lithuanian_litas
@@ -42192,7 +42362,7 @@ introduction_of_spe_lithuanian_litas = {
 		activate_law = law_type:law_spe_lithuanian_litas_currency
 	}
 }
-#spe_peseta 
+#spe_peseta
 introduction_of_spe_peseta = {
 	if = {
 		limit = { #Introduction of spe_peseta
@@ -42242,7 +42412,7 @@ introduction_of_spe_peseta = {
 		activate_law = law_type:law_spe_peseta_currency
 	}
 }
-#spe_ruble 
+#spe_ruble
 introduction_of_spe_ruble = {
 	if = {
 		limit = { #Introduction of spe_ruble
@@ -42292,7 +42462,7 @@ introduction_of_spe_ruble = {
 		activate_law = law_type:law_spe_ruble_currency
 	}
 }
-#spe_uni 
+#spe_uni
 introduction_of_spe_uni = {
 	if = {
 		limit = { #Introduction of spe_uni
@@ -42342,7 +42512,7 @@ introduction_of_spe_uni = {
 		activate_law = law_type:law_spe_uni_currency
 	}
 }
-#spe_yen 
+#spe_yen
 introduction_of_spe_yen = {
 	if = {
 		limit = { #Introduction of spe_yen
@@ -42392,7 +42562,7 @@ introduction_of_spe_yen = {
 		activate_law = law_type:law_spe_yen_currency
 	}
 }
-#spe_yuan 
+#spe_yuan
 introduction_of_spe_yuan = {
 	if = {
 		limit = { #Introduction of spe_yuan
@@ -42442,7 +42612,7 @@ introduction_of_spe_yuan = {
 		activate_law = law_type:law_spe_yuan_currency
 	}
 }
-#spe_zloti 
+#spe_zloti
 introduction_of_spe_zloti = {
 	if = {
 		limit = { #Introduction of spe_zloti
@@ -42492,7 +42662,7 @@ introduction_of_spe_zloti = {
 		activate_law = law_type:law_spe_zloti_currency
 	}
 }
-#thaler_hannoveraner_thaler 
+#thaler_hannoveraner_thaler
 introduction_of_thaler_hannoveraner_thaler = {
 	if = {
 		limit = { #Introduction of thaler_hannoveraner_thaler
@@ -42542,7 +42712,7 @@ introduction_of_thaler_hannoveraner_thaler = {
 		activate_law = law_type:law_thaler_hannoveraner_thaler_currency
 	}
 }
-#thaler_prussian_thaler 
+#thaler_prussian_thaler
 introduction_of_thaler_prussian_thaler = {
 	if = {
 		limit = { #Introduction of thaler_prussian_thaler
@@ -42592,7 +42762,7 @@ introduction_of_thaler_prussian_thaler = {
 		activate_law = law_type:law_thaler_prussian_thaler_currency
 	}
 }
-#thaler_saxon_thaler 
+#thaler_saxon_thaler
 introduction_of_thaler_saxon_thaler = {
 	if = {
 		limit = { #Introduction of thaler_saxon_thaler
