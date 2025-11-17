@@ -138,7 +138,7 @@ central_bank_ef_on_monthly_pulse_country = {
 	every_country = {
 		limit = {
 			global_country_ranking = 1
-		} 
+		}  
 		global_gold_silver_production = yes
 		if = {
 			limit = {
@@ -323,18 +323,19 @@ ef_on_half_yearly_pulse_recurence = {
 	#########################################
 	ai_building_strategy = yes
 	fluctuations_gdp_1_year = yes
-	economic_sentiment_index_base_JE_fixe_half_year_pulse = yes
+	economic_sentiment_index_base_JE_fixe_half_year_pulse = yes  
+	law_no_monetary_system = yes 
 }
 # ef_on_half_yearly_pulse_reset = {
 # }
-central_bank_ef_on_half_yearly_pulse_country = {
-
+central_bank_ef_on_half_yearly_pulse_country = { 
 	if  = {
 		limit  = {
 			has_central_bank_SS_BS_GS_GES_NISO = yes
 		}
 		fluctuations_money_value_1_year = yes
 		buy_sell_currency_order = yes 
+		leading_producer_of_oil = yes
 	}
 	if  = {
 		limit = {
@@ -361,7 +362,14 @@ central_bank_ef_on_half_yearly_pulse_country = {
 			offshore_port_num > 0
 		}
 		is_treaty_port_disable_pm_market_liquidity = yes
-	} 
+	}  
+	if  = {
+		limit  = { 
+			global_country_ranking = 1
+		}   
+		fluctuations_silver_to_gold_rate_1_year = yes
+	}
+
 	crisis_general_reset_count = yes
 }
 financial_center_ef_on_half_yearly_pulse_country = {
@@ -409,11 +417,10 @@ financial_center_ef_on_half_yearly_pulse_country = {
 ############################################################################################################################################################
 
 ef_on_yearly_pulse_recurence = {
-
 	#GDP var -> limité ? 100 premier pays uniquement
 	fluctuations_gdp_5_year = yes
 	fluctuations_gdp_10_year = yes
-	is_at_war_years_pulse = yes
+	is_at_war_years_pulse = yes 
 }
 ef_on_yearly_pulse_reset = {
 
@@ -578,7 +585,7 @@ ef_on_yearly_pulse_reset = {
 			}
 			clear_ironclads_contract_1_year = yes
 		}
-	}
+	} 
 }
 central_bank_ef_on_yearly_pulse_country = {
 
@@ -687,8 +694,14 @@ central_bank_ef_on_yearly_pulse_country = {
 		}
 		extreme_weak_currency_solution_player = yes
 	} 
-
-	establish_bank_compagnie = yes
+ 
+	if  = {
+		limit = {
+			is_ai = yes
+			#maximum_number_companies_exceeded_monthly_pulse >= 1
+		}
+		establish_bank_and_ef_compagnie = yes
+	} 
 
 	economic_instability_count_reset_condition = yes  
 
@@ -703,7 +716,757 @@ financial_center_ef_on_yearly_pulse_country = {
 	sovereign_bond_yields = yes #verif
 	bond_maturity_on_action = yes #attention ordre avec ai_buy_central_bank_debt
 	financial_crash_count_reset_condition = yes
-}
+} 
+
+ef_on_yearly_pulse_event_at_date = { 
+
+	#silver_crisis
+	if = { #à verifier
+		limit = {
+			c:USA ?= this
+			game_date >= 1873.1.1 
+			any_country = { 
+				limit = { 
+					is_player = yes
+				}
+				not = {
+					has_journal_entry = silver_crisis_je_1 
+				}
+			} 
+		}
+		C:USA = {	
+			capital= {
+				save_scope_as = capital_state
+			}
+			save_scope_as = target_country
+
+			every_country = {
+				limit = {
+					is_player = yes 
+					not = {
+						has_journal_entry = silver_crisis_je_1 
+					}   
+				}   
+				trigger_event = 00_ef_economic_event.56   
+			} 
+			set_variable = {
+				name = usa_coinage_act_1873 
+				value = 1
+			} 
+		}    
+	}  
+	if  = {
+		limit  = { 
+			global_country_ranking = 1 
+			c:USA.var:usa_coinage_act_1873 = 1
+		}    
+		#le premier pays mondiale va déclancher toutles evenement de la crise et le joueur et prevenu sur le ta si silver et bimeta
+		#toute les attaque du silver doive etre global et donc pas desn l'evenement qui triger que si le joeuru jour!
+   
+		#🟪 Phase 1 – Déstabilisation (1873–1878 : 5 ans)
+  
+			#1 event -> chaque pays qui change d standart pour standart or +3% de production annuel -> directement dans le bouton de l'event
+			#00_ef_economic_event.26 et 00_ef_economic_event.27 -> cf. event 
+
+			#1 event -> German Silver Dumping -> triger si le est mark 
+			C:GER ?= {
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes  
+					}   
+					trigger_event = 00_ef_economic_event.57 
+				}    
+				set_variable = {
+					name = german_silver_dumping 
+					value = 1
+				} 
+				#changer pour l gold standart si pas deja en vigeur
+			}  
+ 
+ 			#1 Silver Price Collapse of "Game date" -> un event de perte de X% de la valeur de l'arent// à l'or
+ 			if = { 
+				limit = { 
+					c:USA.var:usa_coinage_act_1873 = 1
+					c:GER.var:german_silver_dumping = 1
+				} 
+
+				every_country = {
+					limit = {
+						is_player = yes  
+					}   
+					capital= {
+						save_scope_as = capital_state
+					}
+					c:USA= {
+						save_scope_as = trigger_country_1
+					} 
+					c:GER= {
+						save_scope_as = trigger_country_2
+					}
+
+					save_scope_as = target_country
+					trigger_event = 00_ef_economic_event.58
+				}     
+				
+				change_global_variable = {
+					name = global_silver_production_cumulative_production
+					add = {
+						value = global_silver_production
+						multiply = 0.20
+					}
+				} 
+ 			}   
+
+			#1 event -> (automatique) Arbitrage Against Bimetallism 
+			#1 event -> Union Latine Crisis -> cf. JE 
+ 
+		#🟩 Phase 2 – Expansion minière (1878–1886 : 8 ans)  
+		 
+			#1 event -> découverte de mine d'argent gigantesque dans le nevada -> 3% production mondial
+			if = { 
+				limit = { 
+					game_date > 1878.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_NEVADA
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_NEVADA
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			} 
+			#1 event -> découverte de mine d'argent gigantesque dans le Colorado -> 3% production mondial
+			if = { 
+				limit = { 
+					game_date > 1880.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_COLORADO
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_COLORADO
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59 
+					}    
+				}   
+			} 
+			#1 event -> découverte de mine d'argent gigantesque dans le Idaho -> 3% production mondial
+			if = { 
+				limit = { 
+					game_date > 1882.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_IDAHO
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_IDAHO
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			} 
+			#1 event -> découverte de mine d'argent gigantesque dans le Montana -> 3% production mondial
+			if = { 
+				limit = { 
+					game_date > 1884.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_MONTANA
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_MONTANA
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+ 
+			#1 event -> Inundation of Cheap Silver -> de plus en plus de silver bon marché arrive sur le marché mondiale  -> 5% production mondial  
+			every_country = { 
+				limit = { 
+					has_modifier = global_financial_power
+					game_date >= 1886.1.1
+				} 
+				capital= {
+					save_scope_as = capital_state
+				} 
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes  
+					}   
+					trigger_event = 00_ef_economic_event.60
+				}    
+			}   
+
+			#1 event -> (automatique) Arbitrage Against Bimetallism -> s'entenssifi plusle ratio global devient important -> retirer le 15% quand la crise devienplus importante ? 
+			# Union Latine Crisis -> cf. JE -> pasage au goldstandart pour tout les pays de l'union
+			#X event -> Mint Crisis in the Latin Union 
+ 
+		#🟧 Phase 3 – Silver Bonanza (1886–1893 : 7 ans) 
+ 
+			#1 event -> indique que la production d'argent à augmenter de 3x en 15ans -> Triplement total de la production mondiale -> 10% production mondial 
+ 			every_country = { 
+				limit = { 
+					has_modifier = global_financial_power
+					game_date >= 1888.1.1
+				} 
+				capital= {
+					save_scope_as = capital_state
+				} 
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes  
+					}   
+					trigger_event = 00_ef_economic_event.61
+				}    
+			}   
+ 
+			#production d'argent encore augmenter (1 event par etat dans ces pays) 
+			#1887 - 1 event -> découverte de mine d'argent gigantesque dans le Sonora -> 3% production mondial STATE_SONORA
+			if = { 
+				limit = { 
+					game_date > 1887.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_SONORA
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_SONORA
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+			#1888 - 1 event -> découverte de mine d'argent gigantesque dans le Zacatecas -> 3% production mondial STATE_ZACATECAS
+ 			if = { 
+				limit = { 
+					game_date > 1888.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_ZACATECAS
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_ZACATECAS
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+			#1889 - 1 event -> découverte de mine d'argent gigantesque dans la PAZ -> 3% production mondial STATE_LA_PAZ
+ 			if = { 
+				limit = { 
+					game_date > 1889.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_LA_PAZ
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_LA_PAZ
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+			#1890 - 1 event -> découverte de mine d'argent gigantesque dans la Tucuman -> 3% production mondial STATE_TUCUMAN
+ 			if = { 
+				limit = { 
+					game_date > 1890.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_TUCUMAN
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_TUCUMAN
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+			#1891 - 1 event -> découverte de mine d'argent gigantesque dans la santiago -> 3% production mondial STATE_SANTIAGO
+ 			if = { 
+				limit = { 
+					game_date > 1891.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_SANTIAGO
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_SANTIAGO
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			}  
+			#1892 - 1 event -> découverte de mine d'argent gigantesque dans la new south wale -> 3% production mondial STATE_NEW_SOUTH_WALES
+			if = { 
+				limit = { 
+					game_date > 1892.1.1
+				} 
+				every_country = {
+					limit = {
+						has_state_in_state_region = STATE_NEW_SOUTH_WALES
+					} 
+					every_scope_state = {
+						limit = {
+							state_region = s:STATE_NEW_SOUTH_WALES
+						}
+						save_scope_as = capital_state
+					}
+
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.59
+					}    
+				}   
+			} 
+ 
+			# #🇮🇳 Inde britannique -> La roupie s’effondre → crise économique → famine → fermeture de la frappe en 1893.
+			# 1890–1892 — Crise monétaire sévère 
+			# 1893 — Fermeture de la frappe libre de la roupie en argent (“Silver Closure Act”) 
+  
+			C:BIC ?= {	
+				if = { 
+					limit = { 
+						game_date > 1892.1.1
+					} 
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.62
+					}      
+					#trigger une currency crisis
+				}    
+			}  
+
+			# 🇲🇽 Mexique -> Sa monnaie devient ultra-volatile → instabilité politique et bancaire.
+			# 1873 — crise initiale 
+			# 1878–1886 — baisse du prix → instabilité budgétaire 
+			# 1887–1893 — effondrement fiscal 
+			# 1893 — la dévaluation devient incontrôlable 
+
+			C:MEX ?= {	
+				if = { 
+					limit = { 
+						game_date > 1893.1.1
+					} 
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.63
+					}       
+				}    
+			}  
+
+			# 🇧🇴 Bolivie / 🇵🇪 Pérou -> Les mines deviennent dépendantes du prix US → crises politiques et sociales.
+			# “ANDES SILVER CRASH” 
+
+			random_country = {  
+				limit = {  
+					capital = { region = sr:region_andes } 
+				}  
+				if = { 
+					limit = { 
+						game_date > 1894.1.1 
+					}  
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+ 
+					c:BOL= {
+						save_scope_as = trigger_country_2
+					} 
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.65
+					}       
+				}    
+			} 
+   
+			# 🇨🇳 Chine -> Le tael se déprécie → crise commerciale → déficit structurel → dépendance économique.
+			# 1895 — Le tael touche son niveau le plus bas du siècle 
+
+			C:CHI ?= {	
+				if = { 
+					limit = { 
+						game_date > 1895.1.1
+					} 
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes  
+						}   
+						trigger_event = 00_ef_economic_event.63
+					}       
+				}    
+			}  
+
+			# Iran (Perse)	1885–1892	Dépréciation du qiran
+			# Tunisie	1880–1885	Crise fiscale, dévaluation
+			# Égypte	1878–1882	Crise budgétaire, effondrement de la monnaie
+  
+ 
+			#1 event -> Grands débats politiques (Free Silver Movement) au USA uniquement -> Rise of the Free Silver Movement (USA, si tu veux)
+			#serie évenement spécifique dans le JE bimetalisme sile joeur joue les USA
+  
+			#🟪 3.1 Crises dans les pays bimétalliques (Europe)
+				#brace
+					# La parité bimétallique (15,5:1 dans l’Union Latine) devient totalement irréaliste.
+
+					# Conséquences immédiates :
+
+					# afflux massif d’argent étranger
+
+					# arbitrage monstrueux
+
+					# perte de l’or national
+
+					# suspension totale de la frappe d’argent
+
+					# effondrement de la crédibilité des pièces en argent
+
+					# L’Union Latine entre dans sa phase terminale :
+
+					# ➡ suspension permanente de l’argent
+					# ➡ traité modifié en 1885
+					# ➡ mort du bimétallisme européen
+				#brace
+
+				#Global Arbitrage Against Bimetallic States    #1 event -> absolument le joueur doit stoper la convertibilité 
+
+			# 🟥 3.2 Les USA : la guerre civile monétaire (1890–1900) -> la finalité clo le JE
+				#brace
+					# C’est là que le Free Silver Movement entre dans sa phase ultra-violente.
+
+					# Les lois clés :
+						# ✔ Sherman Silver Purchase Act (1890)
+
+								# Le gouvernement US doit acheter ENORMÉMENT d’argent chaque mois.
+								# C’est une tentative désespérée pour soutenir les cours.
+
+								# Résultat ?
+
+								# ➡ l’État accumule de l’argent inutile
+								# ➡ l’or fuit
+								# ➡ panique bancaire
+								# ➡ crise économique majeure
+
+						# ✔ Panic of 1893
+
+								# grande dépression
+
+								# effondrement des réserves d’or
+
+								# fuite des banques
+
+								# chômage massif
+
+								# C’est la pire crise US du XIXᵉ siècle.
+
+						# ✔ Élection de 1896
+
+								# William Jennings Bryan — pro-argent — faillit gagner la présidence avec son discours :
+
+								# 👉 “You shall not crucify mankind upon a cross of gold.”
+
+								# S’il gagnait, les USA revenaient au bimétallisme.
+
+								# Il perd.
+								# ➡ Fin politique du free silver movement.
+								# ➡ Victoire totale de l’or.
+				#brace
+ 			
+	}  
+	#autre
+	if  = {
+		limit  = { 
+			global_country_ranking = 1
+		}   
+		silver_crisis_progress = yes 
+	}  
+
+
+	#Bimetalisme arbitrage 
+	if = { 
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}
+		  
+		#serie de loi pour la parité or argent qui doit etre passer comme les autre loi 
+  
+		#arbitrage du bimétallisme
+		#gold_drain
+		if = { 
+			# gold_to_silver_rate {or international à 15}
+			# bimetallic_rate_gold_to_silver {or local fixé à 13}
+			# -> or local moins chère qu el'or intranational  
+			# -> vente d'argent contre de l'or et revent de cette or à l'étranger 
+
+			limit = {
+				gold_to_silver_rate > bimetallic_rate_gold_to_silver
+				misalignment_rate_gold_drain >= 0.05
+			} 
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					save_scope_as = central_bank_site_seller
+				}
+			}
+			#arbitrage 
+			scope:central_bank_site_seller = { 
+				change_variable = {
+					name = gold_state_1
+					subtract = owner.gold_lost
+
+				}
+				change_variable = {
+					name = silver_state_1
+					add = owner.silver_gained
+				}
+			}   
+
+			capital= {
+				save_scope_as = capital_state
+			}
+			save_scope_as = target_country
+
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_1
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_2
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_3
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_4
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_5
+			} 
+
+			#Test AI
+			trigger_event = 00_ef_economic_event.95
+
+			if = {
+				limit = {
+					is_player = yes  
+				}   
+				trigger_event = 00_ef_economic_event.95
+			}   
+		} 
+		#silver_drain
+		if = { 
+			# gold_to_silver_rate {or international à 13}
+			# bimetallic_rate_gold_to_silver {or local fixé à 15}
+			# -> or local plus chère qu el'or intranational  
+			# -> vente d'or contre de l'argent et revent de cette argent à l'étranger
+
+			limit = {
+				gold_to_silver_rate < bimetallic_rate_gold_to_silver
+				misalignment_rate_silver_drain >= 0.05
+			}  
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					save_scope_as = central_bank_site_seller
+				}
+			}
+			#arbitrage  
+			scope:central_bank_site_seller = { 
+				change_variable = {
+					name = gold_state_1
+					add = owner.gold_gained
+
+				}
+				change_variable = {
+					name = silver_state_1
+					subtract = owner.silver_lost
+				}
+			} 
+ 
+			capital= {
+				save_scope_as = capital_state
+			}
+			save_scope_as = target_country
+
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_1
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_2
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_3
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_4
+			} 
+			random_in_list = {
+				variable = privat_bank_variable_list_ordered
+				save_scope_as = arbitrage_privat_bank_5
+			} 
+ 
+			#Test AI
+			trigger_event = 00_ef_economic_event.96
+
+			if = {
+				limit = {
+					is_player = yes  
+				}   
+				trigger_event = 00_ef_economic_event.96
+			}   
+		}   
+	}  
+} 
 
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -737,6 +1500,14 @@ central_bank_ef_on_five_year_pulse_country = {
 		}
 		money_value_target_modification = yes 
 	}
+	
+	every_country = {
+		limit = {
+			global_country_ranking = 1
+		}  
+		#Scandinavian Leader list
+		scandinavian_leader_list_1_list = yes 
+	} 
 }
 fiancial_center_ef_on_five_year_pulse_country = {
 	if = {
@@ -16891,4 +17662,118 @@ is_at_war_years_pulse = {
 	}
 }
 
+law_no_monetary_system = {    
+	if = {
+		limit = {
+			or = {
+				has_law = law_type:law_no_monetary_system
+				and = {
+					#or = {
+						has_law = law_type:law_fiat_standard  
+					#	has_law = law_type:law_silver_standard  
+					#}
+					NOT = {
+						has_modifier = has_central_bank
+					}
+				}	 
+			}	
+		}	 
+		remove_modifier = no_money_production
+		add_modifier = {
+			name = no_money_production 
+		} 
+	} 
+	if = {
+		limit = {
+			# NOT = {
+			# 	has_law = law_type:law_no_monetary_system
+			# }
+			has_modifier = has_central_bank
+			has_modifier = no_money_production
+		}	 
+		remove_modifier = no_money_production
+	} 
+}
+leading_producer_of_oil = {      
+	if = {
+		limit = { 
+			has_modifier = leading_producer_of_oil
+		}	
+		remove_modifier = leading_producer_of_oil 
+	}  
+	if = {
+		limit = { 
+			leading_producer_of_oil = 1
+		}	
+		remove_modifier = leading_producer_of_oil	
+		add_modifier = { 
+			name = leading_producer_of_oil
+		}  
+	}   
+} 
 
+silver_crisis_progress = { 
+	
+	# #Test
+	# change_global_variable = {
+	# 	name = global_silver_production_cumulative_production
+	# 	add = {
+	# 		value = global_silver_production #global_var:global_silver_production_fix
+	# 		multiply = 0.03
+	# 	}
+	# } 
+
+
+	if = {
+		limit = { 
+			game_date >= 1873.1.1  
+			game_date < 1880.1.1 
+		} 
+		change_global_variable = {
+			name = global_silver_production_cumulative_production
+			add = {
+				value = global_silver_production #global_var:global_silver_production_fix
+				multiply = 0.03
+			}
+		} 
+	} 
+	if = {
+		limit = { 
+			game_date >= 1880.1.1  
+			game_date < 1886.1.1 
+		}
+		change_global_variable = {
+			name = global_silver_production_cumulative_production
+			add = {
+				value = global_silver_production #global_var:global_silver_production_fix
+				multiply = 0.05
+			}
+		} 
+	}
+	if = {
+		limit = { 
+			game_date >= 1886.1.1  
+			game_date < 1893.1.1 
+		}
+		change_global_variable = {
+			name = global_silver_production_cumulative_production
+			add = {
+				value = global_silver_production #global_var:global_silver_production_fix
+				multiply = 0.07
+			}
+		} 
+	}
+	if = {
+		limit = { 
+			game_date >= 1893.1.1  
+			game_date < 1900.1.1 
+		}
+		change_global_variable = {
+			name = global_silver_production_cumulative_production
+			add = {
+				value = global_silver_production #global_var:global_silver_production_fix
+				multiply = 0.10
+			}
+		} 
+	}  
+}

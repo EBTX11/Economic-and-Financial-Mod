@@ -1,0 +1,2041 @@
+latin_monetary_union_je_1 = {
+	icon = "gfx/interface/icons/event_icons/latin_monetary_union.dds"
+
+	group = je_group_ef
+	should_be_pinned_by_default = yes
+
+	is_shown_when_inactive = {
+		or = {
+			and = {
+				exists = c:FRA
+				c:FRA = ROOT
+			}
+			and = {
+				is_player = yes
+				or = {
+					country_is_in_europe = yes
+					"relations(scope:PREV)" > relations_threshold:cordial
+				}
+			}
+		}
+	}
+	possible = {
+		has_building = building_bank
+		or = {
+			this ?= c:FRA
+			and = {
+				is_player = yes
+				custom_tooltip = {
+					text = latin_monetary_union_je_1_desc.1
+					var:latin_monetary_union_on_discution = 1
+				}
+			}
+		}
+		game_date >= 1860.1.1 
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				not = {
+					and = {
+						c:FRA ?= this
+						is_player = yes
+					}
+				}
+			}
+			c:FRA = {
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+				every_country = {
+					limit = {
+						is_player = yes
+						or = {
+							country_is_in_europe = yes
+							"relations(scope:PREV)" > relations_threshold:cordial
+						}
+					}
+					trigger_event = {
+						id = 00_ef_economic_event.8
+						days = 0
+						popup = no
+					}
+				}
+			}
+		}
+	}
+
+	status_desc = {
+
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_1
+			}
+		}
+
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_2
+				trigger = {
+					c:FRA ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_3
+				trigger = {
+					c:BEL ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_4
+				trigger = {
+					c:SWI ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_5
+				trigger = {
+					c:SAR ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_6
+				trigger = {
+					c:PAR ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_7
+				trigger = {
+					c:MOD ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_8
+				trigger = {
+					c:LUC ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_9
+				trigger = {
+					c:TUS ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_10
+				trigger = {
+					c:PAP ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_11
+				trigger = {
+					c:SIC ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_12
+				trigger = {
+					c:GRE ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_13
+				trigger = {
+					c:ITA ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = { #Trigger si le pays n'ai pas dans les pays d'origine
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_14
+				trigger = {
+					Not = {
+						c:FRA ?= this
+						c:BEL ?= this
+						c:SWI ?= this
+						c:SAR ?= this
+						c:PAR ?= this
+						c:MOD ?= this
+						c:LUC ?= this
+						c:TUS ?= this
+						c:PAP ?= this
+						c:SIC ?= this
+						c:GRE ?= this
+						c:ITA ?= this
+					}
+					var:latin_monetary_union_on_discution = 1
+				}
+			}
+		}
+	}
+
+	complete = { 
+		or = {
+			custom_tooltip = {
+				text = latin_monetary_union_je_1_desc.2
+				var:latin_monetary_union_time >=6
+			}
+			any_scope_treaty = {
+				binds = root
+				any_scope_article = {
+					has_type = latin_monetary_union_treaty 
+				}
+			} 
+		} 
+	}
+
+	scripted_progress_bar = latin_monetary_union_progress_bar
+
+	scripted_button = latin_monetary_union_1_button
+	scripted_button = latin_monetary_union_2_button
+
+	on_yearly_pulse = {
+		effect = {
+			#le pays doit poseder son marché et donc avoir une currency libre
+
+			while = {
+				count = 2
+				every_country = {
+					random_list = {
+						1 = {
+							#BEL
+							if = {
+								limit = {
+									c:BEL ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SWI
+							if = {
+								limit = {
+									c:SWI ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SAR
+							if = {
+								limit = {
+									c:SAR ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#PAR
+							if = {
+								limit = {
+									c:PAR ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#MOD
+							if = {
+								limit = {
+									c:MOD ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#LUC
+							if = {
+								limit = {
+									c:LUC ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#TUS
+							if = {
+								limit = {
+									c:TUS ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#PAP
+							if = {
+								limit = {
+									c:PAP ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SIC
+							if = {
+								limit = {
+									c:SIC ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#GRE
+							if = {
+								limit = {
+									c:GRE ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#ITA
+							if = {
+								limit = {
+									c:ITA ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			change_variable = {
+				name = latin_monetary_union_time
+				add = 1
+			}
+			je:latin_monetary_union_je_1 ?= {
+				set_bar_progress = {
+					value = c:FRA.var:latin_monetary_union_time #il faut trigger l'avancement du debat en france donc propablement un c:FRA.var:latin_monetary_union_time
+					name = latin_monetary_union_progress_bar
+				}
+			}
+
+			#Avancement du debat uniquement trigger par la france
+			
+			# if = {
+				# limit = { 
+				# 	or = { 
+				# 		c:FRA = this
+				# 		is_player = no
+				# 	} 
+				# }   
+				c:FRA = {
+					#Avancement à 2ans
+					if = {
+						limit = {
+							var:latin_monetary_union_time = 2
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.9
+								days = 0
+								popup = no
+							}
+						}
+					}
+					#Avancement à 4 ans
+					if = {
+						limit = {
+							var:latin_monetary_union_time = 4
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.10
+								days = 0
+								popup = no
+							}
+						}
+					}
+				}
+			#}
+		}
+	}
+
+	on_monthly_pulse = {
+		effect = {
+			if = {
+				limit = {
+					has_modifier = has_central_bank
+					var:latin_monetary_union_on_discution = 0
+				}
+				set_variable = {
+					name = latin_monetary_union_on_discution
+					value = 1
+				}
+			}
+		}
+	}
+
+ 	on_complete = {
+		if = {
+			limit = {
+				or = {
+					is_player = no
+					c:FRA ?= this
+				}
+			}
+			every_country = {
+				limit = {
+					var:latin_monetary_union_on_discution = 1
+					not = {
+						c:FRA ?= this
+					}
+				}
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes
+					}
+					custom_tooltip = {
+						text = latin_monetary_union_je_1_desc.3
+						trigger_event = {
+							id = 00_ef_economic_event.12
+							days = 0
+							popup = no
+						}
+					}
+				}
+			}
+		}
+	}
+}
+scandinavian_monetary_union_je_1 = {
+	icon = "gfx/interface/icons/event_icons/scandinavian_monetary_union.dds"
+
+	group = je_group_ef
+	should_be_pinned_by_default = yes
+
+	is_shown_when_inactive = {
+		or = { 
+			country_has_primary_culture = cu:danish
+			country_has_primary_culture = cu:swedish
+			country_has_primary_culture = cu:norwegian 
+		}
+	}
+	possible = {
+		#desactiver la possibilité si dans l'union latine
+		has_building = building_bank
+		or = {
+			country_has_primary_culture = cu:danish
+			country_has_primary_culture = cu:swedish
+			country_has_primary_culture = cu:norwegian  
+		} 
+		not = {
+			or = {
+				market_owner_is_root_univ_with_buiding = yes
+				is_subject_custom_trigger = yes
+			}
+		} 	    
+		or = {
+			and = {
+				var:scandinavian_monetary_union_on_discution = 1
+				is_player = yes
+			}  
+			any_in_global_list = { 
+				variable = scandinavian_leader_list_1_country_1  
+				save_scope_as = scandinavian_leader
+				this = root
+			}  
+		}
+		or = {
+			and = {
+				var:scandinavian_monetary_union_on_discution = 1
+				is_player = yes
+			}  
+			not = {
+				any_in_global_list = { 
+					variable = scandinavian_leader_list_1_ordered_1  
+					has_journal_entry = scandinavian_monetary_union_je_1 
+				} 
+			}   
+		} 
+		game_date >= 1868.1.1 #1870.1.1
+	} 
+	immediate = {  
+		root = {  
+			save_scope_as = scandinavian_leader 
+		}   
+		if = {
+			limit = {
+				not = {
+					and = {
+						scope:scandinavian_leader ?= this
+						is_player = yes
+					}
+				}
+			}
+			scope:scandinavian_leader = {
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+				every_country = {
+					limit = {
+						is_player = yes 
+					}
+					trigger_event = {
+						id = 00_ef_economic_event.19
+						days = 0
+						popup = no
+					}
+				}
+			}
+		} 
+		if = {
+			limit = {
+				not = {
+					any_in_global_list = { 
+						variable = scandinavian_leader_list_1_ordered_1  
+						has_journal_entry = scandinavian_monetary_union_je_1 
+					} 
+				}   
+			}
+			set_variable = {
+				name = scandinavian_monetary_union_initiator
+				value = 1
+			} 
+		}
+	}
+
+	status_desc = { 
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_1
+			}
+		} 
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_2
+				trigger = { 
+					c:SWE ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 1 
+					}
+				}
+			}
+		}     
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_3
+				trigger = { 
+					c:DEN ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 1 
+					}
+				}
+			}
+		}     
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_4
+				trigger = { 
+					c:NOR ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 1 
+					}
+				}
+			}
+		}     
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_5
+				trigger = { 
+					c:SWE ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 0
+					}
+				}
+			}
+		}     
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_6
+				trigger = { 
+					c:DEN ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 0
+					}
+				}
+			}
+		}     
+		first_valid = {
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_7
+				trigger = { 
+					c:NOR ?= { 
+						var:scandinavian_monetary_union_on_discution = 1 
+						var:scandinavian_monetary_union_initiator = 0
+					}
+				}
+			}
+		}   
+		first_valid = { #Trigger si le pays n'ai pas dans les pays d'origine
+			triggered_desc = {
+				desc = status_scandinavian_monetary_union_je_8
+				trigger = {
+					Not = {
+						c:SWE ?= this
+						c:DEN ?= this
+						c:NOR ?= this 
+					}
+					var:scandinavian_monetary_union_on_discution = 1
+				}
+			}
+		}
+	}
+
+	complete = {
+		#game_date >= 1873.1.1
+		or = {
+			custom_tooltip = {
+				text = scandinavian_monetary_union_je_1_desc.2
+				var:scandinavian_monetary_union_time >= 3
+			} 
+			any_scope_treaty = {
+				binds = root
+				any_scope_article = {
+					has_type = scandinavian_monetary_union_treaty 
+				}
+			} 
+		} 
+	}
+
+	scripted_progress_bar = scandinavian_monetary_union_progress_bar
+
+	scripted_button = scandinavian_monetary_union_1_button
+	scripted_button = scandinavian_monetary_union_2_button
+
+	on_yearly_pulse = {
+		effect = { 
+			every_country = {
+				limit = {
+					var:scandinavian_monetary_union_initiator = 1
+				}    
+				save_scope_as = scandinavian_initiator 
+			}
+
+			while = {
+				count = 3
+				every_country = {
+					random_list = {
+						1 = {
+							#SWE
+							if = {
+								limit = {
+									c:SWE ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:scandinavian_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 	
+								}
+								set_variable = {
+									name = scandinavian_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.22
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#DEN
+							if = {
+								limit = {
+									c:DEN ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:scandinavian_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 	
+								}
+								set_variable = {
+									name = scandinavian_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.22
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#NOR
+							if = {
+								limit = {
+									c:NOR ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:scandinavian_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 	
+								}
+								set_variable = {
+									name = scandinavian_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.22
+										days = 0
+										popup = no
+									}
+								}
+							}
+						} 
+					}
+				}
+			} 
+
+			change_variable = {
+				name = scandinavian_monetary_union_time
+				add = 1
+			}  
+			je:scandinavian_monetary_union_je_1 ?= {
+				set_bar_progress = {
+					value =  scope:scandinavian_initiator.var:scandinavian_monetary_union_time
+					name = scandinavian_monetary_union_progress_bar
+				}
+			} 
+			if = {
+				limit = { 
+					or = { 
+						var:scandinavian_monetary_union_initiator = 1  
+						is_player = no
+					} 
+				}  
+				scope:scandinavian_initiator = {
+					#Avancement à 1ans
+					if = {
+						limit = {
+							var:scandinavian_monetary_union_time = 1
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.20
+								days = 0
+								popup = no
+							}
+						}
+					}
+					#Avancement à 2ans
+					if = {
+						limit = {
+							var:scandinavian_monetary_union_time = 2
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.21
+								days = 0
+								popup = no
+							}
+						}
+					}
+				}
+			}
+		}
+	}  
+	on_monthly_pulse = {
+		effect = {
+			if = {
+				limit = {
+					has_modifier = has_central_bank
+					var:scandinavian_monetary_union_on_discution = 0
+				}
+				set_variable = {
+					name = scandinavian_monetary_union_on_discution
+					value = 1
+				}
+			}
+		}
+	}
+ 
+ 	on_complete = {    
+		if = {
+			limit = { 
+				or = { 
+					var:scandinavian_monetary_union_initiator = 1  
+					is_player = no
+				}  
+				not = {
+					or = {
+						market_owner_is_root_univ_with_buiding = yes
+						is_subject_custom_trigger = yes
+					}
+				}
+			} 
+			#scope for treaty
+			every_country = {
+				limit = {
+					var:scandinavian_monetary_union_on_discution = 1
+					var:scandinavian_monetary_union_initiator = 1
+				}
+				save_scope_as = scandinavian_monetary_union_initiator
+			} 
+			#treaty cretion
+			every_country = {
+				limit = {
+					var:scandinavian_monetary_union_on_discution = 1
+					not = { 
+						var:scandinavian_monetary_union_initiator = 1
+					}
+				}  
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes
+					}
+					custom_tooltip = {
+						text = scandinavian_monetary_union_je_1_desc.3
+						trigger_event = {
+							id = 00_ef_economic_event.23
+							days = 0
+							popup = no
+						}
+					}
+				}
+			}
+			#law and money value target modification
+			every_country = {
+				limit = {
+					var:scandinavian_monetary_union_on_discution = 1 
+				}    
+				trigger_event = {
+					id = 00_ef_economic_event.24
+					days = 0
+					popup = no
+				} 
+			}
+		}
+	} 
+ 
+	fail = { 
+		or = {
+			market_owner_is_root_univ_with_buiding = yes
+			is_subject_custom_trigger = yes  
+			custom_tooltip = {
+				text = scandinavian_monetary_union_je_1_desc.4
+				not = {
+					any_country = { 
+						var:scandinavian_monetary_union_initiator = 1 
+					}
+				}
+			} 
+		} 
+	}  
+	on_fail = { 
+		if = {
+			limit = { 
+				var:scandinavian_monetary_union_initiator = 1   
+			} 
+			custom_tooltip = {
+				text = scandinavian_monetary_union_je_1_desc.5
+				set_variable = {
+					name = scandinavian_monetary_union_initiator
+					value = 0
+				} 
+			}  
+		} 
+		#un petit event pour expliquer ? 
+	}  
+}
+
+
+#avant çà crer un traty d'échange de silver entre pays majoritairement productif et les autre pour maintenir la emande
+
+
+
+#boom du silver déclancher par lepremier pays producteur et si il a une bank centrale 
+#à partir de 1870 ou 1873 -> mettre une datte varriable dans la plage des anné 70 déclanche le JE qui afecte tout les autre pays 
+
+
+
+# Soit: 
+# - double JE
+# > un JE pour le 1 producteur mondaile 
+# > un pour le joueur 
+
+# ou 
+# > Un JE pour le 1 producteur mondiale 
+# > des event en serie que le joeuur reçois pour etre tenu au courrant de l'évolution du boom du silver
+
+# ou 
+# Les 2 comme çà le joueur peut suvre par lui meme l'évolution de la crise de l'argent
+#mais uniquement si en silver standaart ou bimetalique pas si en gold raf mais il recoit quand meme les event 
+  
+# Mettre un barometre sur la page du global metal price:
+# - barometre de l'argent vs l'or
+# - barometre de l'or face à l'argent
+
+silver_crisis_je_1 = {
+	icon = "gfx/interface/icons/event_icons/latin_monetary_union.dds"
+
+	group = je_group_ef
+	should_be_pinned_by_default = yes
+
+	is_shown_when_inactive = {
+		has_modifier = has_central_bank
+		or = {
+			has_law = law_type:law_silver_standard
+			has_law = law_type:law_bimetallism_standard
+		}  
+		not = {
+			has_journal_entry = silver_crisis_je_1 
+			or = {
+				market_owner_is_root_univ_with_buiding = yes
+				is_subject_custom_trigger = yes
+			}
+		} 
+	}
+	possible = { 
+		custom_tooltip = {
+			text = silver_crisis_je_1_desc.1
+			c:USA.var:usa_coinage_act_1873 = 1
+		}   
+		has_building = building_bank 
+		or = {
+			has_law = law_type:law_silver_standard
+			has_law = law_type:law_bimetallism_standard
+		}    
+	}
+
+	immediate = {
+		# if = {
+		# 	limit = {
+		# 		not = {
+		# 			and = {
+		# 				c:FRA ?= this
+		# 				is_player = yes
+		# 			}
+		# 		}
+		# 	}
+		# 	c:FRA = {
+		# 		capital= {
+		# 			save_scope_as = capital_state
+		# 		}
+		# 		save_scope_as = target_country
+		# 		every_country = {
+		# 			limit = {
+		# 				is_player = yes
+		# 				or = {
+		# 					country_is_in_europe = yes
+		# 					"relations(scope:PREV)" > relations_threshold:cordial
+		# 				}
+		# 			}
+		# 			trigger_event = {
+		# 				id = 00_ef_economic_event.8
+		# 				days = 0
+		# 				popup = no
+		# 			}
+		# 		}
+		# 	}
+		# }
+	}
+
+	status_desc = {
+
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_1
+			}
+		}
+
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_2
+				trigger = {
+					c:FRA ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_3
+				trigger = {
+					c:BEL ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_4
+				trigger = {
+					c:SWI ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_5
+				trigger = {
+					c:SAR ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_6
+				trigger = {
+					c:PAR ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_7
+				trigger = {
+					c:MOD ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_8
+				trigger = {
+					c:LUC ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_9
+				trigger = {
+					c:TUS ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_10
+				trigger = {
+					c:PAP ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_11
+				trigger = {
+					c:SIC ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_12
+				trigger = {
+					c:GRE ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = {
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_13
+				trigger = {
+					c:ITA ?= { var:latin_monetary_union_on_discution = 1 }
+				}
+			}
+		}
+		first_valid = { #Trigger si le pays n'ai pas dans les pays d'origine
+			triggered_desc = {
+				desc = status_latin_monetary_union_je_14
+				trigger = {
+					Not = {
+						c:FRA ?= this
+						c:BEL ?= this
+						c:SWI ?= this
+						c:SAR ?= this
+						c:PAR ?= this
+						c:MOD ?= this
+						c:LUC ?= this
+						c:TUS ?= this
+						c:PAP ?= this
+						c:SIC ?= this
+						c:GRE ?= this
+						c:ITA ?= this
+					}
+					var:latin_monetary_union_on_discution = 1
+				}
+			}
+		}
+	}
+
+	complete = { 
+		or = {
+			custom_tooltip = {
+				text = latin_monetary_union_je_1_desc.2
+				var:latin_monetary_union_time >=6
+			}
+			any_scope_treaty = {
+				binds = root
+				any_scope_article = {
+					has_type = latin_monetary_union_treaty 
+				}
+			} 
+		} 
+	}
+
+	#Progression des phase de la crise de 1873 à 1900
+	scripted_progress_bar = latin_monetary_union_progress_bar
+
+	scripted_button = latin_monetary_union_1_button
+	scripted_button = latin_monetary_union_2_button
+	
+	#27ans de JE jusqu'à 1900 le toux avec 
+	on_yearly_pulse = {
+		effect = {
+			#le pays doit poseder son marché et donc avoir une currency libre
+
+			while = {
+				count = 2
+				every_country = {
+					random_list = {
+						1 = {
+							#BEL
+							if = {
+								limit = {
+									c:BEL ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SWI
+							if = {
+								limit = {
+									c:SWI ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SAR
+							if = {
+								limit = {
+									c:SAR ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#PAR
+							if = {
+								limit = {
+									c:PAR ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#MOD
+							if = {
+								limit = {
+									c:MOD ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#LUC
+							if = {
+								limit = {
+									c:LUC ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#TUS
+							if = {
+								limit = {
+									c:TUS ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#PAP
+							if = {
+								limit = {
+									c:PAP ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#SIC
+							if = {
+								limit = {
+									c:SIC ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#GRE
+							if = {
+								limit = {
+									c:GRE ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+						1 = {
+							#ITA
+							if = {
+								limit = {
+									c:ITA ?= this
+									has_modifier = has_central_bank
+									is_player = no
+									var:latin_monetary_union_on_discution = 0
+									not = {
+										or = {
+											market_owner_is_root_univ_with_buiding = yes
+											is_subject_custom_trigger = yes
+										}
+									} 
+								}
+								set_variable = {
+									name = latin_monetary_union_on_discution
+									value = 1
+								}
+
+								capital= {
+									save_scope_as = capital_state
+								}
+								save_scope_as = target_country
+
+								every_country = {
+									limit = {
+										is_player = yes
+									}
+									trigger_event = {
+										id = 00_ef_economic_event.11
+										days = 0
+										popup = no
+									}
+								}
+							}
+						}
+					}
+				}
+			} 
+			change_variable = {
+				name = latin_monetary_union_time
+				add = 1
+			}
+			je:latin_monetary_union_je_1 ?= {
+				set_bar_progress = {
+					value = c:FRA.var:latin_monetary_union_time #il faut trigger l'avancement du debat en france donc propablement un c:FRA.var:latin_monetary_union_time
+					name = latin_monetary_union_progress_bar
+				}
+			}
+
+			#Avancement du debat uniquement trigger par la france
+			
+			# if = {
+				# limit = { 
+				# 	or = { 
+				# 		c:FRA = this
+				# 		is_player = no
+				# 	} 
+				# }   
+				c:FRA = {
+					#Avancement à 2ans
+					if = {
+						limit = {
+							var:latin_monetary_union_time = 2
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.9
+								days = 0
+								popup = no
+							}
+						}
+					}
+					#Avancement à 4 ans
+					if = {
+						limit = {
+							var:latin_monetary_union_time = 4
+						}
+						capital= {
+							save_scope_as = capital_state
+						}
+						save_scope_as = target_country
+						every_country = {
+							limit = {
+								is_player = yes
+							}
+							trigger_event = {
+								id = 00_ef_economic_event.10
+								days = 0
+								popup = no
+							}
+						}
+					}
+				}
+			#}
+		}
+	}
+
+	on_monthly_pulse = {
+		effect = {
+			if = {
+				limit = {
+					has_modifier = has_central_bank
+					var:latin_monetary_union_on_discution = 0
+				}
+				set_variable = {
+					name = latin_monetary_union_on_discution
+					value = 1
+				}
+			}
+		}
+	}
+
+ 	on_complete = {
+		if = {
+			limit = {
+				or = {
+					is_player = no
+					c:FRA ?= this
+				}
+			}
+			every_country = {
+				limit = {
+					var:latin_monetary_union_on_discution = 1
+					not = {
+						c:FRA ?= this
+					}
+				}
+				capital= {
+					save_scope_as = capital_state
+				}
+				save_scope_as = target_country
+
+				every_country = {
+					limit = {
+						is_player = yes
+					}
+					custom_tooltip = {
+						text = latin_monetary_union_je_1_desc.3
+						trigger_event = {
+							id = 00_ef_economic_event.12
+							days = 0
+							popup = no
+						}
+					}
+				}
+			}
+		}
+	}
+}
+ 
+#bimetalic_gestion_je_
+#pour le bimetalisme je peut faire une sorte de journal entry dynamique ou le joeur doit progressivement faire passer des traiter pour essayer constament d'aranger le taux argent or dans sont pays avec des attaque sur ces reserve d'or et le JE est dinit quans il passe au gold standart
+

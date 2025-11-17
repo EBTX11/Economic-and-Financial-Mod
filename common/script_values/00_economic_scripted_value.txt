@@ -460,6 +460,26 @@ extreme_weak_currency_solution_count_sc = {
     add = var:extreme_weak_currency_solution_count
 }
 
+latin_monetary_union_country_in_debat = {
+	every_country = {
+		limit = {
+			var:latin_monetary_union_on_discution = 1 
+		}
+		add = 1
+	}
+} 
+scandinavian_monetary_union_country_in_debat = {
+	every_country = {
+		limit = {
+			var:scandinavian_monetary_union_on_discution = 1 
+		}
+		add = 1
+	}
+} 
+
+
+
+
 ########################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
@@ -1259,14 +1279,21 @@ national_capacity = {
 			}
 		}
 		add = central_bank_reserves #en fonction du type de metal
-		add = gold_loaned_to_central_bank_in_national_metal # en or ou en metal sion utilise le money_value_in_gold
+		add = gold_loaned_to_central_bank_in_national_metal # en or pour gold standart et bimetalisme et convertis en equivalent argent pour le silver
 		add = var:trade_balance_in_gold_fixe # en or ou en metal sion utilise le money_value_in_gold
 	}
 
+
+	#tu dois armoniser le bimetalisme pour que la majoritait des 2 sources:
+	# 	- add = gold_loaned_to_central_bank_in_national_metal # en or pour gold standart et bimetalisme et convertis en equivalent argent pour le silver
+	# 	- add = var:trade_balance_in_gold_fixe # en or ou en metal sion utilise le money_value_in_gold
+	# doivent etre en or, c'est uniquement dans le silver standart que c'est valeur sont adpaté pour avoir un esquivalent argent
+	#concernant la reserve dans le bimetalisme l'or est compté à 1 et le silver est calculer dans sont équivalent or ce qui veux dire que c'est comme un gold standart quand la reserve est principalement composé d'or mais comme un silver standart dépendent du prix international du silver quand elle est composé de silver principalement
+	 
+
 	min = 0.01
 }
-
-
+ 
 national_capacity_ratio = {
 	add = national_capacity
 	divide = money_supply
@@ -1305,7 +1332,7 @@ gold_loaned_to_central_bank_in_national_metal = {
 			has_law = law_type:law_bimetallism_standard
 		}
 		add = var:gold_loaned_to_central_bank_fix
-		multiply = bimetallic_rate_gold_to_silver
+		#multiply = bimetallic_rate_gold_to_silver
 	}
 }
 
@@ -1316,7 +1343,7 @@ gold_loaned_to_central_bank_in_national_metal_silver = {
 
 gold_loaned_to_central_bank_in_national_metal_bimetalic = {
 	value = var:gold_loaned_to_central_bank_fix
-	multiply = bimetallic_rate_gold_to_silver
+	#multiply = bimetallic_rate_gold_to_silver
 }
 
 gold_loaned_to_central_bank_in_national_metal_gold = {
@@ -1408,9 +1435,22 @@ silver_state_native_for_stockpile = {
 }
 bimetallic_state_native_for_stockpile = {
 	value = 0
-	add = gold_state_native_for_stockpile
-	add = silver_state_native_for_stockpile
+	add = gold_state_native_for_stockpile 
+	#add  =  silver_state_native_for_stockpile
+	add  = { 
+		add = silver_state_native_for_stockpile
+		divide = gold_to_silver_rate
+	}
 }
+
+silver_state_native_for_stockpile_in_gold = {
+	value = 0
+	add  = { 
+		add = silver_state_native_for_stockpile
+		divide = gold_to_silver_rate
+	}
+}
+
 
 trade_balance_gold_to_silver_rate = {
     add = var:trade_balance_in_gold_fixe
@@ -2640,6 +2680,7 @@ gold_market_goods_sell_orders = {
 				or = {
 					is_subject_custom_trigger = yes
 					market_owner_is_root_univ_with_buiding = yes
+					no_indepeendeent_market = yes
 				}
 			}
 		}
@@ -2655,6 +2696,7 @@ silver_market_goods_sell_orders = {
 				or = {
 					is_subject_custom_trigger = yes
 					market_owner_is_root_univ_with_buiding = yes
+					no_indepeendeent_market = yes
 				}
 			}
 		}
@@ -2666,7 +2708,7 @@ silver_market_goods_sell_orders = {
 stockpiling_central_bank_metal_reserves_var_0 = {
 	value = var:stockpiling_central_bank_metal_reserves_var_1
 }
-
+ 
 debt_in_gold_sc = {
 	value = var:debt_in_gold
 }
@@ -2677,7 +2719,6 @@ delta_in_gold_sc = {
 	value = excess_in_gold_sc
 	subtract = debt_in_gold_sc
 }
-
 
 global_silver_production_real = {
 	add = silver_market_goods_sell_orders
@@ -2695,7 +2736,42 @@ global_silver_production_flux = {
 global_silver_production = {
 	value = 1
 	add = global_var:global_silver_production_fix
+	add = global_var:global_silver_production_cumulative_production
+
+	# if  = {
+	# 	limit = {
+	# 		game_date < 1873.1.1
+	# 	}
+	# 	#add = global_silver_production_compensation
+	# }
 }
+ 
+# global_silver_production_compensation = {
+#     value = 0
+
+#     # 1. Production cible = or × 15.0
+#     add = {
+#         value = global_gold_production
+#         multiply = 15
+#     }
+
+#     # 2. Production réelle = flux (la vraie)
+#     add = {
+#         value = global_silver_production_flux
+#         multiply = -1
+#     }  
+# }
+
+ 
+global_silver_production_compensation_test = {
+	value = 0
+
+	# 1. Production cible : gold × 15
+	add =  global_silver_production
+	add =  global_silver_production_compensation
+}
+
+
 
 global_gold_production_real = {
 	add = gold_market_goods_sell_orders
@@ -2745,17 +2821,22 @@ weight_silver = {
 }
 
 bimetallic_rate_silver_to_gold = {
-	value = 0
-	add = weight_gold
-	add = {
-		value = weight_silver
-		multiply = silver_to_gold_rate
-	}
-	min = 0
+	# value = 0
+	# add = weight_gold
+	# add = {
+	# 	value = weight_silver
+	# 	multiply = silver_to_gold_rate
+	# }
+	# min = 0
+ 
+	value = 1
+	divide = bimetallic_rate_gold_to_silver 
 }
 bimetallic_rate_gold_to_silver = {
-	value = 1
-	divide = bimetallic_rate_silver_to_gold
+	value = var:bimetallic_rate_gold_to_silver_determined
+	#divide = bimetallic_rate_silver_to_gold
+
+	#ici que l'on détermine l valeur puis transfomrer pour l'autre taux
 }
 bimetallic_rate_gold_to_silver_x_2 = {
 	value = bimetallic_rate_gold_to_silver
@@ -2857,6 +2938,106 @@ money_value_target_pre_set = {
 	}
 }
 
+
+rate_by_law_metal_type_FRA = {
+	value = 0
+	
+	c:FRA = {
+		limit = {
+			or = {
+				has_law = law_type:law_gold_standard
+				has_law = law_type:law_gold_exchange_standard
+			}
+		} 
+
+		if = {
+			limit = {
+				or = {
+					has_law = law_type:law_gold_standard
+					has_law = law_type:law_gold_exchange_standard
+				}
+			}
+			add = 1
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_silver_standard
+			}
+			add = gold_to_silver_rate
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_bimetallism_standard
+			}
+			add = bimetallic_rate_gold_to_silver
+		}
+	}
+	min = 0.0001
+} 
+rate_by_law_metal_type_2_FRA = {
+	value = 0
+	c:FRA = {
+		if = {
+			limit = {
+				or = {
+					has_law = law_type:law_gold_standard
+					has_law = law_type:law_gold_exchange_standard
+				}
+			}
+			add = 1
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_silver_standard
+			}
+			add = silver_to_gold_rate
+		}
+		if = {
+			limit = {
+				has_law = law_type:law_bimetallism_standard
+			}
+			add = bimetallic_rate_silver_to_gold
+		}
+	}
+	min = 0.0001
+}
+  
+#gold_drain	gold_to_silver_rate > bimetallic_rate_gold_to_silver
+misalignment_rate_gold_drain = {
+	value = gold_to_silver_rate 
+	subtract = bimetallic_rate_gold_to_silver
+	divide = gold_to_silver_rate
+
+	min = 0
+	max = 0.15   # 15% max de drain/an
+}
+gold_lost = {
+	value = gold_state_native_for_stockpile
+	multiply = misalignment_rate_gold_drain  
+} 
+silver_gained = {
+	value = gold_lost
+	multiply = gold_to_silver_rate  
+} 
+
+#silver_drain gold_to_silver_rate < bimetallic_rate_gold_to_silver 
+misalignment_rate_silver_drain = {
+	value = bimetallic_rate_gold_to_silver
+	subtract = gold_to_silver_rate
+	divide = bimetallic_rate_gold_to_silver
+
+	min = 0
+	max = 0.15   # 15% max de drain/an
+}
+silver_lost = {
+	value = silver_state_native_for_stockpile
+	multiply = misalignment_rate_silver_drain  
+}
+gold_gained = {
+	value = silver_lost
+	divide = gold_to_silver_rate  
+} 
+   
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
