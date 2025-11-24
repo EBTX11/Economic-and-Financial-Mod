@@ -14,6 +14,69 @@
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
+
+law_no_monetary_system_test = { 
+	value = 0 
+	if = { 
+		#- mesure de régulation pour etre sure que tout les pays ayant la tech currency_standards,
+		#et pas encore de bc soit dans la loi fiat standart qui permet l'introduction
+		#- quleque soit le pb quand une nouvelle curency doit apparaitre le pays doit toujours etre revenue en fiat standart
+		limit = {
+			has_law = law_type:law_no_monetary_system
+			has_technology_researched = currency_standards   
+			#has_technology_researched = central_banking  
+			
+			or = {
+				has_law = law_type:law_isolationism
+				not = {
+					has_modifier = has_central_bank  
+				} 
+			}
+ 		} 
+		add =1
+	}
+}
+  
+country_already_central_bank_test = { 
+	value = 0 
+	if = {
+		limit = {
+			has_variable = country_already_central_bank
+		} 
+		add = 1
+	} 
+}
+
+market_owner_is_root_univ_with_buiding_no_external_currency_consuption = { 
+	value = 0
+	if = {
+		limit = {
+			market_owner_is_root = no
+			or = {
+				bank_central_buiding_no_external_currency_consuption = yes  
+				not = {
+					has_law = law_type:law_external_exchange_standard 
+				}
+			}
+		}
+		add = 1
+	} 
+}
+
+market_owner_is_root_univ_with_buiding_test = { 
+	value = 0
+	if = { 
+		limit = {
+			market_owner_is_root = yes 
+			or = {
+				market_owner_is_root_univ_with_buiding = yes 
+				has_law = law_type:law_external_exchange_standard  
+			}
+		}
+		add = 1
+	} 
+}
+ 
 gdp_var = {
 	value = root.gdp
 	min = 1
@@ -989,7 +1052,7 @@ money_value_in_gold = {
 		}
 		add = money_value_bimetallism_standard_in_gold
 	}
-	if = {
+	if = { #subject
 		limit = {
 			or  = {
 			    market_owner_is_root_4 = no
@@ -997,7 +1060,7 @@ money_value_in_gold = {
 		    }
 		}
 		add = money_value
-		multiply = rate_by_law_metal_type_2
+		multiply = rate_by_law_metal_type_2 
 	}
 
 	min = 0.0001
@@ -2498,13 +2561,19 @@ country_minting_month = {
 }
 central_bank_debt = {
 	#value = central_bank_metal_reserves_state_25
-	value = central_bank_metal_reserves_state_75 #central_bank_metal_reserves_state_25
+	value = central_bank_metal_reserves_state_100 
 	#value = 0
 	min = 0
 }
+central_bank_metal_reserves_state_100 = {
+	value = central_bank_metal_reserves_state_to_ensure_the_conversion #la valeur nécessaire de métaux en plus de la trade balance et de la national cap pour assurer 75% de conversion
+	multiply = 1 #0.75 #central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent -> je veux tout prendre pour appliquer la capcité de fiancment après
+	subtract = central_bank_reserves #en fonction du type de metal
+	subtract = var:trade_balance_in_gold_fixe
+}
 central_bank_metal_reserves_state_75 = {
 	value = central_bank_metal_reserves_state_to_ensure_the_conversion #la valeur nécessaire de métaux en plus de la trade balance et de la national cap pour assurer 75% de conversion
-	multiply = 0.75 #central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent
+	multiply = 0.75 #central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent -> je veux tout prendre pour appliquer la capcité de fiancment après
 	subtract = central_bank_reserves #en fonction du type de metal
 	subtract = var:trade_balance_in_gold_fixe
 }
@@ -2512,6 +2581,10 @@ central_bank_metal_reserves_state_25 = { #cela sigifi que je permet les pret ét
 	value = central_bank_metal_reserves_state_to_ensure_the_conversion
 	multiply = 0.25 #central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent
 	#subtract = national_capacity
+}
+central_bank_equity = {
+	add = central_bank_reserves #en fonction du type de metal
+	add = var:trade_balance_in_gold_fixe
 }
 central_bank_debt_compared_gdp = {
 	value = central_bank_debt
@@ -2772,40 +2845,9 @@ global_silver_production = {
 	add = global_var:global_silver_production_fix
 	add = global_var:global_silver_production_cumulative_production
 
-	# if  = {
-	# 	limit = {
-	# 		game_date < 1873.1.1
-	# 	}
-	# 	#add = global_silver_production_compensation
-	# }
-}
-
-# global_silver_production_compensation = {
-#     value = 0
-
-#     # 1. Production cible = or × 15.0
-#     add = {
-#         value = global_gold_production
-#         multiply = 15
-#     }
-
-#     # 2. Production réelle = flux (la vraie)
-#     add = {
-#         value = global_silver_production_flux
-#         multiply = -1
-#     }
-# }
-
-
-global_silver_production_compensation_test = {
-	value = 0
-
-	# 1. Production cible : gold × 15
-	add =  global_silver_production
-	add =  global_silver_production_compensation
-}
-
-
+	min = 1
+	max = 500000
+}  
 
 global_gold_production_real = {
 	add = gold_market_goods_sell_orders
@@ -2828,11 +2870,14 @@ global_gold_production = {
 silver_to_gold_rate = { # = gold_silver_ rate
 	value = global_gold_production
 	divide = global_silver_production
+
+
 	max = 0.2
+	min = 0.015625
 }
 gold_to_silver_rate = {
 	value = 1
-	divide = silver_to_gold_rate
+	divide = silver_to_gold_rate 
 }
 gold_to_silver_rate_x_2 = {
 	value = gold_to_silver_rate
@@ -2948,28 +2993,70 @@ rate_by_law_metal_type = {
 }
 
 rate_by_law_metal_type_2 = {
-	value = 0
+	value = 0  
 	if = {
 		limit = {
-			or = {
-				has_law = law_type:law_gold_standard
-				has_law = law_type:law_gold_exchange_standard
+			#is_subject = yes 
+			is_subject_custom_trigger = yes 
+		}    
+		if = {
+			limit = {
+				any_overlord_or_above = {  
+					or = {
+						has_law = law_type:law_gold_standard
+						has_law = law_type:law_gold_exchange_standard
+					}
+				}
+			}
+			add = 1
+		}
+		if = {
+			limit = {
+				any_overlord_or_above = {  
+					has_law = law_type:law_silver_standard 
+				}
+			}
+			add = silver_to_gold_rate
+		} 
+		if = {
+			limit = {
+				any_overlord_or_above = {  
+					has_law = law_type:law_bimetallism_standard  
+				}
+			}
+			add = 1
+		} 
+	} 
+	if = {
+		limit = { 
+			market_owner_is_root_4 = no
+			is_subject = no			
+		}   
+		market.owner = { 
+			if = {
+				limit = { 
+					or = {
+						has_law = law_type:law_gold_standard
+						has_law = law_type:law_gold_exchange_standard
+					} 
+				}
+				add = 1
+			}
+			if = {
+				limit = { 
+					has_law = law_type:law_silver_standard 
+				}
+				add = silver_to_gold_rate
+			}
+			if = {
+				limit = { 
+					has_law = law_type:law_bimetallism_standard 
+				}
+				add = 1
 			}
 		}
-		add = 1
 	}
-	if = {
-		limit = {
-			has_law = law_type:law_silver_standard
-		}
-		add = silver_to_gold_rate
-	}
-	if = {
-		limit = {
-			has_law = law_type:law_bimetallism_standard
-		}
-		add = bimetallic_rate_silver_to_gold
-	}
+ 
 	min = 0.0001
 }
 
@@ -4049,8 +4136,7 @@ revaluation_money_value_target = {
 		}
 		value = global_var:money_value_median
 		multiply = rate_by_law_metal_type
-	}
-
+	} 
 	if = {
 		#0.8
 		limit = {

@@ -228,7 +228,6 @@ national_capacity_variable_list = {
                         target = prev
                     }
                 }
-                remove_modifier = global_monetary_reference
             }
             clear_global_variable_list = national_capacity_variable_list_ordered_1
             ordered_in_list = {
@@ -262,14 +261,44 @@ national_capacity_variable_list = {
                         target = prev
                     }
                 }
-            }
+            } 
+
+			every_country = {
+				limit = {
+					has_modifier = global_monetary_reference
+				}
+				save_scope_as = target_country
+			}
             every_in_list = {
-                variable = reference_currency_country_1
-                if = {
-                    add_modifier = {
-                        name = global_monetary_reference
-                    }
-                }
+                variable = national_capacity_variable_list 
+				remove_modifier = global_monetary_reference
+            } 
+
+            every_in_list = {
+                variable = reference_currency_country_1 
+				add_modifier = {
+					name = global_monetary_reference
+				}
+
+				if = {
+					limit = { 
+						not = { 
+							scope:target_country = this 
+						}
+					} 
+					#Event for player
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes 
+						}
+						trigger_event = 00_ef_economic_event.33
+					}   
+				} 
             }
         }
     }
@@ -1162,7 +1191,6 @@ country_index_variable_list = {
                         target = prev
                     }
                 }
-                remove_modifier = global_financial_power
             }
             clear_global_variable_list = country_index_variable_list_ordered_1
             ordered_in_list = {
@@ -1196,13 +1224,43 @@ country_index_variable_list = {
                     }
                 }
             }
+        
+			every_country = {
+				limit = {
+					has_modifier = global_financial_power
+				}
+				save_scope_as = target_country
+			}
             every_in_list = {
-                variable = financial_power_country_1
-                if = {
-                    add_modifier = {
-                        name = global_financial_power
-                    }
-                }
+                variable = country_index_variable_list 
+                remove_modifier = global_financial_power
+            } 
+
+            every_in_list = {
+                variable = financial_power_country_1 
+				add_modifier = {
+					name = global_financial_power
+				}
+
+				if = {
+					limit = {
+						not = { 
+							scope:target_country = this 
+						}
+					} 
+					#Event for player
+					capital= {
+						save_scope_as = capital_state
+					}
+					save_scope_as = target_country
+
+					every_country = {
+						limit = {
+							is_player = yes 
+						}
+						trigger_event = 00_ef_economic_event.34
+					}   
+				}   
             }
         }
         clear_variable_list = country_index_variable_list

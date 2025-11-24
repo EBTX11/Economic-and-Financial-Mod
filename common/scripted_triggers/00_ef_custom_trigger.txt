@@ -77,6 +77,7 @@ has_central_bank_SS_BS_GS_NISO = {
 		has_law = law_type:law_silver_standard
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
+		has_law = law_type:law_external_exchange_standard
 	}
 	not = {
 		has_law = law_type:law_isolationism
@@ -89,6 +90,7 @@ has_central_bank_SS_BS_GS_GES_NISO = {
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
 		has_law = law_type:law_gold_exchange_standard
+		has_law = law_type:law_external_exchange_standard
 	}
 	not = {
 		has_law = law_type:law_isolationism
@@ -102,6 +104,7 @@ has_central_bank_FS_SS_BS_GS_GES = {
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
 		has_law = law_type:law_gold_exchange_standard
+		has_law = law_type:law_external_exchange_standard
 	}
 }
 has_central_bank_FS_SS_BS_GS_GES_NISO = {
@@ -112,6 +115,7 @@ has_central_bank_FS_SS_BS_GS_GES_NISO = {
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
 		has_law = law_type:law_gold_exchange_standard
+		has_law = law_type:law_external_exchange_standard
 	}
 	not = {
 		has_law = law_type:law_isolationism
@@ -128,6 +132,7 @@ has_central_bank_SS_BS_GS_GES = {
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_gold_standard
 		has_law = law_type:law_gold_exchange_standard
+		has_law = law_type:law_external_exchange_standard
 	}
 }
 has_central_bank_FS_NS_NISO = {
@@ -174,7 +179,7 @@ subject_overlord_has_central_bank = {
 			or = {
 				is_subject_custom_trigger = yes
 				no_indepeendeent_market_test = no
-			} 
+			}
 		}
 		overlord_has_central_bank = yes
 	}
@@ -242,13 +247,16 @@ no_indepeendeent_market = {
 		market_owner_is_root_2 =  yes
 	}
 }
-market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente 
-	any_scope_state = { 
+market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente
+	#en gros le pays a la pm de la dépendence à une currency étrangère et il n'a pas la pm de non consomation de la currency étrangère
+	#QUand négativé: Le pays n'a pas la pm d'utilisation de pays étrangé et il a un pm de consomation du pays étrangé
+	#donc on doit changer la loi pour que çà marche
+	any_scope_state = {
 		is_production_method_active = {
 			building_type = building_bank
-			production_method = pm_no_metal_consuption
+			production_method = pm_external_exchange_standard_bank_money_currency #pm_no_metal_consuption
 		}
-		not = {
+		not = { #soit qu'il possede la consomation d'une currency étrangère
 			is_production_method_active = {
 				building_type = building_bank
 				production_method = pm_no_subject_currency_type
@@ -257,15 +265,24 @@ market_owner_is_root_univ_with_buiding = { #market_owner_is_root_univ_with_buidi
 	}
 }
 
-market_owner_is_root_with_buiding_subject_building_modifier = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente 
+bank_central_buiding_no_external_currency_consuption = {
+ 	any_scope_state = {
+		is_production_method_active = {
+			building_type = building_bank
+			production_method = pm_no_subject_currency_type
+		}
+	}
+}
+
+market_owner_is_root_with_buiding_subject_building_modifier = { #market_owner_is_root_univ_with_buiding = yes -> pays avec une bank centrale dépendente
 	any_scope_building = {
 		or = {
 			has_modifier = protectora_limit_30
 			has_modifier = dominion_limit_50
 			has_modifier = puppet_limit_75
 		}
-	} 
-}  
+	}
+}
 
 market_owner_power_bloc_leader = {
 	is_power_bloc_leader = yes
@@ -301,7 +318,7 @@ is_strong_currency = {
 		has_modifier = global_monetary_reference
 		money_value_in_gold < 0.01
 	}
-	money_value_in_gold > money_value_median_1_25 
+	money_value_in_gold > money_value_median_1_25
 	var:central_bank_bankruptcy = 0
 }
 is_balanced_currency = {
@@ -309,11 +326,11 @@ is_balanced_currency = {
 	not = {
 		has_modifier = global_monetary_reference
 		money_value_in_gold < 0.01
-		money_value_in_gold > money_value_median_1_25 
-	} 
-	or = { 
+		money_value_in_gold > money_value_median_1_25
+	}
+	or = {
 		#central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1 #0.75
-		and = { 
+		and = {
 			money_value_in_gold < money_value_median_1_25
 			money_value_in_gold > money_value_median_0_75
 		}
@@ -379,7 +396,7 @@ is_in_revaluation = {
 #####################################################################################################################################################
 
 buy_currency_1 = {
-	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste 
+	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste
 	money_value_in_gold < money_value_target_real_below_25  #la monaie sous evalué à plus de 10% de la money_value
 	not = {  #pas d'achat sisujet , a le modifier d'echnge monetaire, a la loi isolationniste
 		has_law = law_type:law_gold_exchange_standard # le GSE n'est plus réguler par les autre pays dans le future ajouter des méchanique pour que le pays ne puisse pas vendre la devise de référence et qui s'equilibre avec en l'achetant avec le reste d'or
@@ -393,7 +410,7 @@ buy_currency_1 = {
 	}
 }
 sell_currency_1 = {
-	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste 
+	#has_central_bank_SS_BS_GS_GES_NISO = yes #? why not -> deja atribué pour etre dans la liste
 
 	money_value_in_gold > money_value_target_real_above_25 #- soit la valeur doit etre equilibré car le pays qui rachete sa devise est sur-évaluée
 	not = {  #pas d'achat sisujet , a le modifier d'echnge monetaire, a la loi isolationniste
@@ -739,7 +756,7 @@ is_valid_country_ASH = {
 
 country_already_central_bank = {
 	root = {
-		var:country_already_central_bank = 1
+	has_variable = country_already_central_bank
 	}
 }
 country_already_financial_center = {
@@ -767,6 +784,16 @@ macro_facilities_on_action_bc_limit = {
 		var:gdp_view >= 1 #AI que à partir de 5M  GDP
 		is_player = yes
 	}
+	#Si crise en lien avec la BC coupe toute possibilité de croissance ou de création de nouvelle currency
+	#Pb avec 
+	not = {
+		or = {
+			has_modifier = central_bank_bankruptcy_country
+			has_modifier = currency_crisis_country
+			#var:extreme_weak_currency_solution_count >= 3
+
+		}
+	} 
 }
 macro_facilities_on_action_fc_limit = {
 	has_technology_researched = financial_center
@@ -941,7 +968,7 @@ state_is_in_unwanted_region = {
 		region = sr:region_bombay
 		region = sr:region_central_india
 		region = sr:region_madras
-		region = sr:region_bengal	
+		region = sr:region_bengal
 	}
 }
 # ### Country geography triggers
@@ -1191,7 +1218,7 @@ market_goods_is_financial_product = {
 		goods = g:mining_stock
 		goods = g:railroad_stock
 		goods = g:war_bond
-		goods = g:mutual_funds 
+		goods = g:mutual_funds
 	}
 }
 
@@ -1230,7 +1257,10 @@ law_dinar_monetary_system_SS_trigger = {
 law_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_monetary_system_GS_GES_trigger = {
@@ -1245,7 +1275,7 @@ law_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_monetary_system_FS_trigger = {
@@ -1276,7 +1306,10 @@ law_dinar_algerian_dinar_monetary_system_SS_trigger = {
 law_dinar_algerian_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_algerian_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_algerian_dinar_monetary_system_GS_GES_trigger = {
@@ -1291,7 +1324,7 @@ law_dinar_algerian_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_algerian_dinar_monetary_system_FS_trigger = {
@@ -1322,7 +1355,10 @@ law_dinar_iraqi_dinar_monetary_system_SS_trigger = {
 law_dinar_iraqi_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_iraqi_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_iraqi_dinar_monetary_system_GS_GES_trigger = {
@@ -1337,7 +1373,7 @@ law_dinar_iraqi_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_iraqi_dinar_monetary_system_FS_trigger = {
@@ -1368,7 +1404,10 @@ law_dinar_libyan_dinar_monetary_system_SS_trigger = {
 law_dinar_libyan_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_libyan_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_libyan_dinar_monetary_system_GS_GES_trigger = {
@@ -1383,7 +1422,7 @@ law_dinar_libyan_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_libyan_dinar_monetary_system_FS_trigger = {
@@ -1414,7 +1453,10 @@ law_dinar_moroccan_dirham_monetary_system_SS_trigger = {
 law_dinar_moroccan_dirham_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_moroccan_dirham_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_moroccan_dirham_monetary_system_GS_GES_trigger = {
@@ -1429,7 +1471,7 @@ law_dinar_moroccan_dirham_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_moroccan_dirham_monetary_system_FS_trigger = {
@@ -1460,7 +1502,10 @@ law_dinar_omanian_rial_monetary_system_SS_trigger = {
 law_dinar_omanian_rial_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_omanian_rial_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_omanian_rial_monetary_system_GS_GES_trigger = {
@@ -1475,7 +1520,7 @@ law_dinar_omanian_rial_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_omanian_rial_monetary_system_FS_trigger = {
@@ -1506,7 +1551,10 @@ law_dinar_qiran_monetary_system_SS_trigger = {
 law_dinar_qiran_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_qiran_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_qiran_monetary_system_GS_GES_trigger = {
@@ -1521,7 +1569,7 @@ law_dinar_qiran_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_qiran_monetary_system_FS_trigger = {
@@ -1552,7 +1600,10 @@ law_dinar_saudi_riyal_monetary_system_SS_trigger = {
 law_dinar_saudi_riyal_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_saudi_riyal_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_saudi_riyal_monetary_system_GS_GES_trigger = {
@@ -1567,7 +1618,7 @@ law_dinar_saudi_riyal_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_saudi_riyal_monetary_system_FS_trigger = {
@@ -1598,7 +1649,10 @@ law_dinar_serbian_dinar_monetary_system_SS_trigger = {
 law_dinar_serbian_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_serbian_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_serbian_dinar_monetary_system_GS_GES_trigger = {
@@ -1613,7 +1667,7 @@ law_dinar_serbian_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_serbian_dinar_monetary_system_FS_trigger = {
@@ -1644,7 +1698,10 @@ law_dinar_tunisian_dinar_monetary_system_SS_trigger = {
 law_dinar_tunisian_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_tunisian_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_tunisian_dinar_monetary_system_GS_GES_trigger = {
@@ -1659,7 +1716,7 @@ law_dinar_tunisian_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_tunisian_dinar_monetary_system_FS_trigger = {
@@ -1690,7 +1747,10 @@ law_dinar_yugoslav_dinar_monetary_system_SS_trigger = {
 law_dinar_yugoslav_dinar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dinar_yugoslav_dinar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dinar_yugoslav_dinar_monetary_system_GS_GES_trigger = {
@@ -1705,7 +1765,7 @@ law_dinar_yugoslav_dinar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dinar_yugoslav_dinar_monetary_system_FS_trigger = {
@@ -1736,7 +1796,10 @@ law_dollar_australian_dollar_monetary_system_SS_trigger = {
 law_dollar_australian_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_australian_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_australian_dollar_monetary_system_GS_GES_trigger = {
@@ -1751,7 +1814,7 @@ law_dollar_australian_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_australian_dollar_monetary_system_FS_trigger = {
@@ -1782,7 +1845,10 @@ law_dollar_canadian_dollar_monetary_system_SS_trigger = {
 law_dollar_canadian_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_canadian_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_canadian_dollar_monetary_system_GS_GES_trigger = {
@@ -1797,7 +1863,7 @@ law_dollar_canadian_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_canadian_dollar_monetary_system_FS_trigger = {
@@ -1828,7 +1894,10 @@ law_dollar_caribbean_dollar_monetary_system_SS_trigger = {
 law_dollar_caribbean_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_caribbean_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_caribbean_dollar_monetary_system_GS_GES_trigger = {
@@ -1843,7 +1912,7 @@ law_dollar_caribbean_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_caribbean_dollar_monetary_system_FS_trigger = {
@@ -1874,7 +1943,10 @@ law_dollar_confederate_states_dollar_monetary_system_SS_trigger = {
 law_dollar_confederate_states_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_confederate_states_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_confederate_states_dollar_monetary_system_GS_GES_trigger = {
@@ -1889,7 +1961,7 @@ law_dollar_confederate_states_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_confederate_states_dollar_monetary_system_FS_trigger = {
@@ -1920,7 +1992,10 @@ law_dollar_liberian_dollar_monetary_system_SS_trigger = {
 law_dollar_liberian_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_liberian_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_liberian_dollar_monetary_system_GS_GES_trigger = {
@@ -1935,7 +2010,7 @@ law_dollar_liberian_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_liberian_dollar_monetary_system_FS_trigger = {
@@ -1966,7 +2041,10 @@ law_dollar_new_zealand_dollar_monetary_system_SS_trigger = {
 law_dollar_new_zealand_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_new_zealand_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_new_zealand_dollar_monetary_system_GS_GES_trigger = {
@@ -1981,7 +2059,7 @@ law_dollar_new_zealand_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_new_zealand_dollar_monetary_system_FS_trigger = {
@@ -2012,7 +2090,10 @@ law_dollar_sierra_leonean_dollar_monetary_system_SS_trigger = {
 law_dollar_sierra_leonean_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_sierra_leonean_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_sierra_leonean_dollar_monetary_system_GS_GES_trigger = {
@@ -2027,7 +2108,7 @@ law_dollar_sierra_leonean_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_sierra_leonean_dollar_monetary_system_FS_trigger = {
@@ -2058,7 +2139,10 @@ law_dollar_united_states_dollar_monetary_system_SS_trigger = {
 law_dollar_united_states_dollar_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = dollar_united_states_dollar_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_dollar_united_states_dollar_monetary_system_GS_GES_trigger = {
@@ -2073,7 +2157,7 @@ law_dollar_united_states_dollar_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_dollar_united_states_dollar_monetary_system_FS_trigger = {
@@ -2104,7 +2188,10 @@ law_eco_ariary_monetary_system_SS_trigger = {
 law_eco_ariary_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_ariary_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_ariary_monetary_system_GS_GES_trigger = {
@@ -2119,7 +2206,7 @@ law_eco_ariary_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_ariary_monetary_system_FS_trigger = {
@@ -2150,7 +2237,10 @@ law_eco_central_african_eco_monetary_system_SS_trigger = {
 law_eco_central_african_eco_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_central_african_eco_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_central_african_eco_monetary_system_GS_GES_trigger = {
@@ -2165,7 +2255,7 @@ law_eco_central_african_eco_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_central_african_eco_monetary_system_FS_trigger = {
@@ -2196,7 +2286,10 @@ law_eco_east_african_eco_monetary_system_SS_trigger = {
 law_eco_east_african_eco_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_east_african_eco_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_east_african_eco_monetary_system_GS_GES_trigger = {
@@ -2211,7 +2304,7 @@ law_eco_east_african_eco_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_east_african_eco_monetary_system_FS_trigger = {
@@ -2242,7 +2335,10 @@ law_eco_ethiopian_birr_monetary_system_SS_trigger = {
 law_eco_ethiopian_birr_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_ethiopian_birr_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_ethiopian_birr_monetary_system_GS_GES_trigger = {
@@ -2257,7 +2353,7 @@ law_eco_ethiopian_birr_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_ethiopian_birr_monetary_system_FS_trigger = {
@@ -2288,7 +2384,10 @@ law_eco_ghanaian_pound_monetary_system_SS_trigger = {
 law_eco_ghanaian_pound_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_ghanaian_pound_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_ghanaian_pound_monetary_system_GS_GES_trigger = {
@@ -2303,7 +2402,7 @@ law_eco_ghanaian_pound_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_ghanaian_pound_monetary_system_FS_trigger = {
@@ -2334,7 +2433,10 @@ law_eco_nigerian_naira_monetary_system_SS_trigger = {
 law_eco_nigerian_naira_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_nigerian_naira_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_nigerian_naira_monetary_system_GS_GES_trigger = {
@@ -2349,7 +2451,7 @@ law_eco_nigerian_naira_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_nigerian_naira_monetary_system_FS_trigger = {
@@ -2380,7 +2482,10 @@ law_eco_south_african_rand_monetary_system_SS_trigger = {
 law_eco_south_african_rand_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_south_african_rand_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_south_african_rand_monetary_system_GS_GES_trigger = {
@@ -2395,7 +2500,7 @@ law_eco_south_african_rand_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_south_african_rand_monetary_system_FS_trigger = {
@@ -2426,7 +2531,10 @@ law_eco_tuareg_ouguiya_monetary_system_SS_trigger = {
 law_eco_tuareg_ouguiya_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_tuareg_ouguiya_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_tuareg_ouguiya_monetary_system_GS_GES_trigger = {
@@ -2441,7 +2549,7 @@ law_eco_tuareg_ouguiya_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_tuareg_ouguiya_monetary_system_FS_trigger = {
@@ -2472,7 +2580,10 @@ law_eco_west_african_eco_monetary_system_SS_trigger = {
 law_eco_west_african_eco_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = eco_west_african_eco_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_eco_west_african_eco_monetary_system_GS_GES_trigger = {
@@ -2487,7 +2598,7 @@ law_eco_west_african_eco_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_eco_west_african_eco_monetary_system_FS_trigger = {
@@ -2518,7 +2629,10 @@ law_franc_belgian_franc_monetary_system_SS_trigger = {
 law_franc_belgian_franc_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = franc_belgian_franc_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_franc_belgian_franc_monetary_system_GS_GES_trigger = {
@@ -2533,7 +2647,7 @@ law_franc_belgian_franc_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_franc_belgian_franc_monetary_system_FS_trigger = {
@@ -2564,7 +2678,10 @@ law_franc_french_franc_monetary_system_SS_trigger = {
 law_franc_french_franc_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = franc_french_franc_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_franc_french_franc_monetary_system_GS_GES_trigger = {
@@ -2579,7 +2696,7 @@ law_franc_french_franc_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_franc_french_franc_monetary_system_FS_trigger = {
@@ -2610,7 +2727,10 @@ law_franc_luxembourgish_franc_monetary_system_SS_trigger = {
 law_franc_luxembourgish_franc_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = franc_luxembourgish_franc_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_franc_luxembourgish_franc_monetary_system_GS_GES_trigger = {
@@ -2625,7 +2745,7 @@ law_franc_luxembourgish_franc_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_franc_luxembourgish_franc_monetary_system_FS_trigger = {
@@ -2656,7 +2776,10 @@ law_franc_swiss_franc_monetary_system_SS_trigger = {
 law_franc_swiss_franc_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = franc_swiss_franc_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_franc_swiss_franc_monetary_system_GS_GES_trigger = {
@@ -2671,7 +2794,7 @@ law_franc_swiss_franc_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_franc_swiss_franc_monetary_system_FS_trigger = {
@@ -2702,7 +2825,10 @@ law_gulden_monetary_system_SS_trigger = {
 law_gulden_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_monetary_system_GS_GES_trigger = {
@@ -2717,7 +2843,7 @@ law_gulden_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_monetary_system_FS_trigger = {
@@ -2748,7 +2874,10 @@ law_gulden_bavarian_gulden_monetary_system_SS_trigger = {
 law_gulden_bavarian_gulden_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_bavarian_gulden_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_bavarian_gulden_monetary_system_GS_GES_trigger = {
@@ -2763,7 +2892,7 @@ law_gulden_bavarian_gulden_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_bavarian_gulden_monetary_system_FS_trigger = {
@@ -2794,7 +2923,10 @@ law_gulden_florin_monetary_system_SS_trigger = {
 law_gulden_florin_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_florin_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_florin_monetary_system_GS_GES_trigger = {
@@ -2809,7 +2941,7 @@ law_gulden_florin_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_florin_monetary_system_FS_trigger = {
@@ -2840,7 +2972,10 @@ law_gulden_hungarian_forint_monetary_system_SS_trigger = {
 law_gulden_hungarian_forint_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_hungarian_forint_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_hungarian_forint_monetary_system_GS_GES_trigger = {
@@ -2855,7 +2990,7 @@ law_gulden_hungarian_forint_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_hungarian_forint_monetary_system_FS_trigger = {
@@ -2886,7 +3021,10 @@ law_gulden_indies_guilder_monetary_system_SS_trigger = {
 law_gulden_indies_guilder_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_indies_guilder_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_indies_guilder_monetary_system_GS_GES_trigger = {
@@ -2901,7 +3039,7 @@ law_gulden_indies_guilder_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_indies_guilder_monetary_system_FS_trigger = {
@@ -2932,7 +3070,10 @@ law_gulden_south_german_gulden_monetary_system_SS_trigger = {
 law_gulden_south_german_gulden_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = gulden_south_german_gulden_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_gulden_south_german_gulden_monetary_system_GS_GES_trigger = {
@@ -2947,7 +3088,7 @@ law_gulden_south_german_gulden_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_gulden_south_german_gulden_monetary_system_FS_trigger = {
@@ -2978,7 +3119,10 @@ law_krone_czech_koruna_monetary_system_SS_trigger = {
 law_krone_czech_koruna_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_czech_koruna_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_czech_koruna_monetary_system_GS_GES_trigger = {
@@ -2993,7 +3137,7 @@ law_krone_czech_koruna_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_czech_koruna_monetary_system_FS_trigger = {
@@ -3024,7 +3168,10 @@ law_krone_danish_krone_monetary_system_SS_trigger = {
 law_krone_danish_krone_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_danish_krone_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_danish_krone_monetary_system_GS_GES_trigger = {
@@ -3039,7 +3186,7 @@ law_krone_danish_krone_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_danish_krone_monetary_system_FS_trigger = {
@@ -3070,7 +3217,10 @@ law_krone_estonian_kroon_monetary_system_SS_trigger = {
 law_krone_estonian_kroon_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_estonian_kroon_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_estonian_kroon_monetary_system_GS_GES_trigger = {
@@ -3085,7 +3235,7 @@ law_krone_estonian_kroon_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_estonian_kroon_monetary_system_FS_trigger = {
@@ -3116,7 +3266,10 @@ law_krone_icelandic_krona_monetary_system_SS_trigger = {
 law_krone_icelandic_krona_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_icelandic_krona_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_icelandic_krona_monetary_system_GS_GES_trigger = {
@@ -3131,7 +3284,7 @@ law_krone_icelandic_krona_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_icelandic_krona_monetary_system_FS_trigger = {
@@ -3162,7 +3315,10 @@ law_krone_norwegian_krone_monetary_system_SS_trigger = {
 law_krone_norwegian_krone_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_norwegian_krone_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_norwegian_krone_monetary_system_GS_GES_trigger = {
@@ -3177,7 +3333,7 @@ law_krone_norwegian_krone_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_norwegian_krone_monetary_system_FS_trigger = {
@@ -3208,7 +3364,10 @@ law_krone_slovak_koruna_monetary_system_SS_trigger = {
 law_krone_slovak_koruna_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_slovak_koruna_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_slovak_koruna_monetary_system_GS_GES_trigger = {
@@ -3223,7 +3382,7 @@ law_krone_slovak_koruna_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_slovak_koruna_monetary_system_FS_trigger = {
@@ -3254,7 +3413,10 @@ law_krone_swedish_krona_monetary_system_SS_trigger = {
 law_krone_swedish_krona_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = krone_swedish_krona_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_krone_swedish_krona_monetary_system_GS_GES_trigger = {
@@ -3269,7 +3431,7 @@ law_krone_swedish_krona_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_krone_swedish_krona_monetary_system_FS_trigger = {
@@ -3300,7 +3462,10 @@ law_leon_leu_monetary_system_SS_trigger = {
 law_leon_leu_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = leon_leu_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_leon_leu_monetary_system_GS_GES_trigger = {
@@ -3315,7 +3480,7 @@ law_leon_leu_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_leon_leu_monetary_system_FS_trigger = {
@@ -3346,7 +3511,10 @@ law_leon_lev_monetary_system_SS_trigger = {
 law_leon_lev_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = leon_lev_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_leon_lev_monetary_system_GS_GES_trigger = {
@@ -3361,7 +3529,7 @@ law_leon_lev_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_leon_lev_monetary_system_FS_trigger = {
@@ -3392,7 +3560,10 @@ law_lira_monetary_system_SS_trigger = {
 law_lira_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_monetary_system_GS_GES_trigger = {
@@ -3407,7 +3578,7 @@ law_lira_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_monetary_system_FS_trigger = {
@@ -3438,7 +3609,10 @@ law_lira_ducato_monetary_system_SS_trigger = {
 law_lira_ducato_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_ducato_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_ducato_monetary_system_GS_GES_trigger = {
@@ -3453,7 +3627,7 @@ law_lira_ducato_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_ducato_monetary_system_FS_trigger = {
@@ -3484,7 +3658,10 @@ law_lira_ottoman_lira_monetary_system_SS_trigger = {
 law_lira_ottoman_lira_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_ottoman_lira_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_ottoman_lira_monetary_system_GS_GES_trigger = {
@@ -3499,7 +3676,7 @@ law_lira_ottoman_lira_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_ottoman_lira_monetary_system_FS_trigger = {
@@ -3530,7 +3707,10 @@ law_lira_scudo_pontificio_monetary_system_SS_trigger = {
 law_lira_scudo_pontificio_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_scudo_pontificio_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_scudo_pontificio_monetary_system_GS_GES_trigger = {
@@ -3545,7 +3725,7 @@ law_lira_scudo_pontificio_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_scudo_pontificio_monetary_system_FS_trigger = {
@@ -3576,7 +3756,10 @@ law_lira_scudo_sardo_monetary_system_SS_trigger = {
 law_lira_scudo_sardo_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_scudo_sardo_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_scudo_sardo_monetary_system_GS_GES_trigger = {
@@ -3591,7 +3774,7 @@ law_lira_scudo_sardo_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_scudo_sardo_monetary_system_FS_trigger = {
@@ -3622,7 +3805,10 @@ law_lira_toscane_lira_monetary_system_SS_trigger = {
 law_lira_toscane_lira_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = lira_toscane_lira_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_lira_toscane_lira_monetary_system_GS_GES_trigger = {
@@ -3637,7 +3823,7 @@ law_lira_toscane_lira_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_lira_toscane_lira_monetary_system_FS_trigger = {
@@ -3668,7 +3854,10 @@ law_mark_monetary_system_SS_trigger = {
 law_mark_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = mark_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_mark_monetary_system_GS_GES_trigger = {
@@ -3683,7 +3872,7 @@ law_mark_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_mark_monetary_system_FS_trigger = {
@@ -3714,7 +3903,10 @@ law_mark_finnish_markka_monetary_system_SS_trigger = {
 law_mark_finnish_markka_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = mark_finnish_markka_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_mark_finnish_markka_monetary_system_GS_GES_trigger = {
@@ -3729,7 +3921,7 @@ law_mark_finnish_markka_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_mark_finnish_markka_monetary_system_FS_trigger = {
@@ -3760,7 +3952,10 @@ law_peso_monetary_system_SS_trigger = {
 law_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_monetary_system_GS_GES_trigger = {
@@ -3775,7 +3970,7 @@ law_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_monetary_system_FS_trigger = {
@@ -3806,7 +4001,10 @@ law_peso_argentine_peso_monetary_system_SS_trigger = {
 law_peso_argentine_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_argentine_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_argentine_peso_monetary_system_GS_GES_trigger = {
@@ -3821,7 +4019,7 @@ law_peso_argentine_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_argentine_peso_monetary_system_FS_trigger = {
@@ -3852,7 +4050,10 @@ law_peso_bolivien_peso_monetary_system_SS_trigger = {
 law_peso_bolivien_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_bolivien_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_bolivien_peso_monetary_system_GS_GES_trigger = {
@@ -3867,7 +4068,7 @@ law_peso_bolivien_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_bolivien_peso_monetary_system_FS_trigger = {
@@ -3898,7 +4099,10 @@ law_peso_chilean_peso_monetary_system_SS_trigger = {
 law_peso_chilean_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_chilean_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_chilean_peso_monetary_system_GS_GES_trigger = {
@@ -3913,7 +4117,7 @@ law_peso_chilean_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_chilean_peso_monetary_system_FS_trigger = {
@@ -3944,7 +4148,10 @@ law_peso_colombian_peso_monetary_system_SS_trigger = {
 law_peso_colombian_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_colombian_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_colombian_peso_monetary_system_GS_GES_trigger = {
@@ -3959,7 +4166,7 @@ law_peso_colombian_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_colombian_peso_monetary_system_FS_trigger = {
@@ -3990,7 +4197,10 @@ law_peso_costa_rican_colon_monetary_system_SS_trigger = {
 law_peso_costa_rican_colon_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_costa_rican_colon_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_costa_rican_colon_monetary_system_GS_GES_trigger = {
@@ -4005,7 +4215,7 @@ law_peso_costa_rican_colon_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_costa_rican_colon_monetary_system_FS_trigger = {
@@ -4036,7 +4246,10 @@ law_peso_cuban_peso_monetary_system_SS_trigger = {
 law_peso_cuban_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_cuban_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_cuban_peso_monetary_system_GS_GES_trigger = {
@@ -4051,7 +4264,7 @@ law_peso_cuban_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_cuban_peso_monetary_system_FS_trigger = {
@@ -4082,7 +4295,10 @@ law_peso_ecuadorian_peso_monetary_system_SS_trigger = {
 law_peso_ecuadorian_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_ecuadorian_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_ecuadorian_peso_monetary_system_GS_GES_trigger = {
@@ -4097,7 +4313,7 @@ law_peso_ecuadorian_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_ecuadorian_peso_monetary_system_FS_trigger = {
@@ -4128,7 +4344,10 @@ law_peso_el_salvador_colon_monetary_system_SS_trigger = {
 law_peso_el_salvador_colon_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_el_salvador_colon_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_el_salvador_colon_monetary_system_GS_GES_trigger = {
@@ -4143,7 +4362,7 @@ law_peso_el_salvador_colon_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_el_salvador_colon_monetary_system_FS_trigger = {
@@ -4174,7 +4393,10 @@ law_peso_guatemalan_quetzal_monetary_system_SS_trigger = {
 law_peso_guatemalan_quetzal_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_guatemalan_quetzal_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_guatemalan_quetzal_monetary_system_GS_GES_trigger = {
@@ -4189,7 +4411,7 @@ law_peso_guatemalan_quetzal_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_guatemalan_quetzal_monetary_system_FS_trigger = {
@@ -4220,7 +4442,10 @@ law_peso_honduran_lempira_monetary_system_SS_trigger = {
 law_peso_honduran_lempira_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_honduran_lempira_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_honduran_lempira_monetary_system_GS_GES_trigger = {
@@ -4235,7 +4460,7 @@ law_peso_honduran_lempira_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_honduran_lempira_monetary_system_FS_trigger = {
@@ -4266,7 +4491,10 @@ law_peso_mexican_peso_monetary_system_SS_trigger = {
 law_peso_mexican_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_mexican_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_mexican_peso_monetary_system_GS_GES_trigger = {
@@ -4281,7 +4509,7 @@ law_peso_mexican_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_mexican_peso_monetary_system_FS_trigger = {
@@ -4312,7 +4540,10 @@ law_peso_nicaraguan_cordoba_monetary_system_SS_trigger = {
 law_peso_nicaraguan_cordoba_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_nicaraguan_cordoba_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_nicaraguan_cordoba_monetary_system_GS_GES_trigger = {
@@ -4327,7 +4558,7 @@ law_peso_nicaraguan_cordoba_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_nicaraguan_cordoba_monetary_system_FS_trigger = {
@@ -4358,7 +4589,10 @@ law_peso_paraguayan_peso_monetary_system_SS_trigger = {
 law_peso_paraguayan_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_paraguayan_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_paraguayan_peso_monetary_system_GS_GES_trigger = {
@@ -4373,7 +4607,7 @@ law_peso_paraguayan_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_paraguayan_peso_monetary_system_FS_trigger = {
@@ -4404,7 +4638,10 @@ law_peso_philippine_peso_monetary_system_SS_trigger = {
 law_peso_philippine_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_philippine_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_philippine_peso_monetary_system_GS_GES_trigger = {
@@ -4419,7 +4656,7 @@ law_peso_philippine_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_philippine_peso_monetary_system_FS_trigger = {
@@ -4450,7 +4687,10 @@ law_peso_sol_de_oro_monetary_system_SS_trigger = {
 law_peso_sol_de_oro_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_sol_de_oro_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_sol_de_oro_monetary_system_GS_GES_trigger = {
@@ -4465,7 +4705,7 @@ law_peso_sol_de_oro_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_sol_de_oro_monetary_system_FS_trigger = {
@@ -4496,7 +4736,10 @@ law_peso_uruguayan_peso_monetary_system_SS_trigger = {
 law_peso_uruguayan_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_uruguayan_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_uruguayan_peso_monetary_system_GS_GES_trigger = {
@@ -4511,7 +4754,7 @@ law_peso_uruguayan_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_uruguayan_peso_monetary_system_FS_trigger = {
@@ -4542,7 +4785,10 @@ law_peso_venezuelan_peso_monetary_system_SS_trigger = {
 law_peso_venezuelan_peso_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = peso_venezuelan_peso_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_peso_venezuelan_peso_monetary_system_GS_GES_trigger = {
@@ -4557,7 +4803,7 @@ law_peso_venezuelan_peso_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_peso_venezuelan_peso_monetary_system_FS_trigger = {
@@ -4588,7 +4834,10 @@ law_pound_egyptian_pound_monetary_system_SS_trigger = {
 law_pound_egyptian_pound_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = pound_egyptian_pound_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_pound_egyptian_pound_monetary_system_GS_GES_trigger = {
@@ -4603,7 +4852,7 @@ law_pound_egyptian_pound_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_pound_egyptian_pound_monetary_system_FS_trigger = {
@@ -4634,7 +4883,10 @@ law_pound_irish_pound_monetary_system_SS_trigger = {
 law_pound_irish_pound_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = pound_irish_pound_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_pound_irish_pound_monetary_system_GS_GES_trigger = {
@@ -4649,7 +4901,7 @@ law_pound_irish_pound_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_pound_irish_pound_monetary_system_FS_trigger = {
@@ -4680,7 +4932,10 @@ law_pound_sterling_monetary_system_SS_trigger = {
 law_pound_sterling_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = pound_sterling_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_pound_sterling_monetary_system_GS_GES_trigger = {
@@ -4695,7 +4950,7 @@ law_pound_sterling_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_pound_sterling_monetary_system_FS_trigger = {
@@ -4726,7 +4981,10 @@ law_real_monetary_system_SS_trigger = {
 law_real_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = real_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_real_monetary_system_GS_GES_trigger = {
@@ -4741,7 +4999,7 @@ law_real_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_real_monetary_system_FS_trigger = {
@@ -4772,7 +5030,10 @@ law_real_brazilian_real_monetary_system_SS_trigger = {
 law_real_brazilian_real_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = real_brazilian_real_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_real_brazilian_real_monetary_system_GS_GES_trigger = {
@@ -4787,7 +5048,7 @@ law_real_brazilian_real_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_real_brazilian_real_monetary_system_FS_trigger = {
@@ -4818,7 +5079,10 @@ law_rupee_indian_rupee_monetary_system_SS_trigger = {
 law_rupee_indian_rupee_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = rupee_indian_rupee_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_rupee_indian_rupee_monetary_system_GS_GES_trigger = {
@@ -4833,7 +5097,7 @@ law_rupee_indian_rupee_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_rupee_indian_rupee_monetary_system_FS_trigger = {
@@ -4864,7 +5128,10 @@ law_rupee_indonesian_rupiah_monetary_system_SS_trigger = {
 law_rupee_indonesian_rupiah_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = rupee_indonesian_rupiah_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_rupee_indonesian_rupiah_monetary_system_GS_GES_trigger = {
@@ -4879,7 +5146,7 @@ law_rupee_indonesian_rupiah_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_rupee_indonesian_rupiah_monetary_system_FS_trigger = {
@@ -4910,7 +5177,10 @@ law_spe_baht_monetary_system_SS_trigger = {
 law_spe_baht_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_baht_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_baht_monetary_system_GS_GES_trigger = {
@@ -4925,7 +5195,7 @@ law_spe_baht_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_baht_monetary_system_FS_trigger = {
@@ -4956,7 +5226,10 @@ law_spe_dong_monetary_system_SS_trigger = {
 law_spe_dong_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_dong_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_dong_monetary_system_GS_GES_trigger = {
@@ -4971,7 +5244,7 @@ law_spe_dong_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_dong_monetary_system_FS_trigger = {
@@ -5002,7 +5275,10 @@ law_spe_drachma_monetary_system_SS_trigger = {
 law_spe_drachma_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_drachma_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_drachma_monetary_system_GS_GES_trigger = {
@@ -5017,7 +5293,7 @@ law_spe_drachma_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_drachma_monetary_system_FS_trigger = {
@@ -5048,7 +5324,10 @@ law_spe_korean_won_monetary_system_SS_trigger = {
 law_spe_korean_won_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_korean_won_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_korean_won_monetary_system_GS_GES_trigger = {
@@ -5063,7 +5342,7 @@ law_spe_korean_won_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_korean_won_monetary_system_FS_trigger = {
@@ -5094,7 +5373,10 @@ law_spe_latvian_lats_monetary_system_SS_trigger = {
 law_spe_latvian_lats_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_latvian_lats_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_latvian_lats_monetary_system_GS_GES_trigger = {
@@ -5109,7 +5391,7 @@ law_spe_latvian_lats_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_latvian_lats_monetary_system_FS_trigger = {
@@ -5140,7 +5422,10 @@ law_spe_lithuanian_litas_monetary_system_SS_trigger = {
 law_spe_lithuanian_litas_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_lithuanian_litas_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_lithuanian_litas_monetary_system_GS_GES_trigger = {
@@ -5155,7 +5440,7 @@ law_spe_lithuanian_litas_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_lithuanian_litas_monetary_system_FS_trigger = {
@@ -5186,7 +5471,10 @@ law_spe_peseta_monetary_system_SS_trigger = {
 law_spe_peseta_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_peseta_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_peseta_monetary_system_GS_GES_trigger = {
@@ -5201,7 +5489,7 @@ law_spe_peseta_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_peseta_monetary_system_FS_trigger = {
@@ -5232,7 +5520,10 @@ law_spe_ruble_monetary_system_SS_trigger = {
 law_spe_ruble_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_ruble_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_ruble_monetary_system_GS_GES_trigger = {
@@ -5247,7 +5538,7 @@ law_spe_ruble_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_ruble_monetary_system_FS_trigger = {
@@ -5278,7 +5569,10 @@ law_spe_uni_monetary_system_SS_trigger = {
 law_spe_uni_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_uni_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_uni_monetary_system_GS_GES_trigger = {
@@ -5293,7 +5587,7 @@ law_spe_uni_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_uni_monetary_system_FS_trigger = {
@@ -5324,7 +5618,10 @@ law_spe_yen_monetary_system_SS_trigger = {
 law_spe_yen_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_yen_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_yen_monetary_system_GS_GES_trigger = {
@@ -5339,7 +5636,7 @@ law_spe_yen_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_yen_monetary_system_FS_trigger = {
@@ -5370,7 +5667,10 @@ law_spe_yuan_monetary_system_SS_trigger = {
 law_spe_yuan_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_yuan_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_yuan_monetary_system_GS_GES_trigger = {
@@ -5385,7 +5685,7 @@ law_spe_yuan_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_yuan_monetary_system_FS_trigger = {
@@ -5416,7 +5716,10 @@ law_spe_zloti_monetary_system_SS_trigger = {
 law_spe_zloti_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = spe_zloti_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_spe_zloti_monetary_system_GS_GES_trigger = {
@@ -5431,7 +5734,7 @@ law_spe_zloti_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_spe_zloti_monetary_system_FS_trigger = {
@@ -5462,7 +5765,10 @@ law_thaler_hannoveraner_thaler_monetary_system_SS_trigger = {
 law_thaler_hannoveraner_thaler_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = thaler_hannoveraner_thaler_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_thaler_hannoveraner_thaler_monetary_system_GS_GES_trigger = {
@@ -5477,7 +5783,7 @@ law_thaler_hannoveraner_thaler_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_thaler_hannoveraner_thaler_monetary_system_FS_trigger = {
@@ -5508,7 +5814,10 @@ law_thaler_prussian_thaler_monetary_system_SS_trigger = {
 law_thaler_prussian_thaler_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = thaler_prussian_thaler_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_thaler_prussian_thaler_monetary_system_GS_GES_trigger = {
@@ -5523,7 +5832,7 @@ law_thaler_prussian_thaler_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_thaler_prussian_thaler_monetary_system_FS_trigger = {
@@ -5554,7 +5863,10 @@ law_thaler_saxon_thaler_monetary_system_SS_trigger = {
 law_thaler_saxon_thaler_monetary_system_BS_trigger = {
 	any_country = {
 		has_modifier = thaler_saxon_thaler_leading_currency_type
-		has_law = law_type:law_bimetallism_standard
+		or = {
+			has_law = law_type:law_bimetallism_standard
+			has_law = law_type:law_external_exchange_standard
+		}
 	}
 }
 law_thaler_saxon_thaler_monetary_system_GS_GES_trigger = {
@@ -5569,7 +5881,7 @@ law_thaler_saxon_thaler_monetary_system_SS_BS_trigger = {
 		or = {
 			has_law = law_type:law_bimetallism_standard
 			has_law = law_type:law_silver_standard
-		}  
+		}
 	}
 }
 law_thaler_saxon_thaler_monetary_system_FS_trigger = {
@@ -5583,127 +5895,124 @@ law_thaler_saxon_thaler_monetary_system_FS_trigger = {
 #####################################################################################################################################################
 
 # #2 force opposées
-# - 1: la valeur médian 
+# - 1: la valeur médian
 # - 2: la money value target
 # >>>> Il faut essyer de faire aller les 2 dans le meme sans
 
-# grand axe 
-devaluation_money_value_target_trigger = {		
+# grand axe
+devaluation_money_value_target_trigger = {
 
-	or = { 
+	or = {
 		AND = {
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75
-			difference_with_average_gold_exchange_rate_currencies_revers > 0.25 
+			difference_with_average_gold_exchange_rate_currencies_revers > 0.25
 		}
 		AND = {
 			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25
-			difference_with_average_gold_exchange_rate_currencies_revers > 0.25 
-		}
-		 
+			difference_with_average_gold_exchange_rate_currencies_revers > 0.25
+		} 
 	}
 	#devaluation_money_value_target < var:money_value_target_1 >=  #permet de ne pas avoir à dévalué si la target actuel ett deja la vlaur mine atteignable
-
-
-
-	# not = {
-	# 	var:money_value_target_1 = 0 #non car je n'utilise pas la money_value_target_1 pour calculer la nouvelle cible donc çà lui donnera une nouvlle cible, il est peut probable que cela arrive de toute manière
-	# 	or = {
-	# 		is_subject_custom_trigger = yes
-	# 		market_owner_is_root_univ_with_buiding = yes
-	# 	}
-	# } 
+ 
+	not = {
+		var:money_value_target_1 = 0 #non car je n'utilise pas la money_value_target_1 pour calculer la nouvelle cible donc çà lui donnera une nouvlle cible, il est peut probable que cela arrive de toute manière
+		# or = {
+		# 	is_subject_custom_trigger = yes
+		# 	market_owner_is_root_univ_with_buiding = yes
+		# }
+	}
 
 	#pas de blocage car les sujet révalue leur taget par rapport à l'overlord
-	# not = { 
+	# not = {
 	# 	or = {
 	# 		is_subject_custom_trigger = yes
 	# 		market_owner_is_root_univ_with_buiding = yes
 	# 	}
-	# } 
+	# }
 }
 
-revaluation_money_value_target_trigger = { 
+revaluation_money_value_target_trigger = {
 	#on peut rajouter quelque chos epour que la valeur de révaluation multiplier par la quantié de devise du à l'import soit supérieur ou élae à 0 quand soustrait à la somme en métaux des export -> empeche de plongé dans la crise le pays
 	#point positif si le pays a une petite target de base la somme du en devise est très faible et c'est les import en métaux only qui représente la majeur partie des due à l'import ce qui fait que la révaluation n'a pas d'impacte sur çà
-	or = { 
+	or = {
 		AND = {
-			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25 #=sur 25% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard 
-			difference_with_average_gold_exchange_rate_currencies_revers < -0.25 #inf de 75% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard 
-		} 
+			central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25 #=sur 25% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard
+			difference_with_average_gold_exchange_rate_currencies_revers < -0.25 #inf de 75% >>>> superieur à 25% du poit d'équilibre -> la devise veux rerentrer dans la norme de sont standard
+		}
  		var:money_value_target_1 = 0 #si jamais un pays ce retrouve avec une target de 0 petit reset de la target
-	} 
+	}
 	not = {
 		gold_loaned_to_central_bank_ratio > 0.75
 		or = {
 			is_subject_custom_trigger = yes
 			market_owner_is_root_univ_with_buiding = yes
 		}
-	} 
+	}
 	#pas de blocage car les sujet révalue leur taget par rapport à l'overlord
-	# not = { 
+	# not = {
 	# 	or = {
 	# 		is_subject_custom_trigger = yes
 	# 		market_owner_is_root_univ_with_buiding = yes
 	# 	}
-	# } 
+	# }
 }
 
 union_latine = {
 	root = {
 		OR = {
 			c:FRA ?= this
-			c:ITA ?= this 
+			c:ITA ?= this
 			c:BEL ?= this
-			c:SWI ?= this 
-			c:GRE ?= this 
+			c:SWI ?= this
+			c:GRE ?= this
 
-			c:SAR ?= this 
-			c:PAR ?= this 
-			c:MOD ?= this 
-			c:LUC ?= this 
-			c:TUS ?= this 
-			c:PAP ?= this 
-			c:SIC ?= this 
+			c:SAR ?= this
+			c:PAR ?= this
+			c:MOD ?= this
+			c:LUC ?= this
+			c:TUS ?= this
+			c:PAP ?= this
+			c:SIC ?= this
 		}
 	}
 }
 scripted_money_value_target = {
 	root = {
 		OR = {
-			#Recalibrage si la valeur cible sote et jamaide modification 
+			#Recalibrage si la valeur cible sote et jamaide modification
 			c:GBR ?= this
 
 			# #union latine
 			# c:FRA ?= this
-			# c:ITA ?= this 
+			# c:ITA ?= this
 			# c:BEL ?= this
-			# c:SWI ?= this 
-			# c:GRE ?= this 
-			# c:SAR ?= this 
-			# c:PAR ?= this 
-			# c:MOD ?= this 
-			# c:LUC ?= this 
-			# c:TUS ?= this 
-			# c:PAP ?= this 
-			# c:SIC ?= this 
+			# c:SWI ?= this
+			# c:GRE ?= this
+			# c:SAR ?= this
+			# c:PAR ?= this
+			# c:MOD ?= this
+			# c:LUC ?= this
+			# c:TUS ?= this
+			# c:PAP ?= this
+			# c:SIC ?= this
 
 			# #Scandinavian Monetary Union
-			# c:SWE ?= this  
-			# c:DEN ?= this  
-			# c:NOR ?= this  
+			# c:SWE ?= this
+			# c:DEN ?= this
+			# c:NOR ?= this
 
-			# c:USA ?= this 
-			# c:NET ?= this 
+			# c:USA ?= this
+			# c:NET ?= this
 			# c:AUS ?= this
 			# c:GER ?= this
-			# c:PRU ?= this 
+			# c:PRU ?= this
 			# c:RUS ?= this
 			# c:CHI ?= this
 			# c:SPA ?= this
-			# c:JAP ?= this 
+			# c:JAP ?= this
 			c:MEX ?= this
-			# c:BRZ ?= this 
-			# c:TUR ?= this 
+			# c:BRZ ?= this
+			# c:TUR ?= this
 		}
 	}
 }
@@ -5809,16 +6118,16 @@ any_neighbouring_state_root = {
 
 #####################################################################################################################################################
 
-nothing_status = { 
+nothing_status = {
 	OR = {
 		has_modifier = economic_instability
 		has_modifier = foreign_exchange_controls
 		has_modifier = country_credit_rating_D
-		has_modifier = declared_bankruptcy 
+		has_modifier = declared_bankruptcy
 	}
 }
 
-nothing_crisis = { 
+nothing_crisis = {
 	var:economic_instability_count >= 2
 	OR = {
 		#var:country_bankruptcy >= 1
@@ -5831,197 +6140,203 @@ nothing_crisis = {
 
 
 
-is_valid_country_for_currency_accumulation = {  
+is_valid_country_for_currency_accumulation = {
 	not = {
 		or = {
 			# var:currency_crisis = 1
 			# var:central_bank_bankruptcy = 1
 			has_modifier = central_bank_bankruptcy_country
-			has_modifier = currency_crisis_country 
+			has_modifier = currency_crisis_country
 			market_owner_is_root_univ_with_buiding = yes
 			is_subject_custom_trigger = yes
 		}
-	} 
+	}
 }
 
 ############################################################################################################################################################
 
 #####################################################################################################################################################
 
-is_monetary_systeme_transition_valid_country_to_bimetalisme = { 
+is_monetary_systeme_transition_valid_country_to_bimetalisme = {
 	has_law = law_type:law_silver_standard
-	OR = {    
-		AND = { 
-			money_value_silver_standard_in_gold <= money_value_bimetallism_standard_in_gold #shunt la  -> non en fait 
+	OR = {
+		AND = {
+			money_value_silver_standard_in_gold <= money_value_bimetallism_standard_in_gold #shunt la  -> non en fait
 			NOT = {
-				OR = { 
-					this = c:SER ?= this  
-					this = c:CAN ?= this  
-					this = c:USA ?= this  
-					this = c:BEL ?= this  
-					this = c:FRA ?= this  
-					this = c:SWI ?= this  
-					this = c:AUS ?= this  
-					this = c:BAV ?= this  
-					this = c:NET ?= this  
-					this = c:DEN ?= this  
-					this = c:NOR ?= this  
-					this = c:SWE ?= this  
-					this = c:ROU ?= this  
-					this = c:BUL ?= this  
-					this = c:ITA ?= this  
-					this = c:TUR ?= this  
-					this = c:GER ?= this  
-					this = c:ARG ?= this  
-					this = c:BOL ?= this  
-					this = c:CHL ?= this  
-					this = c:CLM ?= this  
-					this = c:COS ?= this  
-					this = c:CUB ?= this  
-					this = c:ECU ?= this  
-					this = c:ELS ?= this  
-					this = c:GUA ?= this  
-					this = c:HON ?= this  
-					this = c:MEX ?= this  
-					this = c:NIC ?= this  
-					this = c:PRG ?= this  
-					this = c:PHI ?= this  
-					this = c:PER ?= this  
-					this = c:URU ?= this  
-					this = c:VNZ ?= this  
-					this = c:GBR ?= this  
-					this = c:POR ?= this  
-					this = c:BRZ ?= this  
-					this = c:SPA ?= this  
-					this = c:RUS ?= this  
-					this = c:JAP ?= this   
-				} 
-			} 
-		} 
+				OR = {
+					this = c:SER ?= this
+					this = c:CAN ?= this
+					this = c:USA ?= this
+					this = c:BEL ?= this
+					this = c:FRA ?= this
+					this = c:SWI ?= this
+					this = c:AUS ?= this
+					this = c:BAV ?= this
+					this = c:NET ?= this
+					this = c:DEN ?= this
+					this = c:NOR ?= this
+					this = c:SWE ?= this
+					this = c:ROU ?= this
+					this = c:BUL ?= this
+					this = c:ITA ?= this
+					this = c:TUR ?= this
+					this = c:GER ?= this
+					this = c:ARG ?= this
+					this = c:BOL ?= this
+					this = c:CHL ?= this
+					this = c:CLM ?= this
+					this = c:COS ?= this
+					this = c:CUB ?= this
+					this = c:ECU ?= this
+					this = c:ELS ?= this
+					this = c:GUA ?= this
+					this = c:HON ?= this
+					this = c:MEX ?= this
+					this = c:NIC ?= this
+					this = c:PRG ?= this
+					this = c:PHI ?= this
+					this = c:PER ?= this
+					this = c:URU ?= this
+					this = c:VNZ ?= this
+					this = c:GBR ?= this
+					this = c:POR ?= this
+					this = c:BRZ ?= this
+					this = c:SPA ?= this
+					this = c:RUS ?= this
+					this = c:JAP ?= this
+
+					has_law = law_type:law_peso_bolivien_peso_currency
+					has_law = law_type:law_peso_sol_de_oro_currency  
+				}
+			}
+		}
 		is_valid_country_bimetalisme = yes
-	} 
+	}
 	not = { #ne passeron jamais au dessus du silver
-		OR = { 
-			this = c:SIC ?= this 
-			this = c:PAP ?= this  
-			this = c:SAR ?= this  
-			this = c:PAR ?= this  
-			this = c:MOD ?= this  
-			this = c:TUS ?= this  
-			this = c:CHI ?= this 
-			this = c:MEX ?= this  
-			this = c:PRU ?= this  
-			this = c:HAN ?= this  
-			this = c:SAX ?= this   
+		OR = {
+			this = c:SIC ?= this
+			this = c:PAP ?= this
+			this = c:SAR ?= this
+			this = c:PAR ?= this
+			this = c:MOD ?= this
+			this = c:TUS ?= this 
+			this = c:CHI ?= this
+			this = c:MEX ?= this
+			this = c:PRU ?= this
+			this = c:HAN ?= this
+			this = c:SAX ?= this
+
+			# this = c:GER ?= this
+			# this = c:ITA ?= this
 			
-			# this = c:GER ?= this   
-			# this = c:ITA ?= this   
-		} 
-	} 
-} 
+			has_law = law_type:law_lira_toscane_lira_currency
+		}
+	}
+}
 
-is_monetary_systeme_transition_valid_country_to_gold = { 
-	OR = { 
+is_monetary_systeme_transition_valid_country_to_gold = {
+	OR = {
 		has_law = law_type:law_bimetallism_standard
-		AND = { 
+		AND = {
 			has_law = law_type:law_silver_standard #money_value_bimetallism_standard_in_gold <= money_value_gold_standard -> donc il sont obligé de dépssé la datte
-			OR = { #il invalid directement 
-				this = c:GBR ?= this 
-				this = c:AUS ?= this    
-				this = c:DEN ?= this  
-				this = c:SWE ?= this  
-				this = c:NOR ?= this  
-				this = c:RUS ?= this    
-				# this = c:GER ?= this   
-				# this = c:ITA ?= this  
-			} 
-		} 
-	} 
-	OR = {  
-		AND = {  
-			money_value_bimetallism_standard_in_gold <= money_value_gold_standard 
+			OR = { #il invalid directement
+				this = c:GBR ?= this
+				this = c:AUS ?= this
+				this = c:DEN ?= this
+				this = c:SWE ?= this
+				this = c:NOR ?= this
+				this = c:RUS ?= this
+				this = c:GER ?= this
+				this = c:ITA ?= this
+			}
+		}
+	}
+	OR = {
+		AND = {
+			money_value_bimetallism_standard_in_gold <= money_value_gold_standard
 			NOT = {
-				OR = { 
-					this = c:SER ?= this  
-					this = c:CAN ?= this  
-					this = c:USA ?= this  
-					this = c:BEL ?= this  
-					this = c:FRA ?= this  
-					this = c:SWI ?= this  
-					this = c:AUS ?= this  
-					this = c:BAV ?= this  
-					this = c:NET ?= this  
-					this = c:DEN ?= this  
-					this = c:NOR ?= this  
-					this = c:SWE ?= this  
-					this = c:ROU ?= this  
-					this = c:BUL ?= this  
-					this = c:ITA ?= this  
-					this = c:TUR ?= this  
-					this = c:GER ?= this  
-					this = c:ARG ?= this  
-					this = c:BOL ?= this  
-					this = c:CHL ?= this  
-					this = c:CLM ?= this  
-					this = c:COS ?= this  
-					this = c:CUB ?= this  
-					this = c:ECU ?= this  
-					this = c:ELS ?= this  
-					this = c:GUA ?= this  
-					this = c:HON ?= this  
-					this = c:MEX ?= this  
-					this = c:NIC ?= this  
-					this = c:PRG ?= this  
-					this = c:PHI ?= this  
-					this = c:PER ?= this  
-					this = c:URU ?= this  
-					this = c:VNZ ?= this  
-					this = c:GBR ?= this  
-					this = c:POR ?= this  
-					this = c:BRZ ?= this  
-					this = c:SPA ?= this  
-					this = c:RUS ?= this  
-					this = c:JAP ?= this   
-				} 
-			} 
-		} 
-		is_valid_country_gold = yes 
-	} 
-} 
+				OR = {
+					this = c:SER ?= this
+					this = c:CAN ?= this
+					this = c:USA ?= this
+					this = c:BEL ?= this
+					this = c:FRA ?= this
+					this = c:SWI ?= this
+					this = c:AUS ?= this
+					this = c:BAV ?= this
+					this = c:NET ?= this
+					this = c:DEN ?= this
+					this = c:NOR ?= this
+					this = c:SWE ?= this
+					this = c:ROU ?= this
+					this = c:BUL ?= this
+					this = c:ITA ?= this
+					this = c:TUR ?= this
+					this = c:GER ?= this
+					this = c:ARG ?= this
+					this = c:BOL ?= this
+					this = c:CHL ?= this
+					this = c:CLM ?= this
+					this = c:COS ?= this
+					this = c:CUB ?= this
+					this = c:ECU ?= this
+					this = c:ELS ?= this
+					this = c:GUA ?= this
+					this = c:HON ?= this
+					this = c:MEX ?= this
+					this = c:NIC ?= this
+					this = c:PRG ?= this
+					this = c:PHI ?= this
+					this = c:PER ?= this
+					this = c:URU ?= this
+					this = c:VNZ ?= this
+					this = c:GBR ?= this
+					this = c:POR ?= this
+					this = c:BRZ ?= this
+					this = c:SPA ?= this
+					this = c:RUS ?= this
+					this = c:JAP ?= this
+					this = c:GRE ?= this
+				}
+			}
+		}
+		is_valid_country_gold = yes
+	}
+}
 
-is_monetary_systeme_transition_valid_country_to_gold_exchange_standard = { 
+is_monetary_systeme_transition_valid_country_to_gold_exchange_standard = {
 	or = {
 		has_law = law_type:law_gold_standard
 		has_law = law_type:law_bimetallism_standard
 		has_law = law_type:law_silver_standard
 	}
-	
-	or = { 
-		AND = {  
+
+	or = {
+		AND = {
 			has_law = law_type:law_silver_standard
 			money_value_silver_standard_in_gold <= money_value_by_reference_currency
-		} 
-		AND = {  
+		}
+		AND = {
 			has_law = law_type:law_bimetallism_standard
 			money_value_bimetallism_standard_in_gold <= money_value_by_reference_currency
-		} 
-		AND = {  
+		}
+		AND = {
 			has_law = law_type:law_gold_standard
 			money_value_gold_standard <= money_value_by_reference_currency
-		}  
-	}  
-	has_technology_researched = gold_exchange_standard  
+		}
+	}
+	has_technology_researched = gold_exchange_standard
 	global_country_ranking > 15
-}   
- 
+}
+
 ###################
 ###################
 ###################
 
-is_valid_country_bimetalisme = { 
-	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent 
-	money_value_bimetallism_standard_in_gold >= money_value_silver_standard_in_gold_33 
-	OR = { 
+is_valid_country_bimetalisme = {
+	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent
+	money_value_bimetallism_standard_in_gold >= money_value_silver_standard_in_gold_33
+	OR = {
 		is_valid_country_SER_bimetalisme = yes
 		is_valid_country_CAN_bimetalisme = yes
 		is_valid_country_USA_bimetalisme = yes
@@ -6062,7 +6377,23 @@ is_valid_country_bimetalisme = {
 		is_valid_country_SPA_bimetalisme = yes
 		is_valid_country_RUS_bimetalisme = yes
 		is_valid_country_JAP_bimetalisme = yes
-	} 
+
+		
+		is_valid_country_BOL_bimetalisme = yes
+		is_valid_country_PEU_bimetalisme = yes
+	}
+}
+is_valid_country_BOL_bimetalisme = { 
+	root = {
+		has_law = law_type:law_peso_bolivien_peso_currency
+		game_date > 1900.1.1
+	}
+}
+is_valid_country_PEU_bimetalisme = {
+	root = {
+		has_law = law_type:law_peso_sol_de_oro_currency 
+		game_date > 1898.1.1
+	}
 } 
 is_valid_country_USA_bimetalisme = {
 	root = {
@@ -6204,8 +6535,9 @@ is_valid_country_SWE_bimetalisme = {
 }
 is_valid_country_GER_bimetalisme = {
 	root = {
-		c:GER ?= this  #1871
-		game_date > 1871.1.1
+		c:GER ?= this  #1871 
+		always = no 
+		#game_date > 1800.1.1
 	}
 }
 is_valid_country_GBR_bimetalisme = {
@@ -6303,260 +6635,18 @@ is_valid_country_RUS_bimetalisme = {
 		c:RUS ?= this  #1897
 		game_date > 1897.1.1
 	}
-}
+} 
 
-
-# is_valid_country_SER_bimetalisme = {
-# 	root = {
-# 		c:SER ?= this  #1873
-# 		game_date > 1873.1.1
-# 	}
-# }
-# is_valid_country_CAN_bimetalisme = {
-# 	root = {
-# 		c:CAN ?= this  #1858
-# 		game_date > 1858.1.1
-# 	}
-# }
-# is_valid_country_USA_bimetalisme = {
-# 	root = {
-# 		c:USA ?= this  #1792  environ
-# 		game_date > 1792.1.1
-# 	}
-# }
-# is_valid_country_BEL_bimetalisme = {
-# 	root = {
-# 		c:BEL ?= this  #1865
-# 		game_date > 1865.1.1
-# 	}
-# }
-# is_valid_country_FRA_bimetalisme = {
-# 	root = {
-# 		c:FRA ?= this  #1803
-# 		game_date > 1803.1.1
-# 	}
-# }
-# is_valid_country_SWI_bimetalisme = {
-# 	root = {
-# 		c:SWI ?= this  #1850
-# 		game_date > 1850.1.1
-# 	}
-# }
-# is_valid_country_AUS_bimetalisme = {
-# 	root = {
-# 		c:AUS ?= this  #1872
-# 		always = no
-# 	}
-# }
-# is_valid_country_BAV_bimetalisme = {
-# 	root = {
-# 		c:BAV ?= this  #1871
-# 		always = no
-# 	}
-# }
-# is_valid_country_NET_bimetalisme = {
-# 	root = {
-# 		c:NET ?= this  #1816
-# 		game_date > 1816.1.1
-# 	}
-# }
-# is_valid_country_DEN_bimetalisme = {
-# 	root = {
-# 		c:DEN ?= this  #1871
-# 		always = no
-# 	}
-# }
-# is_valid_country_NOR_bimetalisme = {
-# 	root = {
-# 		c:NOR ?= this  #1871
-# 		always = no
-# 	}
-# }
-# is_valid_country_SWE_bimetalisme = {
-# 	root = {
-# 		c:SWE ?= this  #1871
-# 		always = no
-# 	}
-# }
-# is_valid_country_ROU_bimetalisme = {
-# 	root = {
-# 		c:ROU ?= this  #1867
-# 		game_date > 1867.1.1
-# 	}
-# }
-# is_valid_country_BUL_bimetalisme = {
-# 	root = {
-# 		c:BUL ?= this  #1881
-# 		game_date > 1881.1.1
-# 	}
-# }
-# is_valid_country_ITA_bimetalisme = {
-# 	root = {
-# 		c:ITA ?= this  #1865
-# 		game_date > 1865.1.1
-# 	}
-# }
-# is_valid_country_TUR_bimetalisme = {
-# 	root = {
-# 		c:TUR ?= this  #1844
-# 		game_date > 1844.1.1
-# 	}
-# }
-# is_valid_country_GER_bimetalisme = {
-# 	root = {
-# 		c:GER ?= this  #1871
-# 		game_date > 1871.1.1
-# 	}
-# }
-# is_valid_country_ARG_bimetalisme = {
-# 	root = {
-# 		c:ARG ?= this  #1881
-# 		game_date > 1881.1.1
-# 	}
-# }
-# is_valid_country_BOL_bimetalisme = {
-# 	root = {
-# 		c:BOL ?= this  #1874
-# 		game_date > 1874.1.1
-# 	}
-# }
-# is_valid_country_CHL_bimetalisme = {
-# 	root = {
-# 		c:CHL ?= this  #1868
-# 		game_date > 1868.1.1
-# 	}
-# }
-# is_valid_country_CLM_bimetalisme = {
-# 	root = {
-# 		c:CLM ?= this  #1870
-# 		game_date > 1870.1.1
-# 	}
-# }
-# is_valid_country_COS_bimetalisme = {
-# 	root = {
-# 		c:COS ?= this  #1881
-# 		game_date > 1881.1.1
-# 	}
-# }
-# is_valid_country_CUB_bimetalisme = {
-# 	root = {
-# 		c:CUB ?= this  #1869
-# 		game_date > 1869.1.1
-# 	}
-# }
-# is_valid_country_ECU_bimetalisme = {
-# 	root = {
-# 		c:ECU ?= this  #1884
-# 		game_date > 1884.1.1
-# 	}
-# }
-# is_valid_country_ELS_bimetalisme = {
-# 	root = {
-# 		c:ELS ?= this  #1883
-# 		game_date > 1883.1.1
-# 	}
-# }
-# is_valid_country_GUA_bimetalisme = {
-# 	root = {
-# 		c:GUA ?= this  #1880
-# 		game_date > 1880.1.1
-# 	}
-# }
-# is_valid_country_HON_bimetalisme = {
-# 	root = {
-# 		c:HON ?= this  #1882
-# 		game_date > 1882.1.1
-# 	}
-# }
-# is_valid_country_MEX_bimetalisme = {
-# 	root = {
-# 		c:MEX ?= this  #1863
-# 		game_date > 1863.1.1
-# 	}
-# }
-# is_valid_country_NIC_bimetalisme = {
-# 	root = {
-# 		c:NIC ?= this  #1880
-# 		game_date > 1880.1.1
-# 	}
-# }
-# is_valid_country_PRG_bimetalisme = {
-# 	root = {
-# 		c:PRG ?= this  #1875
-# 		game_date > 1875.1.1
-# 	}
-# }
-# is_valid_country_PHI_bimetalisme = {
-# 	root = {
-# 		c:PHI ?= this  #1851
-# 		game_date > 1851.1.1
-# 	}
-# }
-# is_valid_country_PER_bimetalisme = {
-# 	root = {
-# 		c:PER ?= this  #1863
-# 		game_date > 1863.1.1
-# 	}
-# }
-# is_valid_country_URU_bimetalisme = {
-# 	root = {
-# 		c:URU ?= this  #1867
-# 		game_date > 1867.1.1
-# 	}
-# }
-# is_valid_country_VNZ_bimetalisme = {
-# 	root = {
-# 		c:VNZ ?= this  #1870
-# 		game_date > 1870.1.1
-# 	}
-# }
-# is_valid_country_GBR_bimetalisme = {
-# 	root = {
-# 		c:GBR ?= this  #1871
-# 		always = no
-# 	}
-# }
-# is_valid_country_POR_bimetalisme = {
-# 	root = {
-# 		c:POR ?= this  #1855
-# 		game_date > 1855.1.1
-# 	}
-# }
-# is_valid_country_BRZ_bimetalisme = {
-# 	root = {
-# 		c:BRZ ?= this  #1883
-# 		game_date > 1883.1.1
-# 	}
-# }
-# is_valid_country_SPA_bimetalisme = {
-# 	root = {
-# 		c:SPA ?= this  #1868
-# 		game_date > 1868.1.1
-# 	}
-# }
-# is_valid_country_RUS_bimetalisme = {
-# 	root = {
-# 		c:RUS ?= this  #1897
-# 		game_date > 1897.1.1
-# 	}
-# }
-# is_valid_country_JAP_bimetalisme = {
-# 	root = {
-# 		c:JAP ?= this  #1871
-# 		game_date > 1871.1.1
-# 	}
-# }
- 
 is_valid_country_gold = {
-	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent 
+	# Mettre ici une valeur ou le money_value_bimetallism_standard_in_gold est au moin superieur à 66% de la valeur en argent
 	money_value_gold_standard >= money_value_bimetallism_standard_in_gold_50 #money_value_bimetallism_standard_in_gold_33 
-	OR = { 
+	OR = {
 		is_valid_country_SER_gold_standard = yes
 		is_valid_country_CAN_gold_standard = yes
 		is_valid_country_USA_gold_standard = yes
 		is_valid_country_BEL_gold_standard = yes
 		is_valid_country_FRA_gold_standard = yes
-		is_valid_country_SWI_gold_standard = yes 
+		is_valid_country_SWI_gold_standard = yes
 		is_valid_country_AUS_gold_standard = yes
 		is_valid_country_BAV_gold_standard = yes
 		is_valid_country_NET_gold_standard = yes
@@ -6591,9 +6681,15 @@ is_valid_country_gold = {
 		is_valid_country_SPA_gold_standard = yes
 		is_valid_country_RUS_gold_standard = yes
 		is_valid_country_JAP_gold_standard = yes
-	} 
-} 
-
+		is_valid_country_GRE_gold_standard = yes
+	}
+}
+is_valid_country_GRE_gold_standard = {
+	root = {
+		c:GRE ?= this  #1910
+		game_date > 1910.1.1
+	}
+}
 is_valid_country_SER_gold_standard = {
 	root = {
 		c:SER ?= this  #1880
@@ -6693,7 +6789,8 @@ is_valid_country_TUR_gold_standard = {
 is_valid_country_GER_gold_standard = {
 	root = {
 		c:GER ?= this  #1873
-		game_date > 1873.1.1
+		#game_date > 1873.1.1 
+		always = yes
 	}
 }
 is_valid_country_ARG_gold_standard = {
@@ -6839,27 +6936,27 @@ is_valid_country_JAP_gold_standard = {
 # dinar_serbian_dinar #1873 #1880
 # dinar_serbian_dinar #1873 #1880
 # dollar_canadian_dollar #1858 #1871
-# dollar_united_states_dollar 
+# dollar_united_states_dollar
 # franc_belgian_franc #1865 #1873 #standart argent debut de partie
 # franc_french_franc #1803 #1873
 # franc_luxembourgish_franc #1865 #1873
 # franc_swiss_franc #1850 #1880 #standart argent debut de partie
 # gulden #1872 #standart argent debu de partie
 # gulden_bavarian_gulden #1871 or
-# gulden_florin #1816 #1873 
+# gulden_florin #1816 #1873
 # krone_danish_krone #1875 or
 # krone_norwegian_krone #1875 or
 # krone_swedish_krona #1873 or
 # leon_leu #1867 #1890
 # leon_lev #1881 #1890
-# lira #1865 #1880  
-# lira_ducato -> blocage argent 
+# lira #1865 #1880
+# lira_ducato -> blocage argent
 # lira_ottoman_lira #1844 #1900
-# lira_scudo_pontificio -> blocage argent 
-# lira_scudo_sardo -> blocage argent 
-# lira_toscane_lira -> blocage argent 
+# lira_scudo_pontificio -> blocage argent
+# lira_scudo_sardo -> blocage argent
+# lira_toscane_lira -> blocage argent
 # mark #1873 or
-# peso_argentine_peso #1881 #1899 
+# peso_argentine_peso #1881 #1899
 # peso_bolivien_peso #1874 #1898
 # peso_chilean_peso #1868 #1885
 # peso_colombian_peso #1870 #1880
@@ -6882,7 +6979,7 @@ is_valid_country_JAP_gold_standard = {
 # spe_peseta #1868 #1873
 # spe_ruble #1897 or #standart argent debut de partie
 # spe_yen #1871 #1897
-# spe_yuan -> blocage argent 
-# thaler_hannoveraner_thaler -> blocage argent 
-# thaler_prussian_thaler -> blocage argent 
-# thaler_saxon_thaler -> blocage argent 
+# spe_yuan -> blocage argent
+# thaler_hannoveraner_thaler -> blocage argent
+# thaler_prussian_thaler -> blocage argent
+# thaler_saxon_thaler -> blocage argent
