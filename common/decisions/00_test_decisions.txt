@@ -52,27 +52,36 @@ Test_event_1 = {
 		base = 0
     }
 
-	when_taken = { 
+	when_taken = {  
 
-		c:FRA = {
-			capital= {
-				save_scope_as = capital_state
+		every_scope_state = {
+			limit = {
+				has_modifier = central_bank_place 
 			}
-			save_scope_as = target_country
-			every_country = {
+			random_scope_building = {
 				limit = {
-					is_player = yes 
+					is_building_group = bg_bank
 				}
-				trigger_event = 00_ef_economic_event.96
-			}   
+				save_scope_as = central_bank_scope
+
+				owner = {
+					central_bank_modifier_fixed_var = yes
+				} 
+
+				remove_modifier = currency_demande
+				add_modifier = {
+					name = currency_demande
+					multiplier = target_demand_currency_for_modifier
+				}
+			}
 		}
+
 	}
 }
 
 Test_event_2 = {
 	is_shown = {
 		has_variable = openTestDecision_variable
-		
 	}
 
 	possible = {
@@ -82,30 +91,75 @@ Test_event_2 = {
 		base = 0
     }
 
-	when_taken = {   
-		
-		# every_country = { 
+
+	# company_Rothschild_Bank_gbr_gold_stockpile_fix
+
+	# company_Rothschild_Bank_gbr_silver_stockpile_fix
+
+
+	when_taken = {  
+		every_country = {
+			base_rate_change = yes
+		}
+		#buy_gulden_florin_currency_privat_bank = yes
+		# random_in_global_list = {
+		# 	variable = global_arbitrage_bank_variable_list_ordered #private bank
+		# 	save_scope_as = arbitrage_privat_bank
+
+		# }   
+		# every_scope_state = {
 		# 	if = {
 		# 		limit = {
-		# 			c:FRA ?= this
+		# 			has_modifier = central_bank_historic_place
+		# 			is_capital = yes
 		# 		}
-		# 		add_company = company_type:company_BanqueDeFrance
-		# 		add_company = company_type:company_Rothschild_Bank_fra
-		# 		add_company = company_type:company_basic_gold_and_silver_mining_2
-		# 		company:company_BanqueDeFrance = {
-		# 			set_company_establishment_date = 1830.1.1
-		# 			set_company_state_region = s:STATE_ILE_DE_FRANCE
-		# 		}
-		# 		company:company_Rothschild_Bank_fra = {
-		# 			set_company_establishment_date = 1830.1.1
-		# 			set_company_state_region = s:STATE_ILE_DE_FRANCE
-		# 		}
-		# 		company:company_basic_gold_and_silver_mining_2 = {
-		# 			set_company_establishment_date = 1830.1.1
-		# 			set_company_state_region = s:STATE_ILE_DE_FRANCE
-		# 		}
+		# 		save_scope_as = central_bank_site_seller
 		# 	}
+		# }
+
+		# set_variable = {
+		# 	name = gold_state_1_fix
+		# 	value = 100000000 #gold_gained
+		# }
+		# set_variable = {
+		# 	name = silver_state_1_fix
+		# 	value = 100000000 #silver_gained
 		# } 
+ 
+		# private_bank_arbitrage = yes
+
+		# #Country arbitrage
+		# scope:central_bank_site_seller = {
+		# 	change_variable = {
+		# 		name = gold_state_1
+		# 		subtract = owner.var:gold_state_1_fix 
+		# 	}
+		# 	change_variable = {
+		# 		name = silver_state_1
+		# 		add = owner.var:silver_state_1_fix
+		# 	}
+		# }
+
+		# #event: 
+		# root = {
+		# 	save_scope_as = target_country
+		# } 
+		# scope:arbitrage_privat_bank.owner = {
+		# 	save_scope_as = privat_bank_country 
+		# }
+		# scope:privat_bank_country = {
+		# 	capital= {
+		# 		save_scope_as = privat_bank_country_capital_state
+		# 	}  
+		# 	every_country = {
+		# 		if = {
+		# 			limit = {
+		# 				is_player = yes
+		# 			}
+		# 			trigger_event = 00_ef_economic_event.95
+		# 		}
+		# 	} 
+		# }    
 	}
 }
 
@@ -123,10 +177,9 @@ Test_event_3 = {
     }
 
 	when_taken = {
-		
-		set_variable = {
-			name = central_bank_bankruptcy
-			value = 0
+		change_variable = {
+			name = base_rate_percentage
+			add = -0.01
 		}
 	}
 }

@@ -24,10 +24,10 @@ ef_on_monthly_pulse_recurence = {
 	if  = {
 		limit = {
 			has_modifier = has_central_bank
-			market_owner_is_root = yes 
+			market_owner_is_root = yes
 			or = {
-				market_owner_is_root_univ_with_buiding = yes 
-				has_law = law_type:law_external_exchange_standard  
+				market_owner_is_root_univ_with_buiding = yes
+				has_law = law_type:law_external_exchange_standard
 			}
 			is_revolutionary = no #?
 		}
@@ -38,9 +38,9 @@ ef_on_monthly_pulse_recurence = {
 			has_modifier = has_central_bank
 			market_owner_is_root = no
 			or = {
-				bank_central_buiding_no_external_currency_consuption = yes  
+				bank_central_buiding_no_external_currency_consuption = yes
 				not = {
-					has_law = law_type:law_external_exchange_standard 
+					has_law = law_type:law_external_exchange_standard
 				}
 			}
 			is_revolutionary = no #?
@@ -213,6 +213,7 @@ central_bank_ef_on_monthly_pulse_country = {
 				}
 			}
 			currency_law_list = yes
+			global_arbitrage_bank_variable_list = yes
 			money_value_global_var = yes
 			median_currency_value = yes
 		}
@@ -223,7 +224,7 @@ central_bank_ef_on_monthly_pulse_country = {
 			has_modifier = global_monetary_reference
 		}
 		global_monetary_reference_global_var_fixe = yes
-	} 
+	}
 
  	# if = { #obcolète le pays otient la loi métalique quand il otient l'event avant çà rese en fiat ou no sys
 	# 	limit = {
@@ -260,6 +261,7 @@ central_bank_ef_on_monthly_pulse_country = {
 		limit = {
 			is_player = yes
 		}
+		monetary_policy_inflation_base_rate = yes
 		if = {
 			limit = {
 				or = {
@@ -276,8 +278,14 @@ central_bank_ef_on_monthly_pulse_country = {
 			limit = {
 				has_law = law_type:law_no_monetary_policy
 				or = {
-					var:monetary_policy_inflation > 0
-					var:monetary_policy_inflation < 0
+					var:monetary_policy_inflation < -1
+					var:monetary_policy_inflation > 1
+				}
+				NOT = { #pas de supression de l'inflation tant quel les modificateur sont là
+					or = {
+						has_modifier = rise_base_rate
+						has_modifier = down_base_rate
+					}
 				}
 			}
 			monetary_policy_inflation_reset = yes
@@ -286,14 +294,8 @@ central_bank_ef_on_monthly_pulse_country = {
 			limit = {
 				market_owner_is_root_4 = no
 				or = {
-					has_law = law_type:law_revaluation_25
-					has_law = law_type:law_revaluation_50
-					has_law = law_type:law_revaluation_75
-					has_law = law_type:law_revaluation_100
-					has_law = law_type:law_devaluation_25
-					has_law = law_type:law_devaluation_50
-					has_law = law_type:law_devaluation_75
-					has_law = law_type:law_devaluation_100
+					has_law = law_type:law_revaluation
+					has_law = law_type:law_devaluation
 				}
 			}
 			monetary_policy_inflation_reset_law = yes
@@ -335,6 +337,43 @@ central_bank_ef_on_monthly_pulse_country = {
 			revaluation_on = yes
 		}
 	}
+
+
+
+	#################################################
+	#Base rate d'arbitrage -> à mettre tout les mois
+	#################################################
+
+	if  = {
+		limit = {
+			has_modifier = rise_base_rate
+			market_owner_is_root = yes
+		}
+		privat_bank_buy_currency = yes
+	} 
+	# if  = {
+	# 	limit = {
+	# 		has_modifier = rise_base_rate
+	# 		market_owner_is_root = yes
+	# 	}
+	# 	privat_bank_buy_currency = yes
+	# }
+ 
+	if  = {
+		limit = {
+			has_modifier = revaluation_currency_target
+			market_owner_is_root = yes
+		}
+		privat_bank_buy_currency = yes
+	}
+	# if  = {
+	# 	limit = {
+	# 		has_modifier = devaluation_currency_target
+	# 		market_owner_is_root = yes
+	# 	}
+	# 	privat_bank_buy_currency = yes
+	# }
+
 }
 financial_center_ef_on_monthly_pulse_country = {
 	if  = {
@@ -412,7 +451,7 @@ central_bank_ef_on_half_yearly_pulse_country = {
 		}
 		ai_credit_at_central_bank = yes
 		ai_refund_central_bank = yes
-		ai_currency_deflation_inflation = yes
+		#ai_currency_deflation_inflation = yes
 	}
 	if  = {
 		limit  = {
@@ -434,6 +473,12 @@ central_bank_ef_on_half_yearly_pulse_country = {
 		fluctuations_silver_to_gold_rate_1_year = yes
 	}
 
+	if = {
+		limit = {
+			is_ai = yes
+		}
+		base_rate_change = yes
+	}
 	crisis_general_reset_count = yes
 }
 financial_center_ef_on_half_yearly_pulse_country = {
@@ -484,7 +529,7 @@ ef_on_yearly_pulse_recurence = {
 	#GDP var -> limité ? 100 premier pays uniquement
 	fluctuations_gdp_5_year = yes
 	fluctuations_gdp_10_year = yes
-	is_at_war_years_pulse = yes 
+	is_at_war_years_pulse = yes
 }
 ef_on_yearly_pulse_reset = {
 
@@ -659,6 +704,14 @@ central_bank_ef_on_yearly_pulse_country = {
 	central_bank_interest_refund_per_year_in_gold = yes
 	####
 
+	if = {
+		limit = {
+			market_owner_is_root = yes
+ 		}
+		investement_pool_borrowing = yes
+	}
+
+
 	if  = {
 		limit  = {
 			or  = {
@@ -706,7 +759,6 @@ central_bank_ef_on_yearly_pulse_country = {
 	}
 
 	#production_methods
-	investement_pool_borrowing = yes
 	central_bank_production_methods = yes
 	if = {
 		limit = {
@@ -772,6 +824,153 @@ central_bank_ef_on_yearly_pulse_country = {
 	currency_crisis_count_reset_condition = yes
 	central_bank_bankruptcy_count_reset_condition = yes
 	economic_crisis_count_reset_condition = yes
+
+
+
+	#################################################
+	#Base rate d'arbitrage -> à mettre tout les mois
+	#################################################
+
+	#################################################
+	#bimetalism arbitrage
+	#################################################
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		}
+
+		#gold_drain
+		if = {
+			limit = {
+				gold_to_silver_rate > bimetallic_rate_gold_to_silver
+				misalignment_rate_gold_drain >= 0.05
+			}
+
+			random_in_global_list = {
+				variable = global_arbitrage_bank_variable_list_ordered #private bank
+				save_scope_as = arbitrage_privat_bank
+
+			}
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					save_scope_as = central_bank_site_seller
+				}
+			}
+
+			set_variable = {
+				name = gold_state_1_fix
+				value = gold_lost
+			}
+			set_variable = {
+				name = silver_state_1_fix
+				value = silver_gained
+			}
+
+			private_bank_arbitrage_gold_drain = yes
+
+			#Country arbitrage
+			scope:central_bank_site_seller = {
+				change_variable = {
+					name = gold_state_1
+					subtract = owner.var:gold_state_1_fix
+
+				}
+				change_variable = {
+					name = silver_state_1
+					add = owner.var:silver_state_1_fix
+				}
+			}
+
+			#event:
+			root = {
+				save_scope_as = target_country
+			}
+			scope:arbitrage_privat_bank.owner = {
+				save_scope_as = privat_bank_country
+			}
+			scope:privat_bank_country = {
+				capital= {
+					save_scope_as = privat_bank_country_capital_state
+				}
+				if = {
+					limit = {
+						root = {
+							is_player = yes
+						}
+					}
+					trigger_event = 00_ef_economic_event.95
+				}
+			}
+		}
+		#silver_drain
+		if = {
+			limit = {
+				gold_to_silver_rate < bimetallic_rate_gold_to_silver
+				misalignment_rate_silver_drain >= 0.05
+			}
+			random_in_global_list = {
+				variable = global_arbitrage_bank_variable_list_ordered #private bank
+				save_scope_as = arbitrage_privat_bank
+			}
+			every_scope_state = {
+				if = {
+					limit = {
+						has_modifier = central_bank_historic_place
+						is_capital = yes
+					}
+					save_scope_as = central_bank_site_seller
+				}
+			}
+
+			set_variable = {
+				name = gold_state_1_fix
+				value = gold_gained
+			}
+			set_variable = {
+				name = silver_state_1_fix
+				value = silver_lost
+			}
+
+			private_bank_arbitrage_silver_drain = yes
+
+			#Country arbitrage
+			scope:central_bank_site_seller = {
+				change_variable = {
+					name = gold_state_1
+					add = owner.var:gold_state_1_fix
+				}
+				change_variable = {
+					name = silver_state_1
+					subtract = owner.var:silver_state_1_fix
+				}
+			}
+
+			#event:
+			root = {
+				save_scope_as = target_country
+			}
+			scope:arbitrage_privat_bank.owner = {
+				save_scope_as = privat_bank_country
+			}
+			scope:privat_bank_country = {
+				capital= {
+					save_scope_as = privat_bank_country_capital_state
+				}
+				if = {
+					limit = {
+						root = {
+							is_player = yes
+						}
+					}
+					trigger_event = 00_ef_economic_event.96
+				}
+			}
+		}
+	}
 }
 financial_center_ef_on_yearly_pulse_country = {
 	private_ownership_production_stocks = yes
@@ -783,93 +982,93 @@ financial_center_ef_on_yearly_pulse_country = {
 }
 
 ef_on_yearly_pulse_event_at_date = {
-	
+
 	##################
 	#country unification
-	################## 
+	##################
 	#Unification monétaire dans la confedaration d'allemagne du nord
 	if = { #à verifier
 		limit = {
-			c:NGF ?= this 
+			c:NGF ?= this
 			not  = {
 				has_global_variable = 00_ef_economic_event_5
-			} 
+			}
 		}
 		C:NGF = {
 			capital= {
 				save_scope_as = capital_state
 			}
 			save_scope_as = target_country
-		
+
 			set_global_variable = 00_ef_economic_event_5
 
 			every_country = {
 				limit = {
-					is_player = yes 
-				}		 
-				trigger_event = 00_ef_economic_event.5 
-			} 
+					is_player = yes
+				}
+				trigger_event = 00_ef_economic_event.5
+			}
 		}
 	}
 	#Unification monétaire fianal de l'empire allemand
 	if = { #à verifier
 		limit = {
-			c:GER ?= this 
+			c:GER ?= this
 			not  = {
 				has_global_variable = 00_ef_economic_event_6
-			} 
+			}
 		}
 		C:GER = {
 			capital= {
 				save_scope_as = capital_state
 			}
 			save_scope_as = target_country
-		
+
 			set_global_variable = 00_ef_economic_event_6
 
 			every_country = {
 				limit = {
-					is_player = yes 
-				}		 
+					is_player = yes
+				}
 				trigger_event = 00_ef_economic_event.6
-			} 
+			}
 		}
 	}
 	#Unification monétaire fianal du royaume d'italie
 	if = { #à verifier
 		limit = {
-			c:ITA ?= this 
+			c:ITA ?= this
 			not  = {
 				has_global_variable = 00_ef_economic_event_7
-			} 
+			}
 		}
 		C:ITA = {
 			capital= {
 				save_scope_as = capital_state
 			}
 			save_scope_as = target_country
-		
+
 			set_global_variable = 00_ef_economic_event_7
 
 			every_country = {
 				limit = {
-					is_player = yes 
-				}		 
+					is_player = yes
+				}
 				trigger_event = 00_ef_economic_event.7
-			} 
+			}
 		}
-	} 
+	}
 
 	##################
 	#silver_crisis
-	##################  
+	##################
 	if = {
 		limit = {
 			c:USA ?= this
 			game_date >= 1873.1.1
 			not  = {
 				has_global_variable = 00_ef_economic_event_6
-			} 
+			}
 			any_country = {
 				limit = {
 					is_player = yes
@@ -919,10 +1118,10 @@ ef_on_yearly_pulse_event_at_date = {
 			C:GER ?= {
 				if = { #à verifier
 					limit = {
-						c:NGF ?= this 
+						c:NGF ?= this
 						not  = {
 							has_variable = 00_ef_economic_event_57
-						} 
+						}
 					}
 					capital= {
 						save_scope_as = capital_state
@@ -952,7 +1151,7 @@ ef_on_yearly_pulse_event_at_date = {
 					c:GER.var:german_silver_dumping = 1
 					not  = {
 						has_global_variable = 00_ef_economic_event_58
-					} 
+					}
 				}
 
 				every_country = {
@@ -990,11 +1189,11 @@ ef_on_yearly_pulse_event_at_date = {
 			#1 event -> découverte de mine d'argent gigantesque dans le nevada -> 3% production mondial
 			if = {
 				limit = {
-					game_date > 1878.1.1 
+					game_date > 1878.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_1
-					} 
-				} 
+					}
+				}
 				set_global_variable = 00_ef_economic_event_59_1
 				every_country = {
 					limit = {
@@ -1031,7 +1230,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1880.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_2
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_2
 				every_country = {
@@ -1068,7 +1267,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1882.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_3
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_3
 				every_country = {
@@ -1105,7 +1304,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1884.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_4
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_4
 				every_country = {
@@ -1144,7 +1343,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date >= 1886.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_60
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_60
 				capital= {
@@ -1179,7 +1378,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date >= 1888.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_61
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_61
 				capital= {
@@ -1209,7 +1408,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1887.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_5
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_5
 				every_country = {
@@ -1246,7 +1445,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1888.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_6
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_6
 				every_country = {
@@ -1283,7 +1482,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1889.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_7
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_7
 				every_country = {
@@ -1320,7 +1519,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1890.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_8
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_8
 				every_country = {
@@ -1357,7 +1556,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1891.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_9
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_9
 				every_country = {
@@ -1394,7 +1593,7 @@ ef_on_yearly_pulse_event_at_date = {
 					game_date > 1892.1.1
 					not  = {
 						has_global_variable = 00_ef_economic_event_59_10
-					} 
+					}
 				}
 				set_global_variable = 00_ef_economic_event_59_10
 				every_country = {
@@ -1436,7 +1635,7 @@ ef_on_yearly_pulse_event_at_date = {
 						game_date > 1892.1.1
 						not  = {
 							has_global_variable = 00_ef_economic_event_62
-						} 
+						}
 					}
 					set_global_variable = 00_ef_economic_event_62
 					capital= {
@@ -1473,7 +1672,7 @@ ef_on_yearly_pulse_event_at_date = {
 						game_date > 1893.1.1
 						not  = {
 							has_global_variable = 00_ef_economic_event_64
-						} 
+						}
 					}
 					set_global_variable = 00_ef_economic_event_64
 					capital= {
@@ -1516,7 +1715,7 @@ ef_on_yearly_pulse_event_at_date = {
 						game_date > 1894.1.1
 						not  = {
 							has_global_variable = 00_ef_economic_event_65
-						} 
+						}
 					}
 					set_global_variable = 00_ef_economic_event_65
 					capital= {
@@ -1552,7 +1751,7 @@ ef_on_yearly_pulse_event_at_date = {
 						game_date > 1895.1.1
 						not  = {
 							has_global_variable = 00_ef_economic_event_63
-						} 
+						}
 					}
 					set_global_variable = 00_ef_economic_event_63
 					capital= {
@@ -1659,151 +1858,8 @@ ef_on_yearly_pulse_event_at_date = {
 	}
 
 	#Note silver criissi:
-	#- Pendant la crise les ays prenne un malus de 50% d'investissment par les bank privé si en silver et 25% si en bimetalisme sur le ratio de base		
-		
-	##################
-	#Bimetalisme arbitrage
-	##################   
-	if = {
-		limit = {
-			has_law = law_type:law_bimetallism_standard
-		}
-		#serie de loi pour la parité or argent qui doit etre passer comme les autre loi
+	#- Pendant la crise les ays prenne un malus de 50% d'investissment par les bank privé si en silver et 25% si en bimetalisme sur le ratio de base
 
-		#arbitrage du bimétallisme
-		#gold_drain
-		if = {
-			# gold_to_silver_rate {or international à 15}
-			# bimetallic_rate_gold_to_silver {or local fixé à 13}
-			# -> or local moins chère qu el'or intranational
-			# -> vente d'argent contre de l'or et revent de cette or à l'étranger
-
-			limit = {
-				gold_to_silver_rate > bimetallic_rate_gold_to_silver
-				misalignment_rate_gold_drain >= 0.05
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = central_bank_historic_place
-						is_capital = yes
-					}
-					save_scope_as = central_bank_site_seller
-				}
-			}
-			#arbitrage
-			scope:central_bank_site_seller = {
-				change_variable = {
-					name = gold_state_1
-					subtract = owner.gold_lost
-
-				}
-				change_variable = {
-					name = silver_state_1
-					add = owner.silver_gained
-				}
-			}
-
-			capital= {
-				save_scope_as = capital_state
-			}
-			save_scope_as = target_country
-
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_1
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_2
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_3
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_4
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_5
-			}
-
-			if = {
-				limit = {
-					is_player = yes
-				}
-				trigger_event = 00_ef_economic_event.95
-			}
-		}
-		#silver_drain
-		if = {
-			# gold_to_silver_rate {or international à 13}
-			# bimetallic_rate_gold_to_silver {or local fixé à 15}
-			# -> or local plus chère qu el'or intranational
-			# -> vente d'or contre de l'argent et revent de cette argent à l'étranger
-
-			limit = {
-				gold_to_silver_rate < bimetallic_rate_gold_to_silver
-				misalignment_rate_silver_drain >= 0.05
-			}
-			every_scope_state = {
-				if = {
-					limit = {
-						has_modifier = central_bank_historic_place
-						is_capital = yes
-					}
-					save_scope_as = central_bank_site_seller
-				}
-			}
-			#arbitrage
-			scope:central_bank_site_seller = {
-				change_variable = {
-					name = gold_state_1
-					add = owner.gold_gained
-
-				}
-				change_variable = {
-					name = silver_state_1
-					subtract = owner.silver_lost
-				}
-			}
-
-			capital= {
-				save_scope_as = capital_state
-			}
-			save_scope_as = target_country
-
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_1
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_2
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_3
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_4
-			}
-			random_in_list = {
-				variable = privat_bank_variable_list_ordered
-				save_scope_as = arbitrage_privat_bank_5
-			}
-
-			if = {
-				limit = {
-					is_player = yes
-				}
-				trigger_event = 00_ef_economic_event.96
-			}
-		}
-	}
 
 	#Note Bimetalisme arbitrage :
 	# - dans le JE de la jestion de la currency faire des event qui entraine les groupe politique à aller chercher du 20/1 ou du 10:1 en fonction du taux mondiale
@@ -1811,29 +1867,29 @@ ef_on_yearly_pulse_event_at_date = {
 
 	##################
 	#Divers
-	##################    
-	# every_country = {  
+	##################
+	# every_country = {
 	# 	if = {
 	# 		limit = {
 	# 			national_debt_compared_gdp > 2
 	# 			# not  = {
 	# 			# 	has_global_variable = 00_ef_economic_event_65
-	# 			# } 
+	# 			# }
 	# 		}
 	# 		#set_global_variable = 00_ef_economic_event_65
 	# 		capital= {
 	# 			save_scope_as = capital_state
 	# 		}
 
-	# 		save_scope_as = target_country 
+	# 		save_scope_as = target_country
 	# 		every_country = {
 	# 			limit = {
 	# 				is_player = yes
 	# 			}
 	# 			trigger_event = 00_ef_economic_event.37
-	# 		} 
+	# 		}
 	# 	}
-	# } 
+	# }
 
 
 
@@ -18161,25 +18217,25 @@ silver_crisis_progress = {
 		}
 	}
 }
- 
-law_no_monetary_system_with_tech_currency_standards = { 
-	if = { 
+
+law_no_monetary_system_with_tech_currency_standards = {
+	if = {
 		#- mesure de régulation pour etre sure que tout les pays ayant la tech currency_standards,
 		#et pas encore de bc soit dans la loi fiat standart qui permet l'introduction
 		#- quleque soit le pb quand une nouvelle curency doit apparaitre le pays doit toujours etre revenue en fiat standart
 		limit = {
 			has_law = law_type:law_no_monetary_system
-			has_technology_researched = currency_standards   
-			#has_technology_researched = central_banking  
-			
+			has_technology_researched = currency_standards
+			#has_technology_researched = central_banking
+
 			or = {
 				has_law = law_type:law_isolationism
 				not = {
-					has_modifier = has_central_bank  
-				} 
+					has_modifier = has_central_bank
+				}
 			}
  		}
 		activate_law = law_type:law_fiat_standard
 		#central_bank_production_methods = yes #logiqument pas de bank
-	} 
-} 
+	}
+}

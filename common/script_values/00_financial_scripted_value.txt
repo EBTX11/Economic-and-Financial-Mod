@@ -19,23 +19,32 @@ building_urban_center_lvl = {
 
 building_urban_center_lvl_by_base_rate = {
 	value = building_urban_center_lvl
-	multiply = {
-		value = {
-		 	add = 10
-		 	subtract = owner.base_rate_percentage_decimal
-		}
-		divide = 9
-	}
+	multiply = base_rate_to_pcs_factor
+	# multiply = {
+	# 	value = {
+	# 	 	add = 10
+	# 	 	subtract = owner.base_rate_percentage_decimal
+	# 	}
+	# 	divide = 9
+	# }
 	max = building_urban_center_lvl
 	min = 1
 	round = yes
 }
 
-base_rate_for_je_max_construction_lvl = {
-	value = 10
-	subtract = base_rate_percentage_decimal
-	multiply = 10
-}
+base_rate_to_pcs_factor = {
+    # (base_rate - 0.01) / 0.11
+    value = var:base_rate_percentage
+    subtract = 0.01
+    divide = 0.11          # 12% - 1%
+
+    # factor = 1 - result
+    multiply = -1
+    add = 1
+
+    min = 0
+    max = 1
+} 
 
 building_ef_private_construction_max_level_var = {
 	value = var:gdp_view_fc
@@ -3086,6 +3095,12 @@ bond_price_in_gold = {
 	value = bond_price 
 	if = {
 		limit = {
+			has_law = law_type:law_gold_standard
+		}
+		multiply = money_value
+	}
+	if = {
+		limit = {
 			has_law = law_type:law_silver_standard
 		}
 		multiply = money_value_silver_standard_in_gold
@@ -4873,32 +4888,85 @@ sell_ironclads_in_gold_market_panel = {
 ###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
-price_bond = {
-	value = player.var:bond_quantity
-	multiply = bond_price
-}
-price_bond_in_currency = {
-	value = player.var:bond_quantity
-	multiply = bond_price
-
+price_bond = { 
+	value = 0
+	if = {
+		limit = {
+			player.var:bond_in_on = 0
+		}
+		value = player.var:bond_quantity
+		multiply = price_bond_in_buyer_currency #bond_price_in_gold #bond_price
+	} 
 	if = {
 		limit = {
 			player.var:bond_in_on = 1
 		}
-		divide = money_value
-	}
+		value = price_bond_in_currency_converti
+	} 
+}  
+price_bond_in_gold = {
+	value = player.var:bond_quantity
+	multiply = bond_price_in_gold #bond_price
+} 
+gold_to_currency_rate = { #for gold
+    value = 1
+    divide = player.money_value_in_gold
+} 
+price_bond_in_buyer_currency = { #for gold
+	value = bond_price_in_gold #price_bond 
+	multiply = gold_to_currency_rate
+} 
+price_bond_in_currency = { #for market owner currency
+	value = player.var:bond_quantity
+	multiply = bond_price 
+}  
+price_bond_in_currency_converti = { #for market owner currency
+	value = price_bond_in_currency
+	multiply = exchange_rate_for_international_trade_buy_for_target_market_panel
+}  
+ 
+bond_final_interest_in_currency_5Y = {
+	value = price_bond
+	multiply = interest_value_5Y
+	multiply = 5
+}  
+bond_final_interest_5Y = {
+	value = bond_final_interest_in_currency_5Y 
 }
-price_bond_in_currency_for_gui = {
-	value = scope:buyer.var:bond_quantity
-	multiply = bond_price
+bond_monthly_interest_5Y = {
+	value = bond_final_interest_5Y
+	divide = 60
+}
+bond_weekly_interest_5Y = {
+	value = bond_monthly_interest_5Y
+	divide = 4
+}
+total_at_term_5Y = {
+	value = bond_final_interest_5Y
+	add = price_bond
+}
 
-	if = {
-		limit = {
-			scope:buyer.var:bond_in_on = 1
-		}
-		divide = money_value
-	}
+bond_final_interest_in_currency_10Y = {
+	value = price_bond
+	multiply = interest_value_10Y
+	multiply = 5
+}  
+bond_final_interest_10Y = {
+	value = bond_final_interest_in_currency_10Y 
 }
+bond_monthly_interest_10Y = {
+	value = bond_final_interest_10Y
+	divide = 120 #60
+}
+bond_weekly_interest_10Y = {
+	value = bond_monthly_interest_10Y
+	divide = 4
+}
+total_at_term_10Y = {
+	value = bond_final_interest_10Y
+	add = price_bond
+} 
+
 enough_foreign_currrency = {
  	value = 0
 	market.owner = {
@@ -6518,42 +6586,121 @@ enough_foreign_currrency = {
 			}
 		}
 	}
-}
-bond_final_interest_5Y = {
-	value = price_bond
-	multiply = interest_value_5Y
-	multiply = 5
-}
-bond_monthly_interest_5Y = {
-	value = bond_final_interest_5Y
-	divide = 60
-}
-bond_weekly_interest_5Y = {
-	value = bond_monthly_interest_5Y
-	divide = 4
-}
-total_at_term_5Y = {
-	value = bond_final_interest_5Y
-	add = price_bond
-}
-bond_final_interest_10Y = {
-	value = price_bond
-	multiply = interest_value_10Y
-	multiply = 10
-}
-bond_monthly_interest_10Y = {
-	value = bond_final_interest_10Y
-	divide = 120
-}
-bond_weekly_interest_10Y = {
-	value = bond_monthly_interest_10Y
-	divide = 4
-}
-total_at_term_10Y = {
-	value = bond_final_interest_10Y
-	add = price_bond
-}
+} 
+ 
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+#scripter gui pas pour l'affichage 
 
+price_bond_gui = { 
+	value = 0
+	if = {
+		limit = {
+			scope:buyer.var:bond_in_on = 0
+		}
+		value = scope:buyer.var:bond_quantity
+		multiply = price_bond_in_buyer_currency_gui 
+	} 
+	if = {
+		limit = {
+			scope:buyer.var:bond_in_on = 1
+		}
+		value = price_bond_in_currency_converti_gui
+	} 
+}  
+price_bond_in_gold_gui = {
+	value = scope:buyer.var:bond_quantity
+	multiply = bond_price_in_gold 
+} 
+gold_to_currency_rate_gui = { #for gold
+    value = 1
+    divide = scope:buyer.money_value_in_gold
+} 
+price_bond_in_buyer_currency_gui = { #for gold
+	value = bond_price_in_gold 
+	multiply = gold_to_currency_rate_gui
+} 
+price_bond_in_currency_gui = { #for market owner currency
+	value = scope:buyer.var:bond_quantity
+	multiply = bond_price
+}  
+price_bond_in_currency_converti_gui = { #for market owner currency
+	value = price_bond_in_currency_gui
+	multiply = exchange_rate_for_international_trade_buy_for_target_market_panel_gui
+}  
+ 
+bond_final_interest_in_currency_gui = {
+	value = price_bond_gui 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 1 
+		}
+		multiply = interest_value_5Y
+		multiply = 5
+	} 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 0 
+		}
+		multiply = interest_value_10Y
+		multiply = 10
+	}   
+}   
+interest_purchasing_gui = {
+	value = 0 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 1 
+		}
+		add = interest_value_5Y 
+	} 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 0 
+		}
+		add = interest_value_10Y 
+	}   
+}   
+total_at_term_gui = {
+	value = bond_final_interest_in_currency_gui
+	add = price_bond_gui
+}
+bond_monthly_interest_gui = {
+	value = bond_final_interest_in_currency_gui
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 1 
+		}
+		divide = 60
+	} 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 0 
+		}
+		divide = 120
+	}   
+}
+bond_weekly_interest_gui = {
+	value = bond_monthly_interest_gui
+	divide = 4
+}
+maturity_time_gui = {
+	value = 0 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 1 
+		}
+		add = 5
+	} 
+	if = {
+		limit = {
+			scope:buyer.var:trade_bond_var = 0 
+		}
+		add = 10
+	}  
+}  
+  
+###########################################################################################################################################################################################
 ###########################################################################################################################################################################################
 
 selle_bond_maturity_yers_1_reverse = {
@@ -7294,6 +7441,8 @@ central_bank_interest_refund_per_year = {
 	add = ai_entral_bank_debt_privat_bank_interest_refund_per_year_8
 	add = ai_entral_bank_debt_privat_bank_interest_refund_per_year_9
 	add = ai_entral_bank_debt_privat_bank_interest_refund_per_year_10
+
+	#player oublié 
 }
 gold_loaned_to_central_bank_no_interest = { #for gui only
 	value = 0
@@ -7319,6 +7468,8 @@ gold_loaned_to_central_bank_no_interest = { #for gui only
 	add = ai_central_bank_debt_privat_bank_gold_loaned_8
 	add = ai_central_bank_debt_privat_bank_gold_loaned_9
 	add = ai_central_bank_debt_privat_bank_gold_loaned_10
+
+	#player oublié
 }
 
 #gold
@@ -7328,9 +7479,9 @@ ai_central_bank_gold_loaned_1 = {
 		add = var:ai_total_bond_value_1
 		if  = {
 			limit  = {
-				var:total_bond_value_1 > 0
+				var:total_bond_value_in_gold_1 > 0
 			}
-			add = var:total_bond_value_1
+			add = var:total_bond_value_in_gold_1
 		}
 	}
 }
@@ -7340,9 +7491,9 @@ ai_central_bank_gold_loaned_2 = {
 		add = var:ai_total_bond_value_2
 		if  = {
 			limit  = {
-				var:total_bond_value_2 > 0
+				var:total_bond_value_in_gold_2 > 0
 			}
-			add = var:total_bond_value_2
+			add = var:total_bond_value_in_gold_2
 		}
 	}
 }
@@ -7352,9 +7503,9 @@ ai_central_bank_gold_loaned_3 = {
 		add = var:ai_total_bond_value_3
 		if  = {
 			limit  = {
-				var:total_bond_value_3 > 0
+				var:total_bond_value_in_gold_3 > 0
 			}
-			add = var:total_bond_value_3
+			add = var:total_bond_value_in_gold_3
 		}
 	}
 }
@@ -7364,9 +7515,9 @@ ai_central_bank_gold_loaned_4 = {
 		add = var:ai_total_bond_value_4
 		if  = {
 			limit  = {
-				var:total_bond_value_4 > 0
+				var:total_bond_value_in_gold_4 > 0
 			}
-			add = var:total_bond_value_4
+			add = var:total_bond_value_in_gold_4
 		}
 	}
 }
@@ -7376,9 +7527,9 @@ ai_central_bank_gold_loaned_5 = {
 		add = var:ai_total_bond_value_5
 		if  = {
 			limit  = {
-				var:total_bond_value_5 > 0
+				var:total_bond_value_in_gold_5 > 0
 			}
-			add = var:total_bond_value_5
+			add = var:total_bond_value_in_gold_5
 		}
 	}
 }
@@ -7388,9 +7539,9 @@ ai_central_bank_gold_loaned_6 = {
 		add = var:ai_total_bond_value_6
 		if  = {
 			limit  = {
-				var:total_bond_value_6 > 0
+				var:total_bond_value_in_gold_6 > 0
 			}
-			add = var:total_bond_value_6
+			add = var:total_bond_value_in_gold_6
 		}
 	}
 }
@@ -7400,9 +7551,9 @@ ai_central_bank_gold_loaned_7 = {
 		add = var:ai_total_bond_value_7
 		if  = {
 			limit  = {
-				var:total_bond_value_7 > 0
+				var:total_bond_value_in_gold_7 > 0
 			}
-			add = var:total_bond_value_7
+			add = var:total_bond_value_in_gold_7
 		}
 	}
 }
@@ -7412,9 +7563,9 @@ ai_central_bank_gold_loaned_8 = {
 		add = var:ai_total_bond_value_8
 		if  = {
 			limit  = {
-				var:total_bond_value_8 > 0
+				var:total_bond_value_in_gold_8 > 0
 			}
-			add = var:total_bond_value_8
+			add = var:total_bond_value_in_gold_8
 		}
 	}
 }
@@ -7424,9 +7575,9 @@ ai_central_bank_gold_loaned_9 = {
 		add = var:ai_total_bond_value_9
 		if  = {
 			limit  = {
-				var:total_bond_value_9 > 0
+				var:total_bond_value_in_gold_9 > 0
 			}
-			add = var:total_bond_value_9
+			add = var:total_bond_value_in_gold_9
 		}
 	}
 }
@@ -7436,9 +7587,9 @@ ai_central_bank_gold_loaned_10 = {
 		add = var:ai_total_bond_value_10
 		if  = {
 			limit  = {
-				var:total_bond_value_10 > 0
+				var:total_bond_value_in_gold_10 > 0
 			}
-			add = var:total_bond_value_10
+			add = var:total_bond_value_in_gold_1O
 		}
 	}
 }
@@ -7720,7 +7871,17 @@ ai_central_bank_debt_privat_bank_gold_loaned_25 = {
 
 
 #private bank interest
-
+ai_privat_bank_total_interest_gui = {
+	value = 0 
+	if = {
+		limit = {
+			ai_privat_bank_total_interest > 0
+			private_bank_funds_prevision_interest < private_bank_funds_limit
+			effective_pool_growth > 0
+		}
+		add = ai_privat_bank_total_interest
+	}
+}
 ai_privat_bank_total_interest = {
 	value = 0
 	add = var:ai_privat_bank_interest_calculated_1	
@@ -60309,6 +60470,7 @@ ai_interest_per_month = {
 interest_per_month_from_foreign_debt_investment = {
 	value = 0
 
+	#quand c'est le joueur
 	add = var:interest_per_month_calculated_1
 	add = var:interest_per_month_calculated_2
 	add = var:interest_per_month_calculated_3
@@ -60320,6 +60482,7 @@ interest_per_month_from_foreign_debt_investment = {
 	add = var:interest_per_month_calculated_9
 	add = var:interest_per_month_calculated_10
 
+	#quand c'est le payus AI qui fait les pret
 	add = var:ai_interest_per_month_calculated_1
 	add = var:ai_interest_per_month_calculated_2
 	add = var:ai_interest_per_month_calculated_3
@@ -60333,7 +60496,7 @@ interest_per_month_from_foreign_debt_investment = {
 
 	multiply = 0.25 #week
 	#multiply = inflation
-	max = 1000000000  #nécessaire  car certtain  pays avvec  des  taux  délirantt  prodduise  une  sur prodducttion  de mettal  en  fin  dde  parti
+	#max = 1000000000  #nécessaire  car certtain  pays avvec  des  taux  délirantt  prodduise  une  sur prodducttion  de mettal  en  fin  dde  parti
 }
 
 quantite_de_bon_pour_payer_toute_la_dette = {
