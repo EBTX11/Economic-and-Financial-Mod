@@ -338,42 +338,62 @@ central_bank_ef_on_monthly_pulse_country = {
 		}
 	}
 
-
-
 	#################################################
-	#Base rate d'arbitrage -> à mettre tout les mois
+	#Arbitrage: Base rate d'arbi -> à mettre tout les mois
 	#################################################
-
+ 
 	if  = {
 		limit = {
 			has_modifier = rise_base_rate
-			market_owner_is_root = yes
-		}
+			market_owner_is_root = yes 
+			OR = {
+				# Cas 1 : le pays n'a NI bimetallisme NI silver standard → passe toujours
+				AND = {
+					NOT = { has_law = law_type:law_bimetallism_standard }
+					NOT = { has_law = law_type:law_silver_standard }
+				}
+
+				# Cas 2 : le pays a l'un des deux standards → passe seulement avant 1873
+				AND = {
+					OR = {
+						has_law = law_type:law_bimetallism_standard
+						has_law = law_type:law_silver_standard
+					}
+					game_date < 1873.1.1
+				}
+			}
+		} 
+		set_variable = rise_base_rate
 		privat_bank_buy_currency = yes
 	} 
-	# if  = {
-	# 	limit = {
-	# 		has_modifier = rise_base_rate
-	# 		market_owner_is_root = yes
-	# 	}
-	# 	privat_bank_buy_currency = yes
-	# }
- 
 	if  = {
+		limit = {
+			has_modifier = down_base_rate
+			market_owner_is_root = yes
+		}
+		set_variable = down_base_rate
+		privat_bank_sell_currency = yes 
+	}
+ 
+	#################################################
+	#Arbitrage: Base rate d'arbi -> à mettre tout les mois
+	#################################################
+
+	if  = { #vente de la currency pour obtenir du metal puisque otient plus de metal
 		limit = {
 			has_modifier = revaluation_currency_target
 			market_owner_is_root = yes
 		}
-		privat_bank_buy_currency = yes
+		set_variable = revaluation_currency_target
+		privat_bank_sell_currency = yes 
 	}
-	# if  = {
+	# if  = { #legere vente pour retirer de l'exposition -> infime donc non
 	# 	limit = {
 	# 		has_modifier = devaluation_currency_target
 	# 		market_owner_is_root = yes
 	# 	}
 	# 	privat_bank_buy_currency = yes
-	# }
-
+	# } 
 }
 financial_center_ef_on_monthly_pulse_country = {
 	if  = {
@@ -824,19 +844,15 @@ central_bank_ef_on_yearly_pulse_country = {
 	currency_crisis_count_reset_condition = yes
 	central_bank_bankruptcy_count_reset_condition = yes
 	economic_crisis_count_reset_condition = yes
-
-
-
-	#################################################
-	#Base rate d'arbitrage -> à mettre tout les mois
-	#################################################
+ 
 
 	#################################################
-	#bimetalism arbitrage
+	#Arbitrage: bimetalism arbi pre 1873
 	#################################################
 	if = {
 		limit = {
-			has_law = law_type:law_bimetallism_standard
+			game_date < 1873.1.1
+			has_law = law_type:law_bimetallism_standard 
 		}
 
 		#gold_drain
@@ -971,6 +987,40 @@ central_bank_ef_on_yearly_pulse_country = {
 			}
 		}
 	}
+	
+	#################################################
+	#Arbitrage: post 1873 - Attaque systematique sur silver et bimetalisme
+	#################################################
+
+	if = {
+		limit = {
+			game_date > 1873.1.1
+			or = {
+				has_law = law_type:law_bimetallism_standard 
+				has_law = law_type:law_silver_standard 
+			}
+		}
+		set_variable = attack_on_currency
+		privat_bank_sell_currency = yes  
+	} 
+
+	#################################################
+	#Arbitrage sur la money de référence
+	#################################################
+
+	if  = { 
+		limit = {
+			has_modifier = global_monetary_reference 
+		}
+		set_variable = global_monetary_reference_arbitrage
+		privat_bank_buy_currency = yes 
+	} 
+	
+	#################################################
+	#Attack sur la currency
+	#################################################
+ 
+
 }
 financial_center_ef_on_yearly_pulse_country = {
 	private_ownership_production_stocks = yes
@@ -1067,16 +1117,16 @@ ef_on_yearly_pulse_event_at_date = {
 			c:USA ?= this
 			game_date >= 1873.1.1
 			not  = {
-				has_global_variable = 00_ef_economic_event_6
+				has_global_variable = 00_ef_economic_event_56
 			}
-			any_country = {
-				limit = {
-					is_player = yes
-				}
-				not = {
-					has_journal_entry = silver_crisis_je_1
-				}
-			}
+			# any_country = {
+			# 	limit = {
+			# 		is_player = yes
+			# 	}
+			# 	not = {
+			# 		has_journal_entry = silver_crisis_je_1
+			# 	}
+			# }
 		}
 		C:USA = {
 			capital= {
@@ -1084,7 +1134,7 @@ ef_on_yearly_pulse_event_at_date = {
 			}
 			save_scope_as = target_country
 
-			set_global_variable = 00_ef_economic_event_6
+			set_global_variable = 00_ef_economic_event_56
 
 			every_country = {
 				limit = {
@@ -1095,7 +1145,7 @@ ef_on_yearly_pulse_event_at_date = {
 				}
 				trigger_event = 00_ef_economic_event.56
 			}
-			set_variable = {
+			set_global_variable = {
 				name = usa_coinage_act_1873
 				value = 1
 			}
@@ -1104,7 +1154,7 @@ ef_on_yearly_pulse_event_at_date = {
 	if  = {
 		limit  = {
 			global_country_ranking = 1
-			c:USA.var:usa_coinage_act_1873 = 1
+			global_var:usa_coinage_act_1873 = 1
 		}
 		#le premier pays mondiale va déclancher toutles evenement de la crise et le joueur et prevenu sur le ta si silver et bimeta
 		#toute les attaque du silver doive etre global et donc pas desn l'evenement qui triger que si le joeuru jour!
@@ -1136,10 +1186,10 @@ ef_on_yearly_pulse_event_at_date = {
 						}
 						trigger_event = 00_ef_economic_event.57
 					}
-					set_variable = {
+					set_global_variable = {
 						name = german_silver_dumping
 						value = 1
-					}
+					} 
 					#changer pour l gold standart si pas deja en vigeur
 				}
 			}
@@ -1147,7 +1197,7 @@ ef_on_yearly_pulse_event_at_date = {
  			#1 Silver Price Collapse of "Game date" -> un event de perte de X% de la valeur de l'arent// à l'or
  			if = {
 				limit = {
-					c:USA.var:usa_coinage_act_1873 = 1
+					global_var:usa_coinage_act_1873 = 1
 					c:GER.var:german_silver_dumping = 1
 					not  = {
 						has_global_variable = 00_ef_economic_event_58
@@ -18222,7 +18272,7 @@ law_no_monetary_system_with_tech_currency_standards = {
 	if = {
 		#- mesure de régulation pour etre sure que tout les pays ayant la tech currency_standards,
 		#et pas encore de bc soit dans la loi fiat standart qui permet l'introduction
-		#- quleque soit le pb quand une nouvelle curency doit apparaitre le pays doit toujours etre revenue en fiat standart
+		#- quleque soit le pb quand une nouvelle currency doit apparaitre le pays doit toujours etre revenue en fiat standart
 		limit = {
 			has_law = law_type:law_no_monetary_system
 			has_technology_researched = currency_standards
