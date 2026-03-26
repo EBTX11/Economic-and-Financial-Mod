@@ -75,7 +75,6 @@ types market_panel
 			############################################################################################################################################################
 			############################################################################################################################################################
 			############################################################################################################################################################
-
 		}
 		
 		datacontext = "[MarketPanel.GetMarket]"
@@ -249,6 +248,20 @@ types market_panel
 					direction = vertical
 					parentanchor = hcenter
 					visible = "[InformationPanel.IsTabSelected('world_market_trade')]"
+
+					textbox = {
+						datacontext = "[GetMetaPlayer.GetPlayedOrObservedCountry]"
+						visible = "[GreaterThan_int32(Market.GetCountryTradeCapacity(Country.Self), '(int32)0')]"
+						text = "MARKET_COUNTRY_TRADE_CAPACITY"
+						tooltip = "[Market.GetCountryTradeCapacityDesc(Country.Self)]"
+						margin = { 10 10 }
+						margin_bottom = 5
+						autoresize = yes
+						align = nobaseline
+						parentanchor = hcenter
+						maximumsize = { @panel_width -1 }
+						multiline = yes
+					}
 
 					section_header_button = {					
 						blockoverride "left_text" {
@@ -1091,6 +1104,7 @@ types market_panel
 				############################################################################################################################################################
 				############################################################################################################################################################
  
+				
 				flowcontainer = {
 					direction = vertical
 					visible = "[Not(IsDataModelEmpty(Market.AccessLocalGoods( MarketPanel.GetFilters )))]"
@@ -1132,21 +1146,21 @@ types market_panel
 					}							
 				}					
 				
-				textbox = {
-					text = "[Market.GetModifier.GetFullEntryDescFor('market_land_trade_capacity_add')]"
-					visible = "[Not(InDebugMode)]"
+				# textbox = {
+				# 	text = "[Market.GetModifier.GetFullEntryDescFor('market_land_trade_capacity_add')]"
+				# 	visible = "[InDebugMode]"
 					
-					parentanchor = hcenter
-					minimumsize = { 450 -1 }
-					autoresize = yes
-					multiline = yes
-					margin = { 0 10 }
-					align = center|nobaseline
+				# 	parentanchor = hcenter
+				# 	minimumsize = { 450 -1 }
+				# 	autoresize = yes
+				# 	multiline = yes
+				# 	margin = { 0 10 }
+				# 	align = center|nobaseline
 					
-					background = {
-						using = entry_bg
-					}
-				}
+				# 	background = {
+				# 		using = entry_bg
+				# 	}
+				# }
 
 				textbox = {
 					text = "[Market.GetModifierDesc]"
@@ -1191,6 +1205,8 @@ types market_panel
 				block "staple_icon" {
 					visible = "[Not(MarketPanel.IsSelected('staple'))]"
 				}
+
+				using = tooltip_ne
 				tooltip = "STAPLE_FILTER"
 				
 				block "staple_onclick" {
@@ -1247,6 +1263,8 @@ types market_panel
 				block "staple_icon_selected" {
 					visible = "[MarketPanel.IsSelected('staple')]"
 				}
+
+				using = tooltip_ne
 				tooltip = "STAPLE_FILTER"
 				
 				block "staple_onclick" {
@@ -1316,6 +1334,8 @@ types market_panel
 				block "industrial_icon" {
 					visible = "[Not(MarketPanel.IsSelected('industrial'))]"
 				}
+
+				using = tooltip_ne
 				tooltip = "INDUSTRIAL_GOODS_FILTER"
 				
 				block "industrial_onclick" {
@@ -1371,6 +1391,8 @@ types market_panel
 				block "industrial_icon_selected" {
 					visible = "[MarketPanel.IsSelected('industrial')]"
 				}
+
+				using = tooltip_ne
 				tooltip = "INDUSTRIAL_GOODS_FILTER"
 				
 				block "industrial_onclick" {
@@ -1440,6 +1462,8 @@ types market_panel
 				block "luxury_icon" {
 					visible = "[Not(MarketPanel.IsSelected('luxury'))]"
 				}
+
+				using = tooltip_ne
 				tooltip = "LUXURY_GOODS_FILTER"
 				
 				block "luxury_onclick" {
@@ -1495,6 +1519,8 @@ types market_panel
 				block "luxury_icon_selected" {
 					visible = "[MarketPanel.IsSelected('luxury')]"
 				}
+
+				using = tooltip_ne
 				tooltip = "LUXURY_GOODS_FILTER"
 				
 				block "luxury_onclick" {
@@ -1564,6 +1590,8 @@ types market_panel
 				block "military_icon" {
 					visible = "[Not(MarketPanel.IsSelected('military'))]"
 				}
+
+				using = tooltip_ne
 				tooltip = "MILITARY_GOODS_FILTER"
 				
 				block "military_onclick" {
@@ -1619,6 +1647,8 @@ types market_panel
 				block "military_icon_selected" {
 					visible = "[MarketPanel.IsSelected('military')]"
 				}
+
+				using = tooltip_ne
 				tooltip = "MILITARY_GOODS_FILTER"
 				
 				block "military_onclick" {
@@ -1726,6 +1756,7 @@ types market_panel
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
+
 
 		button = {
 			size = { @panel_width 50 }
@@ -2040,6 +2071,8 @@ types market_panel
 				visible = "[Not(IsDataModelEmpty(Goods.GetMarketPrestigeGoods))]"
 
 				goods_prestige_goods_breakdown_list_item = {
+					size = { 530 55 }
+
 					blockoverride "prestige_goods_item_text_1" {
 						raw_text = "BASE_GOODS_MARKET_SELL_ORDERS"
 					}
@@ -2053,90 +2086,128 @@ types market_panel
 
 			flowcontainer = {
 				visible = "[Not(IsDataModelEmpty(Goods.GetMarketPrestigeGoods))]"
-				datamodel = "[Goods.GetMarketPrestigeGoods]"
-
 				direction = vertical
 				margin_left = 10
 				margin_bottom = 10
+				datamodel = "[Goods.GetMarketPrestigeGoods]"
 
 
 				item = {
-					goods_prestige_goods_breakdown_list_item = {}
+					container = {
+						goods_prestige_goods_breakdown_list_item = {
+							visible = "[Goods.CanEditName]"
+							size = { 530 55 }
+
+							blockoverride "prestige_goods_item_name_size" {
+								minimumsize = { 240 -1 }
+								maximumsize = { 240 -1 }
+							}
+						}
+
+						goods_prestige_goods_breakdown_list_item = {
+							visible = "[Not(Goods.CanEditName)]"
+							size = { 530 55 }
+						}
+					}
 				}
 			}
 		}
 	}
 
-	type goods_prestige_goods_breakdown_list_item = button {
-		using = default_button
-		block "prestige_goods_onclick" {
-			onclick = "[InformationPanelBar.OpenGoodsPanel(Goods.GetMarket, Goods.Self)]"
-		}
-		using = select_button_sound
-		onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+	type goods_prestige_goods_breakdown_list_item = widget {
+		size = { 540 55 }
 
-		tooltipwidget = {
-			FancyTooltip_Goods = {}
-		}
-		
-		flowcontainer = {
-			resizeparent = yes
-			using = goods_list_item
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			spacing = 5
 
-			block "prestige_goods_item_minimumsize" {
-				minimumsize = { 530 -1 }
-			}
-			
-			textbox = {
-				text = "[Goods.GetNameNoFormatting]"
-				autoresize = yes
-				parentanchor = vcenter
-				margin_left = 7
-				block "prestige_goods_item_name_size" {
-					minimumsize = { 290 -1 }
-					maximumsize = { 290 -1 }
-				}
-				multiline = yes
+			### Edit prestige good name button
+			button_icon_edit = {
+				visible = "[And(Goods.IsPrestigeGoods, Goods.CanEditName)]"
+				size = { 30 30 }
+				using = tooltip_se
+				tooltip = "CHANGE_NAME_OF_PRESTIGE_GOOD"
+				onclick = "[PopupManager.ShowPrestigeGoodChangeName(Goods.Self)]"
 			}
 
-			textbox = {
-				block "prestige_goods_item_text_1" {
-					raw_text = "PRESTIGE_GOODS_MARKET_SELL_ORDERS"
-					alpha = "[TransparentIfZero(Goods.GetMarketSellOrders)]"
-				}
-				autoresize = yes
-				parentanchor = vcenter
-				margin_left = 7
+			button = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				using = default_button
+				using = select_button_sound
+				onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
 
-				block "prestige_goods_item_text_size" {
-					minimumsize = { 90 -1 }
-					maximumsize = { 90 -1 }
+				block "prestige_goods_onclick" {
+					onclick = "[InformationPanelBar.OpenGoodsPanel(Goods.GetMarket, Goods.Self)]"
 				}
 
-				align = hcenter|nobaseline
-				margin_right = 10
-				multiline = yes
-			}
-
-			vertical_divider = {}
-
-			textbox = {
-				block "prestige_goods_item_text_2" {
-					raw_text = "PRESTIGE_GOODS_MARKET_BUY_ORDERS"
-					alpha = "[TransparentIfZero(Goods.GetMarketBuyOrders)]"
-				}
-				autoresize = yes
-				parentanchor = vcenter
-				margin_left = 7
-
-				block "prestige_goods_item_text_size" {
-					minimumsize = { 90 -1 }
-					maximumsize = { 90 -1 }
+				tooltipwidget = {
+					FancyTooltip_Goods = {}
 				}
 
-				align = hcenter|nobaseline
-				margin_right = 10
-				multiline = yes
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+
+					flowcontainer = {
+						using = goods_list_item
+					}
+
+					textbox = {
+						text = "[Goods.GetNameNoFormatting]"
+						autoresize = yes
+						margin_left = 7
+						multiline = yes
+
+						block "prestige_goods_item_name_size" {
+							minimumsize = { 270 -1 }
+							maximumsize = { 270 -1 }
+						}
+					}
+
+					textbox = {
+						autoresize = yes
+						margin_left = 7
+						align = hcenter|nobaseline
+						margin_right = 10
+						multiline = yes
+
+						block "prestige_goods_item_text_1" {
+							raw_text = "PRESTIGE_GOODS_MARKET_SELL_ORDERS"
+							alpha = "[TransparentIfZero(Goods.GetMarketSellOrders)]"
+						}
+
+						block "prestige_goods_item_text_size" {
+							minimumsize = { 90 -1 }
+							maximumsize = { 90 -1 }
+						}
+					}
+
+					vertical_divider = {
+						blockoverride "size" {
+							layoutpolicy_vertical = expanding
+							size = { 2 0 }
+						}
+					}
+
+					textbox = {
+						block "prestige_goods_item_text_2" {
+							raw_text = "PRESTIGE_GOODS_MARKET_BUY_ORDERS"
+							alpha = "[TransparentIfZero(Goods.GetMarketBuyOrders)]"
+						}
+						autoresize = yes
+						margin_left = 7
+
+						block "prestige_goods_item_text_size" {
+							minimumsize = { 90 -1 }
+							maximumsize = { 90 -1 }
+						}
+
+						align = hcenter|nobaseline
+						margin_right = 10
+						multiline = yes
+					}
+				}
 			}
 		}
 	}
@@ -2376,6 +2447,7 @@ types market_panel
 	############################################################################################################################################################
 	############################################################################################################################################################
 
+	
 	type filter_button = button {
 		using = default_button
 		using = tooltip_above
@@ -2664,12 +2736,12 @@ types market_panel
 
 	type cannot_be_trade_icon = icon {
 		visible = "[And3(
-			Goods.HasMarketContext, 
+			Goods.HasMarketContext,
 			Not(Goods.GetMarket.CanTradeGoods(Goods.Self)),
 			Not(Goods.IsLocal)
 		)]"
 		tooltip = "GOODS_CANNOT_BE_TRADED_DUE_TO_TREATY"
-		
+
 		size = { 25 25 }
 		texture = "gfx/interface/icons/diplomatic_treaties_articles_icons/prohibit_trade_global_market_treaties.dds"
 		parentanchor = bottom|right
@@ -2754,4 +2826,101 @@ template goods_filter_button
 	upframe = 1
 	overframe = 2
 	downframe = 3
+}
+
+prestige_good_change_name_popup_type = {
+	name = prestige_good_change_name_popup
+}
+
+types prestige_good_change_name
+{
+	type prestige_good_change_name_popup_type = default_popup
+	{
+		datacontext = "[PrestigeGoodChangeNamePopup.GetPrestigeGood]"
+
+		blockoverride "window_header_name"
+		{
+			text = "CHANGE_NAME"
+		}
+
+		blockoverride "header_close_button_visibility"
+		{
+			visible = yes
+		}
+
+		blockoverride "header_close_button"
+		{
+			visible = yes
+			onclick = "[PopupManager.HidePrestigeGoodChangeName]"
+		}
+
+		blockoverride "entire_scrollarea"
+		{
+			flowcontainer = {
+				direction = vertical
+
+				# "Choose Name" section
+				flowcontainer = {
+					direction = vertical
+					spacing = 10
+
+					# Set a custom name
+					editbox = {
+						visible = yes
+						background = {
+							using = text_edit_bg
+						}
+
+						# The name is referenced in code. If you change it, it will no longer get properly reset
+						name = "prestige_good_name_edit"
+						ontextedited = "[PrestigeGoodChangeNamePopup.OnEditName]"
+						maxcharacters = 50
+						size = { 420 40 }
+						margin_left = 10
+						alwaystransparent = no
+						focuspolicy = all
+						focus_on_visible = yes
+						align = left|nobaseline
+					}
+
+					flowcontainer = {
+						direction = horizontal
+						using = default_list_position
+						spacing = 20
+
+						button = {
+							using = default_button
+							using = close_button_sound
+							size = { 140 40 }
+							text = "CANCEL"
+							shortcut = "close_window"
+							onclick = "[PopupManager.HidePrestigeGoodChangeName]"
+						}
+						button = {
+							using = default_button_primary_action
+							using = confirm_button_sound
+							name = "confirmation_button"
+							size = { 140 40 }
+							text = "CONFIRM"
+							enabled = "[IsValid(PrestigeGoodChangeNamePopup.Confirm)]"
+							onclick = "[Execute(PrestigeGoodChangeNamePopup.Confirm)]"
+							tooltip = "[GetDesc(PrestigeGoodChangeNamePopup.Confirm)]"
+							onclick = "[PopupManager.HidePrestigeGoodChangeName]"
+						}
+					}
+
+					widget = {
+						size = { 420 10 }
+					}
+				}
+
+
+			}
+		}
+
+		blockoverride "bottom_margin"
+		{
+			margin_bottom = 50
+		}
+	}
 }

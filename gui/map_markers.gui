@@ -814,14 +814,16 @@ container = {
 		round_progress_default = {
 			parentanchor = center
 			size = { 31 31 }
+			alwaystransparent = yes
 			tooltip = "DEFAULT_EVENT_OPTION"
 			value = "[Event.GetPercentageRemainingDays]"
 		}
 
-		icon = {
+		button = {
 			texture = "[Event.GetEventIcon]"
 			parentanchor = center
 			size = { 25 25 }
+			alwaystransparent = yes
 
 			background = {
 				using = blurry_dark_background
@@ -829,13 +831,15 @@ container = {
 		}
 	}
 
-	widget = {
+	button = {
 		size = { 100% 100% }
+		alwaystransparent = yes
 
-		icon = {
+		button = {
 			visible = "[Or( Or(Event.HasCategory('enactment'), Event.HasCategory('revolution')), LessThanOrEqualTo_int32( Event.GetNumRemainingDays, '(int32)60'))]"
 			using = highlighted_circle_selection_small
 			size = { 110% 110% }
+			alwaystransparent = yes
 		}
 	}
 }
@@ -851,7 +855,7 @@ container = {
 	onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 
 	tooltipwidget = {
-		RegularTooltip_WarGoal = {}
+		FancyTooltip_WarGoal = {}
 	}
 
 	background = {
@@ -1943,13 +1947,13 @@ container = {
 		widget = {
 			parentanchor = bottom|hcenter
 			size = { 100% 3 }
-			
+
 			battle_progressbar = {
 				parentanchor = bottom|hcenter
 				position = { 0 7 }
 				visible = "[Not(Battle.HasEnded)]"
 				size = { 90% 3 }
-				
+
 				blockoverride "values" {
 					value = "[Battle.CalcPushOfWar]"
 					min = -1
@@ -2337,7 +2341,7 @@ button = {
 				margin_right = 5
 				visible = "[MilitaryFormation.IsExiled]"
 				parentanchor = vcenter
-				
+
 				icon = {
 					size = { 32 32 }
 					texture = "gfx/interface/icons/military_icons/exiled_state.dds"
@@ -2864,6 +2868,14 @@ container = {
 	onmousehierarchyenter = "[AccessHighlightManager.HighlightPoliticalMovement(PoliticalMovement.Self)]"
 	onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 
+	state = {
+		name = revolutionary_sound
+		trigger_when = "[PoliticalMovement.IsInsurrectionary]"
+
+		start_sound = {
+			soundeffect = "event:/SFX/DLC/1.3_ip1/UI/item_revolutionary_movt"
+		}
+	}
 
 	tooltipwidget = {
 		FancyTooltip_PoliticalMovement = {}
@@ -3008,16 +3020,14 @@ container = {
 	layer = layer_map_markers
 	max_update_rate = 8
 	parentanchor = bottom|hcenter
-
+	onmousehierarchyenter = "[SetCanOpenRightClickContextMenu( '(bool)no' )]"
+	onmousehierarchyleave = "[SetCanOpenRightClickContextMenu( '(bool)yes' )]"
 
 	button_icon_round = {
 		using = small_nib
 		size = { 40 40 }
 		onclick = "[InformationPanelBar.OpenCultureInfoPanel(Culture.AccessSelf)]"
-		
-		tooltipwidget = {
-			FancyTooltip_Culture = {}
-		}
+		tooltip = "NATIONAL_AWAKENING_CULTURE_TOOLTIP"
 
 		blockoverride "icon" {
 			texture = "gfx/interface/icons/generic_icons/national_awakening.dds"
@@ -3705,8 +3715,7 @@ flowcontainer = {
 		visible = "[Or(IsZoomLevelNear, State.IsBeingHighlighted)]"
 
 		icon = {
-			visible = "[State.GetStateRegion.HasDevastation]"
-			datacontext = "[State.GetStateRegion]"
+			visible = "[State.HasDevastation]"
 			tooltip = "TOOLTIP_STATE_DEVASTATION"
 			texture = "gfx/interface/icons/state_status_icons/has_devastation.dds"
 			size = { 30 30 }

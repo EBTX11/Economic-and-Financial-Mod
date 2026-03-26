@@ -353,16 +353,16 @@ types goods_panel_types
 
 							blockoverride "text"
 							{
-								text = "concept_prestige_goods"
+								text = "GOODS_AND_PRESTIGE_GOODS_DISTRIBUTION_HEADER"
+							}
+
+							blockoverride "text_max_width" {
+								max_width = 530
 							}
 						}
 
 						goods_prestige_goods_breakdown_list_item = {						
 							parentanchor = hcenter
-
-							blockoverride "prestige_goods_item_minimumsize" {
-								minimumsize = { 540 -1 }
-							}
 
 							blockoverride "prestige_goods_item_name_size" {
 								minimumsize = { 300 -1 }
@@ -385,13 +385,10 @@ types goods_panel_types
 
 							item = {
 								goods_prestige_goods_breakdown_list_item = {
-									blockoverride "prestige_goods_item_minimumsize" {
-										minimumsize = { 540 -1 }
-									}
 
 									blockoverride "prestige_goods_item_name_size" {
-										minimumsize = { 300 -1 }
-										maximumsize = { 300 -1 }
+										minimumsize = { 260 -1 }
+										maximumsize = { 260 -1 }
 									}
 								}
 							}
@@ -1420,6 +1417,7 @@ types "production_method_items" {
 		############################################################################################################################################################
 		############################################################################################################################################################
 
+
 		tooltipwidget = {
 			FancyTooltip_BuildingType = {}
 		}
@@ -1686,7 +1684,7 @@ types "production_method_items" {
 
 		raw_text = "#BOLD [BuildingType.GetNumAvailableStatesForBuilding|+]#!"
 		visible = "[And(And(BuildingType.IsBuildable, BuildingType.HasRequiredTechnologiesInCountry(GetPlayer.Self)), BuildingType.HasRequiredPrinciplesInCountry(GetPlayer.Self))]"
-		
+
 		block "tooltip" {
 			tooltip = "BUILDING_ACTION_NUMBER"
 		}
@@ -1768,6 +1766,8 @@ types "production_method_items" {
 
 			flowcontainer = {
 				spacing = 10
+				using = tooltip_se
+				block "price_tooltip" {}
 
 				textbox = {
 					block "price" {
@@ -1853,6 +1853,7 @@ types "production_method_items" {
 						raw_text = "#variable [Goods.GetWorldMarketExportsAndImportsBalance|=D+]#!"
 					}
 
+					using = tooltip_se
 					align = nobaseline
 					autoresize = yes
 					margin_right = 10
@@ -1866,6 +1867,7 @@ types "production_method_items" {
 						raw_text = "#variable [Goods.GetWorldMarketExportsAndImportsBalance|=D+]#!"
 					}
 
+					using = tooltip_se
 					align = nobaseline
 					autoresize = yes
 					margin_right = 10
@@ -1879,6 +1881,7 @@ types "production_method_items" {
 						raw_text = "#variable [Goods.GetWorldMarketExportsAndImportsBalance|=D+]#!"
 					}
 
+					using = tooltip_se
 					align = nobaseline
 					autoresize = yes
 					margin_right = 10
@@ -1950,7 +1953,7 @@ types "production_method_items" {
 			parentanchor = top|right
 			size = { 23 23 }
 			position = { -5 5 }
-			
+
 			block "price_card_goto_button" {
 				datacontext = "[Goods.AccessState]"
 				onclick = "[InformationPanelBar.OpenStatePanel( State.AccessSelf )]"
@@ -1969,6 +1972,10 @@ types "production_method_items" {
 
 			blockoverride "price" {
 				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetStatePrice|v1] [Goods.GetCompareIconAgainstBasePriceNoFormatting(Goods.GetStatePrice)]"
+			}
+
+			blockoverride "price_tooltip" {
+				tooltip = "[Goods.GetStatePriceDesc]"
 			}
 
 			blockoverride "compared_to_base_neutral" {
@@ -2090,6 +2097,10 @@ types "production_method_items" {
 				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMarketPrice|v1] [Goods.GetCompareIconAgainstBasePriceNoFormatting(Goods.GetMarketPrice)]"
 			}
 
+			blockoverride "price_tooltip" {
+				tooltip = "[Goods.GetMarketPriceDesc]"
+			}
+
 			blockoverride "compared_to_base_neutral" {
 				visible = "[And( Not(LessThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)-0.01')), Not(GreaterThanOrEqualTo_CFixedPoint(Goods.GetPercentageDeltaAgainstBasePrice(Goods.GetMarketPrice), '(CFixedPoint)0.01')))]"
 				text = "MARKET_PANEL_GOODS_PRICE"
@@ -2202,8 +2213,13 @@ types "production_method_items" {
 		# Actual information
 		goods_tooltip_price_info = {
 			visible = "[Not(Goods.IsLocal)]"
+
 			blockoverride "price" {
 				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetWorldMarketBasePrice|1v] [Goods.GetCompareIconAgainstBasePriceNoFormatting(Goods.GetWorldMarketBasePrice)]"
+			}
+
+			blockoverride "price_tooltip" {
+				tooltip = "[Goods.GetWorldMarketBasePriceDesc]"
 			}
 
 			blockoverride "compared_to_base_neutral" {

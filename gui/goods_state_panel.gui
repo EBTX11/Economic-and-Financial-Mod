@@ -18,7 +18,7 @@ types goods_state_panel_types
 		
 		blockoverride "window_header_name"
 		{
-			raw_text = "#BOLD [GoodsStatePanel.GetGoods.GetName]#!"
+			raw_text = "#BOLD [GoodsStatePanel.GetGoods.GetNameNoIcon]#!"
 		}
 
 		blockoverride "window_header_name_line_two"
@@ -95,7 +95,7 @@ types goods_state_panel_types
 					tooltip = "LOCAL_PRICES"
 				} 					
 				blockoverride "fourth_button_visibility_checked" {
-					visible = "[GoodsPanel.GetGoods.HasMarketContext]"
+					visible = "[GoodsStatePanel.GetGoods.HasMarketContext]"
 				}			
 				blockoverride "fourth_button_click" {
 					onclick = "[InformationPanelBar.OpenGoodsLocalPricesPanel(GoodsStatePanel.GetGoods.Self)]"
@@ -182,6 +182,9 @@ types goods_state_panel_types
 								visible = "[Goods.IsTradeable]"
 								autoresize = yes
 								align = nobaseline
+								using = elide_fontsize_min
+								max_width = 120
+								multiline = yes
 								text = "BUDGET_TARIFFS"
 							}
 							
@@ -196,6 +199,8 @@ types goods_state_panel_types
 							textbox = {
 								layoutpolicy_horizontal = expanding
 								align = right|nobaseline
+								using = elide_fontsize_min
+								multiline = yes
 								text = "BUDGET_CONSUMPTION_TAXES"
 							}
 							
@@ -427,7 +432,7 @@ types goods_state_panel_types
 										}
 
 										blockoverride "trade_center_revenue" {		
-											raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetState.GetExportRevenue(Goods.Self)|+K]"
+											raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetState.GetExportRevenue(Goods.Self)|+K]"
 										}
 
 										blockoverride "trade_center_provider" {
@@ -534,7 +539,7 @@ types goods_state_panel {
 		}
 
 		flowcontainer = {
-			visible = "[Not(GoodsPanelValue.HasBuildingInfo)]"
+			visible = "[And(GoodsPanelValue.ShowChildValues,Not(GoodsPanelValue.HasBuildingInfo))]"
 			position = { 0 35 }
 			margin_left = 10
 			spacing = 5
@@ -546,7 +551,7 @@ types goods_state_panel {
 			item = {
 				widget = {
 					size = { 26 35 }
-					
+
 					textbox = {
 						parentanchor = vcenter
 						text = "[GoodsPanelChildValue.GetName]"
@@ -816,7 +821,7 @@ types goods_state_panel {
 
 									textbox = {
 										block "trade_center_revenue" {		
-											raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetState.GetImportRevenue(Goods.Self)|+K]"
+											raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetState.GetImportRevenue(Goods.Self)|+K]"
 										}
 										autoresize = yes
 										align = nobaseline

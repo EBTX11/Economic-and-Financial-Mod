@@ -430,8 +430,7 @@ types companies_panel
 				############################################################################################################################################################
 				############################################################################################################################################################
 				############################################################################################################################################################
-
-
+ 
 				### sort buttons
 				widget = {
 					size = { @panel_width_plus_14 30 }
@@ -692,7 +691,7 @@ types companies_panel
 
 
 							textbox = {
-								raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Company.GetProfit|v+=D]"
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][Company.GetProfit|v+=D]"
 								autoresize = yes
 								align = right|nobaseline
 								minimumsize = { 100 -1 }
@@ -897,8 +896,10 @@ types companies_panel
 							visible = "[Not(IsDataModelEmpty(Company.GetPrestigeGoods))]"
 
 							company_info_item = {
+								tooltip = "COMPANY_PRODUCING_PRESTIGE_GOODS_TOOLTIP"
+
 								blockoverride "header" {
-									text = "[concept_prestige_good]"
+									text = "COMPANY_PRODUCING_PRESTIGE_GOODS_HEADER"
 								}
 
 								blockoverride "info" {
@@ -908,12 +909,50 @@ types companies_panel
 										datamodel = "[Company.GetPrestigeGoods]"
 										
 										item = {
-											icon = {
-												size = { 40 40 }
-												texture = "[Goods.GetTexture]"
-												
+											button = {
+												texture = "gfx/interface/market_view/trade_good_icon_bg.dds"
+												color = "[Goods.GetCategoryColor]"
+												alpha = "[TransparentIfFalse(Company.IsProducingPrestigeGoods)]"
+												enabled = "[Company.IsProducingPrestigeGoods]"
+												onclick = "[InformationPanelBar.OpenGoodsPanel(Goods.GetMarket, Goods.Self)]"
+												onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+
 												tooltipwidget = {
 													FancyTooltip_Goods = {}
+												}
+
+												block "bg_size" {
+													size = { 40 40 }
+												}
+
+												button = {
+													texture = "[Goods.GetTexture]"
+													size = { 28 28 }
+													parentanchor = center
+													alwaystransparent = yes
+												}
+
+												icon = {
+													visible = "[Goods.HasGoodsShortage]"
+													tooltip = "GOODS_SHORTAGE_TOOLTIP"
+
+													size = { 25 25 }
+													texture = "gfx/interface/icons/generic_icons/goods_shortage.dds"
+													parentanchor = bottom
+												}
+
+												cannot_be_trade_icon = {}
+
+												icon = {
+													size = { 100% 100% }
+													texture = "gfx/interface/icons/goods_icons/prestige_goods/trade_good_icon_prestige_frame.dds"
+													visible = "[Goods.IsPrestigeGoods]"
+												}
+
+												icon = {
+													size = { 100% 100% }
+													texture = "gfx/interface/icons/goods_icons/prestige_goods/trade_good_icon_prestige_ribbon.dds"
+													visible = "[Goods.IsPrestigeGoods]"
 												}
 											}
 										}
@@ -1122,9 +1161,9 @@ types companies_panel
 						}
 					}
 					
-					flowcontainer = {					
+					flowcontainer = {
 						visible = "[Not(IsDataModelEmpty(CompanyType.GetPrestigeGoods))]"
-							
+
 						textbox = {
 							autoresize = yes
 							align = left|vcenter
@@ -1132,22 +1171,22 @@ types companies_panel
 							fontsize_min = 12
 							max_width = 360
 							text = "PRESTIGE_GOODS_CONCEPT"
-						}		
+						}
 
 						widget = { size = { 5 5 } }
-						
+
 						flowcontainer = {
 							direction = horizontal
 							spacing = 5
-								
+
 							datamodel = "[CompanyType.GetPrestigeGoods]"
-							
+
 							item = {
 								company_type_prestige_good_item = {}
 							}
-						}	
+						}
 					}
-					
+
 					textbox = {
 						autoresize = yes
 						align = nobaseline
@@ -1223,10 +1262,10 @@ types companies_panel
 			}
 
 			#Progress Bar
-			widget = {		
+			widget = {
 				size = { 240 10 }
 				using = tooltip_below
-			
+
 				changed_value_increased_progressbar_horizontal = {
 					visible = "[And(GreaterThan_CFixedPoint(Company.GetProsperityChange,'(CFixedPoint)0'), LessThan_CFixedPoint(Company.GetProsperity, GetDefine('NEconomy', 'COMPANY_PROSPERITY_MAX')))]"
 					size = { 100%  100% }
@@ -1321,14 +1360,14 @@ types companies_panel
 			FancyTooltip_BuildingType = {}
 		}
 	}
-	
+
 	type company_type_prestige_good_item = icon {
 		texture = "[Goods.GetTexture]"
-		size = { 30 30 }	
+		size = { 30 30 }
 		tooltipwidget = {
 			FancyTooltip_Goods = {}
 		}
-	}	
+	}
 
 	type company_building_item = button {
 		texture = "[BuildingType.GetIcon]"

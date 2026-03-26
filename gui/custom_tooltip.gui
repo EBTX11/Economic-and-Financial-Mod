@@ -14,7 +14,7 @@ types TooltipTypes
 	}
 
 	type custom_tooltip_textbox_column_width = custom_tooltip_textbox {
-		maximumsize = { @tooltip_fixed_column_width -1 }
+		max_width = @tooltip_fixed_column_width
 	}
 
 	type custom_tooltip_textbox_fixed_width = custom_tooltip_textbox {
@@ -106,7 +106,7 @@ types TooltipTypes
 			}
 
 			custom_tooltip_textbox = {
-				text = "[DecreeType.GetCostFormatted]"
+				text = "[DecreeType.GetCostFormatted(GetPlayer.Self)]"
 			}
 
 			block "available_options" {}
@@ -880,6 +880,15 @@ types TooltipTypes
 				}
 			}
 
+			### COUNTRY INPUT
+			country_input_article = {
+				parentanchor = vcenter
+
+				blockoverride "text_format" {
+					fonttintcolor = "[TooltipInfo.GetTintColor]"
+				}
+			}
+
 			### STRATEGIC REGION INPUT
 			strategic_region_input_article = {
 				parentanchor = vcenter
@@ -909,6 +918,15 @@ types TooltipTypes
 
 			### COMPANY MONOPOLY
 			company_monopoly_article = {
+				parentanchor = vcenter
+
+				blockoverride "text_format" {
+					fonttintcolor = "[TooltipInfo.GetTintColor]"
+				}
+			}
+
+			### TEXT INPUT
+			text_input_article = {
 				parentanchor = vcenter
 
 				blockoverride "text_format" {
@@ -1019,12 +1037,23 @@ types TooltipTypes
 			block "article_fulfillment_status" {}
 
 			block "maintenance_cost_article_tooltip" {
+				visible = "[Not(Article.HasType('free_text'))]"
 				custom_tooltip_textbox_with_empty_line = {
 					text = "ARTICLE_TYPE_INFLUENCE_COST_TOOLTIP"
 				}
 			}
 
+			### FREE TEXT
 			custom_tooltip_textbox = {
+				visible = "[Article.HasType('free_text')]"
+				multiline = yes
+				margin_left = 10
+				default_format = "#lore"
+				text = "TREATY_FREE_TEXT"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(Article.HasType('free_text'))]"
 				text = "ARTICLE_EFFECTS_TITLE"
 			}
 
@@ -1149,18 +1178,28 @@ types TooltipTypes
 			}
 
 			custom_tooltip_textbox_with_empty_line = {
-				visible = "[Article.HasKind('mutual')]"
+				visible = "[And( Article.HasKind('mutual'), Not(Article.HasType('free_text')))]"
 				alpha = "[TransparentIfTrue(Treaty.IsFrozenFor(Country.Self))]"
 				text = "ARTICLE_INFLUENCE_COST_TOOLTIP_MUTUAL"
 			}
 
 			custom_tooltip_textbox_with_empty_line = {
-				visible = "[Article.HasKind('directed')]"
+				visible = "[And( Article.HasKind('directed'), Not(Article.HasType('free_text')))]"
 				alpha = "[TransparentIfTrue(Treaty.IsFrozenFor(Country.Self))]"
 				text = "ARTICLE_INFLUENCE_COST_TOOLTIP_DIRECTED"
 			}
 
+			### FREE TEXT
 			custom_tooltip_textbox = {
+				visible = "[Article.HasType('free_text')]"
+				multiline = yes
+				margin_left = 10
+				default_format = "#lore"
+				text = "TREATY_FREE_TEXT"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(Article.HasType('free_text'))]"
 				text = "ARTICLE_EFFECTS_TITLE"
 			}
 
@@ -1279,8 +1318,18 @@ types TooltipTypes
 				text = "ARTICLE_TYPE_INFLUENCE_COST_TOOLTIP"
 			}
 
+			### FREE TEXT
+			custom_tooltip_textbox = {
+				visible = "[ArticleDraft.HasType('free_text')]"
+				multiline = yes
+				margin_left = 10
+				default_format = "#lore"
+				text = "TREATY_DRAFT_SELECTED_TEXT_INPUT"
+			}
+
 			### EFFECTS TITLE
 			custom_tooltip_textbox = {
+				visible = "[Not(ArticleDraft.HasType('free_text'))]"
 				text = "ARTICLE_DRAFT_EFFECTS_TITLE"
 			}
 
@@ -1366,17 +1415,17 @@ types TooltipTypes
 			}
 
 			custom_tooltip_textbox = {
-				visible = "[ArticleDraft.HasKind('mutual')]"
+				visible = "[And( ArticleDraft.HasKind('mutual'), Not(ArticleDraft.HasType('free_text')))]"
 				text = "ARTICLE_DRAFT_INFLUENCE_COST_TOOLTIP_MUTUAL"
 			}
 
 			custom_tooltip_textbox = {
-				visible = "[ArticleDraft.HasKind('directed')]"
+				visible = "[And( ArticleDraft.HasKind('directed'), Not(ArticleDraft.HasType('free_text')))]"
 				text = "ARTICLE_DRAFT_INFLUENCE_COST_TOOLTIP_DIRECTED"
 			}
 
 			flowcontainer = {
-				visible = "[TreatyDraft.GetRightCountry.IsAI]"
+				visible = "[And( TreatyDraft.GetRightCountry.IsAI, Not(ArticleDraft.HasType('free_text')))]"
 				spacing = 5
 				tooltip = "[ArticleDraft.GetAcceptanceBreakdown(TreatyDraft.GetRightCountry.Self)]"
 
@@ -1403,8 +1452,18 @@ types TooltipTypes
 
 			custom_tooltip_newline = {}
 
+			### FREE TEXT
+			custom_tooltip_textbox = {
+				visible = "[ArticleDraft.HasType('free_text')]"
+				multiline = yes
+				margin_left = 10
+				default_format = "#lore"
+				text = "TREATY_DRAFT_SELECTED_TEXT_INPUT"
+			}
+
 			### EFFECTS TITLE
 			custom_tooltip_textbox = {
+				visible = "[Not(ArticleDraft.HasType('free_text'))]"
 				text = "ARTICLE_DRAFT_EFFECTS_TITLE"
 			}
 
@@ -1676,6 +1735,362 @@ types TooltipTypes
 		}
 	}
 
+	type FancyTooltip_WarGoalType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			texture = "[WarGoalType.GetIcon]"
+		}
+
+		blockoverride "icon_size" {
+			size = { 70% 70% }
+		}
+
+		blockoverride "name" {
+			text = "[WarGoalType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_war_goal]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			block "war_goal_type_acceptance" {}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(WarGoalType.GetDesc))]"
+				default_format = "#lore"
+				text = "[WarGoalType.GetDesc]"
+			}
+		}
+	}
+
+	type FancyTooltip_WarGoal = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			block "wargoal_icon_exture" {
+				texture = "[WarGoal.GetIcon]"
+			}
+		}
+
+		blockoverride "icon_size" {
+			size = { 70% 70% }
+		}
+
+		blockoverride "name" {
+			text = "[WarGoal.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			block "wargoal_type" {
+				text = "[concept_war_goal]"
+			}
+		}
+
+		blockoverride "tooltip_content_after" {
+			flowcontainer = {
+				parentanchor = hcenter
+				spacing = 2
+				direction = vertical
+
+				block "war_goal_before_text" {}
+
+				flowcontainer = {
+					spacing = 5
+
+					flowcontainer = {
+						direction = vertical
+						minimumsize = { 500 -1 }
+
+						block "can_add_text" {}
+
+						custom_tooltip_textbox = {
+							max_width = 450
+							text = "WARGOAL_SUBHEADER_HOLDER_AND_TARGET"
+						}
+					}
+				}
+
+				custom_tooltip_textbox = {
+					text = "DIPLO_PLAY_WAR_GOAL_PRIMARY_OR_SECONDARY"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[WarGoal.HoldsArticle]"
+					text = "ADD_ARTICLE_WARGOAL_BINDING_PERIOD"
+				}
+
+				block "infamy" {}
+
+				block "maneuver_cost" {}
+
+				custom_tooltip_newline = {}
+
+				custom_tooltip_textbox_with_empty_line = {
+					visible = "[WarGoal.IsPartOfWar]"
+					text = "WAR_GOAL_CONTESTED_DESC_SHORT"
+				}
+
+				custom_tooltip_textbox_with_empty_line = {
+					visible = "[And(Not(WarGoal.IsPartOfWar), WarGoal.IsPartOfPlay)]"
+					raw_text = "[WarGoal.GetIsContestedDesc]"
+				}
+
+				custom_tooltip_textbox_with_empty_line = {
+					visible = "[Not(StringIsEmpty(WarGoal.GetStatusString))]"
+					text = "[WarGoal.GetStatusString]"
+				}
+
+				custom_tooltip_textbox = {
+					text = "ARTICLE_TYPE_EFFECTS_TITLE"
+				}
+
+				block "war_goal_desc" {
+					custom_tooltip_textbox = {
+						margin_left = 10
+						text = "[WarGoal.GetDesc]"
+					}
+				}
+
+				custom_tooltip_textbox = {
+					margin_left = 10
+					text = "[WarGoal.GetInfamyDesc]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(WarGoal.GetAddWarGoalDiplomaticIncidentDesc))]"
+					text "[WarGoal.GetAddWarGoalDiplomaticIncidentDesc]"
+				}
+
+				custom_tooltip_newline = {
+					block "click_prompt_visibility" {
+						visible = "[And(WarGoal.HoldsArticle, WarGoal.GetArticleType.RequiresAnyInput)]"
+					}
+				}
+
+				flowcontainer = {
+					block "click_prompt_visibility" {
+						visible = "[And(WarGoal.HoldsArticle, WarGoal.GetArticleType.RequiresAnyInput)]"
+					}
+
+					direction = vertical
+					spacing = 2
+					datacontext = "[WarGoal.GetArticleType]"
+					datacontext = "[WarGoal.GetArticleDraft]"
+
+					custom_tooltip_textbox = {
+						visible = "[Not(Or(Or(Or(Or(ArticleDraft.RequiresInput('goods'), ArticleType.HasType('money_transfer')), Or(ArticleType.HasType('acquire_monopoly_for_company'), ArticleDraft.RequiresInput('state'))), Or(ArticleDraft.RequiresInput('strategic_region'), ArticleDraft.RequiresInput('law_type'))), ArticleDraft.RequiresInput('country')))]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[And(Not(ArticleType.HasType('goods_transfer')), ArticleDraft.RequiresInput('goods'))]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('goods_transfer')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS_AND_AMOUNT"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('money_transfer')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_MONEY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('acquire_monopoly_for_company')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_COMPANY_AND_INDUSTRY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('state')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STATE"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('country')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_COUNTRY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('strategic_region')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STRATEGIC_REGION"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('law_type')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_LAW"
+					}
+				}
+			}
+		}
+	}
+
+	type FancyTooltip_WarGoalDraft = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			block "wargoal_icon_exture" {
+				texture = "[WarGoalDraft.GetIcon]"
+			}
+		}
+
+		blockoverride "icon_size" {
+			size = { 70% 70% }
+		}
+
+		blockoverride "name" {
+			text = "[WarGoalDraft.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			block "wargoal_type" {
+				text = "[concept_war_goal]"
+			}
+		}
+
+		blockoverride "tooltip_content" {
+			flowcontainer = {
+				parentanchor = hcenter
+				spacing = 2
+				direction = vertical
+				
+				block "war_goal_before_text" {}
+
+				flowcontainer = {
+					spacing = 5
+
+					flowcontainer = {
+						direction = vertical
+						minimumsize = { 500 -1 }
+
+						block "can_add_text" {}
+
+						custom_tooltip_textbox = {
+							max_width = 450
+							text = "WAR_GOAL_DRAFT_SUBHEADER_HOLDER_AND_TARGET"
+						}
+					}
+				}
+
+				custom_tooltip_textbox = {
+					tooltip = "ADD_WARGOAL_MANEUVERS_COST_TOOLTIP"
+					text = "ADD_WARGOAL_MANEUVERS_COST_WITH_LABEL"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[WarGoalDraft.HoldsArticle]"
+					text = "ADD_ARTICLE_WARGOAL_BINDING_PERIOD"
+				}
+
+				custom_tooltip_newline = {}
+
+				custom_tooltip_textbox = {
+					text = "ARTICLE_TYPE_EFFECTS_TITLE"
+				}
+
+				block "war_goal_desc" {
+					custom_tooltip_textbox = {
+						margin_left = 10
+						text = "[WarGoalDraft.GetDesc]"
+					}
+				}
+
+				custom_tooltip_textbox = {
+					margin_left = 10
+					text = "[WarGoalDraft.GetInfamyDesc]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(WarGoalDraft.GetAddWarGoalDiplomaticIncidentDesc))]"
+					text "[WarGoalDraft.GetAddWarGoalDiplomaticIncidentDesc]"
+				}
+
+				custom_tooltip_newline = {
+					block "click_prompt_visibility" {
+						visible = "[And(WarGoalDraft.HoldsArticle, WarGoalDraft.GetArticleType.RequiresAnyInput)]"
+					}
+				}
+
+				flowcontainer = {
+					block "click_prompt_visibility" {
+						visible = "[And(WarGoalDraft.HoldsArticle, WarGoalDraft.GetArticleType.RequiresAnyInput)]"
+					}
+
+					direction = vertical
+					spacing = 2
+					datacontext = "[WarGoalDraft.GetArticleType]"
+					datacontext = "[WarGoalDraft.GetArticleDraft]"
+
+					custom_tooltip_textbox = {
+						visible = "[Not(Or(Or(Or(Or(ArticleDraft.RequiresInput('goods'), ArticleType.HasType('money_transfer')), Or(ArticleType.HasType('acquire_monopoly_for_company'), ArticleDraft.RequiresInput('state'))), Or(ArticleDraft.RequiresInput('strategic_region'), ArticleDraft.RequiresInput('law_type'))), ArticleDraft.RequiresInput('country')))]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[And(Not(ArticleType.HasType('goods_transfer')), ArticleDraft.RequiresInput('goods'))]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('goods_transfer')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS_AND_AMOUNT"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('money_transfer')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_MONEY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleType.HasType('acquire_monopoly_for_company')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_COMPANY_AND_INDUSTRY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('state')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STATE"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('country')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_COUNTRY"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('strategic_region')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STRATEGIC_REGION"
+					}
+
+					custom_tooltip_textbox = {
+						visible = "[ArticleDraft.RequiresInput('law_type')]"
+						default_format = "#i"
+						text = "CLICK_TO_SELECT_ARTICLE_INPUT_LAW"
+					}
+				}
+			}
+		}
+	}
+
 	type RegularTooltip_LocalPrices = RegularTooltip {
 		blockoverride "tooltip_content_after" {
 			flowcontainer = {
@@ -1754,31 +2169,45 @@ types TooltipTypes
 		}
 
 		blockoverride "go_to_button_properties" {
-			onclick = "[InformationPanelBar.OpenChangeLaw(Law.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenChangeLaw(Law.GetGroup)]"
 		}
 
 		blockoverride "tooltip_content_after" {
 
 			block "active_status" {
-				custom_tooltip_textbox_with_empty_line = {
-				visible = "[Law.IsActive]"
-				text = "ACTIVE_LAW"
-			}
+				custom_tooltip_textbox = {
+					visible = "[Law.IsActive]"
+					text = "ACTIVE_LAW"
+				}
 
-			custom_tooltip_textbox_with_empty_line = {
-				visible = "[And(Not(Law.IsActive), Not(Law.IsBeingEnacted))]"
-				text = "INACTIVE_LAW"
-			}
+				custom_tooltip_textbox = {
+					visible = "[And(Not(Law.IsActive), Not(Law.IsBeingEnacted))]"
+					text = "INACTIVE_LAW"
+				}
 
-				custom_tooltip_textbox_with_empty_line = {
-				visible = "[Law.IsBeingEnacted]"
-				text = "LAW_BEING_ENACTED_DESC"
-			}
+				custom_tooltip_textbox = {
+					visible = "[And(Not(StringIsEmpty(Law.CannotEnactDesc)), And(Not(Law.IsActive), Not(Law.IsBeingEnacted)))]"
+					text = "[Law.CannotEnactDesc]"
+				}
 
-			custom_tooltip_textbox = {
-				visible = "[Not(Or(Law.IsActive, Law.IsBeingEnacted))]"
-				text = "ENACT_LAW_CHANCES_HEADER"
-			}
+				custom_tooltip_textbox = {
+					visible = "[IsValid(Law.StartEnacting)]"
+					text = "LAW_CAN_BE_ENACTED"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Law.IsBeingEnacted]"
+					text = "LAW_BEING_ENACTED_DESC"
+				}
+
+				custom_tooltip_newline = {
+					visible = "[Not(Or(Law.IsActive, Law.IsBeingEnacted))]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(Or(Law.IsActive, Law.IsBeingEnacted))]"
+					text = "ENACT_LAW_CHANCES_HEADER"
+				}
 			}
 
 			### ENACTMENT CHANCES
@@ -1889,7 +2318,7 @@ types TooltipTypes
 				text = "DATA_LAW_EFFECTS_HEADER"
 			}
 
-			custom_tooltip_textbox_with_empty_line = {
+			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(Law.GetLawType.GetEffectDesc(GetPlayer.Self)))]"
 				margin_left = 10
 				text = "[Law.GetLawType.GetEffectDesc(GetPlayer.Self)]"
@@ -1925,6 +2354,8 @@ types TooltipTypes
 				text = "[Law.GetOnDeactivateDesc]"
 			}
 
+			amendment_list_flowcontainer = {}
+
 			custom_tooltip_newline = {}
 
 			custom_tooltip_textbox = {
@@ -1937,11 +2368,192 @@ types TooltipTypes
 				text = "DATA_LAW_TOOLTIP_NOT_SUPPORTED"
 			}
 
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				text = "DATA_LAW_MOVEMENT_AND_AGITATORS_TITLE"
+			}
+			
+			agitators_movements_endorsement_list = {
+				margin_left = 10
+			}
+
 			tooltip_divider = {}
 
 			custom_tooltip_textbox = {
 				default_format = "#lore"
 				text = "[Law.GetDesc]"
+			}
+		}
+	}
+
+	type RegularTooltip_AmendmentsList = RegularTooltip {
+		blockoverride "tooltip_content_after" {
+			flowcontainer = {
+				spacing = 5
+
+				icon = {
+					parentanchor = vcenter
+					size = { 30 30 }
+					texture = "[Law.GetTexture]"
+				}
+
+				custom_tooltip_textbox = {
+					parentanchor = vcenter
+					max_width = 510
+					text = "ACTIVE_LAW_AMENDMENTS"
+				}
+			}
+
+			amendment_list_flowcontainer = {}
+		}
+	}
+
+	type FancyTooltip_Amendment = FancyTooltipWidgetType {
+		datacontext = "[Amendment.GetAttachedLaw]"
+
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			texture = "[Amendment.GetParentLawType.GetTexture]"
+		}
+
+		blockoverride "name" {
+			raw_text = "[Amendment.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "TOOLTIP_TYPE_AMENDMENT"
+		}
+
+		blockoverride "tooltip_content_after" {
+
+			custom_tooltip_textbox_with_empty_line = {
+				text = "AMENDMENT_SPONSOR"
+			}
+
+			custom_tooltip_textbox = {
+				text = "AMENDMENT_PARENT_LAW_TYPE_TITLE"
+			}
+
+			flowcontainer = {
+				margin_left = 10
+				spacing = 5
+
+				icon = {
+					parentanchor = vcenter
+					size = { 30 30 }
+					texture = "[Amendment.GetParentLawType.GetTexture]"
+				}
+
+				custom_tooltip_textbox = {
+					parentanchor = vcenter
+					max_width = 510
+					text = "AMENDMENT_PARENT_LAW_TYPE"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				visible = "[NotZero(Amendment.GetNumEndorsingInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_ENDORSED"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[IsZero(Amendment.GetNumEndorsingInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_NOT_ENDORSED"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[NotZero(Amendment.GetNumIndifferentInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_INDIFFERENT"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[IsZero(Amendment.GetNumIndifferentInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_NOT_INDIFFERENT"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[NotZero(Amendment.GetNumOpposingInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_OPPOSED"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[IsZero(Amendment.GetNumOpposingInterestGroups)]"
+				text = "AMENDMENT_TOOLTIP_NOT_OPPOSED"
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
+				text = "[Amendment.GetType.GetUnlocks]"
+			}			
+
+			tooltip_divider = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
+			}		
+		
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetEffectsDesc))]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_EFFECTS_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetEffectsDesc))]"
+				margin_left = 10
+				text = "[Amendment.GetType.GetEffectsDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(Amendment.GetType.GetModifier.IsEmpty)]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_MODIFIERS_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(Amendment.GetType.GetModifier.IsEmpty)]"
+				margin_left = 10
+				text = "[Amendment.GetType.GetModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetTaxModifierDesc(GetPlayer.Self)))]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_TAX_MODIFIERS_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetTaxModifierDesc(GetPlayer.Self)))]"
+				margin_left = 10
+				text = "[Amendment.GetType.GetTaxModifierDesc(GetPlayer.Self)]"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetInstitutionModifierDesc))]"
+				text = "[Amendment.GetType.GetInstitutionModifierDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(Amendment.GetType.GetSponsorModifier.IsEmpty)]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_SPONSOR_MODIFIERS_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(Amendment.GetType.GetSponsorModifier.IsEmpty)]"
+				margin_left = 10
+				text = "[Amendment.GetType.GetSponsorModifier.GetDesc]"
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				default_format = "#lore"
+				text = "[Amendment.GetType.GetDesc]"
 			}
 		}
 	}
@@ -1966,7 +2578,7 @@ types TooltipTypes
 		}
 
 		blockoverride "go_to_button_properties" {
-			onclick = "[InformationPanelBar.OpenChangeLaw(Law.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenChangeLaw(Law.GetGroup)]"
 		}
 
 		blockoverride "tooltip_content_after" {
@@ -2149,7 +2761,70 @@ types TooltipTypes
 
 		blockoverride "go_to_button_properties" {
 			datacontext = "[LawType.GetGroup.GetCurrentlyActive]"
-			onclick = "[InformationPanelBar.OpenChangeLaw(Law.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenChangeLaw(Law.GetGroup)]"
+		}
+	}
+
+	type FancyTooltip_AmendmentType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_size" {
+			size = { 70% 70% }
+		}
+
+		blockoverride "name" {
+			raw_text = "[AmendmentType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_amendment]"
+		}
+		
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "DATA_AMENDMENT_TYPE_PARENT_LAW_OR_NONE"
+			}
+			
+			tooltip_divider = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
+				text = "[AmendmentType.GetUnlocks]"
+			}			
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				text = "EFFECTS_TITLE"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetSponsorModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "SPONSOR_MODIFIER_HEADER"
+			}
+			
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetSponsorModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetSponsorModifier.GetDesc]"
+			}
+			
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetDesc]"
+			}
 		}
 	}
 
@@ -2171,16 +2846,17 @@ types TooltipTypes
 
 					item = {
 						flowcontainer = {
-							background = {
-								using = entry_bg_simple
-					}
 							margin = { 8 6 }
 							spacing = 7
+
+							background = {
+								using = entry_bg_simple
+							}
 
 							small_market_flag = {
 								parentanchor = vcenter
 								blockoverride "small_market_flag_tooltip" {}
-				}
+							}
 
 							custom_tooltip_textbox = {
 								text = "[Market.GetImportedAmountFromMarket(Goods.GetMarket, Goods.Self)|v1]"
@@ -2191,15 +2867,15 @@ types TooltipTypes
 								maximumsize = { 50 -1 }
 								using = elide_fontsize_min
 								multiline = no
-			}
+							}
 
 							tooltipwidget = {
 								FancyTooltip_Market = {
 									blockoverride "tooltip_content_before" {
 										custom_tooltip_textbox = {
 											text = "MARKET_TRADE_VALUES"
-		}
-	}
+										}
+									}
 								}
 							}
 						}
@@ -3394,48 +4070,52 @@ types TooltipTypes
 				}
 			}
 
-			custom_tooltip_2_columns = {
-				blockoverride "left_column" {
-					custom_tooltip_textbox_column_width = {
-						text = "IG_TT_POPULATION_LOYAL_RADICAL"
+			block "ig_pop_info" {
+				custom_tooltip_2_columns = {
+					blockoverride "left_column" {
+						custom_tooltip_textbox_column_width = {
+							text = "IG_TT_POPULATION_LOYAL_RADICAL"
+						}
 					}
-				}
 
-				blockoverride "right_column" {
-					custom_tooltip_textbox_column_width = {
-						text = "[InterestGroup.GetSupportingPopTypesDesc]"
+					blockoverride "right_column" {
+						custom_tooltip_textbox_column_width = {
+							text = "[InterestGroup.GetSupportingPopTypesDesc]"
+						}
 					}
 				}
 			}
 
-			flowcontainer = {
-				using = tooltip_segment_margin
-				direction = vertical
-
-				custom_tooltip_textbox = {
-					text = "IG_TT_LEADER"
-				}
-
-				custom_tooltip_textbox = {
-					text = "IG_TT_PARTY"
-				}
-
+			block "leader_and_party_ig_info" {
 				flowcontainer = {
+					using = tooltip_segment_margin
 					direction = vertical
 
-					visible = "[Not(IsDataModelEmpty(InterestGroup.GetPoliticalLobbies))]"
-
-					#custom_tooltip_newline = {}
-
 					custom_tooltip_textbox = {
-						text = "IG_TT_LOBBY_HEADER"
+						text = "IG_TT_LEADER"
 					}
 
-					datamodel = "[InterestGroup.GetPoliticalLobbies]"
+					custom_tooltip_textbox = {
+						text = "IG_TT_PARTY"
+					}
 
-					item = {
+					flowcontainer = {
+						direction = vertical
+
+						visible = "[Not(IsDataModelEmpty(InterestGroup.GetPoliticalLobbies))]"
+
+						#custom_tooltip_newline = {}
+
 						custom_tooltip_textbox = {
-							text = "IG_TT_LOBBY_ENTRY"
+							text = "IG_TT_LOBBY_HEADER"
+						}
+
+						datamodel = "[InterestGroup.GetPoliticalLobbies]"
+
+						item = {
+							custom_tooltip_textbox = {
+								text = "IG_TT_LOBBY_ENTRY"
+							}
 						}
 					}
 				}
@@ -3612,7 +4292,7 @@ types TooltipTypes
 
 		blockoverride "go_to_button_properties" {
 			datacontext = "[LawGroup.GetCurrentlyActive]"
-			onclick = "[InformationPanelBar.OpenChangeLaw(Law.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenChangeLaw(Law.GetGroup)]"
 		}
 	}
 
@@ -4437,13 +5117,8 @@ types TooltipTypes
 
 				item = {
 					flowcontainer = {
+						margin_left = 10
 						spacing = 5
-
-						icon = {
-							parentanchor = vcenter
-							size = { 25 25 }
-							texture = "[Goods.GetTexture]"
-						}
 
 						custom_tooltip_textbox = {
 							parentanchor = vcenter
@@ -4883,14 +5558,14 @@ types TooltipTypes
 
 				blockoverride "left_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_TURMOIL_WORLDWIDE"
 					}
 				}
 
 				blockoverride "right_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_MIGRATION_TARGETS"
 					}
 				}
@@ -4901,14 +5576,14 @@ types TooltipTypes
 
 				blockoverride "left_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_OBSESSIONS"
 					}
 				}
 
 				blockoverride "right_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_TABOOS"
 					}
 				}
@@ -4917,13 +5592,13 @@ types TooltipTypes
 			custom_tooltip_2_columns = {
 				blockoverride "left_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_FERVOR"
 					}
 				}
 				blockoverride "right_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						visible = "[Culture.HasNationalAwakening]"
 						text = "HAS_NATIONAL_AWAKENING"
 					}
@@ -4935,14 +5610,14 @@ types TooltipTypes
 
 				blockoverride "left_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_TRAITS"
 					}
 
 					flowcontainer = {
 						direction = vertical
 
-						custom_tooltip_textbox = {
+						custom_tooltip_textbox_column_width = {
 							text = "CULTURE_TT_TRADITIONS_HEADER"
 						}
 
@@ -4967,7 +5642,7 @@ types TooltipTypes
 							}
 						}
 
-						custom_tooltip_textbox = {
+						custom_tooltip_textbox_column_width = {
 							visible = "[IsDataModelEmpty(Culture.GetTraditionTraits)]"
 							alpha = 0.3
 							text = "NONE"
@@ -4977,7 +5652,7 @@ types TooltipTypes
 
 				blockoverride "right_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						text = "CULTURE_TT_RELIGION"
 					}
 				}
@@ -5106,7 +5781,7 @@ types TooltipTypes
 
 				blockoverride "left_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						max_width = 275
 						text = "RELIGION_TT_TRAITS"
 					}
@@ -5114,7 +5789,7 @@ types TooltipTypes
 
 				blockoverride "right_column"
 				{
-					custom_tooltip_textbox = {
+					custom_tooltip_textbox_column_width = {
 						max_width = 275
 						text = "RELIGION_TT_TABOOS"
 					}
@@ -5428,6 +6103,322 @@ types TooltipTypes
 
 		blockoverride "type" {
 			text = "TOOLTIP_TYPE_STATE_REGION"
+		}
+	}
+
+	type FancyTooltip_BuildingGroup = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			texture = "gfx/interface/icons/generic_icons/generic_concept_icon.dds"
+		}
+
+		blockoverride "name" {
+			text = "[BuildingGroup.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_building_group]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "THIS_BUILDING_GROUP_CONSIST_OF"
+			}
+
+			### AGRICULTURE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_agriculture')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_AGRICULTURE_TYPES"
+			}
+
+			### MANUFACTURING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_manufacturing')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MANUFACTURING_TYPES"
+			}
+
+			### LIGHT INDUSTRY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_light_industry')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_LIGHT_INDUSTRY_TYPES"
+			}
+
+			### HEAVY INDUSTRY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_heavy_industry')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_HEAVY_INDUSTRY_TYPES"
+			}
+
+			### STAPLE CROPS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_staple_crops')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_STAPLE_CROPS_TYPES"
+			}
+
+			### SUBSISTENCE AGRICULTURE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_subsistence_agriculture')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_SUBSISTENCE_AGRICULTURE_TYPES"
+			}
+
+			### RANCHING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_ranching')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_RANCHING_TYPES"
+			}
+
+			### PLANTATIONS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_plantations')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_PLANTATIONS_TYPES"
+			}
+
+			### EXTRACTION
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_extraction')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_EXTRACTION_TYPES"
+			}
+
+			### MINING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_mining')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MINING_TYPES"
+			}
+
+			### URBAN FACILITIES
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_urban_facilities')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_URBAN_FACILITIES_TYPES"
+			}
+
+			### OWNER BUILDINGS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_owner_buildings')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_OWNER_BUILDINGS_TYPES"
+			}
+
+			### ARMY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_army')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_ARMY_TYPES"
+			}
+
+			### ARTS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_arts')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_ARTS_TYPES"
+			}
+
+			### BUREAUCRACY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_bureaucracy')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_BUREAUCRACY_TYPES"
+			}
+
+			### CANALS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_canals')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_CANALS_TYPES"
+			}
+
+			### COMPANY HEADQUARTER
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_company_headquarter')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_COMPANY_HEADQUARTER_TYPES"
+			}
+
+			### COMPANY REGIONAL HEADQUARTER
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_company_regional_headquarter')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_COMPANY_REGIONAL_HEADQUARTER_TYPES"
+			}
+
+			### CONSCRIPTION
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_conscription')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_CONSCRIPTION_TYPES"
+			}
+
+			### CONSTRUCTION
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_construction')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_CONSTRUCTION_TYPES"
+			}
+
+			### FINANCIAL DISTRICTS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_financial_districts')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_FINANCIAL_DISTRICTS_TYPES"
+			}
+
+			### FISHING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_fishing')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_FISHING_TYPES"
+			}
+
+			### GOLD FIELDS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_gold_fields')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_GOLD_FIELDS_TYPES"
+			}
+
+			### GOVERNMENT
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_government')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_GOVERNMENT_TYPES"
+			}
+
+			### INFRASTRUCTURE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_infrastructure')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_INFRASTRUCTURE_TYPES"
+			}
+
+			### LOGGING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_logging')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_LOGGING_TYPES"
+			}
+
+			### MANOR HOUSES
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_manor_houses')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MANOR_HOUSES_TYPES"
+			}
+
+			### MILITARY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_military')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MILITARY_TYPES"
+			}
+
+			### MILITARY INDUSTRY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_military_industry')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MILITARY_INDUSTRY_TYPES"
+			}
+
+			### MONUMENTS
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_monuments')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_MONUMENTS_TYPES"
+			}
+
+			### NAVY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_navy')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_NAVY_TYPES"
+			}
+
+			### OIL EXTRACTION
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_oil_extraction')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_OIL_EXTRACTION_TYPES"
+			}
+
+			### POWER
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_power')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_POWER_TYPES"
+			}
+
+			### PRIVATE INFRASTRUCTURE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_private_infrastructure')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_PRIVATE_INFRASTRUCTURE_TYPES"
+			}
+
+			### PUBLIC INFRASTRUCTURE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_public_infrastructure')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_PUBLIC_INFRASTRUCTURE_TYPES"
+			}
+
+			### RUBBER
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_rubber')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_RUBBER_TYPES"
+			}
+
+			### SERVICE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_service')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_SERVICE_TYPES"
+			}
+
+			### SKYSCRAPER
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_skyscraper')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_SKYSCRAPER_TYPES"
+			}
+
+			### SUBSISTENCE RANCHING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_subsistence_ranching')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_SUBSISTENCE_RANCHING_TYPES"
+			}
+
+			### TECHNOLOGY
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_technology')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_TECHNOLOGY_TYPES"
+			}
+
+			### TRADE
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_trade')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_TRADE_TYPES"
+			}
+
+			### WHALING
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_whaling')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_WHALING_TYPES"
+			}
 		}
 	}
 
@@ -7278,6 +8269,39 @@ types TooltipTypes
 		}
 	}
 
+	type FancyTooltip_GeographicRegion = FancyTooltipWidgetType {
+		blockoverride "text" {
+			text = "DATA_GEOGRAPHIC_REGION_NAME_FORMAT"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "gfx/interface/icons/generic_icons/generic_concept_icon.dds"
+		}
+
+		blockoverride "name" {
+			text = "[GeographicRegion.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "TOOLTIP_TYPE_GEOGRAPHIC_REGION"
+		}
+		
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(GeographicRegion.GetUnlocks))]"
+				text = "[GeographicRegion.GetUnlocks]"
+			}
+		}
+
+		blockoverride "zoom_to_button_visibility" {
+			visible = yes
+		}
+
+		blockoverride "zoom_to_button_properties" {
+			onclick = "[GeographicRegion.ZoomToRegion]"
+		}
+	}
+
 	type FancyTooltip_Company = FancyTooltipWidgetType {
 		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
 
@@ -7316,11 +8340,11 @@ types TooltipTypes
 				using = tooltip_segment_margin
 				max_width = @tooltip_fixed_width
 				min_width = @tooltip_fixed_width
-				
+
 			custom_tooltip_textbox_with_empty_line = {
 				datacontext = "[Company.GetCompanyType]"
 				text = "DATA_COMPANY_TYPE_CATEGORY"
-			}				
+			}
 
 			custom_tooltip_textbox = {
 				text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP"
@@ -7513,10 +8537,10 @@ types TooltipTypes
 
 		blockoverride "tooltip_content_after" {
 			datacontext = "[GetPlayer]"
-			
+
 			custom_tooltip_textbox_with_empty_line = {
 				text = "DATA_COMPANY_TYPE_CATEGORY"
-			}				
+			}
 
 			custom_tooltip_textbox_with_empty_line = {
 				text = "DATA_COMPANY_TYPE_PREDICTED_PRODUCTIVITY"
@@ -7669,169 +8693,188 @@ types TooltipTypes
 		}
 	}
 
-	type RegularTooltip_WarGoal = RegularTooltip {
-		blockoverride "tooltip_content" {
+	type FancyTooltip_WarGoalDraftArticle = FancyTooltip_WarGoalDraft {
+		datacontext = "[WarGoalDraft.GetDiplomaticPlay]"
+
+		blockoverride "wargoal_icon_texture" {
+			texture = "[WarGoalDraft.GetArticleType.GetIcon]"
+		}
+
+		blockoverride "wargoal_type" {
+			raw_text = "WARGOAL_ARTICLE_TYPE"
+		}
+
+		blockoverride "war_goal_before_text" {
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetRequiredInputsDesc))]"
+				text = "[ArticleDraft.GetRequiredInputsDesc]"
+			}
+
+			block "can_add_article_text" {}
+
 			flowcontainer = {
-				parentanchor = hcenter
-				spacing = 2
+				visible = "[And(ArticleDraft.HasType('law_commitment'), ArticleDraft.HasAllRequiredInputsSet)]"
 				direction = vertical
+				datacontext = "[WarGoalDraft.GetArticleDraft]"
+				datacontext = "[WarGoalDraft.GetTarget]"
+				datacontext = "[ArticleDraft.GetLawType]"
 
 				flowcontainer = {
-					spacing = 5
+					margin = { 15 10 }
+
+					tooltipwidget = {
+						FancyTooltip_LawType = {}
+					}
+
+					background = {
+						using = entry_bg
+					}
 
 					flowcontainer = {
-						direction = vertical
-						minimumsize = { 500 -1 }
-
-						custom_tooltip_textbox = {
-							max_width = 450
-							raw_text = "#header [WarGoal.GetName]#!"
-						}
-
-						block "can_add_text" {}
-
-						custom_tooltip_textbox = {
-							max_width = 450
-							text = "WARGOAL_SUBHEADER_HOLDER_AND_TARGET"
-						}
-					}
-
-					textbox = {
 						parentanchor = vcenter
-						autoresize = yes
-						align = nobaseline
-						using = fontsize_small
-						alpha = 0.75
-						max_width = 50
-						elide = right
-						default_format = "#title"
-						text = "TOOLTIP_TYPE_WAR_GOAL"
+						spacing = 10
+
+						icon = {
+							parentanchor = vcenter
+							size = { 50 50 }
+							texture = "[LawType.GetTexture]"
+						}
+
+						flowcontainer = {
+							parentanchor = vcenter
+							direction = vertical
+
+							custom_tooltip_textbox = {
+								max_width = 450
+								text = "[LawType.GetGroup.GetName]"
+							}
+
+							custom_tooltip_textbox = {
+								max_width = 450
+								using = fontsize_large
+								text = "[LawType.GetNameNoFormatting]"
+							}
+						}
 					}
 				}
 
-				custom_tooltip_textbox = {
-					text = "DIPLO_PLAY_WAR_GOAL_PRIMARY_OR_SECONDARY"
-				}
-
-				tooltip_divider = {}
-
-				block "war_goal_before_text" {}
-
-				custom_tooltip_textbox = {
-					visible = "[WarGoal.HoldsArticle]"
-					text = "ADD_ARTICLE_WARGOAL_BINDING_PERIOD"
-				}
-
-				block "infamy" {}
-
-				block "maneuver_cost" {}
-
-				custom_tooltip_textbox_with_empty_line = {
-					visible = "[WarGoal.IsPartOfWar]"
-					text = "WAR_GOAL_CONTESTED_DESC_SHORT"
+				widget = {
+					size = { 5 5 }
 				}
 
 				custom_tooltip_textbox_with_empty_line = {
-					visible = "[And(Not(WarGoal.IsPartOfWar),WarGoal.IsPartOfPlay)]"
-					raw_text = "[WarGoal.GetIsContestedDesc]"
+					visible = "[ObjectsEqual(ArticleDraft.GetLawType, Country.GetActiveLawFromGroup(ArticleDraft.GetLawType.GetGroup.GetKey).GetLawType)]"
+					text = "ACTIVE_LAW_COUNTRY"
 				}
 
 				custom_tooltip_textbox_with_empty_line = {
-					visible = "[Not(StringIsEmpty(WarGoal.GetStatusString))]"
-					text = "[WarGoal.GetStatusString]"
+					visible = "[And(Not(ObjectsEqual(ArticleDraft.GetLawType, Country.GetActiveLawFromGroup(ArticleDraft.GetLawType.GetGroup.GetKey).GetLawType)), Not(ObjectsEqual(ArticleDraft.GetLawType, Country.GetLawBeingEnacted.GetLawType)))]"
+					text = "INACTIVE_LAW_COUNTRY"
 				}
 
-				custom_tooltip_textbox = {
-					text = "ARTICLE_TYPE_EFFECTS_TITLE"
+				custom_tooltip_textbox_with_empty_line = {
+					visible = "[ObjectsEqual(ArticleDraft.GetLawType, Country.GetLawBeingEnacted.GetLawType)]"
+					datacontext = "[Country.GetLawBeingEnacted]"
+					text = "LAW_BEING_ENACTED_DESC"
 				}
+			}
+		}
 
-				block "war_goal_desc" {
-					custom_tooltip_textbox = {
-						margin_left = 10
-						text = "[WarGoal.GetDesc]"
-					}
-				}
+		blockoverride "infamy" {
+			custom_tooltip_textbox = {
+				visible = "[GreaterThan_CFixedPoint(ArticleDraft.GetWarGoalInfamyValue(GetPlayer.Self), '(CFixedPoint)0')]"
+				text = "[ArticleDraft.GetWarGoalInfamyValueDesc(GetPlayer.Self)]"
+			}
+		}
 
-				custom_tooltip_textbox = {
-					margin_left = 10
-					text = "[WarGoal.GetInfamyDesc]"
-				}
+		blockoverride "maneuver_cost" {
+			custom_tooltip_textbox_with_empty_line = {
+				text = "[ArticleDraft.GetWarGoalManeuversCostDesc(GetPlayer.Self, DiplomaticPlay.Self)]"
+			}
+		}
 
-				custom_tooltip_textbox = {
-					visible = "[Not(StringIsEmpty(WarGoal.GetAddWarGoalDiplomaticIncidentDesc))]"
-					text "[WarGoal.GetAddWarGoalDiplomaticIncidentDesc]"
-				}
+		blockoverride "click_prompt_visibility" {
+			visible = no
+		}
 
-				custom_tooltip_newline = {
-					block "click_prompt_visibility" {
-						visible = "[And(WarGoal.HoldsArticle, WarGoal.GetArticleType.RequiresAnyInput)]"
-					}
-				}
+		blockoverride "war_goal_desc" {
+			### GENERAL EFFECTS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetEffectsDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_EFFECTS"
+			}
 
-				flowcontainer = {
-					block "click_prompt_visibility" {
-						visible = "[And(WarGoal.HoldsArticle, WarGoal.GetArticleType.RequiresAnyInput)]"
-					}
+			### RELATION EFFECTS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetRelationsEffectDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_EFFECTS_RELATION"
+			}
 
-					direction = vertical
-					spacing = 2
-					datacontext = "[WarGoal.GetArticleType]"
-					datacontext = "[WarGoal.GetArticleDraft]"
+			custom_tooltip_newline = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetMutualModifierDesc))]"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[Not(Or(Or(Or(ArticleDraft.RequiresInput('goods'), ArticleType.HasType('money_transfer')), Or(ArticleType.HasType('acquire_monopoly_for_company'), ArticleDraft.RequiresInput('state'))), Or(ArticleDraft.RequiresInput('strategic_region'), ArticleDraft.RequiresInput('law_type'))))]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT"
-					}
+			### MUTUAL MODIFIERS TITLE
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetMutualModifierDesc))]"
+				text = "ARTICLE_DRAFT_MUTUAL_MODIFIERS_TITLE"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[And(Not(ArticleType.HasType('goods_transfer')), ArticleDraft.RequiresInput('goods'))]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS"
-					}
+			### MUTUAL MODIFIERS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetMutualModifierDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_MUTUAL_MODIFIERS"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleType.HasType('goods_transfer')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_GOODS_AND_AMOUNT"
-					}
+			custom_tooltip_newline = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetSourceModifierDesc))]"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleType.HasType('money_transfer')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_MONEY"
-					}
+			### SOURCE MODIFIERS TITLE
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetSourceModifierDesc))]"
+				text = "ARTICLE_DRAFT_WAR_GOAL_SOURCE_MODIFIERS_TITLE"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleType.HasType('acquire_monopoly_for_company')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_COMPANY_AND_INDUSTRY"
-					}
+			### SOURCE MODIFIERS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetSourceModifierDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_SOURCE_MODIFIERS"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleDraft.RequiresInput('state')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STATE"
-					}
+			custom_tooltip_newline = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetTargetModifierDesc))]"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleDraft.RequiresInput('strategic_region')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_STRATEGIC_REGION"
-					}
+			### TARGET MODIFIERS TITLE
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetTargetModifierDesc))]"
+				text = "ARTICLE_DRAFT_WAR_GOAL_TARGET_MODIFIERS_TITLE"
+			}
 
-					custom_tooltip_textbox = {
-						visible = "[ArticleDraft.RequiresInput('law_type')]"
-						default_format = "#i"
-						text = "CLICK_TO_SELECT_ARTICLE_INPUT_LAW"
-					}
-				}
+			### TARGET MODIFIERS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetTargetModifierDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_TARGET_MODIFIERS"
 			}
 		}
 	}
 
-	type RegularTooltip_WarGoalArticle = RegularTooltip_WarGoal {
+	type FancyTooltip_WarGoalArticle = FancyTooltip_WarGoal {
 		datacontext = "[WarGoal.GetDiplomaticPlay]"
+
+		blockoverride "wargoal_icon_texture" {
+			texture = "[WarGoal.GetArticleType.GetIcon]"
+		}
+
+		blockoverride "wargoal_type" {
+			text = "WARGOAL_ARTICLE_TYPE"
+		}
 
 		blockoverride "war_goal_before_text" {
 			custom_tooltip_textbox_with_empty_line = {
@@ -7917,7 +8960,7 @@ types TooltipTypes
 		}
 
 		blockoverride "maneuver_cost" {
-			custom_tooltip_textbox_with_empty_line = {
+			custom_tooltip_textbox = {
 				text = "[ArticleDraft.GetWarGoalManeuversCostDesc(GetPlayer.Self, DiplomaticPlay.Self)]"
 			}
 		}
@@ -9470,8 +10513,14 @@ types TooltipTypes
 			text = "[ModifierBreakdown.GetTypeName]"
 		}
 
-		blockoverride "instruction_text" {
-			text = "[ModifierBreakdown.GetTypeDescription]"
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_newline = {
+				visible = "[Not(StringIsEmpty(ModifierBreakdown.GetTypeDescription))]"
+			}
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ModifierBreakdown.GetTypeDescription))]"
+				text = "[ModifierBreakdown.GetTypeDescription]"
+			}
 		}
 	}
 }
@@ -9552,7 +10601,7 @@ template building_ownership_share_tooltip
 						flowcontainer = {
 							direction = vertical
 
-							datamodel = "[BuildingOwnership.GetOwnedBuilding.AccessPopsList.GetItems]"
+							datamodel = "[BuildingOwnership.GetOwnedBuilding.AccessOwnerPopsList.GetItems]"
 
 							item = {
 								custom_tooltip_textbox = {
@@ -9573,7 +10622,7 @@ template building_ownership_share_tooltip
 						flowcontainer = {
 							direction = vertical
 
-							datamodel = "[BuildingOwnership.GetOwnerBuilding.AccessPopsList.GetItems]"
+							datamodel = "[BuildingOwnership.GetOwnerBuilding.AccessOwnerPopsList.GetItems]"
 
 							item = {
 								custom_tooltip_textbox = {

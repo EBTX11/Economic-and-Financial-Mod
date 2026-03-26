@@ -188,7 +188,7 @@ types building_panels
 
 				### BUILDING ICON
 				button = {
-					visible = "[Not(Building.IsBuildingType('building_company_headquarter'))]" #todo - PRCAL-38246 Make sure this function works for company HQs, does not seem to be correct atm, but it works for other building types.
+					visible = "[Not(Or(Building.IsBuildingType('building_company_headquarter'), Building.IsBuildingType('building_company_regional_headquarter')))]"
 					size = { 115 115 }
 					onrightclick = "[RightClickMenuManager.ShowForBuilding(Building.AccessSelf)]"
 
@@ -219,9 +219,8 @@ types building_panels
 
 				### BUILDING COMPANY ICON
 				button = {
-					visible = "[Building.IsBuildingType('building_company_headquarter')]"
+					visible = "[Or(Building.IsBuildingType('building_company_headquarter'), Building.IsBuildingType('building_company_regional_headquarter'))]"
 					datacontext = "[Building.GetCompany]"
-					parentanchor = hcenter
 					size = { 115 115 }
 					using = tooltip_se
 					tooltip = "GO_TO_BUTTON_COMPANY"
@@ -396,35 +395,39 @@ types building_panels
 				parentanchor = hcenter
 				sort_button = {
 					size = { 280 30 }
-					text = "BUILDING"
 					align = left|nobaseline
 					onclick = "[Building.SortBuildings('name')]"
+					tooltip = "SORT_BY_BUILDING_NAME"
+					text = "BUILDING"
 				}
 				
 				sort_button = {
 					size = { 120 30 }
-					text = "OWNED"
 					align = left|nobaseline
 					onclick = "[Building.SortBuildings('level')]"
+					tooltip = "OWNED"
+					text = "OWNED"
 				}
 				
 				sort_button = {
 					size = { 70 30 }
+					align = left|nobaseline
 					tooltip = "BUILDING_PROFITABILITY_HEADER_TOOLTIP"
+					onclick = "[Building.SortBuildings('earnings_per_employee')]"
+
 					icon = {
 						texture = "gfx/interface/buttons/sort_button_icons/sort_icon_profitability.dds"
 						size = { 25 25 }
 						parentanchor = center
 					}
-					align = left|nobaseline
-					onclick = "[Building.SortBuildings('earnings_per_employee')]"
 				}
 
 				sort_button = {
 					size = { 70 30 }
-					text = "DIVIDENDS"
 					align = left|nobaseline
 					onclick = "[Building.SortBuildings('dividend')]"
+					tooltip = "[concept_dividends]"
+					text = "DIVIDENDS"
 				}
 			}
 
@@ -1142,9 +1145,9 @@ types building_panels
 					direction = vertical
 					datamodel = "[Building.AccessState.GetImports]"
 					margin_bottom = 10
-					
+
 					item = {
-						building_imports_exports_item = {}		
+						building_imports_exports_item = {}
 					}
 				}
 			}
@@ -1192,7 +1195,7 @@ types building_panels
 					direction = vertical
 					datamodel = "[Building.AccessState.GetExports]"
 					margin_bottom = 10
-					
+
 					item = {
 						building_imports_exports_item = {
 							blockoverride "tooltip" {
@@ -1201,7 +1204,7 @@ types building_panels
 
 							blockoverride "amount" {
 								raw_text = "[Building.GetState.GetExportedAmount(Goods.Self)|v0D]"
-							}	
+							}
 
 							blockoverride "amount_progressbar_widget_properties" {
 								tooltip = "STATE_GOODS_EXPORT_DEPENDENCE"
@@ -1210,7 +1213,7 @@ types building_panels
 								gold_progressbar_horizontal = {
 									size = { 100% 100% }
 									alpha = "[TransparentIfZero(Goods.GetStateExports)]"
-								
+
 									blockoverride "values" {
 										min = 0
 										max = "[Goods.GetStateConsumption]"
@@ -1220,13 +1223,13 @@ types building_panels
 							}
 
 							blockoverride "first_price" {
-								raw_text = "[Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )] [Goods.GetStatePrice|v1]"						
+								raw_text = "[Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStateExportPrice )] [Goods.GetStateExportPrice|v1]"
 							}
-							
+
 							blockoverride "second_price" {
-								raw_text = "[Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStateExportPrice )] [Goods.GetStateExportPrice|v1]"						
-							}	
-							
+								raw_text = "[Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )] [Goods.GetStatePrice|v1]"
+							}
+
 							blockoverride "advantage" {
 								raw_text = "[Goods.GetStateRelativeExportAdvantage|=+%0]"
 								tooltip = "[Goods.GetStateRelativeExportAdvantageDesc]"
@@ -1239,8 +1242,8 @@ types building_panels
 							blockoverride "provider"{
 								datamodel = "[Goods.GetImportersFromState]"
 							}
-						}		
-					}						
+						}
+					}
 				}
 			}
 		}
@@ -1735,7 +1738,7 @@ types building_panels
 			text = "AMOUNT"
 			tooltip = "AMOUNT"
 			enabled = no
-			
+
 			size = { 64 20 }
 			align = hcenter|nobaseline
 		}
@@ -1747,7 +1750,7 @@ types building_panels
 			}
 
 			enabled = no
-			
+
 			size = { 80 20 }
 			elide = right
 		}
@@ -1757,7 +1760,7 @@ types building_panels
 			tooltip = "concept_local_price"
 
 			enabled = no
-			
+
 			size = { 80 20 }
 			elide = right
 		}
@@ -1767,7 +1770,7 @@ types building_panels
 			tooltip = "concept_trade_advantage"
 
 			enabled = no
-			
+
 			size = { 60 20 }
 			elide = right
 		}
@@ -1779,7 +1782,7 @@ types building_panels
 			}
 
 			enabled = no
-			
+
 			size = { 129 20 }
 			elide = right
 		}
@@ -1789,7 +1792,7 @@ types building_panels
 			tooltip = "concept_revenue"
 
 			enabled = no
-			
+
 			size = { 87 20 }
 			elide = right
 		}
@@ -1844,7 +1847,7 @@ types building_panels
 						gold_progressbar_horizontal = {
 							size = { 100% 100% }
 							alpha = "[TransparentIfZero(Goods.GetStateImports)]"
-						
+
 							blockoverride "values" {
 								min = 0
 								max = "[Goods.GetStateProduction]"
@@ -1862,7 +1865,7 @@ types building_panels
 			textbox = {
 				block "first_price" {
 					raw_text = "[Goods.GetStateImportPrice|v1] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStateImportPrice )]"
-				}		
+				}
 				parentanchor = vcenter
 				align = right|nobaseline
 
@@ -1870,12 +1873,12 @@ types building_panels
 				using = elide_fontsize_min
 				margin_right = 7
 
-			}	
-			
+			}
+
 			vertical_divider = {}
 
 			textbox = {
-				block "second_price" {		
+				block "second_price" {
 					raw_text = "[Goods.GetStatePrice|v1] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStatePrice )]"
 				}
 				parentanchor = vcenter
@@ -1886,7 +1889,7 @@ types building_panels
 			}
 
 			vertical_divider = {}
-				
+
 			textbox = {
 				block "advantage" {
 					raw_text = "[Goods.GetStateRelativeImportAdvantage|=+%0]"
@@ -1922,14 +1925,14 @@ types building_panels
 			vertical_divider = {}
 
 			textbox = {
-				block "revenue" {		
+				block "revenue" {
 					raw_text = "[Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetState.GetImportRevenue(Goods.Self)|+K]"
 				}
 				parentanchor = vcenter
 				align = right|nobaseline
 				size = { 80 23 }
 				using = elide_fontsize_min
-			}			
+			}
 		}
 	}
 
@@ -2214,7 +2217,7 @@ types building_panels
 							onclick = "[InformationPanelBar.OpenCompanyPanel(Company.Self)]"
 							tooltip = "GO_TO_BUTTON_COMPANY"
 							using = tooltip_ne
-							
+
 							textbox = {
 								size = { 100% 100% }
 								align = hcenter|nobaseline
@@ -2243,7 +2246,7 @@ types building_panels
 								texture = "[StateTrait.GetTexture]"
 							}
 						}
-					}
+					} 
 
 					############################################################################################################################################################
 					############################################################################################################################################################
@@ -2298,7 +2301,7 @@ types building_panels
 					############################################################################################################################################################
 					############################################################################################################################################################
 					############################################################################################################################################################
-
+ 
 					block "productivity" {
 						textbox = {
 							visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
@@ -2340,45 +2343,6 @@ types building_panels
 				flowcontainer = {
 					parentanchor = vcenter
 					margin_left = 2
-				
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-
-					# ███╗   ███╗ ██████╗ ██████╗ 
-					# ████╗ ████║██╔═══██╗██╔══██╗
-					# ██╔████╔██║██║   ██║██║  ██║
-					# ██║╚██╔╝██║██║   ██║██║  ██║
-					# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-					# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
-
-					#E&F mod
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-
-					visible = "[Not(Building.IsBuildingType('building_national_stockpile'))]"
-
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-
-					# ███╗   ███╗ ██████╗ ██████╗ 
-					# ████╗ ████║██╔═══██╗██╔══██╗
-					# ██╔████╔██║██║   ██║██║  ██║
-					# ██║╚██╔╝██║██║   ██║██║  ██║
-					# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-					# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
-
-					#E&F mod
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-					############################################################################################################################################################
-
 					
 					condensed_building_information_pms = {
 						blockoverride "pms_slot_sizes" {
@@ -2475,7 +2439,7 @@ types building_panels
 			}
 
 			blockoverride "icon_size" {
-							size = { 77% 77% }
+				size = { 77% 77% }
 			}	
 		}
 
@@ -2493,14 +2457,14 @@ types building_panels
 			}
 
 			blockoverride "icon_size" {
-							size = { 77% 77% }
+				size = { 77% 77% }
 			}
 		}
 	}
 
 	### subsidize
 	type building_subsidize_toggle = widget {
-		visible = "[IsPotential( Building.ToggleSubsidies )]"
+		visible = "[Building.GetBuildingType.CanBeSubsidized]"
 		size = { 35 35 }
 		
 		icon = {
@@ -2526,7 +2490,7 @@ types building_panels
 			}
 
 			blockoverride "icon_size" {
-							size = { 77% 77% }
+				size = { 77% 77% }
 			}	
 		}
 
@@ -2544,7 +2508,7 @@ types building_panels
 			}
 
 			blockoverride "icon_size" {
-							size = { 77% 77% }
+				size = { 77% 77% }
 			}
 		}
 	}
@@ -2955,7 +2919,7 @@ types building_panels
 	### Country Monopolized, only the icon
 	type building_country_monopoly_icon = widget {
 		size = { 30 30 }
-		
+
 		icon = {
 			using = rotate_glow_blue
 			size = { 100% 100% }
@@ -2963,7 +2927,7 @@ types building_panels
 			parentanchor = center
 			alpha = 0.3
 		}
-		
+
 		icon = {
 			size = { 100% 100% }
 			tooltip = "COUNTRY_MONOPOLIZE_TOOLTIP_ACTIVE"
@@ -3572,7 +3536,7 @@ types building_panels
 	type building_progressbars = flowcontainer {
 		direction = vertical
 		spacing = 8
-		
+
 		building_employment_bar = {}
 
 		widget = {
@@ -4280,6 +4244,18 @@ types building_panels
 			tooltip = "OWNERSHIP_SHARE_CHART_REMAINDER_TOOLTIP_LONG"
 		}
 
+		blockoverride "barchart_item_margins" {
+			margin = { 0 0 }
+		}
+
+		blockoverride "barchart_item_background" {
+			background = {
+				texture = "gfx/interface/tooltip/stacked_barchart_small_item.dds"
+				color = "[BuildingOwnership.GetOwnershipTypeColor]"
+				spriteType = Corneredstretched
+				spriteborder = { 3 3 }
+			}
+		}
 	}
 
 
@@ -4303,6 +4279,19 @@ types building_panels
 
 		blockoverride "building_owner_icon_size" {
 			size = { 25 25 }
+		}
+
+		blockoverride "barchart_item_margins" {
+			margin = { 0 0 }
+		}
+
+		blockoverride "barchart_item_background" {
+			background = {
+				texture = "gfx/interface/tooltip/stacked_barchart_small_item.dds"
+				color = "[BuildingOwnership.GetOwnershipTypeColor]"
+				spriteType = Corneredstretched
+				spriteborder = { 3 3 }
+			}
 		}
 	}
 

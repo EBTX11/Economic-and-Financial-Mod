@@ -204,7 +204,7 @@ types company_panel_types
 								company_charter_button_horizontal = {
 									visible = "[Not(Or(And(CompanyCharterType.IsTradeCharter, Company.HasAnyTradeCharterActive), And(CompanyCharterType.IsInvestmentCharter, Company.HasAnyInvestmentCharterActive)))]"
 									enabled = "[IsValid(Company.ToggleCharter(CompanyCharterType.Self))]"
-									
+
 									blockoverride "onclick" {
 										onclick = "[PopupManager.AskConfirmationWithSound(Company.ToggleCharter(CompanyCharterType.Self), 'event:/SFX/UI/CompanyCharters/company_charter_grant')]"
 										using = icon_toggle_single_on_sound
@@ -410,7 +410,7 @@ types company_panel_types
 					margin_left = 18
 					margin_right = 10
 					margin_bottom = 10
-					
+
 					modify_texture = {
 						texture = "gfx/interface/masks/fade_vertical_center.dds"
 						spriteType = Corneredstretched
@@ -628,13 +628,50 @@ types company_panel_types
 											datamodel = "[Company.GetPrestigeGoods]"
 											
 											item = {
-												icon = {
-													size = { 40 40 }
+												button = {
+													texture = "gfx/interface/market_view/trade_good_icon_bg.dds"
+													color = "[Goods.GetCategoryColor]"
 													alpha = "[TransparentIfFalse(Company.IsProducingPrestigeGoods)]"
-													texture = "[Goods.GetTexture]"
-													
+													enabled = "[Company.IsProducingPrestigeGoods]"
+													onclick = "[InformationPanelBar.OpenGoodsPanel(Goods.GetMarket, Goods.Self)]"
+													onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+
 													tooltipwidget = {
 														FancyTooltip_Goods = {}
+													}
+
+													block "bg_size" {
+														size = { 55 55 }
+													}
+
+													button = {
+														texture = "[Goods.GetTexture]"
+														size = { 40 40 }
+														parentanchor = center
+														alwaystransparent = yes
+													}
+
+													icon = {
+														visible = "[Goods.HasGoodsShortage]"
+														tooltip = "GOODS_SHORTAGE_TOOLTIP"
+
+														size = { 25 25 }
+														texture = "gfx/interface/icons/generic_icons/goods_shortage.dds"
+														parentanchor = bottom
+													}
+
+													cannot_be_trade_icon = {}
+
+													icon = {
+														size = { 100% 100% }
+														texture = "gfx/interface/icons/goods_icons/prestige_goods/trade_good_icon_prestige_frame.dds"
+														visible = "[Goods.IsPrestigeGoods]"
+													}
+
+													icon = {
+														size = { 100% 100% }
+														texture = "gfx/interface/icons/goods_icons/prestige_goods/trade_good_icon_prestige_ribbon.dds"
+														visible = "[Goods.IsPrestigeGoods]"
 													}
 												}
 											}
@@ -669,14 +706,14 @@ types company_panel_types
 															texture = "[BuildingType.GetIcon]"
 
 															icon = {
-																visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																visible = "[And(Company.HasAnyTradeCharterActive, ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self))]"
 																parentanchor = right
 																size = { 30 30 }
 																texture = "gfx/interface/backgrounds/round_button_bg.dds"
 															
 
 																icon = {
-																	visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																	visible = "[And(Company.HasAnyTradeCharterActive, ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self))]"
 																	parentanchor = center
 																	size = { 75% 75% }
 																	texture = "gfx/interface/icons/company_charter_icons/trade_charter.dds"
@@ -702,7 +739,7 @@ types company_panel_types
 																FancyTooltip_BuildingType = {
 																	blockoverride "tooltip_content_before" {
 																		custom_tooltip_textbox_with_empty_line = {
-																			visible = "[ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self)]"
+																			visible = "[And(Company.HasAnyTradeCharterActive, ObjectsEqual(BuildingType.Self, GetBuildingType('building_trade_center').Self))]"
 																			text = "BUILDING_TYPE_ICON_TRADE_CHARTER"
 																		}
 
@@ -1226,7 +1263,7 @@ types company_panel_types
 			direction = vertical
 			spacing = 10
 
-			default_header = {
+			default_header_hbox = {
 				blockoverride "text" {
 					block "header_text" {
 						text = "COMPANY_COUNTRIES_AND_COLONIES_HEADER"
@@ -1459,8 +1496,6 @@ types company_panel_types
 				size = { 45 45 }
 				position = { -15 -15 }
 
-				blockoverride "datacontext " {}
-
 				blockoverride "font_size_under_100_rank" {
 					using = fontsize_medium
 				}
@@ -1508,138 +1543,173 @@ types company_panel_types
 
 			property_portfolio_stacked_bar_chart = {}
 		}
-		
-		# Sorting
-		flowcontainer = {
-			parentanchor = hcenter
-			sort_button = {
-				size = { 280 30 }
-				text = "BUILDING"
-				align = left|nobaseline
-				onclick = "[Building.SortBuildings('name')]"
-			}
-			
-			sort_button = {
-				size = { 120 30 }
-				text = "OWNED"
-				align = left|nobaseline
-				onclick = "[Building.SortBuildings('level')]"
-			}
-			
-			sort_button = {
-				size = { 70 30 }
-				tooltip = "BUILDING_PROFITABILITY_HEADER_TOOLTIP"
-				icon = {
-					texture = "gfx/interface/buttons/sort_button_icons/sort_icon_profitability.dds"
-					size = { 25 25 }
-					parentanchor = center
-				}
-				align = left|nobaseline
-				onclick = "[Building.SortBuildings('earnings_per_employee')]"
+
+		widget = {
+			size = { 5 5 }
+		}
+
+		### COMPANY HQ ASSETS DROPDOWN
+		section_header_button = {
+			blockoverride "layout" {
+				parentanchor = hcenter
+				size = { @panel_width 38 }
 			}
 
-			sort_button = {
-				size = { 70 30 }
-				text = "DIVIDENDS"
-				align = left|nobaseline
-				onclick = "[Building.SortBuildings('dividend')]"
+			blockoverride "left_text" {
+				text = "COMPANY_HQ_ASSETS_HEADER"
+				using = elide_fontsize_min
+			}
+
+			blockoverride "onclick" {
+				onclick = "[GetVariableSystem.Toggle(Concatenate('company_hq_item_', Building.GetIDString))]"
+			}
+
+			blockoverride "onclick_showmore" {
+				visible = "[Not(GetVariableSystem.Exists(Concatenate('company_hq_item_', Building.GetIDString)))]"
+			}
+
+			blockoverride "onclick_showless" {
+				visible = "[GetVariableSystem.Exists(Concatenate('company_hq_item_', Building.GetIDString))]"
 			}
 		}
 
-		# Assets
 		flowcontainer = {
-			datamodel = "[Building.GetBuildingAssets]"
+			visible = "[GetVariableSystem.Exists(Concatenate('company_hq_item_', Building.GetIDString))]"
 			parentanchor = hcenter
-			spacing = 3
 			direction = vertical
-			margin_top = 3
-			margin_bottom = 10
-			
-			item = {
-				container = {
-					background = {
-						using = fade_right_entry_header_colored
-						color = "[Select_CVector4f( BuildingOwnership.GetOwnedBuilding.IsValid, BuildingOwnership.GetOwnedBuilding.GetState.GetOwner.GetMapColor, Building.GetOwner.GetMapColor )]"
-						margin_top = 4
-						margin_left = 5
-					}
 
-					flowcontainer = {
-						visible = "[BuildingOwnership.GetOwnedBuilding.IsValid]"
-						tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
-						margin_bottom = 4
-						icon = {
-							size = { 30 30 }
-							texture = "[BuildingOwnership.GetOwnedBuilding.GetIcon]"
+			# Sorting
+			flowcontainer = {
+				parentanchor = hcenter
+				sort_button = {
+					size = { 280 30 }
+					text = "BUILDING"
+					align = left|nobaseline
+					onclick = "[Building.SortBuildings('name')]"
+				}
+
+				sort_button = {
+					size = { 120 30 }
+					text = "OWNED"
+					align = left|nobaseline
+					onclick = "[Building.SortBuildings('level')]"
+				}
+
+				sort_button = {
+					size = { 70 30 }
+					tooltip = "BUILDING_PROFITABILITY_HEADER_TOOLTIP"
+					icon = {
+						texture = "gfx/interface/buttons/sort_button_icons/sort_icon_profitability.dds"
+						size = { 25 25 }
+						parentanchor = center
+					}
+					align = left|nobaseline
+					onclick = "[Building.SortBuildings('earnings_per_employee')]"
+				}
+
+				sort_button = {
+					size = { 70 30 }
+					text = "DIVIDENDS"
+					align = left|nobaseline
+					onclick = "[Building.SortBuildings('dividend')]"
+				}
+			}
+
+			# Assets
+			flowcontainer = {
+				datamodel = "[Building.GetBuildingAssets]"
+				parentanchor = hcenter
+				spacing = 3
+				direction = vertical
+				margin_top = 3
+				margin_bottom = 10
+
+				item = {
+					container = {
+						background = {
+							using = fade_right_entry_header_colored
+							color = "[Select_CVector4f( BuildingOwnership.GetOwnedBuilding.IsValid, BuildingOwnership.GetOwnedBuilding.GetState.GetOwner.GetMapColor, Building.GetOwner.GetMapColor )]"
+							margin_top = 4
+							margin_left = 5
 						}
+
 						flowcontainer = {
-							spacing = 5
-							minimumsize = { 250 30 }
+							visible = "[BuildingOwnership.GetOwnedBuilding.IsValid]"
+							tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
+							margin_bottom = 4
+							icon = {
+								size = { 30 30 }
+								texture = "[BuildingOwnership.GetOwnedBuilding.GetIcon]"
+							}
+							flowcontainer = {
+								spacing = 5
+								minimumsize = { 250 30 }
+								textbox = {
+									maximumsize = { 220 30 }
+									text = "PROPERTY_SHARE_ENTRY_LABEL"
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_left = 5
+									autoresize = yes
+									parentanchor = vcenter
+								}
+								button_icon_goto = {
+									size = { 25 25 }
+									onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(BuildingOwnership.GetOwnedBuilding.AccessSelf)]"
+									visible = "[Building.IsValid]"
+									tooltip = "GO_TO_BUTTON_BUILDING"
+									parentanchor = vcenter
+								}
+							}
+
 							textbox = {
-								maximumsize = { 220 30 }
-								text = "PROPERTY_SHARE_ENTRY_LABEL"
-								align = nobaseline
+								size = { 120 30 }
+								text = "[BuildingOwnership.GetLevel|v]"
+								align = right|nobaseline
+								margin_right = 5
 								fontsize_min = 12
 								elide = right
-								margin_left = 5
-								autoresize = yes
-								parentanchor = vcenter
 							}
-							button_icon_goto = {
-								size = { 25 25 }
-								onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(BuildingOwnership.GetOwnedBuilding.AccessSelf)]"
-								visible = "[Building.IsValid]"
-								tooltip = "GO_TO_BUTTON_BUILDING"
-								parentanchor = vcenter
-							}
-						}
-						
-						textbox = {
-							size = { 120 30 }
-							text = "[BuildingOwnership.GetLevel|v]"
-							align = right|nobaseline
-							margin_right = 5
-							fontsize_min = 12
-							elide = right
-						}
-						
-						textbox = {
-							datacontext = "[BuildingOwnership.GetOwnedBuilding]"
-							size = { 70 30 }
-							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
-							align = left|nobaseline
-							margin_left = 5
-							using = productivity_tooltip_with_graph
-						}
 
-						textbox = {
-							size = { 70 30 }
-							raw_text = "[GetPlayer.GetCustom('currency_symbol')] [BuildingOwnership.GetDividendToOwner|D]"
-							tooltip = "BUILDING_OWNERSHIP_DIVIDENDS_TOOLTIP"
-							align = left|nobaseline
-							default_format = "#v"
+							textbox = {
+								datacontext = "[BuildingOwnership.GetOwnedBuilding]"
+								size = { 70 30 }
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
+								align = left|nobaseline
+								margin_left = 5
+								using = productivity_tooltip_with_graph
+							}
+
+							textbox = {
+								size = { 70 30 }
+								raw_text = "[GetPlayer.GetCustom('currency_symbol')][BuildingOwnership.GetDividendToOwner|D]"
+								tooltip = "BUILDING_OWNERSHIP_DIVIDENDS_TOOLTIP"
+								align = left|nobaseline
+								default_format = "#v"
+							}
 						}
-					}
-					
-					flowcontainer = {
-						visible = "[Not(BuildingOwnership.GetOwnedBuilding.IsValid)]"
-						tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
-						margin_bottom = 4
-						minimumsize = { 250 30 }
 						
-						textbox = {
-							size = { 120 30 }
-							text = "BUILDING_OWNERSHIP_INVALID_ENTRY"
-							align = right|nobaseline
-							margin_right = 5
-							fontsize_min = 12
-							elide = right
+						flowcontainer = {
+							visible = "[Not(BuildingOwnership.GetOwnedBuilding.IsValid)]"
+							tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
+							margin_bottom = 4
+							minimumsize = { 250 30 }
+
+							textbox = {
+								size = { 120 30 }
+								text = "BUILDING_OWNERSHIP_INVALID_ENTRY"
+								align = right|nobaseline
+								margin_right = 5
+								fontsize_min = 12
+								elide = right
+							}
 						}
-					}
-					
-					divider_clean = {
-						parentanchor = bottom|hcenter
-						size = { 100% 1 }
+						
+						divider_clean = {
+							parentanchor = bottom|hcenter
+							size = { 100% 1 }
+						}
 					}
 				}
 			}
@@ -1683,11 +1753,11 @@ types company_panel_types
 				}
 
 				blockoverride "maxvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')] [GetMax(Company.GetProductivityTrend)|Dv]"
+					raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetMax(Company.GetProductivityTrend)|Dv]"
 				}
 
 				blockoverride "minvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')] 0"
+					raw_text = "0"
 				}
 
 				blockoverride "startdate" {
@@ -1804,15 +1874,15 @@ types company_panel_types
 			}
 
 			blockoverride "line_plotpoints" {
-				plotpoints = "[GetTrendPlotPointsNormalized(Company.GetProfitTrend, Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetProfitTrend)), Max_CFixedPoint(GetMax(Company.GetRevenueTrend), GetMax(Company.GetProfitTrend)))]"
+				plotpoints = "[GetTrendPlotPointsNormalized(Company.GetProfitTrend, Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetProfitTrend)), GetMax(Company.GetProfitTrend))]"
 			}
 
 			blockoverride "maxvalue" {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Max_CFixedPoint(GetMax(Company.GetRevenueTrend), GetMax(Company.GetProfitTrend))|=+D]"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Max_CFixedPoint(GetMax(Company.GetRevenueTrend), GetMax(Company.GetProfitTrend))|=+D]"
 			}
 
 			blockoverride "minvalue" {
-				raw_text = "[GetPlayer.GetCustom('currency_symbol')] [Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetRevenueTrend))|=+D]"
+				raw_text = "[GetPlayer.GetCustom('currency_symbol')][Min_CFixedPoint('(CFixedPoint)0', GetMin(Company.GetRevenueTrend))|=+D]"
 			}
 
 			blockoverride "startdate" {
@@ -2118,7 +2188,7 @@ types company_panel_types
 			block "onclick" {
 				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
 			}
-			
+
 			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
 			button = {
 				size = { 75% 75% }
@@ -2233,7 +2303,7 @@ types company_panel_types
 			block "onclick" {
 				onclick = "[PopupManager.AskConfirmationCustom(Company.ToggleCharter(CompanyCharterType.Self), 'company_charter_confirmation_window')]"
 			}
-			
+
 			### MAINTINING HIGHLIGHT WITH A BUTTON HERE AS WELL
 			button = {
 				size = { 75% 75% }

@@ -10660,7 +10660,7 @@ global_monetary_reference_reset = {
 						or = {
 							is_subject_custom_trigger = yes
 							market_owner_is_root_univ_with_buiding = yes
-						}
+						} 
 					}
 				}
 				devaluation_money_value_target = yes
@@ -10674,7 +10674,10 @@ global_monetary_reference_reset = {
 				every_country = {
 					limit = {
 						is_player = yes
-					}
+						scope:target_country = {
+							scripted_money_value_target = no #test empeche UK et Mex d'avoir une notification pour indiquer une modification de parité inverse
+						} 
+ 					}
 					trigger_event = 00_ef_economic_event.31
 				}
 
@@ -10691,7 +10694,7 @@ global_monetary_reference_reset = {
 						or = {
 							is_subject_custom_trigger = yes
 							market_owner_is_root_univ_with_buiding = yes
-						}
+						} 
 					}
 				}
 				revaluation_money_value_target = yes
@@ -10705,11 +10708,13 @@ global_monetary_reference_reset = {
 				every_country = {
 					limit = {
 						is_player = yes
+						scope:target_country = {
+							scripted_money_value_target = no #test empeche UK et Mex d'avoir une notification pour indiquer une modification de parité inverse
+						} 
 					}
 					trigger_event = 00_ef_economic_event.32
 				}
-
-
+ 
 				remove_modifier = revaluation_currency_target
 				add_modifier = {
 					name = revaluation_currency_target
@@ -135698,6 +135703,41 @@ central_bank_production_methods = {
 				production_method = pm_no_subject_currency_type
 			}
 		}
+ 
+		# if = { #le pays est suijet et isolationiste il doit prendre la PM External exchange qui ne se met pas automatiquement
+		# 	limit = {
+		# 		owner = { 
+		# 			has_law = law_type:law_isolationism 
+		# 			market_owner_is_root = no #pas de switch vers Fiat standart loi si le pays est sujet et isolationiste, ce qui veux dire que il est en currency obligatoirement ouvert si il est sujet, ce qui pose pas de probleme puisque il est dans le marché du overlord -> quand devien independent la boucle reprend ici pour appliquer le fiat standart et donc fermer le marcher
+ 		# 		} 
+		# 		or = { 
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_fiat_standard_bank_money_currency
+		# 			} 
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_silver_standard_bank_money_currency
+		# 			} 
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_bimetallism_standard_bank_money_currency
+		# 			} 
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_gold_standard_bank_money_currency
+		# 			} 
+		# 			is_production_method_active = {
+		# 				building_type = building_bank
+		# 				production_method = pm_gold_exchange_standard_bank_money_currency
+		# 			} 
+		# 		}  
+		# 	}
+		# 	activate_production_method = {
+		# 		building_type = building_bank
+		# 		production_method = pm_external_exchange_standard_bank_money_currency
+		# 	}
+		# }
 
 		#########################
 		#pm_silver_consuption
@@ -143224,54 +143264,57 @@ reset_debt_in_national_currency = {
 ###########################################################################################################################################################################################
 
 remove_suject_currency = {
+	activate_law = law_type:law_no_monetary_system #on reset les loi
 
-	#a verifier
-	if = {
-		limit = {
-			or = {
-				var:law_no_monetary_system = 1
-				AND = {
-					var:law_no_monetary_system = 0
-					var:law_fiat_standard = 0
-					var:law_silver_standard = 0
-					var:law_bimetallism_standard = 0
-					var:law_gold_standard = 0
-					var:law_gold_exchange_standard = 0
-				}
-			}
-		}
-		#activate_law = law_type:law_silver_standard #minimum à voir si autre chose ap 1873
-	}
-	if = {
-		limit = {
-			var:law_fiat_standard = 1
-		}
-		activate_law = law_type:law_fiat_standard
-	}
-	if = {
-		limit = {
-			var:law_silver_standard = 1
-		}
-		activate_law = law_type:law_silver_standard
-	}
-	if = {
-		limit = {
-			var:law_bimetallism_standard = 1
-		}
-		activate_law = law_type:law_bimetallism_standard
-	}
-	if = {
-		limit = {
-			var:law_gold_standard = 1
-		}
-		activate_law = law_type:law_gold_standard
-	}
-	if = {
-		limit = {
-			var:law_gold_exchange_standard = 1
-		}
-		activate_law = law_type:law_gold_exchange_standard
-	}
+	macro_facilities_on_action_bc = yes #On reprend completement 
+
+	# #a verifier
+	# if = {
+	# 	limit = {
+	# 		or = {
+	# 			var:law_no_monetary_system = 1
+	# 			AND = {
+	# 				var:law_no_monetary_system = 0
+	# 				var:law_fiat_standard = 0
+	# 				var:law_silver_standard = 0
+	# 				var:law_bimetallism_standard = 0
+	# 				var:law_gold_standard = 0
+	# 				var:law_gold_exchange_standard = 0
+	# 			}
+	# 		}
+	# 	}
+	# 	activate_law = law_type:law_silver_standard #minimum à voir si autre chose ap 1873
+	# }
+	# if = {
+	# 	limit = {
+	# 		var:law_fiat_standard = 1
+	# 	}
+	# 	activate_law = law_type:law_fiat_standard
+	# }
+	# if = {
+	# 	limit = {
+	# 		var:law_silver_standard = 1
+	# 	}
+	# 	activate_law = law_type:law_silver_standard
+	# }
+	# if = {
+	# 	limit = {
+	# 		var:law_bimetallism_standard = 1
+	# 	}
+	# 	activate_law = law_type:law_bimetallism_standard
+	# }
+	# if = {
+	# 	limit = {
+	# 		var:law_gold_standard = 1
+	# 	}
+	# 	activate_law = law_type:law_gold_standard
+	# }
+	# if = {
+	# 	limit = {
+	# 		var:law_gold_exchange_standard = 1
+	# 	}
+	# 	activate_law = law_type:law_gold_exchange_standard
+	# }
 
 	# every_scope_state = {
 	# 	if = {
@@ -143333,127 +143376,43 @@ remove_suject_currency = {
 	}
 }
 subject_currency = {
-	activate_law = law_type:law_external_exchange_standard
-
-	# #subject_type_protectorate_personal_union
-	# if = {
-	# 	limit = {
-	# 		or = {
-	# 			is_subject_type = subject_type_protectorate
-	# 			is_subject_type = subject_type_personal_union
+	activate_law = law_type:law_external_exchange_standard 
+ 
+	# every_scope_state = {
+ 	# 	if = {
+	# 		limit = {
+	# 			or = { 
+	# 				is_production_method_active = {
+	# 					building_type = building_bank
+	# 					production_method = pm_fiat_standard_bank_money_currency
+	# 				} 
+	# 				is_production_method_active = {
+	# 					building_type = building_bank
+	# 					production_method = pm_silver_standard_bank_money_currency
+	# 				} 
+	# 				is_production_method_active = {
+	# 					building_type = building_bank
+	# 					production_method = pm_bimetallism_standard_bank_money_currency
+	# 				} 
+	# 				is_production_method_active = {
+	# 					building_type = building_bank
+	# 					production_method = pm_gold_standard_bank_money_currency
+	# 				} 
+	# 				is_production_method_active = {
+	# 					building_type = building_bank
+	# 					production_method = pm_gold_exchange_standard_bank_money_currency
+	# 				} 
+	# 			} 
 	# 		}
-	# 	}
-	# 	every_scope_state = {
-	# 		#pm_bond_production
-	# 		if = {
-	# 			limit = {
-	# 				or = {
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_no_additional_production_method
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_desactive_bc
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_protectora_limit_30
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_puppet_limit_75
-	# 					}
-	# 				}
-	# 			}
-	# 			activate_production_method = {
-	# 				building_type = building_bank
-	# 				production_method = pm_dominion_limit_50
-	# 			}
-	# 		}
-	# 	}
-	# }
-	# #subject_type_dominione_chartered_company_vassal
-	# if = {
-	# 	limit = {
-	# 		or = {
-	# 			is_subject_type = subject_type_dominion
-	# 			is_subject_type = subject_type_chartered_company
-	# 			is_subject_type = subject_type_vassal
-	# 		}
-	# 	}
-	# 	every_scope_state = {
-	# 		#pm_bond_production
-	# 		if = {
-	# 			limit = {
-	# 				or = {
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_no_additional_production_method
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_desactive_bc
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_protectora_limit_30
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_puppet_limit_75
-	# 					}
-	# 				}
-	# 			}
-	# 			activate_production_method = {
-	# 				building_type = building_bank
-	# 				production_method = pm_dominion_limit_50
-	# 			}
-	# 		}
-	# 	}
-	# }
-	# #subject_type_puppet_colony_tributary
-	# if = {
-	# 	limit = {
-	# 		or = {
-	# 			is_subject_type = subject_type_puppet
-	# 			is_subject_type = subject_type_colony
-	# 			is_subject_type = subject_type_tributary
-	# 		}
-	# 	}
-	# 	every_scope_state = {
-	# 		#pm_bond_production
-	# 		if = {
-	# 			limit = {
-	# 				or = {
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_no_additional_production_method
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_desactive_bc
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_protectora_limit_30
-	# 					}
-	# 					is_production_method_active = {
-	# 						building_type = building_bank
-	# 						production_method = pm_dominion_limit_50
-	# 					}
-	# 				}
-	# 			}
-	# 			activate_production_method = {
-	# 				building_type = building_bank
-	# 				production_method = pm_puppet_limit_75
-	# 			}
+	# 		activate_production_method = {
+	# 			building_type = building_bank
+	# 			production_method = pm_external_exchange_standard_bank_money_currency
 	# 		}
 	# 	}
 	# }
 
 	central_bank_production_methods_2 = yes
-	#central_bank_production_methods = yes
+	#central_bank_production_methods = yes #why not?
 	money_value_target_modification = yes
 
 	#Event for player
