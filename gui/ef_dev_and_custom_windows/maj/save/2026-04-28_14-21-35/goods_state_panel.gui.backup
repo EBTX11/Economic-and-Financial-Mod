@@ -1,0 +1,855 @@
+# COPY-PASTED FOR NOW
+@panel_width_minus_20 = 520			# used to be 440
+@panel_width_minus_20_half = 260	# used to be 220
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+types goods_state_panel_types
+{
+	type goods_state_panel = default_block_window_two_lines {
+		name = "goods_state_panel"
+		
+		blockoverride "window_header_name"
+		{
+			raw_text = "#BOLD [GoodsStatePanel.GetGoods.GetNameNoIcon]#!"
+		}
+
+		blockoverride "window_header_name_line_two"
+		{
+			text = "GOODS_STATE_PANEL_LINE_TWO"
+		}
+
+		blockoverride "map_modes_button" {
+			map_modes_single_button_minimized = {
+				datacontext = "[GoodsStatePanel.GetMapModeList]"
+				using = map_modes_button_position
+			}
+		}
+
+		blockoverride "goto_button" {
+			button_icon_goto = {
+				datacontext = "[GoodsStatePanel.GetGoods.GetMarket]"
+				size = { 30 30 }
+				onclick = "[InformationPanelBar.OpenMarketPanel(Market.Self)]"
+				tooltip = "GO_TO_BUTTON_MARKET"
+				input_action = "go_to_details"
+			}
+		}
+		
+		blockoverride "fixed_top"
+		{
+			tab_buttons = {
+				
+				# OBS! these 5 tabs are copied to goods_panel.gui / goods_usage_panel.gui / goods_state_panel.gui / goods_local_prices_panel.gui
+				# consider merging these panels into the same panel
+
+				# world market
+				blockoverride "first_button" {
+					text = "concept_world_market"
+				}
+				blockoverride "first_button_tooltip" {
+					tooltip = "[concept_world_market]"
+				} 
+				blockoverride "first_button_click" {
+					onclick = "[InformationPanelBar.OpenGoodsWorldMarketPanel( GoodsStatePanel.GetGoods.Self )]"
+				}
+				blockoverride "first_button_visibility_checked" {
+					visible = "[Not(GoodsStatePanel.GetGoods.IsLocal)]"
+				}
+
+				# market
+				blockoverride "second_button" {
+					text = "[GoodsStatePanel.GetGoods.GetMarket.GetNameNoFormatting]"
+				}
+				blockoverride "second_button_tooltip" {
+					tooltip = "[GoodsStatePanel.GetGoods.GetMarket.GetNameNoFormatting]"
+				}
+				blockoverride "second_button_click" {
+					onclick = "[InformationPanelBar.OpenGoodsPanel(GoodsStatePanel.GetGoods.GetMarket, GoodsStatePanel.GetGoods.Self)]"
+				}
+				blockoverride "second_button_visibility_checked" {
+					visible = "[And(GoodsStatePanel.GetGoods.HasMarketContext,Not(GoodsStatePanel.GetGoods.IsLocal))]"
+				}					
+				
+				# selected state
+				blockoverride "third_button_selected" {
+					text = "[GoodsStatePanel.GetGoods.GetState.GetNameNoFormatting]"
+				}
+				blockoverride "third_button_selected_tooltip" {}
+				blockoverride "third_button_visibility" {
+					visible = yes
+				}
+
+				# states in market
+				blockoverride "fourth_button" {
+					text = "LOCAL_PRICES"
+				}
+				blockoverride "fourth_button_tooltip" {
+					tooltip = "LOCAL_PRICES"
+				} 					
+				blockoverride "fourth_button_visibility_checked" {
+					visible = "[GoodsStatePanel.GetGoods.HasMarketContext]"
+				}			
+				blockoverride "fourth_button_click" {
+					onclick = "[InformationPanelBar.OpenGoodsLocalPricesPanel(GoodsStatePanel.GetGoods.Self)]"
+				}					
+				
+				# usage / application
+				blockoverride "fifth_button" {
+					text = USAGE
+				}
+				blockoverride "fifth_button_tooltip" {
+					tooltip = "USAGE"
+				}
+				blockoverride "fifth_button_click" {
+					onclick = "[InformationPanelBar.OpenGoodsUsagePanel(GoodsStatePanel.GetGoods.Self)]"
+				}
+				blockoverride "fifth_button_visibility_checked" {
+					visible = yes
+				}
+								
+			}
+		}
+
+		blockoverride "scrollarea_content"
+		{
+			container = {
+				parentanchor = hcenter				
+				
+				flowcontainer = {
+					margin_top = 10
+					minimumsize = { @panel_width -1 }
+					using = default_list_position
+					direction = vertical
+					datacontext = "[GoodsStatePanel.GetGoods]"
+					
+					container = {
+						parentanchor = hcenter
+						minimumsize = { @panel_width -1 }
+						maximumsize = { @panel_width -1 }
+						
+						good_icon_and_prize = {
+							blockoverride "price_card" {
+								state_price_card = {
+									blockoverride "icons_visible" {
+										visible = yes
+									}
+
+									blockoverride "icon_balance" {
+										texture = "gfx/interface/icons/trade_icons/balance.dds"
+									}
+
+									blockoverride = "icon_input" {
+										texture = "gfx/interface/icons/trade_icons/production.dds"	
+									}
+
+									blockoverride "icon_output" {
+										texture = "gfx/interface/icons/trade_icons/consumption.dds"
+									}
+
+									blockoverride "price_card_name_maximumsize" {
+										maximumsize = { 250 -1 }
+										minimumsize = { 250 -1 }
+									}
+								}
+							}
+						}
+					}
+					
+					widget = { size = { 10 10 }}
+					
+					widget = {
+						size = { @panel_width 100 }
+						parentanchor = hcenter
+						
+						background = {
+							using = entry_bg_simple
+						}
+
+						hbox = {
+							layoutpolicy_horizontal = expanding
+							spacing = 10
+							margin = { 10 0 }
+							
+							textbox = {
+								visible = "[Goods.IsTradeable]"
+								autoresize = yes
+								align = nobaseline
+								using = elide_fontsize_min
+								max_width = 120
+								multiline = yes
+								text = "BUDGET_TARIFFS"
+							}
+							
+							vbox = {
+								visible = "[Goods.IsTradeable]"
+								name = "tutorial_highlight_market_goods_policy"
+								spacing = 5
+								set_level_bar_import_tariffs = {}
+								set_level_bar_export_tariffs = {}
+							}						
+							
+							textbox = {
+								layoutpolicy_horizontal = expanding
+								align = right|nobaseline
+								using = elide_fontsize_min
+								multiline = yes
+								text = "BUDGET_CONSUMPTION_TAXES"
+							}
+							
+							consumption_tax_button_toggle = {
+								visible = "[Not(ObjectsEqual(GetMetaPlayer.GetPlayedOrObservedCountry.GetCapital.GetMarket, Goods.GetMarket))]"
+								
+								blockoverride "tooltip" {
+									tooltip = "NOT_PLAYER_MARKET_CONSUMPTION_TAXES"
+								}
+
+								blockoverride "enabled" {
+									enabled = no
+								}
+							}
+
+							consumption_tax_button_toggle = {
+								visible = "[ObjectsEqual(GetMetaPlayer.GetPlayedOrObservedCountry.GetCapital.GetMarket, Goods.GetMarket)]"
+							}
+						}
+					}
+
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(Goods.GetStatePrestigeGoods))]"
+						parentanchor = hcenter
+						direction = vertical
+						margin_bottom = 5
+						margin_top = 5
+
+						default_header = {
+							parentanchor = hcenter
+
+							blockoverride "text"
+							{
+								text = "concept_prestige_goods"
+							}
+						}
+
+						goods_prestige_goods_breakdown_list_item = {						
+							parentanchor = hcenter
+
+							blockoverride "prestige_goods_item_minimumsize" {
+								minimumsize = { 540 -1 }
+							}
+
+							blockoverride "prestige_goods_item_name_size" {
+								minimumsize = { 300 -1 }
+								maximumsize = { 300 -1 }
+							}
+
+							blockoverride "prestige_goods_item_text_1" {
+								raw_text = "BASE_GOODS_STATE_PRODUCTION"
+								alpha = "[TransparentIfZero(Goods.GetNonPrestigeGoodsStateProduction)]"
+							}
+
+							blockoverride "prestige_goods_item_text_2" {
+								raw_text = "BASE_GOODS_STATE_CONSUMPTION"
+								alpha = "[TransparentIfZero(Goods.GetNonPrestigeGoodsStateConsumption)]"
+
+							}
+						}
+
+						flowcontainer = {
+							direction = vertical
+							parentanchor = hcenter
+							datamodel = "[Goods.GetStatePrestigeGoods]"
+							
+							item = {
+								goods_prestige_goods_breakdown_list_item = {
+									blockoverride "prestige_goods_item_minimumsize" {
+										minimumsize = { 540 -1 }
+									}
+
+									blockoverride "prestige_goods_item_name_size" {
+										minimumsize = { 300 -1 }
+										maximumsize = { 300 -1 }
+									}
+
+									blockoverride "prestige_goods_item_text_1" {
+										raw_text = "PRESTIGE_GOODS_STATE_PRODUCTION"
+										alpha = "[TransparentIfZero(Goods.GetStateProduction)]"
+									}
+
+									blockoverride "prestige_goods_item_text_2" {
+										raw_text = "PRESTIGE_GOODS_STATE_CONSUMPTION"
+										alpha = "[TransparentIfZero(Goods.GetStateConsumption)]"
+									}
+								}
+							}
+						}
+					}
+
+					
+
+					flowcontainer = {
+						margin_top = 10
+						using = default_list_position
+						
+						### SUPPLIED BY LIST
+						flowcontainer = {
+							direction = vertical
+							minimumsize = { @panel_width_minus_20_half 1 }
+							
+							default_header = {
+								blockoverride "size"
+								{
+									size = { @panel_width_plus_14_half 38 }
+								}
+								blockoverride "text"
+								{
+									text = "PRODUCED_BY"
+								}
+							}
+							
+							flowcontainer = {
+								margin_top = 10
+								margin_bottom = 10
+								alpha = "[TransparentIfZero(GoodsStatePanel.GetInputValuesTotal)]"
+								datacontext = "[GoodsStatePanel.GetGoods.AccessState]"
+								tooltip = "GOODS_STATE_PRODUCTION_BREAKDOWN"
+								
+								textbox = {
+									text = "PRODUCTION"
+									autoresize = yes
+									align = nobaseline
+									minimumsize = { 160 -1 }
+									maximumsize = { 160 -1 }
+									margin_left = 10
+									parentanchor = left|vcenter
+									default_format = "#title"
+									using = fontsize_large
+								}
+								textbox = {
+									text = "[GoodsStatePanel.GetInputValuesTotal|D]"
+									autoresize = yes
+									align = right|nobaseline
+									minimumsize = { 110 -1 }
+									maximumsize = { 110 -1 }
+									using = fontsize_large
+									margin_right = 5
+									default_format = "#variable"
+								}
+							}
+							
+							divider_clean = {}
+
+							dynamicgridbox = {
+								minimumsize = { @panel_width_minus_20_half 1 }
+								datamodel = "[GoodsStatePanel.GetInputValues]"
+								
+								item = {
+									goods_state_panel_input_output_item = {}
+								}
+							}
+						}
+						
+						vertical_divider_full = {}
+						
+						### DEMANDED BY LIST
+						flowcontainer = {
+							direction = vertical
+							minimumsize = { @panel_width_minus_20_half 1 }
+							
+							default_header = {
+								blockoverride "size"
+								{
+									size = { @panel_width_plus_14_half 38 }
+								}
+								blockoverride "text"
+								{
+									text = "CONSUMED_BY"
+								}
+							}
+							
+							flowcontainer = {
+								margin_top = 10
+								margin_bottom = 10 
+								alpha = "[TransparentIfZero(GoodsStatePanel.GetOutputValuesTotal)]"
+								datacontext = "[GoodsStatePanel.GetGoods.AccessState]"
+								tooltip = "GOODS_STATE_CONSUMPTION_BREAKDOWN"
+								
+								textbox = {
+									text = "CONSUMPTION"
+									autoresize = yes
+									align = nobaseline
+									minimumsize = { 160 -1 }
+									maximumsize = { 160 -1 }
+									margin_left = 10
+									parentanchor = left|vcenter
+									default_format = "#title"
+									using = fontsize_large
+								}
+								textbox = {
+									text = "[GoodsStatePanel.GetOutputValuesTotal|D]"
+									autoresize = yes
+									align = right|nobaseline
+									minimumsize = { 110 -1 }
+									maximumsize = { 110 -1 }
+									using = fontsize_large
+									margin_right = 5
+									default_format = "#variable"
+								}
+							}
+							
+							divider_clean = {}
+
+							dynamicgridbox = {
+								minimumsize = { 277 1 }
+								datamodel = "[GoodsStatePanel.GetOutputValues]"
+								
+								item = {
+									goods_state_panel_input_output_item = {
+										blockoverride "trade_center_datamodel" {
+											datamodel = "[Building.AccessState.GetExports]"
+										}
+										
+
+										blockoverride "trade_center_tooltip" {
+											tooltip = "[Goods.GetStateExportsDesc]"
+										}
+
+
+										blockoverride "trade_center_icon" {
+											texture = "gfx/interface/icons/trade_icons/exports.dds"
+										}
+
+										blockoverride "trade_center_advantage" {
+											raw_text = "[Goods.GetStateRelativeExportAdvantage|=+%0] [concept_trade_advantage]"
+											tooltip = "[Goods.GetStateRelativeExportAdvantageDesc]"
+										}
+
+										blockoverride "trade_center_revenue" {		
+											raw_text = "@money![Building.GetState.GetExportRevenue(Goods.Self)|+K]"
+										}
+
+										blockoverride "trade_center_provider" {
+											datamodel = "[Goods.GetImportersFromState]"
+										}
+									}
+								}
+							}
+						}
+					}				
+				}	
+			}
+		}
+	}
+}
+
+types goods_state_panel {
+	type goods_state_panel_input_output_item = container {
+		minimumsize = { @panel_width_plus_14_half -1 }
+
+		using = market_goods_orders_with_table
+
+		alwaystransparent = no
+		onmousehierarchyenter = "[PdxGuiWidget.InterruptThenTriggerAnimation('hide_pms','show_pms')]"
+		onmousehierarchyleave = "[PdxGuiWidget.InterruptThenTriggerAnimation('show_pms','hide_pms')]"
+
+		state = {
+			name = show_pms
+			on_start = "[PdxGuiWidget.FindChild('pms').InterruptThenTriggerAnimation('hover_hide', 'hover_show')]"
+		}
+
+		state = {
+			name = hide_pms
+
+			on_start = "[PdxGuiWidget.FindChild('pms').InterruptThenTriggerAnimation('hover_show', 'hover_hide')]"
+		}
+
+		background = {
+			visible = "[IsEven_int32(PdxGuiWidget.GetIndexInDataModel)]"
+			using = dark_area
+			alpha = 0.15
+		}
+
+		flowcontainer = {
+			margin_top = 5
+			margin_bottom = 5
+			margin_left = 10
+			spacing = 5 
+			
+			icon = {
+				visible = "[GoodsPanelValue.HasBuildingInfo]"
+				size = { 25 25 }
+				texture = "[GoodsPanelValue.GetBuilding.GetIcon]"
+			}
+
+			icon = {
+				visible = "[GoodsPanelValue.IsPiracy]"
+				texture = "gfx/interface/icons/commander_order_icons/piracy_privateering.dds"
+				size = { 25 25 }
+			}
+
+			icon = {
+				visible = "[And(Not(GoodsPanelValue.HasBuildingInfo),Not(GoodsPanelValue.IsPiracy))]"
+				texture = "gfx/interface/icons/generic_icons/population.dds"
+				size = { 25 25 }
+			}
+
+			textbox = {
+				raw_text = "#bold [GoodsPanelValue.GetName]#!"
+				autoresize = yes
+				align = nobaseline
+				maximumsize = { 160 -1 }
+				elide = right
+				fontsize_min = 14
+				parentanchor = vcenter
+			}
+
+
+			container = {
+				parentanchor = vcenter
+				visible = "[GoodsPanelValue.HasBuildingInfo]"
+
+				button_icon_goto = {
+					datacontext = "[GoodsPanelValue.GetBuilding]"
+					size = { 25 25 }
+					onclick = "[InformationPanelBar.OpenBuildingDetailsPanel(Building.AccessSelf)]"
+					tooltip = "GO_TO_BUTTON_BUILDING"
+				}
+			}
+		}
+		
+		textbox = {
+			text = "[GoodsPanelValue.GetValue|Dv]"
+			autoresize = yes
+			align = nobaseline
+			maximumsize = { 200 -1 }
+			elide = right
+			parentanchor = right
+			margin_right = 10
+			margin_top = 5
+			margin_bottom = 5
+		}
+		
+		divider_clean = {
+			parentanchor = bottom|hcenter
+		}
+
+		flowcontainer = {
+			visible = "[And(GoodsPanelValue.ShowChildValues,Not(GoodsPanelValue.HasBuildingInfo))]"
+			position = { 0 35 }
+			margin_left = 10
+			spacing = 5
+			margin_bottom = 10
+			minimumsize = { 265 50 }
+
+			datamodel = "[DataModelFirst(GoodsPanelValue.GetChildren, '(int32)8')]"
+
+			item = {
+				widget = {
+					size = { 26 35 }
+
+					textbox = {
+						parentanchor = vcenter
+						text = "[GoodsPanelChildValue.GetName]"
+						size = { 26 35 }
+						scissor = yes
+						using = fontsize_xl
+						align = nobaseline
+					}
+
+					# blocking tooltip from GetName
+					widget = {
+						size = { 26 23 }
+						alwaystransparent = no
+					}
+				}
+			}
+		}
+
+		flowcontainer = {
+			visible = "[GoodsPanelValue.HasBuildingInfo]"
+			position = { 0 35 }
+			direction = vertical
+			margin_left = 5
+			spacing = 5
+			margin_bottom = 10
+
+			### DOWNSIZE / EXPAND
+			container = {
+				datacontext = "[GoodsPanelValue.GetBuilding]"
+				datacontext = "[Building.GetBuildingType]"
+				minimumsize = { 265 35 }
+
+				using = building_size_tooltip_with_ownership
+				using = tooltip_ws
+
+				### DOWNSIZE
+				button_icon_minus_action = {
+					size = { 35 35 }
+					parentanchor = vcenter
+					tooltip = "[Building.GetDownsizeTooltip]"
+					onclick = "[Execute( Building.Downsize )]"
+					enabled = "[IsValid( Building.Downsize )]"
+					visible = "[And(Not( ShouldAskConfirmation( Building.Downsize ) ), Not(BuildingType.GeneratesCombatUnits))]"
+					using = tooltip_below
+				}
+
+				### DOWNSIZE WITH CONFIRMATION
+				button_icon_minus_action = {
+					size = { 35 35 }
+					parentanchor = vcenter
+					tooltip = "[Building.GetDownsizeTooltip]"
+					onclick = "[PopupManager.AskConfirmation( Building.Downsize )]"
+					enabled = "[IsValid( Building.Downsize )]"
+					visible = "[And(ShouldAskConfirmation( Building.Downsize ), Not(BuildingType.GeneratesCombatUnits))]"
+					using = tooltip_below
+				}
+
+				### CANCEL CONSTRUCTION
+				button_icon_minus_action = {
+					size = { 35 35 }
+					parentanchor = vcenter
+					tooltip = "[Building.GetCancelConstructionTooltip]"
+					visible = "[And(IsValid( Building.CancelConstruction ), Not(BuildingType.GeneratesCombatUnits))]"
+					onclick = "[Execute( Building.CancelConstruction )]"
+					using = tooltip_below
+				}
+
+				### LEVEL
+				container = {
+					position = { 35 0 }
+					background = {
+						using = entry_bg
+						margin = { 0 -2 }
+					}
+
+					textbox = {
+						text = "BUILDING_SIZE"
+						align = hcenter|nobaseline
+						size = { 195 35 }
+						elide = right
+						fontsize_min = 12
+					}
+				}
+
+				### EXPAND
+				expand_building_button = {
+					widgetid = "[Concatenate('building_expand', Building.GetIDString)]"
+
+					parentanchor = right|vcenter
+				}
+			}
+
+			widget = {
+				datacontext = "[GoodsPanelValue.GetBuilding]"
+				datacontext = "[Building.GetBuildingType]"
+				visible = "[Building.IsOwner(GetPlayer.Self)]"
+				scissor = yes
+
+				name = "pms"
+
+				alpha = 0
+
+				state = {
+					name = hover_show
+					alpha = 1
+					duration = 0.1
+					size = { 270 50 }
+				}
+
+				state = {
+					name = hover_hide
+					alpha = 0
+					duration = 0.1
+					size = { 270 0 }
+				}
+
+				flowcontainer = {
+					datamodel = "[Building.AccessProductionMethodGroups]"
+					spacing = 4
+
+					item = {
+						widget = {
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							
+							# ███╗   ███╗ ██████╗ ██████╗ 
+							# ████╗ ████║██╔═══██╗██╔══██╗
+							# ██╔████╔██║██║   ██║██║  ██║
+							# ██║╚██╔╝██║██║   ██║██║  ██║
+							# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+							# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+							
+							#E&F mod
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							
+							visible = "[Not(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(Or(EqualTo_string(ProductionMethodGroup.GetKey,'pmg_market_liquidity'),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_manufacture_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_agricultural_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_mining_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_private_ownership_railroad_stock')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_bond_exchange')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_monetary_system')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_bond_production')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_additional_production_method')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_currency_type')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_subject_currency_type')),EqualTo_string(ProductionMethodGroup.GetKey,'pmg_market_liquidity_urban_center')))]"
+														
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+
+							# ███╗   ███╗ ██████╗ ██████╗ 
+							# ████╗ ████║██╔═══██╗██╔══██╗
+							# ██╔████╔██║██║   ██║██║  ██║
+							# ██║╚██╔╝██║██║   ██║██║  ██║
+							# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+							# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+							#E&F mod
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+							############################################################################################################################################################
+
+							size = { 50 50 }
+							datacontext = "[Building.AccessProductionMethod(ProductionMethodGroup.Self)]"
+							datacontext = "[ProductionMethod]"
+							datacontext = "[Building]"
+							datacontext = "[ProductionMethodGroup]"
+							using = tooltip_above
+
+							tooltip = "CHANGE_FROM_CURRENT_PRODUCTION_METHOD_TOOLTIP"
+
+							button = {
+								visible = "[NotEqualTo_int32( GetDataModelSize( ProductionMethodGroup.AccessBuildingProductionMethods( Building.Self ) ), '(int32)1' )]"
+								using = expand_button_bg_dropdown
+								size = { 50 50 }
+								enabled = "[Building.IsOwner( GetPlayer.Self )]"
+								onclick = "[RightClickMenuManager.ToggleSwitchProductionMethodMenu(Building.AccessSelf, ProductionMethodGroup.AccessSelf, PdxGuiWidget.AccessSelf)]"
+							}
+
+							icon = {
+								size = { 35 35 }
+								parentanchor = center
+								texture = "[ProductionMethod.GetTexture]"
+							}
+
+							### new pm
+							has_new_pm_icon	= {
+								blockoverride "visible" {
+									visible = "[And(Building.IsOwner( GetPlayer.Self ), GetPlayer.HasNewProductionMethodInSameGroup( Building.GetBuildingType.Self, ProductionMethod.Self ))]"
+								}
+								position = { 0 0 }
+								tooltip = "TOOLTIP_NEW_PRODUCTION_METHOD"
+								parentanchor = bottom
+							}
+
+							textbox = {
+								raw_text = "#P #bold [ProductionMethodGroup.GetNumAvailableOptions(Building.AccessSelf)]#!#!"
+								parentanchor = top|right
+								position = { -2 0 }
+								autoresize = yes
+								align = right|nobaseline
+								visible = "[NotEqualTo_int32( ProductionMethodGroup.GetNumAvailableOptions(Building.AccessSelf), '(int32)1')]"
+								tooltip = "PRODUCTION_METHOD_OPTIONS"
+								using = tooltip_above
+								using = fontsize_small
+
+								background = {
+									using = default_background
+									margin = { 8 4 }
+								}
+							}
+						}
+					}
+				}
+			}
+
+			container = {
+				datacontext = "[GoodsPanelValue.GetBuilding]"
+				visible = "[ObjectsEqual(Building.GetBuildingType, GetBuildingType('building_trade_center').Self)]"
+
+				flowcontainer = {
+					parentanchor = hcenter
+					direction = vertical
+
+					block "trade_center_datamodel" {
+						datamodel = "[Building.AccessState.GetImports]"
+					}
+					
+					item = {
+						widget = {
+							visible = "[ObjectsEqual(Goods.Self, GoodsStatePanel.GetGoods.Self )]"
+							size = { 265 65 }
+
+							background = { 
+								using = entry_bg_simple
+							}
+
+							block "trade_center_tooltip" {
+								tooltip = "[Goods.GetStateImportsDesc]"
+							}
+
+							vbox = {
+								margin_left = 10
+								margin_right = 10
+								margin_bottom = 5
+
+								hbox = {
+									layoutpolicy_horizontal = preferred
+									spacing = 5
+
+									icon = {
+										size = { 30 30 }
+
+										block "trade_center_icon" {
+											texture = "gfx/interface/icons/trade_icons/imports.dds"
+										}
+									}
+			
+									textbox = {
+										block "trade_center_advantage" {
+											raw_text = "[Goods.GetStateRelativeImportAdvantage|=+%0] [concept_trade_advantage]"
+											tooltip = "[Goods.GetStateRelativeImportAdvantageDesc]"
+										}
+										autoresize = yes
+										align = nobaseline
+										elide = right
+										layoutpolicy_horizontal = preferred
+									}
+
+									textbox = {
+										block "trade_center_revenue" {		
+											raw_text = "@money![Building.GetState.GetImportRevenue(Goods.Self)|+K]"
+										}
+										autoresize = yes
+										align = nobaseline
+										size = { 65 -1 }
+									}
+								}
+
+								overlappingitembox = {
+
+									block "trade_center_provider" {
+										datamodel = "[Goods.GetExportersToState]"
+									}
+
+									size = { 245 18 }
+									righttoleft = yes
+									spacing = 5
+
+									item = {
+										small_market_flag = {}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

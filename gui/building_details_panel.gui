@@ -9,12 +9,12 @@
 @panel_width_plus_30 = 570			# used to be 490
 @panel_width_plus_70 = 610			# used to be 530
 
-@building_process_item_width = 200
+@building_process_item_width = 230
 
 
 template visible_if_produces {
-	#buildings that produce goods, provide modifiers, or are military buildings "make" something, so show arrows etc
-	visible = "[Or( Building.IsMilitaryBuilding, Or( Not(IsDataModelEmpty(Building.GetProducedModifiers.GetEntries)), Not(IsDataModelEmpty(Building.AccessProducedGoods)) ))]"  
+	#buildings that produce goods, provide modifiers, or generate combat units "make" something, so show arrows etc
+	visible = "[Or( Building.GeneratesCombatUnits, Or( Not(IsDataModelEmpty(Building.GetProducedModifiers.GetEntries)), Not(IsDataModelEmpty(Building.AccessProducedGoods)) ))]"
 }
 
 types building_panels
@@ -135,7 +135,7 @@ types building_panels
 				}
 			}
 		}
-		
+
 		blockoverride "pin_visibility" {
 			visible = "[Building.IsValid]"
 		}
@@ -174,11 +174,12 @@ types building_panels
 		top_illu = {
 			blockoverride "illu" {
 				texture = "[Building.GetBuildingType.GetBackground]"
-				fittype = start
-				alpha = 0.7
+				fittype = centercrop
+				alpha = 0.5
 			}
+
 			minimumsize = { @panel_width_plus_14 -1 }
-	
+
 			flowcontainer = {
 				resizeparent = yes
 				parentanchor = hcenter
@@ -260,7 +261,7 @@ types building_panels
 							parentanchor = vcenter
 							margin_left = 4
 							direction = vertical
-							
+
 							building_rank_label = {}
 
 							textbox = {
@@ -285,8 +286,8 @@ types building_panels
 				flowcontainer = {
 					direction = vertical
 					margin_left = 10
-					parentanchor = vcenter	
-					
+					parentanchor = vcenter
+
 					military_building_combat_unit_summary = {
 						margin_bottom = 10
 						blockoverride "icon_size" {
@@ -300,7 +301,7 @@ types building_panels
 						blockoverride "unit_number_margins" {
 							margin = { 6 3 }
 						}
-					}				
+					}
 
 					### battalions mobilized
 					container = {
@@ -330,14 +331,14 @@ types building_panels
 						text = "BUILDING_AVERAGE_WAGE"
 						tooltip = TOOLTIP_BUILDING_AVERAGE_WAGE
 						visible = "[And(Building.IsActive, ObjectsEqual(Building.GetBuildingType, GetBuildingType('building_government_administration').Self))]"
-						
+
 						align = left|nobaseline
 						autoresize = yes
 						elide = right
 						maximumsize = { 230 -1 }
 						minimumsize = { 230 -1 }
 						margin_top = 10
-					}			
+					}
 				}
 			}
 		}
@@ -349,7 +350,7 @@ types building_panels
 		condensed_building_information = {
 			margin = { 7 0 }
 			margin_top = 0
-			
+
 			blockoverride "state_name_button" {}
 
 			blockoverride "productivity" {}
@@ -360,6 +361,21 @@ types building_panels
 			blockoverride "background" {}
 
 			blockoverride "action_status_icons" {}
+
+			blockoverride "action_buttons" {
+				building_auto_expand_toggle = {}
+
+				building_subsidize_toggle = {}
+
+				building_privatize_toggle = {}
+
+				building_country_monopoly_icon = {
+					visible = "[BuildingType.HasCountryMonopoly]"
+					datacontext = "[Building.GetBuildingType]"
+				}
+
+				building_nationalize_button = {}
+			}
 
 			blockoverride "divider" {
 				widget = { size = { 5 5 }}
@@ -400,7 +416,7 @@ types building_panels
 					tooltip = "SORT_BY_BUILDING_NAME"
 					text = "BUILDING"
 				}
-				
+
 				sort_button = {
 					size = { 120 30 }
 					align = left|nobaseline
@@ -408,7 +424,7 @@ types building_panels
 					tooltip = "OWNED"
 					text = "OWNED"
 				}
-				
+
 				sort_button = {
 					size = { 70 30 }
 					align = left|nobaseline
@@ -439,7 +455,7 @@ types building_panels
 				direction = vertical
 				margin_top = 3
 				margin_bottom = 10
-				
+
 				item = {
 					container = {
 						background = {
@@ -478,7 +494,7 @@ types building_panels
 									parentanchor = vcenter
 								}
 							}
-							
+
 							textbox = {
 								size = { 120 30 }
 								text = "[BuildingOwnership.GetLevel|v]"
@@ -487,7 +503,7 @@ types building_panels
 								fontsize_min = 12
 								elide = right
 							}
-							
+
 							textbox = {
 								datacontext = "[BuildingOwnership.GetOwnedBuilding]"
 								size = { 70 30 }
@@ -505,13 +521,13 @@ types building_panels
 								default_format = "#v"
 							}
 						}
-						
+
 						flowcontainer = {
 							visible = "[Not(BuildingOwnership.GetOwnedBuilding.IsValid)]"
 							tooltip = "PROPERTY_SHARE_CHART_TOOLTIP"
 							margin_bottom = 4
 							minimumsize = { 250 30 }
-							
+
 							textbox = {
 								size = { 120 30 }
 								text = "BUILDING_OWNERSHIP_INVALID_ENTRY"
@@ -521,7 +537,7 @@ types building_panels
 								elide = right
 							}
 						}
-						
+
 						divider_clean = {
 							parentanchor = bottom|hcenter
 							size = { 100% 1 }
@@ -559,7 +575,7 @@ types building_panels
 				parentanchor = hcenter
 				spacing = 10
 				margin_top = 10
-				margin_bottom = 10 
+				margin_bottom = 10
 
 				state_panel_status_item_small = {
 					tooltip = "STATE_WORLD_MARKET_ACCESS_DESC"
@@ -576,8 +592,8 @@ types building_panels
 					blockoverride "alpha" {
 						alpha = "[TransparentIfZero_int32(State.GetTradeCapacity)]"
 					}
-				}			
-				
+				}
+
 				state_panel_status_item_small = {
 					tooltip = "STATE_TRADE_CAPACITY_DESC"
 					visible = "[GreaterThan_int32(State.GetTradeCapacity,'(int32)0')]"
@@ -706,7 +722,7 @@ types building_panels
 								}
 
 								flowcontainer = {
-									parentanchor = left|vcenter 
+									parentanchor = left|vcenter
 									spacing = 3
 									margin_left = 50
 									margin_top = 7
@@ -804,10 +820,24 @@ types building_panels
 						}
 					}
 
+					### tolls
+					building_process_entry = {
+						blockoverride "visible" {
+							visible = "[GreaterThan_CFixedPoint(Building.GetTollsPaid, '(CFixedPoint)0')]"
+						}
+						blockoverride "text" {
+							text = "[concept_tolls]"
+						}
+						blockoverride "text_right" {
+							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetTollsPaid|K]#!"
+							tooltip = "[Building.GetTollsPaidDesc]"
+						}
+					}
+
 					### infrastructure
 					building_process_entry = {
 						tooltip = BUILDING_INFRA_USAGE_TOOLTIP
-						
+
 						blockoverride "visible" {
 							visible = "[Building.UsesInfrastructure]"
 						}
@@ -815,7 +845,7 @@ types building_panels
 							text = "[concept_infrastructure_usage]"
 						}
 						blockoverride "text_right" {
-							raw_text = "#variable [Building.CalcInfrastructureUsage|=0]#!"
+							raw_text = "#variable [Building.CalcInfrastructureUsage|=1]#!"
 						}
 					}
 				}
@@ -869,7 +899,7 @@ types building_panels
 								}
 
 								flowcontainer = {
-									parentanchor = left|vcenter 
+									parentanchor = left|vcenter
 									spacing = 3
 									margin_left = 50
 									margin_top = 7
@@ -879,7 +909,7 @@ types building_panels
 										visible = "[And(Building.HasAnyInputShortage,GreaterThan_CFixedPoint(Building.GetInputShortagePenalty, '(CFixedPoint)0'))]"
 										texture = "gfx/interface/icons/generic_icons/goods_shortage.dds"
 										tooltip = "GOODS_OUTPUT_PENALTY_TOOLTIP"
-										parentanchor = left|vcenter 
+										parentanchor = left|vcenter
 									}
 
 									icon = {
@@ -887,7 +917,7 @@ types building_panels
 										visible = "[And(Not(Building.HasAnyInputShortage),GreaterThan_CFixedPoint(Building.GetInputShortagePenalty, '(CFixedPoint)0'))]"
 										texture = "gfx/interface/icons/generic_icons/goods_shortage.dds"
 										tooltip = "GOODS_OUTPUT_PENALTY_LINGERING_TOOLTIP"
-										parentanchor = left|vcenter 
+										parentanchor = left|vcenter
 									}
 
 									textbox = {
@@ -925,7 +955,7 @@ types building_panels
 					### military production
 					building_process_entry = {
 						blockoverride "visible" {
-							visible = "[Building.IsMilitaryBuilding]"
+							visible = "[Building.GeneratesCombatUnits]"
 						}
 						blockoverride "text" {
 							text = "[Building.GetCombatUnitProduction]"
@@ -944,7 +974,7 @@ types building_panels
 							container = {
 								maximumsize = { 250 -1 }
 								minimumsize = { 250 39 }
-								
+
 								background = {
 									using = entry_bg_simple
 								}
@@ -1025,7 +1055,7 @@ types building_panels
 							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetTradeRevenue|K]#!"
 						}
 					}
-					
+
 					### subventions
 					building_process_entry = {
 						blockoverride "visible" {
@@ -1037,15 +1067,68 @@ types building_panels
 						blockoverride "text_right" {
 							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetSubventions|K]#!"
 						}
-					}						
+					}
+
+					### port connection revenue
+					building_process_entry = {
+						blockoverride "visible" {
+							visible = "[GreaterThan_CFixedPoint(Building.GetPortConnectionRevenue, '(CFixedPoint)0')]"
+						}
+						blockoverride "text" {
+							text = "PORT_CONNECTION_REVENUE"
+						}
+						blockoverride "text_right" {
+							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetPortConnectionRevenue|K]#!"
+						}
+					}
+
+					### Ship construction revenue
+					building_process_entry = {
+						blockoverride "visible" {
+							visible = "[GreaterThan_CFixedPoint(Building.GetShipConstructionRevenue, '(CFixedPoint)0')]"
+						}
+						blockoverride "text" {
+							text = "[concept_ship_construction]"
+						}
+						blockoverride "text_right" {
+							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetShipConstructionRevenue|K]#!"
+						}
+					}
+
+					### Supply ship maintenance revenue
+					building_process_entry = {
+						blockoverride "visible" {
+							visible = "[GreaterThan_CFixedPoint(Building.GetSupplyShipMaintenanceRevenue, '(CFixedPoint)0')]"
+						}
+						blockoverride "text" {
+							text = "SUPPLY_SHIP_MAINTENANCE_REVENUE"
+							fontsize = 14
+						}
+						blockoverride "text_right" {
+							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetSupplyShipMaintenanceRevenue|K]#!"
+						}
+					}
+
+					### Military ship maintenance revenue
+					building_process_entry = {
+						blockoverride "visible" {
+							visible = "[GreaterThan_CFixedPoint(Building.GetMilitaryShipMaintenanceRevenue, '(CFixedPoint)0')]"
+						}
+						blockoverride "text" {
+							text = "MILITARY_SHIP_MAINTENANCE_REVENUE"
+						}
+						blockoverride "text_right" {
+							raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetMilitaryShipMaintenanceRevenue|K]#!"
+						}
+					}
 
 					building_process_entry = {
 						tooltip = BUILDING_URBANIZATION_TOOLTIP
-						
+
 						blockoverride "visible" {
 							visible = "[Building.ProvidesUrbanization]"
 						}
-						
+
 						blockoverride "text" {
 							raw_text = "[concept_urbanization]"
 						}
@@ -1065,7 +1148,7 @@ types building_panels
 
 			using = visible_if_produces
 
-			
+
 			divider_clean = {
 				visible = "[Or(Not( StringIsEmpty( Building.GetInputMultDesc )), Not(And( StringIsEmpty(Building.GetThroughputDesc), EqualTo_CFixedPoint(Building.GetThroughputBonusCurrent, Building.GetThroughputBonusTarget) )))]"
 			}
@@ -1103,10 +1186,10 @@ types building_panels
 			}
 
 		}
-		
-		widget = { 
+
+		widget = {
 			size = { 10 10 }
-		}	
+		}
 
 		flowcontainer = {
 			direction = vertical
@@ -1138,8 +1221,9 @@ types building_panels
 					}
 				}
 
-				trade_center_trade_headers = {}
-				
+				#IMPORT HEADERS
+				trade_center_import_headers = {}
+
 				flowcontainer = {
 					parentanchor = hcenter
 					direction = vertical
@@ -1151,7 +1235,7 @@ types building_panels
 					}
 				}
 			}
-			
+
 			### EXPORTS
 			flowcontainer = {
 				using = default_list_position
@@ -1178,18 +1262,9 @@ types building_panels
 					}
 				}
 
-				trade_center_trade_headers = {
-					blockoverride "trade_direction_price_text" {
-						text = "concept_export_price"
-						tooltip = "concept_export_price"
-					}
+				#EXPORT HEADERS
+				trade_center_export_headers = {}
 
-					blockoverride "trade_direction_text" {
-						text = "IMPORTERS"
-						tooltip = "IMPORTERS"
-					}
-				}
-				
 				flowcontainer = {
 					parentanchor = hcenter
 					direction = vertical
@@ -1248,15 +1323,111 @@ types building_panels
 			}
 		}
 
+		flowcontainer = {
+			direction = vertical
+			parentanchor = hcenter
+			visible = "[ObjectsEqual(Building.GetBuildingType, GetBuildingType('building_naval_administration').Self)]"
+
+			### SHIP ASSIGNMENTS
+			flowcontainer = {
+				using = default_list_position
+				direction = vertical
+
+				default_header_2texts = {
+					blockoverride "text1" {
+						text = "SHIP_ASSIGNMENTS"
+					}
+					blockoverride "right" {
+						textbox = {
+							text = "FILLED_SHIP_ASSIGNMENTS"
+							autoresize = yes
+							multiline = yes
+							maximumsize = { 250 -1 }
+							margin_right = 10
+							parentanchor = right|vcenter
+							align = right|nobaseline
+						}
+					}
+				}
+
+				flowcontainer = {
+					visible = "[GreaterThan_int32(Building.GetNumShipAssignmentsFilled, '(int32)0')]"
+					parentanchor = hcenter
+					wrap_count = 2
+					margin_bottom = 10
+					datacontext = "[Building.GetState]"
+					datacontext = "[Building.GetState.GetCountry]"
+					datamodel = "[Building.GetShipsWithAssignments]"
+
+					item = {
+						widget = {
+							size = { 260 105 }
+
+							ship_item = {
+								blockoverride "small_header_grid_items" {
+
+									### CARRYING CAPACITY
+									small_header_grid_item = {
+										tooltip = "[Ship.GetModifier.GetShipCarryingCapacityTooltip]"
+										size = { 90 24 }
+										using = tooltip_es
+
+										blockoverride "icon_size" {
+											size = { 28 28 }
+										}
+
+										blockoverride "icon_widget_size" {
+											size = { 24 24 }
+										}
+
+										blockoverride "text" {
+											text = "[Ship.GetModifier.GetShipCarryingCapacity|vD]"
+										}
+
+										blockoverride "icon" {
+											texture = "gfx/interface/icons/military_icons/navy_icons/carry_capacity_navy.dds"
+										}
+									}
+
+									### CREW
+									small_header_grid_item = {
+										size = { 90 24 }
+										tooltip = "SHIP_CREW_STATE_TOOLTIP"
+										using = tooltip_es
+
+										blockoverride "icon_size" {
+											size = { 28 28 }
+										}
+
+										blockoverride "icon_widget_size" {
+											size = { 24 24 }
+										}
+
+										blockoverride "text" {
+											raw_text = "#v [Ship.GetTotalCrew|D]#!"
+										}
+
+										blockoverride "icon" {
+											texture = "gfx/interface/icons/military_icons/navy_icons/total_crew_navy.dds"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		### FORMATIONS
 		flowcontainer = {
 			direction = vertical
-			visible = "[Building.IsMilitaryBuilding]"
+			visible = "[Building.GeneratesCombatUnits]"
 			margin_top = 5
 			margin_bottom = 10
 			parentanchor = hcenter
 			name = formations_list
-	
+
 			default_header_2texts = {
 
 				blockoverride "text1" {
@@ -1365,7 +1536,7 @@ types building_panels
 											maximumsize = { 60 38 }
 											minimumsize = { 60 38 }
 											align = right|nobaseline
-											text = "[MilitaryFormation.GetSupply]"
+											text = "[MilitaryFormation.GetSupplyRatio|0v%]"
 										}
 
 										overlappingitembox = {
@@ -1416,6 +1587,131 @@ types building_panels
 									blockoverride "combat_unit_goto_button" {}
 									blockoverride "combat_unit_name_maximumsize" {
 										maximumsize = { 205 -1 }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		### SUPPLIED FORMATIONS
+		flowcontainer = {
+			direction = vertical
+			visible = "[And( Building.IsLogisticsCenter, Not(IsDataModelEmpty(Building.GetSuppliedFormations)) )]"
+			margin_top = 5
+			margin_bottom = 10
+			parentanchor = hcenter
+
+			default_header_2texts = {
+
+				blockoverride "text1" {
+					text = "[SelectLocalization(Building.IsNavalLogisticsCenter, 'SUPPLIED_NAVIES', 'SUPPLIED_ARMIES')]"
+				}
+			}
+
+			flowcontainer = {
+				direction = vertical
+				parentanchor = hcenter
+
+				flowcontainer = {
+					sort_button = {
+						size = { 250 30 }
+						text = "concept_military_formation"
+						align = left|nobaseline
+						onclick = "[Building.SortSuppliedFormations('name')]"
+					}
+					sort_button = {
+						size = { 290 30 }
+						text = "concept_supply"
+						align = left|nobaseline
+						onclick = "[Building.SortSuppliedFormations('supply')]"
+					}
+				}
+
+				flowcontainer = {
+					parentanchor = hcenter
+					direction = vertical
+					datamodel = "[Building.GetSuppliedFormations]"
+
+					item = {
+						widget = {
+							size = { 540 38 }
+							onmousehierarchyenter = "[AccessHighlightManager.HighlightMilitaryFormationSupplyNetwork(MilitaryFormation.Self)]"
+
+							tooltipwidget = {
+								FancyTooltip_MilitaryFormation = {}
+							}
+
+							background = {
+								using = dropdown_background
+								margin = { 0 -2 }
+							}
+
+							hbox = {
+								layoutpolicy_horizontal = expanding
+								layoutpolicy_vertical = expanding
+								spacing = 5
+								margin_left = 5
+
+								widget = {
+									size = { 240 38 }
+
+									icon = {
+										parentanchor = vcenter
+										size = { 32 32 }
+										texture = "[MilitaryFormation.GetFlag]"
+										color = "[MilitaryFormation.GetFlagColor]"
+									}
+
+									textbox = {
+										parentanchor = vcenter
+										position = { 35 0 }
+										autoresize = yes
+										align = nobaseline
+										max_width = 160
+										elide = right
+										fontsize_min = 12
+										text = "[MilitaryFormation.GetNameNoFormatting]"
+									}
+
+									button_icon_goto = {
+										parentanchor = right|vcenter
+										size = { 25 25 }
+										tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+										onclick = "[InformationPanelBar.OpenMilitaryFormationPanel(MilitaryFormation.Self)]"
+									}
+								}
+
+								overlappingitembox = {
+									size = { 280 30 }
+									datamodel = "[MilitaryFormation.GetSupplyGoodsRequest]"
+
+									item = {
+										widget = {
+											size = { 55 30 }
+
+											icon = {
+												size = { 25 25 }
+												parentanchor = left|vcenter
+												texture = "[Goods.GetTexture]"
+
+												tooltipwidget = {
+													FancyTooltip_Goods = {}
+												}
+											}
+
+											textbox = {
+												position = { 26 0 }
+												autoresize = yes
+												parentanchor = left|vcenter
+												align = left|nobaseline
+												fontsize_min = 12
+												raw_text = "#bold [MilitaryFormation.GetSupplyGoodsRequestAmount(Goods.Self)|0v]#!"
+											}
+										}
 									}
 								}
 							}
@@ -1493,7 +1789,7 @@ types building_panels
 		}
 
 
-		
+
 		### DETAILED BUILDING OWNERSHIP
 		flowcontainer = {
 			using = visible_if_ownership_can_be_split
@@ -1522,22 +1818,22 @@ types building_panels
 					size = { 320 30 }
 					text = "OWNER"
 					align = left|nobaseline
-					#onclick = "TODO SORT" #TODO PRCAL-31240
+					onclick = "[Building.SortOwnerships('name')]"
 				}
-				
+
 				sort_button = {
 					size = { 120 30 }
 					text = "OWNED"
 					align = hcenter|nobaseline
-					#onclick = "TODO SORT" #TODO PRCAL-31240
+					onclick = "[Building.SortOwnerships('levels_owned')]"
 				}
 
 				sort_button = {
 					size = { 100 30 }
 					text = "DIVIDENDS"
 					align = hcenter|nobaseline
-					#onclick = "TODO SORT" #TODO PRCAL-31240
-				}	
+					onclick = "[Building.SortOwnerships('dividends')]"
+				}
 			}
 
 			flowcontainer = {
@@ -1547,7 +1843,7 @@ types building_panels
 				direction = vertical
 				margin_top = 3
 				margin_bottom = 10
-				
+
 				item = {
 					container = {
 						background = {
@@ -1603,8 +1899,8 @@ types building_panels
 								}
 							}
 
-							
-							
+
+
 							textbox = {
 								size = { 120 30 }
 								text = "[BuildingOwnership.GetLevel|v]"
@@ -1643,7 +1939,7 @@ types building_panels
 			textbox = {
 				using = default_list_position
 				text = "LOCAL_WORKFORCE_OWNERSHIP_EXPLANATION"
-				
+
 				autoresize = yes
 				multiline = yes
 				maximumsize = { @panel_width -1 }
@@ -1653,7 +1949,7 @@ types building_panels
 			}
 		}
 
-		
+
 
 		divider_clean = {
 			visible = "[Or(Building.IsSubsistenceBuilding, Building.IsUrbanCenter )]"
@@ -1697,7 +1993,7 @@ types building_panels
 			block "oln_label" {
 				raw_text = "todo"
 			}
-			
+
 			align = nobaseline
 			fontsize_min = 12
 			elide = right
@@ -1711,21 +2007,106 @@ types building_panels
 			block "oln_button" {
 
 			}
-			
+
 			tooltip = "GO_TO_BUTTON_BUILDING"
 			parentanchor = vcenter
 		}
 	}
 
-	type trade_center_trade_headers = flowcontainer {
+	type trade_center_import_headers = flowcontainer {
+			parentanchor = hcenter
+			datacontext = "[Building.AccessState]"
+			minimumsize = { @panel_width -1 }
+			margin_top = 5
+			margin_bottom = 2
+
+			sort_button = {
+				size = { 40 20 }
+
+				onclick = "[State.SortImports('name')]"
+
+				icon = {
+					texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
+					size = { 23 23 }
+					parentanchor = center
+				}
+			}
+
+			sort_button = {
+				text = "AMOUNT"
+				tooltip = "AMOUNT"
+				onclick = "[State.SortImports('import_amount')]"
+
+				size = { 64 20 }
+				align = hcenter|nobaseline
+			}
+
+			sort_button = {
+				block "trade_direction_price_text" {
+					text = "concept_import_price"
+					tooltip = "concept_import_price"
+				}
+
+				onclick = "[State.SortImports('import_price')]"
+
+				size = { 80 20 }
+				elide = right
+			}
+
+			sort_button = {
+				text = "concept_local_price"
+				tooltip = "concept_local_price"
+
+				onclick = "[State.SortImports('local_price')]"
+
+				size = { 80 20 }
+				elide = right
+			}
+
+			sort_button = {
+				text = "concept_trade_advantage"
+				tooltip = "concept_trade_advantage"
+
+				onclick = "[State.SortImports('import_trade_advantage')]"
+
+				size = { 60 20 }
+				elide = right
+			}
+
+			sort_button = {
+				block "trade_direction_text" {
+					text = "EXPORTERS"
+					tooltip = "EXPORTERS"
+				}
+
+				onclick = "[State.SortImports('exporter_size')]"
+
+				size = { 129 20 }
+				elide = right
+			}
+
+			sort_button = {
+				text = "concept_revenue"
+				tooltip = "concept_revenue"
+
+				onclick = "[State.SortImports('import_revenue')]"
+
+				size = { 87 20 }
+				elide = right
+			}
+		}
+
+	type trade_center_export_headers = flowcontainer {
 		parentanchor = hcenter
+		datacontext = "[Building.AccessState]"
 		minimumsize = { @panel_width -1 }
 		margin_top = 5
 		margin_bottom = 2
 
 		sort_button = {
-			enabled = no
 			size = { 40 20 }
+
+			onclick = "[State.SortExports('name')]"
 
 			icon = {
 				texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
@@ -1737,19 +2118,17 @@ types building_panels
 		sort_button = {
 			text = "AMOUNT"
 			tooltip = "AMOUNT"
-			enabled = no
+			onclick = "[State.SortExports('export_amount')]"
 
 			size = { 64 20 }
 			align = hcenter|nobaseline
 		}
 
 		sort_button = {
-			block "trade_direction_price_text" {
-				text = "concept_import_price"
-				tooltip = "concept_import_price"
-			}
+			text = "concept_export_price"
+			tooltip = "concept_export_price"
 
-			enabled = no
+			onclick = "[State.SortExports('export_price')]"
 
 			size = { 80 20 }
 			elide = right
@@ -1759,7 +2138,7 @@ types building_panels
 			text = "concept_local_price"
 			tooltip = "concept_local_price"
 
-			enabled = no
+			onclick = "[State.SortExports('local_price')]"
 
 			size = { 80 20 }
 			elide = right
@@ -1769,19 +2148,17 @@ types building_panels
 			text = "concept_trade_advantage"
 			tooltip = "concept_trade_advantage"
 
-			enabled = no
+			onclick = "[State.SortExports('export_trade_advantage')]"
 
 			size = { 60 20 }
 			elide = right
 		}
 
 		sort_button = {
-			block "trade_direction_text" {
-				text = "EXPORTERS"
-				tooltip = "EXPORTERS"
-			}
+			text = "IMPORTERS"
+			tooltip = "IMPORTERS"
 
-			enabled = no
+			onclick = "[State.SortExports('importer_size')]"
 
 			size = { 129 20 }
 			elide = right
@@ -1791,18 +2168,18 @@ types building_panels
 			text = "concept_revenue"
 			tooltip = "concept_revenue"
 
-			enabled = no
+			onclick = "[State.SortExports('export_revenue')]"
 
 			size = { 87 20 }
 			elide = right
 		}
 	}
-	
+
 	type building_imports_exports_item = button {
 
 		block "tooltip" {
 			tooltip = "[Goods.GetStateImportsDesc]"
-		}			
+		}
 
 		using = default_button
 		onclick = "[InformationPanelBar.OpenGoodsStatePanel(Building.GetState, Goods.Self)]"
@@ -1861,7 +2238,7 @@ types building_panels
 			widget = { size = { 10 10 }}
 
 			vertical_divider = {}
-			
+
 			textbox = {
 				block "first_price" {
 					raw_text = "[Goods.GetStateImportPrice|v1] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetStateImportPrice )]"
@@ -1937,7 +2314,7 @@ types building_panels
 	}
 
 	type military_building_combat_unit_summary = flowcontainer {
-		visible = "[Building.IsMilitaryBuilding]"
+		visible = "[Building.GeneratesCombatUnits]"
 		margin_right = 10
 
 		flowcontainer = {
@@ -1948,7 +2325,7 @@ types building_panels
 			item = {
 				flowcontainer = {
 					datamodel = "[DataModelFirst(Building.AccessState.AccessPopCultures, '(int32)1')]"
-					
+
 					item = {
 						military_building_combat_unit_summary_list_item = {}
 					}
@@ -1967,7 +2344,7 @@ types building_panels
 			item = {
 				flowcontainer = {
 					datamodel = "[DataModelFirst(Building.AccessState.AccessPopCultures, '(int32)1')]"
-					
+
 					item = {
 						military_building_combat_unit_summary_list_item = {}
 					}
@@ -2107,31 +2484,6 @@ types building_panels
 				layoutpolicy_vertical = expanding
 				spacing = 5
 
-				vbox = {
-					### DOWNSIZE / EXPAND
-					building_level_controls = {
-						blockoverride "controller_size" {
-							size = { 130 35 }
-						}
-					}
-
-					### BUILD PROGRESS
-					hbox = {
-						visible = "[Building.HasConstructionQueued]"
-
-						default_progressbar_horizontal = {
-							tooltip = "BUILDING_PROGRESS_TOOLTIP"
-							size = { 110 5 }
-
-							blockoverride "values" {
-								value = "[Building.GetConstructionProgressPercentage]"
-								min = 0
-								max = 1
-							}
-						}
-					}
-				}
-
 				### STATE NAME AND BUTTON
 				block "state_name_button" {
 					button = {
@@ -2182,23 +2534,10 @@ types building_panels
 					}
 				}
 
+				block "action_buttons" {}
+
 				expand = {
 					visible = "[Not(Building.IsBuildingType('building_company_headquarter'))]"
-				}
-
-				block "action_buttons" {
-					building_auto_expand_toggle = {}
-
-					building_subsidize_toggle = {}
-
-					building_privatize_toggle = {}
-
-					building_country_monopoly_icon = {
-						visible = "[BuildingType.HasCountryMonopoly]"
-						datacontext = "[Building.GetBuildingType]"
-					}
-
-					building_nationalize_button = {}
 				}
 
 				hbox = {
@@ -2246,7 +2585,7 @@ types building_panels
 								texture = "[StateTrait.GetTexture]"
 							}
 						}
-					} 
+					}
 
 					############################################################################################################################################################
 					############################################################################################################################################################
@@ -2301,7 +2640,7 @@ types building_panels
 					############################################################################################################################################################
 					############################################################################################################################################################
 					############################################################################################################################################################
- 
+  
 					block "productivity" {
 						textbox = {
 							visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
@@ -2313,8 +2652,33 @@ types building_panels
 						}
 					}
 
+					vbox = {
+						### DOWNSIZE / EXPAND
+						building_level_controls = {
+							blockoverride "controller_size" {
+								size = { 130 35 }
+							}
+						}
+
+						### BUILD PROGRESS
+						hbox = {
+							visible = "[Building.HasConstructionQueued]"
+
+							default_progressbar_horizontal = {
+								tooltip = "BUILDING_PROGRESS_TOOLTIP"
+								size = { 110 5 }
+
+								blockoverride "values" {
+									value = "[Building.GetConstructionProgressPercentage]"
+									min = 0
+									max = 1
+								}
+							}
+						}
+					}
+
 					button_icon_round = {
-						size = { 30 30 }
+						size = { 34 34 }
 						onclick = "[RightClickMenuManager.ToggleBuildingActions(Building.AccessSelf, PdxGuiWidget.AccessSelf)]"
 						enabled = "[ObjectsEqual(Building.GetState.GetOwner.Self, GetPlayer.Self)]"
 						tooltip = "SHOW_BUILDING_ACTIONS"
@@ -2343,7 +2707,7 @@ types building_panels
 				flowcontainer = {
 					parentanchor = vcenter
 					margin_left = 2
-					
+
 					condensed_building_information_pms = {
 						blockoverride "pms_slot_sizes" {
 							addcolumn = 72
@@ -2393,15 +2757,15 @@ types building_panels
 			using = tooltip_se
 		}
 	}
-	
+
 	type building_nationalize_button_base = button_icon_round {
 		size = { 35 35 }
-		
+
 		block "nationalize" {
 		}
-		
+
 		using = confirm_button_sound
-		
+
 
 		blockoverride "icon" {
 			texture = "gfx/interface/production_methods/nationalize.dds"
@@ -2415,7 +2779,7 @@ types building_panels
 	type building_auto_expand_toggle = widget {
 		visible = "[IsPotential( Building.ToggleAutoExpand )]"
 		size = { 35 35 }
-		
+
 		icon = {
 			using = rotate_glow_blue
 			size = { 130% 130% }
@@ -2424,34 +2788,34 @@ types building_panels
 			parentanchor = center
 			using = default_fade_in_out
 		}
-		
+
 		button_icon_round_action = {
 			size = { 100% 100% }
 			visible = "[Building.IsAutoExpanding]"
 			enabled = "[IsValid( Building.ToggleAutoExpand )]"
-			onclick = "[Execute( Building.ToggleAutoExpand )]" 
+			onclick = "[Execute( Building.ToggleAutoExpand )]"
 			tooltip = "[Building.GetAutoExpandTooltip]"
 			using = tooltip_se
 			using = icon_toggle_single_off_sound
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/production_methods/auto_expand.dds"
 			}
 
 			blockoverride "icon_size" {
 				size = { 77% 77% }
-			}	
+			}
 		}
 
 		button_icon_round_action = {
 			size = { 100% 100% }
 			visible = "[Not(Building.IsAutoExpanding)]"
 			enabled = "[IsValid( Building.ToggleAutoExpand )]"
-			onclick = "[Execute( Building.ToggleAutoExpand )]" 
+			onclick = "[Execute( Building.ToggleAutoExpand )]"
 			tooltip = "[Building.GetAutoExpandTooltip]"
 			using = tooltip_se
 			using = icon_toggle_single_on_sound
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/production_methods/auto_expand_not.dds"
 			}
@@ -2466,7 +2830,7 @@ types building_panels
 	type building_subsidize_toggle = widget {
 		visible = "[Building.GetBuildingType.CanBeSubsidized]"
 		size = { 35 35 }
-		
+
 		icon = {
 			visible = "[Building.IsSubsidized]"
 			using = rotate_glow_blue
@@ -2475,34 +2839,34 @@ types building_panels
 			parentanchor = center
 			using = default_fade_in_out
 		}
-		
+
 		button_icon_round_action = {
 			visible = "[Building.IsSubsidized]"
 			size = { 100% 100% }
 			enabled = "[IsValid( Building.ToggleSubsidies)]"
-			onclick = "[Execute( Building.ToggleSubsidies )]" 
+			onclick = "[Execute( Building.ToggleSubsidies )]"
 			tooltip = "[Building.GetSubsidizeTooltip]"
 			using = tooltip_se
 			using = icon_toggle_single_off_sound
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/production_methods/subsidized.dds"
 			}
 
 			blockoverride "icon_size" {
 				size = { 77% 77% }
-			}	
+			}
 		}
 
 		button_icon_round_action = {
 			visible = "[Not(Building.IsSubsidized)]"
 			size = { 100% 100% }
 			enabled = "[IsValid( Building.ToggleSubsidies )]"
-			onclick = "[Execute( Building.ToggleSubsidies )]" 
+			onclick = "[Execute( Building.ToggleSubsidies )]"
 			tooltip = "[Building.GetSubsidizeTooltip]"
 			using = tooltip_se
 			using = icon_toggle_single_on_sound
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/production_methods/subsidized_not.dds"
 			}
@@ -2754,14 +3118,14 @@ types building_panels
 		{
 			visible = "[IsValid( BuildingBrowserBuildingTypeItem.ToggleAllPrivatization)]"
 		}
-		
+
 		blockoverride "toggle_privatize_invalid"
 		{
 			visible = "[Not(IsValid( BuildingBrowserBuildingTypeItem.ToggleAllPrivatization))]"
 			tooltip = "PRIVATIZATION_ALL_INVALID"
 			using = tooltip_se
 		}
-		
+
 		blockoverride "toggle_privatize_on_glow"
 		{
 			visible = "[Not(BuildingBrowserBuildingTypeItem.HasAllNoPrivatization)]"
@@ -2801,7 +3165,7 @@ types building_panels
 		{
 
 		}
-		
+
 		widget = {
 			size = { 100% 100% }
 
@@ -2809,7 +3173,7 @@ types building_panels
 			{
 				visible = yes
 			}
-		
+
 			icon = {
 				using = rotate_glow_blue
 				size = { 130% 130% }
@@ -2817,7 +3181,7 @@ types building_panels
 				{
 					visible = no
 				}
-				
+
 				alwaystransparent = yes
 				parentanchor = center
 				using = default_fade_in_out
@@ -2829,9 +3193,9 @@ types building_panels
 				{
 					visible = yes
 				}
-				
+
 				using = icon_toggle_single_off_sound
-	
+
 				blockoverride "icon" {
 					texture = "gfx/interface/production_methods/privatize.dds"
 				}
@@ -2839,7 +3203,7 @@ types building_panels
 					size = { 80% 80% }
 				}
 			}
-	
+
 			button_icon_round_action = {
 				size = { 100% 100% }
 				block "toggle_privatize_off"
@@ -2847,7 +3211,7 @@ types building_panels
 					visible = no
 				}
 				using = icon_toggle_single_on_sound
-	
+
 				blockoverride "icon" {
 					texture = "gfx/interface/production_methods/privatize_not.dds"
 				}
@@ -2855,16 +3219,16 @@ types building_panels
 					size = { 80% 80% }
 				}
 			}
-	
+
 			button_icon_round_action = {
 				size = { 100% 100% }
 				block "toggle_privatize_mixed"
 				{
 					visible = no
 				}
-	
+
 				using = icon_toggle_all_on_sound
-	
+
 				blockoverride "icon" {
 					texture = "gfx/interface/production_methods/subsidized_mixed.dds"
 				}
@@ -2873,19 +3237,19 @@ types building_panels
 				}
 			}
 		}
-		
+
 		widget = {
 			size = { 100% 100% }
-			
+
 			block "toggle_privatize_invalid"
 			{
 				visible = no
 			}
-			
+
 			button_icon_round_action = {
 				size = { 100% 100% }
 				enabled = no
-				
+
 				blockoverride "icon" {
 					texture = "gfx/interface/production_methods/privatize.dds"
 				}
@@ -2899,7 +3263,7 @@ types building_panels
 	### autoexpand, only the icon
 	type building_auto_expand_icon = widget {
 		size = { 30 30 }
-		
+
 		icon = {
 			using = rotate_glow_blue
 			size = { 100% 100% }
@@ -2907,7 +3271,7 @@ types building_panels
 			parentanchor = center
 			alpha = 0.3
 		}
-		
+
 		icon = {
 			size = { 100% 100% }
 			tooltip = "AUTOEXPAND_BUILDING_ICON_TOOLTIP"
@@ -2939,7 +3303,7 @@ types building_panels
 	### privatizing, only the icon
 	type building_privatize_icon = widget {
 		size = { 30 30 }
-		
+
 		icon = {
 			using = rotate_glow_blue
 			size = { 100% 100% }
@@ -2947,7 +3311,7 @@ types building_panels
 			parentanchor = center
 			alpha = 0.3
 		}
-		
+
 		icon = {
 			size = { 100% 100% }
 			tooltip = "[Building.GetPrivatizationTooltip]"
@@ -2959,7 +3323,7 @@ types building_panels
 	### subsidized, only the icon
 	type building_subsidized_icon = widget {
 		size = { 30 30 }
-		
+
 		icon = {
 			using = rotate_glow_blue
 			size = { 100% 100% }
@@ -2967,7 +3331,7 @@ types building_panels
 			parentanchor = center
 			alpha = 0.3
 		}
-		
+
 		icon = {
 			size = { 100% 100% }
 			tooltip = "SUBSIDIZED_YES"
@@ -3119,15 +3483,15 @@ types building_panels
 					block "trade_center_extra_info_size" {
 						size = { 110 23 }
 					}
-					
+
 					datamodel = "[Building.AccessState.GetImports]"
-					
+
 					item = {
 						small_goods_button = {
 							blockoverride "tooltip" {
 								tooltip = "[Goods.GetStateImportsDesc]"
 							}
-						}		
+						}
 					}
 				}
 			}
@@ -3146,15 +3510,15 @@ types building_panels
 					block "trade_center_extra_info_size" {
 						size = { 110 23 }
 					}
-					
+
 					datamodel = "[Building.AccessState.GetExports]"
-					
+
 					item = {
 						small_goods_button = {
 							blockoverride "tooltip" {
 								tooltip = "[Goods.GetStateExportsDesc]"
 							}
-						}		
+						}
 					}
 				}
 			}
@@ -3193,9 +3557,9 @@ types building_panels
 			using = tooltip_below
 
 			block "downsize_button_visibility" {
-				visible = "[And(And( IsValid( Building.Downsize ), Not( ShouldAskConfirmation( Building.Downsize ) ) ), Not(Building.IsMilitaryBuilding))]"
+				visible = "[And(And( IsValid( Building.Downsize ), Not( ShouldAskConfirmation( Building.Downsize ) ) ), Not(Building.GeneratesCombatUnits))]"
 			}
-			
+
 			block "button_size" {
 				size = { 28 28 }
 			}
@@ -3210,9 +3574,9 @@ types building_panels
 			using = tooltip_below
 
 			block "downsize_with_confirmation_button_visibility" {
-				visible = "[And(And( IsValid( Building.Downsize ), ShouldAskConfirmation( Building.Downsize ) ), Not(Building.IsMilitaryBuilding))]"
+				visible = "[And(And( IsValid( Building.Downsize ), ShouldAskConfirmation( Building.Downsize ) ), Not(Building.GeneratesCombatUnits))]"
 			}
-			
+
 			block "button_size" {
 				size = { 28 28 }
 			}
@@ -3224,9 +3588,9 @@ types building_panels
 			tooltip = "[Building.GetCancelConstructionTooltip]"
 			onclick = "[Execute( Building.CancelConstruction )]"
 			using = tooltip_below
-			
+
 			block "cancel_button_visibility" {
-				visible = "[And(IsValid( Building.CancelConstruction ), Not(Building.IsMilitaryBuilding))]"
+				visible = "[And(IsValid( Building.CancelConstruction ), Not(Building.GeneratesCombatUnits))]"
 			}
 
 			block "button_size" {
@@ -3301,11 +3665,11 @@ types building_panels
 		}
 
 		blockoverride "barchart_item_tooltip" {
-			
+
 		}
 
 		blockoverride "barchart_item_icon" {
-			
+
 		}
 
 		blockoverride "barchart_item_margins" {
@@ -3356,14 +3720,16 @@ types building_panels
 		}
 
 		button_icon_round_action = { #foreign investment
- 			visible = "[Not(Building.GetState.GetOwner.IsLocalPlayer)]"
+			block "foreign_investment_visibility" {
+ 				visible = "[Not(Building.GetState.GetOwner.IsLocalPlayer)]"
+			}
 
  			size = { 100% 100% }
 
 			blockoverride "icon_size" {
 				size = { 75% 75% }
 			}
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/buttons/button_icons/foreign_invest.dds"
 			}
@@ -3374,7 +3740,7 @@ types building_panels
 
 			onclick = "[Execute( Building.QueueConstruction )]"
 			enabled = "[IsValid( Building.QueueConstruction )]"
-		}		
+		}
 	}
 
 	type expand_building_button_with_military = button_icon_plus_action {
@@ -3412,7 +3778,7 @@ types building_panels
 			blockoverride "icon_size" {
 				size = { 75% 75% }
 			}
-			
+
 			blockoverride "icon" {
 				texture = "gfx/interface/buttons/button_icons/foreign_invest.dds"
 			}
@@ -3423,7 +3789,7 @@ types building_panels
 
 			onclick = "[Execute( Building.QueueMilitaryConstruction( MilitaryFormation.Self, CombatUnitType.Self ) )]"
 			enabled = "[IsValid( Building.QueueMilitaryConstruction( MilitaryFormation.Self, CombatUnitType.Self ) )]"
-		}		
+		}
 	}
 
 	type building_ownership_chart = container { #unused, unsure it works anymore after changes elsewhere
@@ -3466,7 +3832,7 @@ types building_panels
 			tooltip = "BUILDING_CONTROLLER"
 		}
 	}
-	
+
 	type building_productivity_mini_chart = flowcontainer {
 		direction = vertical
 		margin = { 8 8 }
@@ -3481,7 +3847,7 @@ types building_panels
 			block "graph_size" {
 				size = { 150 60 }
 			}
-			
+
 			background = {
 				texture = "gfx/interface/graph/graph_frame.dds"
 				spriteType = Corneredtiled
@@ -3650,7 +4016,7 @@ types building_panels
 		}
 		### HQ
 		textbox = {
-			visible = "[Building.GetBuildingType.IsMilitaryBuilding]"
+			visible = "[Building.GetBuildingType.GeneratesCombatUnits]"
 			raw_text = "[Building.GetHQ.GetName]"
 			align = right|nobaseline
 			layoutpolicy_horizontal = expanding
@@ -3818,7 +4184,7 @@ types building_panels
 						}
 
 						flowcontainer = {
-							parentanchor = left|vcenter 
+							parentanchor = left|vcenter
 							spacing = 3
 							margin_left = 43
 							margin_top = 7
@@ -3917,10 +4283,23 @@ types building_panels
 				}
 			}
 
+			### tolls
+			building_process_entry_small = {
+				blockoverride "visible" {
+					visible = "[GreaterThan_CFixedPoint(Building.GetTariffsPaid, '(CFixedPoint)0')]"
+				}
+				blockoverride "text" {
+					text = "[concept_tolls]"
+				}
+				blockoverride "text_right" {
+					raw_text = "#todo #variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetTariffsPaid|K]#!#!"
+				}
+			}
+
 			### infrastructure
 			building_process_entry_small = {
 				tooltip = BUILDING_INFRA_USAGE_TOOLTIP
-				
+
 				blockoverride "visible" {
 					visible = "[Building.UsesInfrastructure]"
 				}
@@ -3928,7 +4307,7 @@ types building_panels
 					text = "[concept_infrastructure_usage]"
 				}
 				blockoverride "text_right" {
-					raw_text = "#variable [Building.CalcInfrastructureUsage|=0]#!"
+					raw_text = "#variable [Building.CalcInfrastructureUsage|=1]#!"
 				}
 			}
 		}
@@ -3981,7 +4360,7 @@ types building_panels
 						}
 
 						flowcontainer = {
-							parentanchor = left|vcenter 
+							parentanchor = left|vcenter
 							spacing = 3
 							margin_left = 43
 							margin_top = 7
@@ -4037,7 +4416,7 @@ types building_panels
 			### military production
 			building_process_entry_small = {
 				blockoverride "visible" {
-					visible = "[Building.IsMilitaryBuilding]"
+					visible = "[Building.GeneratesCombatUnits]"
 				}
 				blockoverride "text" {
 					text = "[Building.GetCombatUnitProduction]"
@@ -4056,7 +4435,7 @@ types building_panels
 					container = {
 						maximumsize = { @building_process_item_width -1 }
 						minimumsize = { @building_process_item_width 39 }
-						
+
 						background = {
 							using = entry_bg_simple
 						}
@@ -4122,7 +4501,7 @@ types building_panels
 					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetTradeRevenue|K]#!"
 				}
 			}
-			
+
 			### subventions
 			building_process_entry_small = {
 				blockoverride "visible" {
@@ -4134,15 +4513,68 @@ types building_panels
 				blockoverride "text_right" {
 					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetSubventions|K]#!"
 				}
-			}			
+			}
+
+			### port connection revenue
+			building_process_entry_small = {
+				blockoverride "visible" {
+					visible = "[GreaterThan_CFixedPoint(Building.GetPortConnectionRevenue, '(CFixedPoint)0')]"
+				}
+				blockoverride "text" {
+					text = "PORT_CONNECTION_REVENUE"
+				}
+				blockoverride "text_right" {
+					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetPortConnectionRevenue|K]#!"
+				}
+			}
+
+			### Ship construction revenue
+			building_process_entry_small = {
+				blockoverride "visible" {
+					visible = "[GreaterThan_CFixedPoint(Building.GetShipConstructionRevenue, '(CFixedPoint)0')]"
+				}
+				blockoverride "text" {
+					text = "[concept_ship_construction]"
+				}
+				blockoverride "text_right" {
+					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetShipConstructionRevenue|K]#!"
+				}
+			}
+
+			### Supply ship maintenance revenue
+			building_process_entry_small = {
+				blockoverride "visible" {
+					visible = "[GreaterThan_CFixedPoint(Building.GetSupplyShipMaintenanceRevenue, '(CFixedPoint)0')]"
+				}
+				blockoverride "text" {
+					text = "SUPPLY_SHIP_MAINTENANCE_REVENUE"
+					fontsize = 14
+				}
+				blockoverride "text_right" {
+					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetSupplyShipMaintenanceRevenue|K]#!"
+				}
+			}
+
+			### Supply ship maintenance revenue
+			building_process_entry_small = {
+				blockoverride "visible" {
+					visible = "[GreaterThan_CFixedPoint(Building.GetMilitaryShipMaintenanceRevenue, '(CFixedPoint)0')]"
+				}
+				blockoverride "text" {
+					text = "MILITARY_SHIP_MAINTENANCE_REVENUE"
+				}
+				blockoverride "text_right" {
+					raw_text = "#variable [Building.GetState.GetOwner.GetCustom('currency_symbol')][Building.GetMilitaryShipMaintenanceRevenue|K]#!"
+				}
+			}
 
 			building_process_entry_small = {
 				tooltip = BUILDING_URBANIZATION_TOOLTIP
-				
+
 				blockoverride "visible" {
 					visible = "[Building.ProvidesUrbanization]"
 				}
-				
+
 				blockoverride "text" {
 					raw_text = "[concept_urbanization]"
 				}
@@ -4153,7 +4585,7 @@ types building_panels
 		}
 	}
 
-	# standard 
+	# standard
 	type property_portfolio_stacked_bar_chart = property_portfolio_stacked_bar_chart_base {
 		block "barchart_size" {
 			size = { @panel_width 40 } #450 or so and up
@@ -4210,9 +4642,9 @@ types building_panels
 			block "barchart_item_icon_size" {
 				size = { 30 30 }
 			}
-			
+
 			visible = "[BuildingOwnership.GetOwnedBuilding.IsValid]"
-			
+
 			texture = "[BuildingOwnership.GetOwnedBuilding.GetIcon]"
 
 			textbox = {
@@ -4226,7 +4658,7 @@ types building_panels
 		}
 	}
 
-	# standard 
+	# standard
 	type building_ownership_stacked_barchart = building_ownership_stacked_barchart_base {
 		block "barchart_size" {
 			size = { @panel_width 40 } #450 or so and up
@@ -4318,7 +4750,7 @@ types building_panels
 	}
 
 
-	
+
 
 	type building_owner_icon = widget {
 		size = { 30 30 }
@@ -4337,7 +4769,7 @@ types building_panels
 		widget = {
 			visible = "[Not(BuildingOwnership.IsCountryOwned)]"
 			size = { 100% 100% }
-			
+
 
 			#local workforce
 			icon = {
@@ -4351,7 +4783,7 @@ types building_panels
 
 				size = { 100% 100% }
 			}
-			
+
 			#dirty capitalists and aristocrats
 			icon = {
 				visible = "[Not(ObjectsEqual(BuildingOwnership.GetOwnedBuilding.Self, BuildingOwnership.GetOwnerBuilding.Self))]"
@@ -4385,7 +4817,7 @@ template visible_if_ownership_can_be_split
 {
 	# The buildings ownership can be split between multiple entities:
 	# It is not a Manor House, Financial District (GetBuildingAssets)
-	# It is not a Government Building. 
+	# It is not a Government Building.
 	# It is not a Urban Center
 	# Or it is simply a level 0 building
 	visible = "[And( Not(Building.IsUrbanCenter), And( And( IsDataModelEmpty(Building.GetBuildingAssets), Not(Building.IsGovernmentFunded) ), NotEqualTo_int32(Building.GetExpansionLevel, '(int32)0')))]"

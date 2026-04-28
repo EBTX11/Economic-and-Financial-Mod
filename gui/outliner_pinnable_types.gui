@@ -21,7 +21,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 			onrightclick = "[RightClickMenuManager.ShowForCharacter(Character.AccessSelf)]"
 		}
 
@@ -52,6 +52,7 @@ types pinnable_outliner_items {
 
 		blockoverride "additional_info" {
 			icon = {
+				visible = "[Character.AccessInterestGroup.IsValid]"
 				datacontext = "[Character.AccessInterestGroup]"
 				texture = "[InterestGroup.GetTexture]"
 				size = { 25 25 }
@@ -83,11 +84,48 @@ types pinnable_outliner_items {
 						FancyTooltip_MilitaryFormation = {}
 					}
 				}
+
 				icon = {
 					size = { 26 26 }
-					visible = "[Or(Character.IsAdmiral, Character.IsGeneral)]"
+					visible = "[Character.IsGeneral]"
 					texture = "[Character.GetOrderType.GetTexture]"
 					tooltip = "COMMANDER_ORDER_TOOLTIP"
+					parentanchor = vcenter
+				}
+
+				icon = {
+					size = { 26 26 }
+					visible = "[And(Character.IsAdmiral, Character.GetMilitaryFormation.HasNavalMission)]"
+					texture = "[Character.GetMilitaryFormation.GetNavalMission.GetType.GetIcon]"
+					tooltipwidget = {
+						FancyTooltip_MilitaryFormation = {
+							datacontext = "[Character.GetMilitaryFormation]"
+						}
+					}
+					parentanchor = vcenter
+				}
+
+				icon = {
+					size = { 26 26 }
+					visible = "[And(Character.IsAdmiral, And(Not(Character.GetMilitaryFormation.HasNavalMission), Character.GetMilitaryFormation.HasInvasion))]"
+					texture = "gfx/interface/icons/formation_order_icons/naval_invasion.dds"
+					tooltipwidget = {
+						FancyTooltip_MilitaryFormation = {
+							datacontext = "[Character.GetMilitaryFormation]"
+						}
+					}
+					parentanchor = vcenter
+				}
+
+				icon = {
+					size = { 26 26 }
+					visible = "[And(Character.IsAdmiral, And(Not(Character.GetMilitaryFormation.HasNavalMission), And(Not(Character.GetMilitaryFormation.HasInvasion), Character.GetMilitaryFormation.IsAboutToTransportArmies)))]"
+					texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+					tooltipwidget = {
+						FancyTooltip_MilitaryFormation = {
+							datacontext = "[Character.GetMilitaryFormation]"
+						}
+					}
 					parentanchor = vcenter
 				}
 			}
@@ -113,7 +151,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 			onrightclick = "[RightClickMenuManager.ShowForCharacter(Character.AccessSelf)]"
 		}
 
@@ -141,6 +179,7 @@ types pinnable_outliner_items {
 				parentanchor = vcenter
 
 				icon = {
+					visible = "[Character.AccessInterestGroup.IsValid]"
 					datacontext = "[Character.AccessInterestGroup]"
 					texture = "[InterestGroup.GetTexture]"
 					size = { 25 25 }
@@ -163,8 +202,22 @@ types pinnable_outliner_items {
 				}
 
 				textbox = {
-					text = "[Character.GetPopularity|+=0]"
+					visible = "[Character.IsAgitator]"
+					raw_text = "@popularity![Character.GetPopularity|v0]"
 					tooltip = "POPULARITY_BREAKDOWN"
+					default_format = "#v"
+					autoresize = yes
+					minimumsize = { 50 -1 }
+					maximumsize = { 50 -1 }
+					fontsize_min = 12
+					align = right|nobaseline
+					parentanchor = vcenter
+				}
+
+				textbox = {
+					visible = "[Not(Character.IsAgitator)]"
+					raw_text = "@prominence![Character.GetProminence|v0]"
+					tooltip = "PROMINENCE_BREAKDOWN"
 					default_format = "#v"
 					autoresize = yes
 					minimumsize = { 50 -1 }
@@ -663,8 +716,37 @@ types pinnable_outliner_items {
 		}
 	}
 
+	type strategic_region_outliner_item = pinnable_expandable_outliner_entry {
+		datacontext = "[OutlinerEntry.AccessScope.GetStrategicRegion]"
+
+		blockoverride "entry_size" {
+			size = { @entry_width 30 }
+		}
+
+		blockoverride "pinnable_expand_buttons" {}
+
+		blockoverride "text" {
+			text = "[StrategicRegion.GetNameNoFormatting]"
+			margin_left = 5
+		}
+
+		blockoverride "outliner_item_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_StrategicRegion = {}
+			}
+		}
+
+		blockoverride "onclick" {
+			onclick = "[InformationPanelBar.OpenStrategicRegionPanel(StrategicRegion.Self)]"
+		}
+	}
+
 	type formation_item = pinnable_expandable_outliner_entry {
 		datacontext = "[OutlinerEntry.AccessScope.AccessMilitaryFormation]"
+
+		tooltipwidget = {
+			FancyTooltip_MilitaryFormation = {}
+		}
 
 		icon = {
 			visible = "[Or(MilitaryFormation.IsBeingHighlighted, MilitaryFormation.IsSelected)]"
@@ -672,7 +754,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "text" {
-			raw_text = "[MilitaryFormation.GetNameNoFormatting][Nbsp][AddLocalizationIf(MilitaryFormation.IsExiled, '@exiled_state!')]"
+			text = "MILITARY_FORMATION_NAME_OUTLINER"
 		}
 
 		blockoverride "outliner_item_tooltip" {
@@ -684,6 +766,8 @@ types pinnable_outliner_items {
 		blockoverride "onclick" {
 			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
 			onrightclick = "[RightClickMenuManager.ShowForMilitaryFormation(MilitaryFormation.AccessSelf)]"
+			ondoubleclick = "[MilitaryFormation.ZoomToMapMarkerPosition]"
+			ondoubleclick = "[InformationPanelBar.OpenMilitaryFormationPanelTabForDoubleClick( MilitaryFormation.Self, 'default' )]"
 
 			click_modifiers = {
 				onshift = "[MilitaryFormation.Select]"
@@ -700,7 +784,7 @@ types pinnable_outliner_items {
 			flowcontainer = {
 				icon = {
 					parentanchor = vcenter
-					size = { 28 28 }
+					size = { 24 24 }
 					texture = "[MilitaryFormation.GetFlag]"
 					color = "[MilitaryFormation.GetFlagColor]"
 				}
@@ -725,22 +809,56 @@ types pinnable_outliner_items {
 					margin_right = 3
 				}
 
+				widget = {
+					visible = "[MilitaryFormation.IsFleet]"
+					size = { 24 -1 }
+					parentanchor = vcenter
+
+					icon = {
+						visible = "[MilitaryFormation.HasNavalMission]"
+						parentanchor = vcenter
+						size = { 24 24 }
+						texture = "[MilitaryFormation.GetNavalMission.GetType.GetIcon]"
+					}
+
+					icon = {
+						visible = "[And(Not(MilitaryFormation.HasNavalMission), MilitaryFormation.HasInvasion)]"
+						parentanchor = vcenter
+						size = { 24 24 }
+						texture = "gfx/interface/icons/formation_order_icons/naval_invasion.dds"
+					}
+
+					icon = {
+						visible = "[And(Not(MilitaryFormation.HasNavalMission), And(Not(MilitaryFormation.HasInvasion), MilitaryFormation.IsAboutToTransportArmies))]"
+						parentanchor = vcenter
+						size = { 24 24 }
+						texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+					}
+				}
+
 				textbox = {
 					visible = "[MilitaryFormation.IsFleet]"
 					raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
 					tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
 					autoresize = yes
-					minimumsize = { 90 -1 }
-					maximumsize = { 90 -1 }
+					minimumsize = { 60 -1 }
+					maximumsize = { 60 -1 }
 					align = right|nobaseline
 					parentanchor = vcenter
-					margin_right = 3
 				}
 
 				manpower_bar = {
+					visible = "[MilitaryFormation.IsArmy]"
 					size = { 6 18 }
 					parentanchor = vcenter
 					alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
+				}
+
+				crew_bar = {
+					visible = "[MilitaryFormation.IsFleet]"
+					size = { 6 18 }
+					parentanchor = vcenter
+					alpha = "[TransparentIfTrue(EqualTo_int32(MilitaryFormation.GetShipList.GetCrewMax, MilitaryFormation.GetShipList.GetCrew))]"
 				}
 
 				organization_bar = {
@@ -758,6 +876,7 @@ types pinnable_outliner_items {
 				}
 
 				morale_bar = {
+					visible = "[MilitaryFormation.IsArmy]"
 					size = { 6 18 }
 					parentanchor = vcenter
 					tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
@@ -769,6 +888,21 @@ types pinnable_outliner_items {
 						color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
 					}
 					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetMorale, '(CFixedPoint)1'))]"
+				}
+
+				hit_points_bar = {
+					visible = "[MilitaryFormation.IsFleet]"
+					size = { 6 18 }
+					parentanchor = vcenter
+					tooltip = "MILITARY_FORMATION_HIT_POINTS_TOOLTIP"
+
+					blockoverride "hit_points_value" {
+						value = "[FixedPointToFloat(MilitaryFormation.GetHitPointsPercentage)]"
+					}
+					blockoverride "hit_points_color" {
+						color = "[GetMoraleColorVec(MilitaryFormation.GetHitPointsPercentage)]"
+					}
+					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetHitPointsPercentage, '(CFixedPoint)1'))]"
 				}
 			}
 		}
@@ -903,7 +1037,7 @@ types pinnable_outliner_items {
 		}
 
 		blockoverride "onclick" {
-			onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 			onrightclick = "[RightClickMenuManager.ShowForCharacter(Character.AccessSelf)]"
 		}
 
@@ -918,7 +1052,7 @@ types pinnable_outliner_items {
 
 				icon = {
 					size = { 30 30 }
-					visible = "[Or(Character.IsAdmiral, Character.IsGeneral)]"
+					visible = "[Character.IsGeneral]"
 					texture = "[Character.GetOrderType.GetTexture]"
 					tooltip = "[Character.GetOrderType.GetDesc]"
 				}
@@ -944,7 +1078,7 @@ types pinnable_outliner_items {
 			textbox = {
 				visible = "[Character.IsAdmiral]"
 				tooltip = "MILITARY_PANEL_COMMAND_LIMIT_BREAKDOWN_TOOLTIP"
-				raw_text = "@flotillas!#variable [Character.GetCommandLimitRaw]#!"
+				raw_text = "@ships!#variable [Character.GetCommandLimitRaw]#!"
 				autoresize = yes
 				minimumsize = { 70 -1 }
 				maximumsize = { 70 -1 }
@@ -957,6 +1091,74 @@ types pinnable_outliner_items {
 	type outliner_politicians = pinnable_outliner_group {
 		datacontext = "[Outliner.AccessCategory('politicians')]"
 
+
+		blockoverride "item" {
+			character_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+
+				blockoverride "text_size" {
+					minimumsize = { 132 -1 }
+					maximumsize = { 132 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_rulers = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('rulers')]"
+
+		blockoverride "item" {
+			character_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+
+				blockoverride "text_size" {
+					minimumsize = { 132 -1 }
+					maximumsize = { 132 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_heirs = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('heirs')]"
+
+		blockoverride "item" {
+			character_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+
+				blockoverride "text_size" {
+					minimumsize = { 132 -1 }
+					maximumsize = { 132 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_executives = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('executives')]"
+
+		blockoverride "item" {
+			character_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+
+				blockoverride "text_size" {
+					minimumsize = { 132 -1 }
+					maximumsize = { 132 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_magnates = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('magnates')]"
 
 		blockoverride "item" {
 			character_item = {
@@ -1240,6 +1442,26 @@ types pinnable_outliner_items {
 			}
 
 			country_outliner_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+				blockoverride "text_size" {
+					minimumsize = { 150 -1 }
+					maximumsize = { 150 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_strategic_regions = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('strategic_regions')]"
+
+		blockoverride "item" {
+			blockoverride "entry_size" {
+				size = { @entry_width @entry_height }
+			}
+
+			strategic_region_outliner_item = {
 				blockoverride "entry_size" {
 					size = { @entry_width @entry_height }
 				}

@@ -1046,8 +1046,25 @@ types state_panel_types
 				}
 			}
 
+			### FACTION
+			flowcontainer = {
+				ignoreinvisible = yes
+				parentanchor = bottom|left
+				margin = { 15 10 }
+				visible = "[And(ObjectsEqual(GetMetaPlayer.GetPlayedOrObservedCountry.Self, State.GetOwner), GetScriptedGui('je_meiji_restoration_get_faction_sgui').IsShown( GuiScope.SetRoot( State.MakeScope ).End ) )]"
+				tooltip = "DOMAIN_FROM_STATE_FULL"
+
+				ep2_meiji_restoration_faction_button = {
+					datacontext = "[GetPlayerJournalEntry('je_meiji_restoration')]"
+					blockoverride "onclick" {
+						onclick = "[InformationPanelBar.OpenJournalEntryPanel(JournalEntry.AccessSelf)]"
+					}
+				}
+			}
+
 			### FLAG
 			flowcontainer = {
+				ignoreinvisible = yes
 				spacing = 15
 				margin_left = 10
 				margin_top = 15
@@ -1138,70 +1155,74 @@ types state_panel_types
 				}
 			}
 
-
-
 			flowcontainer = {
-				visible = "[Not(IsDataModelEmpty(State.AccessStateRegion.AccessTraits))]"
-				datamodel = "[State.AccessStateRegion.AccessTraits]"
+				direction = vertical
 				parentanchor = top|right
 				widgetanchor = top|right
-				position =  { -15 15 }
+				margin = { 15 10 }
 				spacing = 5
 
-				item = {
-					icon = {
-						size = { 45 45 }
-						tooltip = "TOOLTIP_STATE_TRAIT"
-						onmousehierarchyenter = "[AccessHighlightManager.HighlightStateTrait(StateTrait.Self)]"
-						onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
-						alwaystransparent = no
-						texture = "[StateTrait.GetTexture]"
-					}
-				}
-			}
-
-			# Harvest conditions and Famine
-			flowcontainer = {
-				parentanchor = top|right
-				widgetanchor = top|right
-				position =  { -15 65 }
-				spacing = 5
-
-				# Harvest conditions
 				flowcontainer = {
-					visible = "[Not(IsDataModelEmpty(State.GetHarvestConditions))]"
-					datamodel = "[State.GetHarvestConditions]"
-					spacing = 5
+					visible = "[Not(IsDataModelEmpty(State.AccessStateRegion.AccessTraits))]"
+					datamodel = "[State.AccessStateRegion.AccessTraits]"
+					parentanchor = top|right
+					spacing = 3
 
 					item = {
 						icon = {
 							size = { 45 45 }
-							using = tooltip_se
-							onmousehierarchyenter = "[AccessHighlightManager.HighlightHarvestConditionArea(HarvestCondition.GetArea.Self)]"
+							tooltip = "TOOLTIP_STATE_TRAIT"
+							onmousehierarchyenter = "[AccessHighlightManager.HighlightStateTrait(StateTrait.Self)]"
 							onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 							alwaystransparent = no
-							texture = "[HarvestCondition.GetType.GetIcon]"
-
-							tooltipwidget = {
-								FancyTooltip_HarvestCondition = {}
-							}
+							texture = "[StateTrait.GetTexture]"
 						}
 					}
 				}
 
-				# Famine icon
-				icon = {
-					visible = "[State.HasFamine]"
-					tooltip = "[State.GetFamineDesc]"
-					using = tooltip_se
-					size = { 50 50 }
-					texture = "gfx/interface/backgrounds/round_button_bg.dds"
-					using = clickthrough_blocker
+				# Harvest conditions and Famine
+				flowcontainer = {
+					parentanchor = top|right
+					widgetanchor = top|right
+					#position =  { -15 65 }
+					spacing = 5
 
+					# Harvest conditions
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(State.GetHarvestConditions))]"
+						datamodel = "[State.GetHarvestConditions]"
+						spacing = 5
+
+						item = {
+							icon = {
+								size = { 45 45 }
+								using = tooltip_se
+								onmousehierarchyenter = "[AccessHighlightManager.HighlightHarvestConditionArea(HarvestCondition.GetArea.Self)]"
+								onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+								alwaystransparent = no
+								texture = "[HarvestCondition.GetType.GetIcon]"
+
+								tooltipwidget = {
+									FancyTooltip_HarvestCondition = {}
+								}
+							}
+						}
+					}
+
+					# Famine icon
 					icon = {
+						visible = "[State.HasFamine]"
+						tooltip = "[State.GetFamineDesc]"
+						using = tooltip_se
 						size = { 50 50 }
-						parentanchor = center
-						texture = "gfx/interface/icons/famine_icons/famine_icon.dds"
+						texture = "gfx/interface/backgrounds/round_button_bg.dds"
+						using = clickthrough_blocker
+
+						icon = {
+							size = { 50 50 }
+							parentanchor = center
+							texture = "gfx/interface/icons/famine_icons/famine_icon.dds"
+						}
 					}
 				}
 			}
@@ -1462,8 +1483,7 @@ types state_panel_types
 		############################################################################################################################################################
 		############################################################################################################################################################
 		############################################################################################################################################################
-		 
-
+		   
 		flowcontainer = {
 			parentanchor = hcenter
 			margin = { 10 10 }
@@ -1856,6 +1876,19 @@ types state_panel_types
 
 				blockoverride "name" {
 					text = "STATE_BLOCKADE_LEVEL"
+				}
+			}
+
+			state_panel_status_item_small = {
+				visible = "[State.IsBeingBombarded]"
+				tooltip = "TOOLTIP_STATE_BOMBARDMENT"
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/commander_order_icons/bomb_shores.dds"
+				}
+
+				blockoverride "name" {
+					text = "STATE_BOMBARDMENT"
 				}
 			}
 
@@ -3783,7 +3816,7 @@ types state_panel_types
 				}
 
 				building_item_condensed = {
-					datacontext = "[StatesPanel.AccessBuilding('building_naval_base')]"
+					datacontext = "[StatesPanel.AccessBuilding('building_naval_administration')]"
 
 					tooltipwidget = {
 						FancyTooltip_Building = {}
@@ -4173,7 +4206,7 @@ types building_item_types
 						onclick = "[Execute( Building.Downsize )]"
 						enabled = "[IsValid( Building.Downsize )]"
 						visible = no
-						#visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), Not( ShouldAskConfirmation( Building.Downsize ) ) ), Not(Building.IsMilitaryBuilding))]"
+						#visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), Not( ShouldAskConfirmation( Building.Downsize ) ) ), Not(Building.GeneratesCombatUnits))]"
 						using = tooltip_below
 					}
 
@@ -4186,7 +4219,7 @@ types building_item_types
 						onclick = "[PopupManager.AskConfirmation( Building.Downsize )]"
 						enabled = "[IsValid( Building.Downsize )]"
 						visible = no
-						#visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), ShouldAskConfirmation( Building.Downsize ) ), Not(Building.IsMilitaryBuilding))]"
+						#visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), ShouldAskConfirmation( Building.Downsize ) ), Not(Building.GeneratesCombatUnits))]"
 						using = tooltip_below
 					}
 
@@ -4487,35 +4520,35 @@ types building_item_types
 
 					### DOWNSIZE
 					button_icon_minus_action = {
+						visible = "[And4( Building.IsValid, Building.IsDownsizeable, Not(ShouldAskConfirmation(Building.Downsize)), Not(Building.GeneratesCombatUnits))]"
 						size = { 28 28 }
 						parentanchor = vcenter
 						position = { 5 0 }
 						tooltip = "[Building.GetDownsizeTooltip]"
 						onclick = "[Execute( Building.Downsize )]"
 						enabled = "[IsValid( Building.Downsize )]"
-						visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), Not( ShouldAskConfirmation( Building.Downsize ) ) ), Not(Building.IsMilitaryBuilding))]"
 						using = tooltip_below
 					}
 
 					### DOWNSIZE WITH CONFIRMATION
 					button_icon_minus_action = {
+						visible = "[And4(Building.IsValid, Building.IsDownsizeable, ShouldAskConfirmation(Building.Downsize), Not(Building.GeneratesCombatUnits))]"
 						size = { 28 28 }
 						parentanchor = vcenter
 						position = { 5 0 }
 						tooltip = "[Building.GetDownsizeTooltip]"
 						onclick = "[PopupManager.AskConfirmation( Building.Downsize )]"
 						enabled = "[IsValid( Building.Downsize )]"
-						visible = "[And(And( And( Building.IsValid, Building.IsDownsizeable ), ShouldAskConfirmation( Building.Downsize ) ), Not(Building.IsMilitaryBuilding))]"
 						using = tooltip_below
 					}
 
 					### CANCEL CONSTRUCTION
 					button_icon_minus_action = {
+						visible = "[And(IsValid( Building.CancelConstruction ), Not(Building.GeneratesCombatUnits))]"
 						size = { 28 28 }
 						parentanchor = vcenter
 						position = { 5 0 }
 						tooltip = "[Building.GetCancelConstructionTooltip]"
-						visible = "[And(IsValid( Building.CancelConstruction ), Not(Building.IsMilitaryBuilding))]"
 						onclick = "[Execute( Building.CancelConstruction )]"
 						using = tooltip_below
 					}
@@ -4532,8 +4565,6 @@ types building_item_types
 							size = { 28 28 }
 						}
 					}
-
-
 				}
 			}
 		}

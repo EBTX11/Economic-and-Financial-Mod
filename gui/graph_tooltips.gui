@@ -599,9 +599,24 @@ template military_slaves_expense_tooltip_with_graph
     }
 }
 
+template supply_ship_maintenance_expense_tooltip
+{
+    tooltip = "SUPPLY_SHIP_MAINTENANCE_EXPENSES_BREAKDOWN"
+}
+
+template military_ship_maintenance_expense_tooltip
+{
+    tooltip = "MILITARY_SHIP_MAINTENANCE_EXPENSES_BREAKDOWN"
+}
+
+template port_connection_expense_tooltip
+{
+    tooltip = "PORT_CONNECTION_EXPENSES_BREAKDOWN"
+}
+
 template military_goods_expense_tooltip_with_graph
 {
-    tooltip = "MILITARY_BUILDINGS_EXPENSES_BREAKDOWN"
+    tooltip = "MILITARY_UPKEEP_EXPENSES_BREAKDOWN"
 
     tooltipwidget = {
         GraphTooltip_MilitaryGoodsExpense = {}
@@ -729,10 +744,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Goods.GetPriceTrend)]"
@@ -784,10 +799,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetWorldPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Goods.GetWorldPriceTrend)]"
@@ -929,7 +944,7 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetEarningsPerEmployeeTrend, '(CFixedPoint)0', GetMax(Building.GetEarningsPerEmployeeTrend) )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[GetPlayer.GetCustom('currency_symbol')][GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
 				}
 				blockoverride "minvalue" {
 					raw_text = "0.0"
@@ -1675,6 +1690,52 @@ types graph_tooltips {
 		}
 	}
 
+	type GraphTooltip_PiracyIncome = TooltipWidgetType {
+		blockoverride "tooltip_content_after" {
+			v3_plotline = {
+				using = default_list_position
+
+				blockoverride "header" {
+					text = "[concept_piracy]"
+				}
+				blockoverride "line_color" {
+					color = { .9 .9 .9 1.0 }
+				}
+				blockoverride "size" {
+					size = { 280 100 }
+				}
+				blockoverride "line_plotpoints" {
+					visible = "[Not(IsEmpty(GetPlayer.GetPiracyIncomeTrend))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPiracyIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetPiracyIncomeTrend) )]"
+				}
+				blockoverride "maxvalue" {
+					text = "[GetMax(GetPlayer.GetPiracyIncomeTrend)|D]"
+				}
+				blockoverride "minvalue" {
+					raw_text = "0"
+				}
+				blockoverride "startdate" {
+					text = "[GetOldestDate(GetPlayer.GetPiracyIncomeTrend)]"
+				}
+				blockoverride "enddate" {
+					text = "[GetLatestDate(GetPlayer.GetPiracyIncomeTrend)]"
+				}
+				blockoverride "multiitem" {}
+
+				blockoverride "empty_state_visibility" {
+					visible = "[IsEmpty(GetPlayer.GetPiracyIncomeTrend)]"
+				}
+				blockoverride "everything_that_is_not_empty_state_visibility" {
+					visible = "[Not(IsEmpty(GetPlayer.GetPiracyIncomeTrend))]"
+				}
+				blockoverride "empty_state_text" {
+					text = "GRAPH_NOT_INITIALIZED"
+				}
+			}
+		}
+	}
+
+
 	type GraphTooltip_GovernmentSlavesExpense = TooltipWidgetType {
 		blockoverride "tooltip_content_after" {
 			v3_plotline = {
@@ -1861,7 +1922,7 @@ types graph_tooltips {
 				using = default_list_position
 
 				blockoverride "header" {
-					text = "[concept_budget_goods_for_military_buildings]"
+					text = "[concept_budget_goods_for_military_upkeep]"
 				}
 				blockoverride "line_color" {
 					color = { .9 .9 .9 1.0 }
@@ -1991,7 +2052,7 @@ types graph_tooltips {
 				using = default_list_position
 
 				blockoverride "header" {
-					text = "[concept_budget_goods_for_military_buildings]"
+					text = "[concept_budget_goods_for_military_upkeep]"
 				}
 				blockoverride "line_color" {
 					color = { .9 .9 .9 1.0 }
@@ -2694,7 +2755,7 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetSupportTrend, '(CFixedPoint)0', GetMax(PoliticalMovement.GetSupportTrend) )]"
 				}
 				blockoverride "maxvalue" {
-					text = "[GetMax(PoliticalMovement.GetSupportTrend)|D]"
+					text = "[GetMax(PoliticalMovement.GetSupportTrend)|%0]"
 				}
 				blockoverride "minvalue" {
 					raw_text = "0"
@@ -2739,7 +2800,7 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetRadicalismTrend, '(CFixedPoint)0', GetMax(PoliticalMovement.GetRadicalismTrend) )]"
 				}
 				blockoverride "maxvalue" {
-					text = "[GetMax(PoliticalMovement.GetRadicalismTrend)|D]"
+					text = "[GetMax(PoliticalMovement.GetRadicalismTrend)|%0]"
 				}
 				blockoverride "minvalue" {
 					raw_text = "0"

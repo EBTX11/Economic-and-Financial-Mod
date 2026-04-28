@@ -1,0 +1,761 @@
+﻿template editor_text
+{
+	font = "standard_font"
+	fontsize = 15
+	fontcolor = { 1 1 1 1 }
+}
+
+template ConsoleBackground
+{
+	using = clickthrough_blocker
+
+	texture = "gfx/interface/backgrounds/illu_color.dds"
+	spriteType = Corneredtiled
+	spriteborder = { 0 0 }
+	texture_density = 2
+
+	block "fade" {
+		modify_texture = {
+			texture = "gfx/interface/backgrounds/default_bg_shading.dds"
+			spriteType = Corneredstretched
+			spriteborder = { 0 0 }
+			blend_mode = overlay
+			alpha = 0.8
+		}
+	}
+
+	modify_texture = {
+		using = bg_tiling_pattern
+		alpha = 0.065
+	}
+
+}
+
+template console_frame
+{
+	texture = "gfx/interface/backgrounds/simple_frame.dds"
+	spriteType = Corneredstretched
+	spriteborder = { 20 20 }
+	texture_density = 2
+}
+
+template ConsoleEditbg
+{
+	spriteType = Corneredtiled
+	spriteborder = { 5 5 }
+	shaderfile = "gfx/FX/pdxgui_default.shader"
+	texture = "gfx/interface/backgrounds/text_edit_bg.dds"
+	texture_density = 2
+}
+
+@button_sizeX = 125
+@button_sizeY = 31
+@scrollarea_length = 550
+
+types console_widgets {
+	type console_button = button
+	{
+		using = default_button
+		font = "standard_font"
+		fontsize = 14
+		parentanchor = hcenter
+		size = { @button_sizeX @button_sizeY }
+	}
+}
+
+textbox = {
+	name = "console_output_item"
+	maximumsize = { 390 -1 }
+	align = left|top
+	fontsize = 13
+	multiline = yes
+	autoresize = yes
+}
+
+flowcontainer = {
+	name = "console_window"
+	alwaystransparent = no
+	scissor = no
+	layer = confirmation
+	using = clickthrough_blocker
+
+	margin = { 10 10 }
+
+	flowcontainer = {
+		direction = vertical
+		spacing = 4
+		background = {
+			using = ConsoleBackground
+			margin = { 8 8 }
+		}
+
+		icon = {
+			size = { 100% 100% }
+			background = {
+				using = console_frame
+				margin = { 10 10 }
+			}
+		}
+
+		scrollarea = {
+			name = "console_output_scrollarea"
+			size = { 408 @scrollarea_length }
+
+			scrollwidget = {
+				flowcontainer = {
+					name = "console_output"
+					direction = "vertical"
+					ignoreinvisible = no
+				}
+			}
+
+			scrollbar_vertical = {
+				using = vertical_scrollbar
+			}
+
+			scrollbar_horizontal = {
+				using = horizontal_scrollbar
+			}
+		}
+
+		#button = {
+		#	using = default_button
+		#	position = { 365 0 }
+		#	size = { 30 30 }
+		#	onclick = "[ConsoleWindow.ToggleMenu]"
+		#	raw_text = "M"
+		#}
+
+		editbox = {
+			background = {
+				using = ConsoleEditbg
+				margin = { 4 0 }
+			}
+
+			name = "console_edit"
+			size = { 408 40 }
+			alwaystransparent = no
+			focuspolicy = all
+			align = left|nobaseline
+		}
+
+		flowcontainer = {
+			name = "toolbars_window"
+			@window_width = 398
+			@panel_width = @[window_width-16]
+
+			parentanchor = hcenter
+
+			margin = { 1 10 }
+
+			background = {
+				using = top_header_bg
+				margin = { 6 3 }
+			}
+			background = {
+				using = entry_bg_unit
+				margin = { 8 1 }
+				color = { .7 .4 .4 1.0 }
+			}
+
+			flowcontainer = {
+				direction = vertical
+				spacing = 10
+
+				flowcontainer = {
+					parentanchor = hcenter
+
+					background = {
+						using = entry_bg_simple_colored
+						margin = { 5 5 }
+					}
+
+					flowcontainer = {
+						direction = vertical
+
+						flowcontainer = {
+							direction = horizontal
+
+							@debug_button_size_square = 42
+
+							button = {
+								using = default_button
+								icon = {
+									texture = "gfx/interface/main_hud/tech_btn.dds"
+									size = { 40 40 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('research 5')]"
+								raw_tooltip = "Unlock #v all#! Technologies"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/generic_icons/money.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('money')]"
+								raw_tooltip = "Add @money!#p 10000000#!"
+							}
+
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('yesmen')]"
+								raw_tooltip = "Toggle #v yesmen#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/generic_icons/population_loyalist.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.19')]"
+								raw_tooltip = "Add #p 10%#! #v Loyalists#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/generic_icons/population_radical.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.20')]"
+								raw_tooltip = "Add #n 10%#! #v Radicals#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/topbar/bureaucracy_icon.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.21')]"
+								raw_tooltip = "Add #p 1000#! #v Bureaucracy#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/topbar/authority_icon.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.22')]"
+								raw_tooltip = "Add #p 1000#! #v Authority#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/topbar/influence_icon.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.23')]"
+								raw_tooltip = "Add #p 1000#! #v Influence#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/map_mode_icons/infamy.dds"
+
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('event debug.24')]"
+								raw_tooltip = "Reduce #v Infamy#! by #p 1000#!"
+							}
+
+						}
+						flowcontainer = {
+							direction = horizontal
+
+							button = {
+								using = default_button
+								icon = {
+									texture = "gfx/interface/main_hud/tech_btn.dds"
+									size = { 40 40 }
+								}
+								icon = {
+									parentanchor = bottom|right
+									texture = "gfx/interface/icons/generic_icons/clock.dds"
+									size = { 18 18 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastresearch')]"
+								raw_tooltip = "Toggle #v FastResearch"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/building_icons/building_browser_filter_icons/filter_icons_queued_construction.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastbuild')]"
+								raw_tooltip = "Toggle #v FastBuild#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/diplomatic_treaties_articles_icons/law_commitment_treaties.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastenact')]"
+								raw_tooltip = "Toggle #v FastEnact#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/generic_icons/company_prosperity.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastprosperity')]"
+								raw_tooltip = "Toggle #v FastProsperity#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/lens_toolbar_icons/declare_interest.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastinvolvement')]"
+								raw_tooltip = "Toggle #v FastInvolvement#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/lens_toolbar_icons/incorporate_state.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastincorporate')]"
+								raw_tooltip = "Toggle #v FastIncorporate#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/political_movement_icons/movement_ideological.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastmovements')]"
+								raw_tooltip = "Toggle #v FastMovements#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/political_movement_icons/political_activism_red.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastactivism')]"
+								raw_tooltip = "Toggle #v FastActivism#!"
+							}
+							button = {
+								using = default_button
+								icon = {
+									parentanchor = center
+									texture = "gfx/interface/icons/politics_icons/revolution.dds"
+									size = { 30 30 }
+								}
+								size = { @debug_button_size_square @debug_button_size_square }
+								onclick = "[ExecuteConsoleCommand('fastcivilwars')]"
+								raw_tooltip = "Toggle #v FastCivilWars#!"
+							}
+						}
+					}
+				}
+
+				container = {
+					parentanchor = hcenter
+
+					background = {
+						using = entry_bg_simple_colored
+						margin = { 5 5 }
+					}
+
+					@button_num = 4
+					@button_width = @[ panel_width / button_num ]
+					@button_height = 25
+
+					flowcontainer = {
+						direction = vertical
+						spacing = 3
+
+						flowcontainer = {
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Theocracy"
+								onclick = "[ExecuteConsoleCommand('event debug.1')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Abs. Monarchy"
+								onclick = "[ExecuteConsoleCommand('event debug.2')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Monarchy"
+								onclick = "[ExecuteConsoleCommand('event debug.3')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Dictatorship"
+								onclick = "[ExecuteConsoleCommand('event debug.4')]"
+								using = fontsize_xsmall
+							}
+						}
+
+						flowcontainer = {
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Oligarchy"
+								onclick = "[ExecuteConsoleCommand('event debug.5')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Republic"
+								onclick = "[ExecuteConsoleCommand('event debug.6')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Communism"
+								onclick = "[ExecuteConsoleCommand('event debug.7')]"
+								using = fontsize_xsmall
+							}
+							button = {
+								using = default_button
+								size = { @button_width @button_height }
+								raw_text = "Anarchism"
+								onclick = "[ExecuteConsoleCommand('event debug.8')]"
+								using = fontsize_xsmall
+							}
+						}
+					}
+				}
+
+				flowcontainer = {
+					spacing = 8
+					parentanchor = hcenter
+
+					flowcontainer = {
+						direction = vertical
+						spacing = 8
+
+						flowcontainer = {
+							direction = vertical
+
+							background = {
+								using = entry_bg_simple_colored
+								margin = { 3 5 }
+							}
+
+							textbox = {
+								size = { 126 25 }
+								align = center|nobaseline
+								raw_text = "UI | 2D"
+							}
+
+							console_button = {
+								raw_text = "#gold Master Menu"
+								onclick = "[ExecuteConsoleCommand('gui.CreateDockable gui/debug_menues.gui ui_master_menu')]"
+							}
+
+							console_button = {
+								raw_text = "GUI Debug"
+								onclick = "[ExecuteConsoleCommand('gui.debug')]"
+							}
+
+							console_button = {
+								raw_text = "GUI Editor"
+								onclick = "[ExecuteConsoleCommand('gui_editor')]"
+							}
+
+							console_button = {
+								raw_text = "UI Library"
+								raw_tooltip = "Open UI Library"
+								onclick = "[ExecuteConsoleCommand('GUI.CreateWidget gui/window_component_library.gui component_library_window')]"
+							}
+
+							console_button = {
+								raw_text = "Data Types"
+								raw_tooltip = "Data Types"
+								onclick = "[ExecuteConsoleCommand('data_types_explorer')]"
+							}
+						}
+					}
+
+					flowcontainer = {
+						direction = vertical
+						background = {
+							using = entry_bg_simple_colored
+							margin = { 3 5 }
+						}
+						textbox = {
+							size = { 126 25 }
+							align = center|nobaseline
+							raw_text = "Debug | Misc"
+						}
+
+						console_button = {
+							raw_text = "#n Reload Textures"
+							onclick = "[ExecuteConsoleCommand('reload texture')]"
+						}
+
+						console_button = {
+							raw_text = "Script Explorer"
+							raw_tooltip = "Script Explorer"
+							onclick = "[ExecuteConsoleCommand('explorer')]"
+						}
+
+						console_button = {
+							raw_text = "Inspect Country"
+							raw_tooltip = "Open Object Inspector scoped to a specific country"
+							onclick = "[ExecuteConsoleCommand('inspect_country')]"
+						}
+
+						console_button = {
+							raw_text = "Script Profiler"
+							raw_tooltip = "Script Profiler"
+							onclick = "[ExecuteConsoleCommand('Script.Profiling.Gui')]"
+						}
+
+						console_button = {
+							raw_text = "Audio"
+							onclick = "[ExecuteConsoleCommand('tweak Audio.')]"
+						}
+
+						console_button = {
+							raw_text = "Language"
+							onclick = "[ExecuteConsoleCommand('gui.CreateDockable gui/debug_menues.gui language_window')]"
+						}
+
+						console_button = {
+							raw_text = "Flags"
+							onclick = "[ExecuteConsoleCommand('gui.CreateDockable gui/debug_menues.gui flags_window')]"
+						}
+
+						console_button = {
+							raw_text = "Occupation"
+							raw_tooltip = "#i Alt+LMB#! to add [GetDefine('NDebug','OCCUPATION_TOOL_DELTA')|v0%]. #i Shift+LMB#! to remove [GetDefine('NDebug','OCCUPATION_TOOL_DELTA')|v0%].#i Ctrl+Alt+LMB#! to fully capture state"
+							onclick = "[ExecuteConsoleCommand('OccupationTool')]"
+						}
+					}
+
+					flowcontainer = {
+						direction = vertical
+						spacing = 10
+						flowcontainer = {
+							direction = vertical
+
+							background = {
+								using = entry_bg_simple_colored
+								margin = { 3 5 }
+							}
+
+							textbox = {
+								size = { 126 25 }
+								align = center|nobaseline
+								raw_text = "Quick Toggle"
+							}
+
+							console_button = {
+								raw_text = "Camera Restrictions"
+								fontsize = 12
+								onclick = "[ExecuteConsoleCommand('Camera.Restrictions')]"
+							}
+
+							console_button = {
+								raw_text = "Disable Map Tooltip"
+								fontsize = 12
+								onclick = "[ExecuteConsoleCommand('Draw.MapTooltip')]"
+							}
+
+							flowcontainer = {
+								direction = horizontal
+
+								button = {
+									using = default_button
+									raw_text = "Particle"
+									size = { 62 35 }
+									fontsize = 13
+									using = fontsize_small
+									onclick = "[ExecuteConsoleCommand('particleeditor')]"
+									raw_tooltip = "Open the particle editor"
+								}
+
+								button = {
+									using = default_button
+									raw_text = "Entities"
+									size = { 62 35 }
+									fontsize = 13
+									using = fontsize_small
+									onclick = "[ExecuteConsoleCommand('clearspawnedentities')]"
+									raw_tooltip = "Removes all manually spawned items"
+								}
+							}
+
+						}
+
+						flowcontainer = {
+							direction = vertical
+
+							background = {
+								using = entry_bg_simple_colored
+								margin = { 3 5 }
+							}
+
+							textbox = {
+								size = { 126 26 }
+								align = center|nobaseline
+								raw_text = "Graphics | Env"
+							}
+
+							console_button = {
+								raw_text = "#gold Master Menu"
+								onclick = "[ExecuteConsoleCommand('gui.CreateDockable gui/debug_menues.gui environment_debug_window')]"
+							}
+
+							console_button = {
+								raw_text = "Settings"
+
+								onclick = "[ExecuteConsoleCommand('settings')]"
+							}
+
+							console_button = {
+								raw_text = "Particle Tools"
+
+								onclick = "[ExecuteConsoleCommand('gui.CreateDockable gui/debug_menues.gui Particle_Tools')]"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	container = {
+		name = "menu"
+		visible = "[ConsoleWindow.IsMenuShown]"
+
+		scrollarea = {
+			name = "menu_scroll_area"
+			position = { 415 0 }
+			size = { 150 500 }
+			scrollbarpolicy_horizontal = always_off
+
+			background = {
+				using = default_background
+			}
+
+			scrollbar_vertical = {
+				using = vertical_scrollbar
+			}
+
+			scrollwidget = {
+				fixedgridbox = {
+					name = "menu_grid"
+					position = { 0 0 }
+					addcolumn = 100
+					addrow = 24
+
+					item = {
+						container = {
+							icon = {
+								using = ConsoleBackground
+								visible = "[ConsoleMenuItem.IsCurrentGroup]"
+								position = { 0 0 }
+								size = { 106 28 }
+							}
+
+							button = {
+								using = default_button
+								position = { 3 3 }
+								size = { 100 22 }
+								onclick = "[ConsoleMenuItem.Select]"
+								tooltip = "[ConsoleMenuItem.GetHelp]"
+								raw_text = "[ConsoleMenuItem.GetName]"
+							}
+						}
+					}
+				}
+			}
+		}
+
+		scrollarea = {
+			name = "command_scroll_area"
+			position = { 565 0 }
+			size = { 250 500 }
+			scrollbarpolicy_horizontal = always_off
+
+			background = {
+				using = default_background
+			}
+
+			scrollbar_vertical = {
+				using = vertical_scrollbar
+			}
+
+			scrollwidget = {
+				fixedgridbox = {
+					name = "command_grid"
+					addcolumn = 200
+					addrow = 24
+
+					item = {
+						button = {
+							using = default_button
+							size = { 250 24 }
+							onclick = "[ConsoleMenuItem.Select]"
+							tooltip = "[ConsoleMenuItem.GetHelp]"
+							raw_text = "[ConsoleMenuItem.GetName]"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+

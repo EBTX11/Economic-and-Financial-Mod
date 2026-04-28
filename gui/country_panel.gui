@@ -246,7 +246,6 @@ types country_panel_types
 
 		blockoverride "fixed_bottom" {
 			flowcontainer = {
-				visible = "[Not(Country.IsLocalPlayer)]"
 				direction = vertical
 				spacing = 5
 
@@ -261,13 +260,25 @@ types country_panel_types
 				widget = {
 					size = { 5 5 }
 				}
+				
+				button = {
+					text = "NATIONAL_CAST"
+					visible = "[GetMetaPlayer.IsPlayedOrObservedCountry(Country.Self)]"
+					onclick = "[InformationPanelBar.OpenPanelTab('pops_overview', 'national_cast')]"
+					parentanchor = hcenter
+					using = default_button_primary_big
+					align = hcenter|nobaseline
+					size = { @panel_width 50 }
+					using = fontsize_large
+				}				
 
 				button = {
 					parentanchor = hcenter
+					visible = "[Not(GetMetaPlayer.IsPlayedOrObservedCountry(Country.Self))]"
 					size = { 540 50 }
 					using = default_button_primary
 					onclick = "[InformationPanelBar.OpenTreatyDraftPanelForNewDraft(GetPlayer.Self, Country.Self)]"
-					enabled = "[GetPlayer.CanSignTreatyWith(Country.Self)]"
+					enabled = "[And(Not(GetMetaPlayer.IsObserver), GetPlayer.CanSignTreatyWith(Country.Self))]"
 					tooltip = "TREATY_CAN_SIGN_WITH"
 
 					flowcontainer = {
@@ -471,7 +482,6 @@ types country_panel_types
 						datacontext = "[Country.AccessRuler]"
 						blockoverride "show_hat" {}
 						blockoverride "highlight" {}
-						blockoverride "commander_order_icon" {}
 					}
 				}
 
@@ -594,8 +604,8 @@ types country_panel_types
 					textbox = {
 						autoresize = yes
 						visible = "[Not(CountryPanel.GetCountry.IsColonizable)]"
-						raw_text = "#variable @flotillas! [Country.GetWarships|0]#!"
-						tooltip = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP"
+						raw_text = "#variable @ships! [Country.GetNumShips|0]#!"
+						tooltip = "PANEL_MILITARY_NAVY_CURRENT_SHIPS_TOOLTIP"
 						using = fontsize_mega
 						minimumsize = { 60 -1 }
 						align = right|nobaseline
@@ -870,24 +880,24 @@ types country_panel_types
 					}
 				}
 
-				#FLOTILLAS
+				#SHIPS
 				country_stats_entry = {
-					alpha = "[TransparentIfZero_int32(Country.GetWarships)]"
+					alpha = "[TransparentIfZero_int32(Country.GetNumShips)]"
 					blockoverride "stats_tooltip" {
-						tooltip = "PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP"
+						tooltip = "PANEL_MILITARY_NAVY_CURRENT_SHIPS_TOOLTIP"
 					}
 					blockoverride "information_icon" {
 						texture = "gfx/interface/icons/generic_icons/flotillas.dds"
 					}
 					blockoverride "stats_label" {
-						text = "FLOTILLAS"
+						text = "SHIPS_CONCEPT"
 					}
 					blockoverride "stats_value" {
-						raw_text = "#variable [Country.GetWarships|0]#!"
+						raw_text = "#variable [Country.GetNumShips|0]#!"
 					}
 
 					blockoverride "stats_rank" {
-						text = "[Country.GetFlotillasRanking]"
+						text = "[Country.GetShipsRanking]"
 					}
 				}
 
@@ -958,7 +968,7 @@ types country_panel_types
 				country_panel_currency_panel_content = {
 					using = default_fade_in_out
 				}
-				
+				 
 				############################################################################################################################################################
 				############################################################################################################################################################
 				############################################################################################################################################################
@@ -976,7 +986,7 @@ types country_panel_types
 				############################################################################################################################################################
 				############################################################################################################################################################
 				############################################################################################################################################################
- 
+  
 				##POPULATION
 				country_stats_entry = {
 					onmousehierarchyenter = "[SetTempMapModeByKey('mm_population')]"
@@ -1083,7 +1093,9 @@ types country_panel_types
 
 				##CULTURE
 				country_stats_entry = {
-					blockoverride "stats_tooltip" {}
+					blockoverride "stats_tooltip" {
+						tooltip = "[Country.GetPrimaryCulturesDesc]"
+					}
 
 					blockoverride "information_icon" {
 						texture = "gfx/interface/population/pop_culture.dds"
@@ -3534,14 +3546,14 @@ types war_panel
 					parentanchor = vcenter
 					position = { 0 -4 }
 
-					small_flag = {
+					small_flag_no_interact = {
 						mobilization_icon_flag = {}
 					}
+
 					textbox = {
 						name = "warscore"
 						autoresize = yes
 						text = "WAR_SUPPORT_LEFT_SIDE"
-						tooltip = "WAR_LEFT_LEADER_TOOLTIP"
 						align = nobaseline
 						parentanchor = vcenter
 						using = fontsize_large
@@ -3557,14 +3569,14 @@ types war_panel
 					parentanchor = right|vcenter
 					position = { 0 -4 }
 
-					small_flag = {
+					small_flag_no_interact = {
 						mobilization_icon_flag = {}
 					}
+
 					textbox = {
 						name = "warscore"
 						autoresize = yes
 						text = "WAR_SUPPORT_RIGHT_SIDE"
-						tooltip = "WAR_RIGHT_LEADER_TOOLTIP"
 						align = right|nobaseline
 						parentanchor = vcenter
 						using = fontsize_large
@@ -3586,44 +3598,8 @@ types war_panel
 
 		block "entire_icon" {
 			icon = {
-								block "information_icon" {
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-
-				# ███╗   ███╗ ██████╗ ██████╗ 
-				# ████╗ ████║██╔═══██╗██╔══██╗
-				# ██╔████╔██║██║   ██║██║  ██║
-				# ██║╚██╔╝██║██║   ██║██║  ██║
-				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
-
-				#E&F mod
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-
-					#texture = "gfx/interface/icons/generic_icons/gdp.dds"
-
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-
-				# ███╗   ███╗ ██████╗ ██████╗ 
-				# ████╗ ████║██╔═══██╗██╔══██╗
-				# ██╔████╔██║██║   ██║██║  ██║
-				# ██║╚██╔╝██║██║   ██║██║  ██║
-				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
-
-				#E&F mod
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
+				block "information_icon" {
+					texture = "gfx/interface/icons/generic_icons/gdp.dds"
 				}
 				size = { 40 40 }
 				position = { -5 0 }
@@ -4238,8 +4214,8 @@ types country_info
 			textbox = {
 				autoresize = yes
 				visible = "[Not(CountryPanel.GetCountry.IsColonizable)]"
-				raw_text = "#variable @flotillas![Country.GetWarships|0]#!"
-				tooltip = PANEL_MILITARY_NAVY_CURRENT_FLOTILLAS_TOOLTIP
+				raw_text = "#variable @ships![Country.GetNumShips|0]#!"
+				tooltip = PANEL_MILITARY_NAVY_CURRENT_SHIPS_TOOLTIP
 				using = fontsize_mega
 				minimumsize = { 60 -1 }
 				align = hcenter|nobaseline
@@ -4390,6 +4366,7 @@ types country_info
 		section_header_button = {
 			using = default_fade_in_out
 			parentanchor = hcenter
+			align = nobaseline
 
 			block "section_header_tooltip" {}
 

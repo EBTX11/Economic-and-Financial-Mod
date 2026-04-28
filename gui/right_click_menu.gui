@@ -33,6 +33,12 @@ types right_click_menu_types {
 			}
 
 			textbox = {
+				align = nobaseline
+				using = fontsize_large
+				fontsize_min = 12
+				elide = right
+				margin = { 5 0 }
+
 				block "text_layoutpolicies" {
 					layoutpolicy_horizontal = expanding
 					layoutpolicy_vertical = expanding
@@ -41,12 +47,6 @@ types right_click_menu_types {
 				block "text" {
 					raw_text = "#TODO Default Item Text#!"
 				}
-
-				align = left|nobaseline
-				using = fontsize_large
-				fontsize_min = 12
-				elide = right
-				margin = { 5 0 }
 			}
 
 			block "rclick_item_after_label" {}
@@ -240,7 +240,8 @@ types right_click_menu_types {
 								textbox = {
 									autoresize = yes
 									default_format = "#header"
-									align = left|nobaseline
+									align = nobaseline|left
+									parentanchor = left
 									using = right_click_menu_title_margin_left
 									margin_bottom = 2
 
@@ -959,19 +960,8 @@ types right_click_menu_types {
 			spacing = 5
 
 			icon = {
-				### Remove this visible state when the GetIcon/GetTexture function is in
-				visible = "[MilitaryFormation.IsArmy]"
 				parentanchor = vcenter
-				size = { 65 65 }
-				texture = "[MilitaryFormation.GetFlag]"
-				color = "[MilitaryFormation.GetFlagColor]"
-			}
-
-			### Remove this whole icon when the GetIcon/GetTexture function is in
-			icon = {
-				visible = "[MilitaryFormation.IsFleet]"
-				parentanchor = vcenter
-				size = { 65 65 }
+				size = { 60 60 }
 				texture = "[MilitaryFormation.GetFlag]"
 				color = "[MilitaryFormation.GetFlagColor]"
 			}
@@ -982,21 +972,21 @@ types right_click_menu_types {
 				parentanchor = vcenter
 
 				flowcontainer = {
-					minimumsize = { 235 30 }
-					spacing = 5
+					minimumsize = { 230 30 }
+					maximumsize = { 255 30 }
+					spacing = 10
 
 					textbox = {
-						minimumsize = { 180 30 }
-						maximumsize = { 180 30 }
+						minimumsize = { 170 30 }
+						maximumsize = { 170 30 }
 						parentanchor = vcenter
 						align = nobaseline
-						elide = right
+						using = elide_fontsize_min
 						autoresize = yes
-						text = "[MilitaryFormation.GetName]"
-						fontsize_min = 14
+						text = "[MilitaryFormation.GetNameNoIcon]"
 
 						block "name_max_width" {
-							max_width = 160
+							max_width = 165
 						}
 					}
 
@@ -1010,10 +1000,13 @@ types right_click_menu_types {
 							autoresize = yes
 							align = hcenter|nobaseline
 							using = fontsize_large
-							text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
-							max_width = 90
+							max_width = 80
 							elide = right
 							fontsize_min = 12
+
+							block "unit_count_text" {
+								text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
+							}
 						}
 					}
 				}
@@ -1059,15 +1052,6 @@ types right_click_menu_types {
 			spacing = 5
 
 			icon = {
-				visible = "[MilitaryFormation.IsArmy]"
-				parentanchor = vcenter
-				size = { 65 65 }
-				texture = "[MilitaryFormation.GetFlag]"
-				color = "[MilitaryFormation.GetFlagColor]"
-			}
-
-			icon = {
-				visible = "[MilitaryFormation.IsFleet]"
 				parentanchor = vcenter
 				size = { 65 65 }
 				texture = "[MilitaryFormation.GetFlag]"
@@ -1089,7 +1073,7 @@ types right_click_menu_types {
 						parentanchor = vcenter
 						align = nobaseline
 						autoresize = yes
-						text = "[MilitaryFormation.GetName]"
+						text = "[MilitaryFormation.GetNameNoIcon]"
 						elide = right
 						fontsize_min = 14
 
@@ -1108,10 +1092,13 @@ types right_click_menu_types {
 							autoresize = yes
 							align = hcenter|nobaseline
 							using = fontsize_large
-							text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
 							max_width = 90
 							elide = right
 							fontsize_min = 12
+
+							block "unit_count_text" {
+								text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
+							}
 						}
 					}
 				}
@@ -1143,7 +1130,7 @@ right_click_menu = {
 
 	blockoverride "items" {
 		flowcontainer = {
-			visible = "[Not(Building.GetBuildingType.IsMilitaryBuilding)]"
+			visible = "[Not(Building.GetBuildingType.GeneratesCombatUnits)]"
 			direction = vertical
 			parentanchor = hcenter
 			datacontext = "[Building.GetState]"
@@ -1538,7 +1525,7 @@ right_click_menu = {
 
 	blockoverride "items" {
 		flowcontainer = {
-			visible = "[Not(Building.GetBuildingType.IsMilitaryBuilding)]"
+			visible = "[Not(Building.GetBuildingType.GeneratesCombatUnits)]"
 			direction = vertical
 			parentanchor = hcenter
 
@@ -1799,7 +1786,7 @@ right_click_menu = {
 				margin_left = 45
 			}
 			blockoverride "properties" {
-				visible = "[And(BuildingType.IsExpandable, Not(BuildingType.IsMilitaryBuilding))]"
+				visible = "[And(BuildingType.IsExpandable, Not(BuildingType.GeneratesCombatUnits))]"
 				onclick = "[BuildingType.ActivateExpansionLens]"
 			}
 
@@ -1875,7 +1862,7 @@ right_click_menu = {
 			blockoverride "properties" {
 				enabled = "[IsValid(AccessPlayer.StartNegotiationWith(InterestGroup.Self))]"
 				onclick = "[Execute(AccessPlayer.StartNegotiationWith(InterestGroup.Self))]"
-				tooltip = "NEGOTIATE_LAW_INTEREST_GROUP_BUTTON_TOOLTIP" 
+				tooltip = "NEGOTIATE_LAW_INTEREST_GROUP_BUTTON_TOOLTIP"
 			}
 
 			blockoverride "texture" {
@@ -1966,7 +1953,7 @@ right_click_menu = {
 				default_format = "#header"
 				align = nobaseline
 				using = right_click_menu_title_margin_left
-				text = "[MilitaryFormation.GetName]"
+				text = "[MilitaryFormation.GetNameNoIcon]"
 			}
 		}
 	}
@@ -2136,22 +2123,21 @@ right_click_menu = {
 				}
 			}
 
-			right_click_menu_item = {		# DEPLOY TO SEA NODE
+			right_click_menu_item = {		# EDIT MISSION SEA REGIONS
 				visible = "[MilitaryFormation.IsFleet]"
 
 				blockoverride "properties" {
-					tooltip = "DEPLOY_MILITARY_FORMATION_TO_SEA_NODE_TOOLTIP"
-                    enabled = "[MilitaryFormation.CanDeployToSeaNode]"
-					onclick = "[MilitaryFormation.OnDeployToSeaNodeClicked]"
+					tooltip = "EDIT_NAVAL_MISSION_SEA_REGIONS_TOOLTIP"
+					onclick = "[MilitaryFormation.OnEditMissionSeaRegionsClicked]"
+					enabled = "[MilitaryFormation.CanEditMissionSeaRegions]"
 				}
 
 				blockoverride "texture" {
-					### PLACEHOLDER ICON
-					texture = "gfx/interface/icons/generic_icons/sea_region_mm_battle.dds"
+					texture = "gfx/interface/icons/generic_icons/edit_sea_nodes.dds"
 				}
 
 				blockoverride = "text" {
-					text = "DEPLOY_MILITARY_FORMATION_TO_SEA_NODE_LABEL"
+					text = "EDIT_NAVAL_MISSION_SEA_REGIONS_LABEL"
 				}
 
 				blockoverride "size" {
@@ -2169,7 +2155,7 @@ right_click_menu = {
 
 				blockoverride "texture" {
 					### PLACEHOLDER ICON
-					texture = "gfx/interface/icons/alert_icons/has_army_in_reserve.dds"
+					texture = "gfx/interface/icons/formation_order_icons/station_armies.dds"
 				}
 
 				blockoverride = "text" {
@@ -2196,6 +2182,53 @@ right_click_menu = {
 
 				blockoverride = "text" {
 					text = "MILITARY_FORMATION_INVADE_LABEL"
+				}
+
+				blockoverride "size" {
+					size = { 260 44 }
+				}
+			}
+
+			right_click_menu_item = {		# EMBARK
+				visible = "[And( MilitaryFormation.IsArmy, Not( MilitaryFormation.IsAttachedToFleet ) )]"
+
+				blockoverride "properties" {
+					tooltip = "MILITARY_FORMATION_EMBARK_TOOLTIP"
+					enabled = "[MilitaryFormation.CanEmbark]"
+					onclick = "[RightClickMenuManager.ShowForEmbarkSelectFleet( MilitaryFormation.AccessSelf )]"
+				}
+
+				blockoverride "texture" {
+					### PLACEHOLDER ICON
+					texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+				}
+
+				blockoverride = "text" {
+					text = "MILITARY_FORMATION_EMBARK_LABEL"
+				}
+
+				blockoverride "size" {
+					size = { 260 44 }
+				}
+			}
+
+			right_click_menu_item = {		# DISEMBARK
+				visible = "[And(MilitaryFormation.IsArmy, MilitaryFormation.IsAttachedToFleet)]"
+				tooltip = "MILITARY_FORMATION_DISEMBARK_TOOLTIP"
+
+				blockoverride "properties" {
+					enabled = "[IsValid(MilitaryFormation.DisembarkFormation)]"
+					onclick = "[Execute(MilitaryFormation.DisembarkFormation)]"
+					onclick = "[RightClickMenuManager.Close]"
+				}
+
+				blockoverride "texture" {
+					### PLACEHOLDER ICON
+					texture = "gfx/interface/icons/formation_order_icons/disembark_from_fleet.dds"
+				}
+
+				blockoverride = "text" {
+					text = "MILITARY_FORMATION_DISEMBARK_LABEL"
 				}
 
 				blockoverride "size" {
@@ -2263,6 +2296,215 @@ right_click_menu = {
 
 				blockoverride "size" {
 					size = { 260 44 }
+				}
+			}
+
+			### Naval Missions
+			right_click_menu_dropdown = {
+				visible = "[MilitaryFormation.IsFleet]"
+				direction = vertical
+
+				blockoverride "left_text" {
+					text = "concept_naval_mission"
+				}
+
+				blockoverride "section_header_tooltip" {
+					tooltip = "SHOW_NAVAL_MISSIONS"
+				}
+
+				blockoverride "section_header_size" {
+					size = { 260 44 }
+				}
+
+				blockoverride "section_header_right_text" {
+					flowcontainer = {
+						margin = { 5 0 }
+
+						icon = {
+							visible = "[MilitaryFormation.HasNavalMission]"
+							datacontext = "[MilitaryFormation.GetNavalMission.GetType]"
+							parentanchor = vcenter
+							size = { 30 30 }
+							texture = "[NavalMissionType.GetIcon]"
+						}
+
+						textbox = {
+							visible = "[Not(MilitaryFormation.HasNavalMission)]"
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							alpha = 0.3
+							text = "NONE"
+						}
+					}
+				}
+
+				blockoverride "onclick" {
+					onclick = "[GetVariableSystem.Toggle('show_naval_missions')]"
+				}
+
+				blockoverride "onclick_showmore" {
+					visible = "[Not(GetVariableSystem.Exists('show_naval_missions'))]"
+				}
+
+				blockoverride "onclick_showless" {
+					visible = "[GetVariableSystem.Exists('show_naval_missions')]"
+				}
+
+				blockoverride "dropdown_items" {
+					dynamicgridbox = {
+						visible = "[GetVariableSystem.Exists('show_naval_missions')]"
+						datamodel = "[MilitaryFormation.GetPotentialMissionsTypes]"
+
+						item = {
+							flowcontainer = {
+								direction = vertical
+
+								naval_mission_right_click_item = {
+									visible = "[MilitaryFormation.HasNavalMission]"
+
+									blockoverride "naval_mission_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "naval_mission_tooltip_desc" {
+													custom_tooltip_textbox = {
+														visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))))]"
+														text = "[GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+													}
+
+													custom_tooltip_newline = {
+														visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))))]"
+													}
+												}
+											}
+										}
+									}
+
+									blockoverride "not_selected_visibility" {
+										visible = "[Not(MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf))]"
+									}
+
+									blockoverride "selected_visibility" {
+										visible = "[MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf)]"
+									}
+
+									blockoverride "button_size" {
+										size = { 260 44 }
+									}
+
+									blockoverride "text_properties" {
+										max_width = 210
+									}
+
+									blockoverride "add_mission_button_properties" {
+								        enabled = "[IsValid(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+								        onclick = "[PopupManager.ExecuteOrAskConfirmationIfNeeded(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+								    }
+
+								    blockoverride "remove_mission_button_properties" {
+								        enabled = "[IsValid(MilitaryFormation.RemoveNavalMission)]"
+										onclick = "[Execute(MilitaryFormation.RemoveNavalMission)]"
+									}
+
+									blockoverride "tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "tooltip_content_before" {
+													custom_tooltip_textbox = {
+														text = "[GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+													}
+												}
+											}
+										}
+									}
+
+									blockoverride "remove_naval_mission_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "text_before" {
+													custom_tooltip_textbox_with_empty_line = {
+														#tooltip = "UNASSIGN_NAVAL_MISSION_TOOLTIP_FLEET"
+													}
+												}
+											}
+										}
+									}
+								}
+
+								naval_mission_right_click_item = {
+									visible = "[Not(MilitaryFormation.HasNavalMission)]"
+
+									blockoverride "naval_mission_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "naval_mission_tooltip_desc" {
+													custom_tooltip_textbox = {
+														visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))))]"
+														text = "[GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+													}
+
+													custom_tooltip_newline = {
+														visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))))]"
+													}
+												}
+											}
+										}
+									}
+
+									blockoverride "not_selected_visibility" {
+										visible = "[Not(MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf))]"
+									}
+
+									blockoverride "selected_visibility" {
+										visible = "[MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf)]"
+									}
+
+									blockoverride "button_size" {
+										size = { 260 44 }
+									}
+
+									blockoverride "text_properties" {
+										max_width = 210
+									}
+
+									blockoverride "add_mission_button_properties" {
+								        enabled = "[IsValid(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+								        onclick = "[PopupManager.ExecuteOrAskConfirmationIfNeeded(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+										onclick = "[MilitaryFormation.OnEditMissionSeaRegionsClicked]"
+								    }
+
+								    blockoverride "remove_mission_button_properties" {
+								        enabled = "[IsValid(MilitaryFormation.RemoveNavalMission)]"
+										onclick = "[Execute(MilitaryFormation.RemoveNavalMission)]"
+									}
+
+									blockoverride "tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "tooltip_content_before" {
+													custom_tooltip_textbox = {
+														text = "[GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+													}
+												}
+											}
+										}
+									}
+
+									blockoverride "remove_naval_mission_tooltip" {
+										tooltipwidget = {
+											FancyTooltip_NavalMissionType = {
+												blockoverride "text_before" {
+													custom_tooltip_textbox_with_empty_line = {
+														#tooltip = "UNASSIGN_NAVAL_MISSION_TOOLTIP_FLEET"
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -3613,11 +3855,11 @@ right_click_menu = {
 			align = nobaseline
 			using = right_click_menu_title_margin_left
 			margin_bottom = 2
-		max_width = 390
-		fontsize_min = 12
-		elide = right
-		text = "PRIVATIZE_OR_MONOPOLIZE_RIGHT_CLICK_MENU_TITLE"
-	}
+			max_width = 390
+			fontsize_min = 12
+			elide = right
+			text = "PRIVATIZE_OR_MONOPOLIZE_RIGHT_CLICK_MENU_TITLE"
+		}
 
 		textbox = {
 			visible = "[Not(HasDlcFeature('mp1_monopolies'))]"
@@ -4030,7 +4272,7 @@ right_click_menu = {
 }
 
 right_click_menu = {
-	name = "select_fleet_right_click_menu"
+	name = "select_fleet_embark_right_click_menu"
 
 	blockoverride "title_text" {
 		text = "SELECT_MILITARY_FORMATION"
@@ -4045,16 +4287,67 @@ right_click_menu = {
 			item = {
 				widget = {
 					using = standard_formation_item_size
+					military_formation_right_click_item = {
+						visible = yes
+
+						blockoverride "tooltip" {
+							tooltipwidget = {
+								FancyTooltip_MilitaryFormation = {
+									blockoverride "text_before" {
+										visible = "[Not(IsValid(MilitaryFormationWrapped.EmbarkFormation(MilitaryFormation.Self)))]"
+										text = "[GetDesc(MilitaryFormationWrapped.EmbarkFormation(MilitaryFormation.Self))]"
+										margin_bottom = 15
+									}
+								}
+							}
+						}
+
+						blockoverride "onclick" {
+							enabled = "[IsValid(MilitaryFormationWrapped.EmbarkFormation(MilitaryFormation.Self) )]"
+							onclick = "[Execute(MilitaryFormationWrapped.EmbarkFormation(MilitaryFormation.Self) )]"
+                        	onclick = "[RightClickMenuManager.Close]"
+						}
+
+						#TODO PRCAL-43127 : Connect popup here
+
+					}
+				}
+			}
+
+		}
+	}
+}
+
+right_click_menu = {
+	name = "select_fleet_right_click_menu"
+
+	blockoverride "title_text" {
+		text = "SELECT_MILITARY_FORMATION"
+	}
+
+	blockoverride "items" {
+		dynamicgridbox = {
+			datamodel = "[InvasionPlannerPopup.GetSortedFleets]"
+			flipdirection = yes
+			datamodel_wrap = 2
+
+			item = {
+				widget = {
+					using = standard_formation_item_size
 
 					military_formation_right_click_item = {
 						visible = "[Not(InvasionPlannerPopup.IsMilitaryFormationSelected(MilitaryFormation.Self))]"
+
+                        blockoverride "unit_count_text" {
+                        	text = "MILITARY_FORMATION_CARRYING_CAPACITY_WITH_ICON"
+                        }
 
                         blockoverride "tooltip" {
                         	tooltipwidget = {
                         		FancyTooltip_MilitaryFormation = {
                         			blockoverride "text_before" {
                         				visible = "[Not(InvasionPlannerPopup.CanMilitaryFormationBeSelected(MilitaryFormation.Self))]"
-                        				text =  "[InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)]"
+                        				text = "[InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)]"
                         				margin_bottom = 15
                         			}
                         		}
@@ -4071,17 +4364,99 @@ right_click_menu = {
 					military_formation_right_click_item_selected = {
 						visible = "[InvasionPlannerPopup.IsMilitaryFormationSelected(MilitaryFormation.Self)]"
 
+						blockoverride "unit_count_text" {
+							text = "MILITARY_FORMATION_CARRYING_CAPACITY_WITH_ICON"
+						}
+
 						blockoverride "tooltip" {
 							tooltipwidget = {
                         		FancyTooltip_MilitaryFormation = {
                         			blockoverride "text_before" {
                         				visible = "[Not(InvasionPlannerPopup.CanMilitaryFormationBeSelected(MilitaryFormation.Self))]"
-                        				text =  "[InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)]"
+                        				text = "[InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)]"
                         				margin_bottom = 15
                         			}
                         		}
                         	}
 						}
+					}
+				}
+			}
+
+		}
+	}
+}
+
+types warn_types {
+	type warn_busy_fleet = icon {
+		visible = "[Or(MilitaryFormation.HasNavalMission, MilitaryFormation.IsAboutToTransportArmies)]"
+		position = { 50 47 }
+		size = { 25 25 }
+		texture = "gfx/interface/icons/generic_icons/warning.dds"
+		datacontext = "[MilitaryFormation]"
+		tooltip = "CANDIDATE_FLEET_FOR_TRANSPORT_IS_BUSY"
+	}
+}
+
+right_click_menu = {
+	name = "select_transport_fleet_right_click_menu"
+
+	blockoverride "title_text" {
+		text = "SELECT_MILITARY_FORMATION"
+	}
+
+	blockoverride "items" {
+		dynamicgridbox = {
+			datamodel = "[TransportPlannerPopup.GetSortedFleets]"
+			flipdirection = yes
+			datamodel_wrap = 2
+
+			item = {
+				widget = {
+					using = standard_formation_item_size
+
+					military_formation_right_click_item = {
+						visible = "[Not(TransportPlannerPopup.IsFleetSelected(MilitaryFormation.Self))]"
+
+						blockoverride "unit_count_text" {
+							text = "MILITARY_FORMATION_CARRYING_CAPACITY_WITH_ICON"
+						}
+
+						blockoverride "tooltip" {
+							tooltipwidget = {
+								FancyTooltip_MilitaryFormation = {
+									blockoverride "text_before" {
+										visible = "[Not(IsValid(TransportPlannerPopup.GetTransportCommand(MilitaryFormation.Self)))]"
+										text = "[GetDesc(TransportPlannerPopup.GetTransportCommand(MilitaryFormation.Self))]"
+										margin_bottom = 15
+									}
+								}
+							}
+						}
+
+						blockoverride "onclick" {
+							enabled = "[IsValid(TransportPlannerPopup.GetTransportCommand(MilitaryFormation.Self))]"
+							onclick = "[TransportPlannerPopup.OnSelectedFleet(MilitaryFormation.AccessSelf)]"
+							onclick = "[RightClickMenuManager.Close]"
+						}
+
+						warn_busy_fleet = {}
+					}
+
+					military_formation_right_click_item_selected = {
+						visible = "[TransportPlannerPopup.IsFleetSelected(MilitaryFormation.Self)]"
+
+						blockoverride "unit_count_text" {
+							text = "MILITARY_FORMATION_CARRYING_CAPACITY_WITH_ICON"
+						}
+
+						blockoverride "tooltip" {
+							tooltipwidget = {
+								FancyTooltip_MilitaryFormation = {}
+							}
+						}
+
+						warn_busy_fleet = {}
 					}
 				}
 			}
@@ -4132,6 +4507,7 @@ right_click_menu = {
 					military_formation_right_click_item_selected = {
 						visible = "[InvasionPlannerPopup.IsMilitaryFormationSelected(MilitaryFormation.Self)]"
 
+
 						blockoverride "tooltip" {
 							tooltipwidget = {
                         		FancyTooltip_MilitaryFormation = {
@@ -4147,6 +4523,49 @@ right_click_menu = {
 				}
 			}
 
+		}
+	}
+}
+
+right_click_menu = {
+	name = "select_transport_army_right_click_menu"
+
+	blockoverride "title_text" {
+		text = "SELECT_MILITARY_FORMATION"
+	}
+
+	blockoverride "items" {
+		dynamicgridbox = {
+			datamodel = "[AccessPlayer.GetMilitaryFormationsArmy]"
+			flipdirection = yes
+			datamodel_wrap = 2
+
+			item = {
+				widget = {
+					using = standard_formation_item_size
+
+					military_formation_right_click_item = {
+
+						blockoverride "tooltip" {
+							tooltipwidget = {
+								FancyTooltip_MilitaryFormation = {
+									blockoverride "text_before" {
+										visible = "[Not(MilitaryFormationWrapped.CanFleetTransportArmy(MilitaryFormation.Self))]"
+										text = "[MilitaryFormationWrapped.GetCanFleetTransportArmyDesc(MilitaryFormation.Self)]"
+										margin_bottom = 15
+									}
+								}
+							}
+						}
+
+						blockoverride "onclick" {
+							enabled = "[MilitaryFormationWrapped.CanFleetTransportArmy(MilitaryFormation.Self)]"
+							onclick = "[MilitaryFormationWrapped.TransportArmyForFleet(MilitaryFormation.AccessSelf)]"
+							onclick = "[RightClickMenuManager.Close]"
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -4275,6 +4694,7 @@ right_click_menu = {
 
 right_click_menu = {
 	name = "select_order_right_click_menu"
+	parentanchor = right
 
 	blockoverride "title_text" {
 		text = "SELECT_ORDER_RIGHT_CLICK_MENU_TITLE"
@@ -4384,9 +4804,11 @@ right_click_menu = {
 		                    		parentanchor = vcenter
 		                    		align = nobaseline
 		                    		autoresize = yes
-		                    		text = "[CommanderOrderType.GetNameNoFormatting]"
 		                    		using = fontsize_large
 		                    		using = look_at_me_text_animation
+		                    		max_width = 210
+		                    		using = elide_fontsize_min
+		                    		text = "[CommanderOrderType.GetNameNoFormatting]"
 		                    	}
 
 		                    	icon = {
@@ -4594,7 +5016,326 @@ right_click_menu = {
 }
 
 right_click_menu = {
-	name = "military_formation_marker_right_click_menu"
+	name = "select_naval_mission_type_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "SELECT_NAVAL_MISSION_TYPE_RIGHT_CLICK_MENU_TITLE"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			direction = vertical
+			spacing = 10
+
+			### NAVAL MISSION TYPES
+			dynamicgridbox = {
+				datamodel = "[GetSelectedFleetsPotentialAndPossibleMissions]"
+
+				item = {
+					naval_mission_right_click_item = {}
+				}
+			}
+
+			flowcontainer = {
+				spacing = 10
+				margin = { 20 10 }
+				minimumsize = { 360 -1 }
+				direction = vertical
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				textbox = {
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					multiline = yes
+					max_width = 320
+					text = "NAVAL_MISSION_REGIONS"
+				}
+
+				textbox = {
+					visible = "[StringIsEmpty(GetSelectedFleetsMissionRegionsDesc)]"
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					multiline = yes
+					max_width = 320
+					text = "NO_FLEET_HAS_NAVAL_MISSION"
+				}
+
+				button = {
+					parentanchor = hcenter
+					size = { 320 50 }
+					using = default_button_map_interaction
+					enabled = "[CanEditSeaRegionsForSelectedFleets]"
+					onclick = "[OnEditSelectedFleetsSeaRegionsClicked]"
+					tooltip = "EDIT_NAVAL_MISSION_SEA_REGIONS_TOOLTIP_MULTIPLE"
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						margin = { 15 5 }
+						spacing = 5
+
+						expand = {}
+
+						textbox = {
+							layoutpolicy_horizontal = expanding
+							size = { 0 20 }
+							align = hcenter|nobaseline
+							elide = right
+							fontsize_min = 12
+							min_width = 52
+							text = "CHANGE_REGION"
+						}
+
+						expand = {}
+					}
+				}
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "fleet_select_naval_mission_type_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "SELECT_NAVAL_MISSION_TYPE_RIGHT_CLICK_MENU_TITLE"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			direction = vertical
+			spacing = 10
+
+			### NAVAL MISSION TYPES
+			dynamicgridbox = {
+				datamodel = "[MilitaryFormation.GetPotentialMissionsTypes]"
+
+				item = {
+					container = {
+						naval_mission_right_click_item = {
+							visible = "[MilitaryFormation.HasNavalMission]"
+
+							blockoverride "naval_mission_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "naval_mission_tooltip_desc" {
+											custom_tooltip_textbox = {
+												visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))))]"
+												text = "[GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+											}
+
+											custom_tooltip_newline = {
+												visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))))]"
+											}
+										}
+									}
+								}
+							}
+
+							blockoverride "not_selected_visibility" {
+								visible = "[Not(MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf))]"
+							}
+
+							blockoverride "selected_visibility" {
+								visible = "[MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf)]"
+							}
+
+							blockoverride "add_mission_button_properties" {
+								enabled = "[IsValid(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+								onclick = "[PopupManager.ExecuteOrAskConfirmationIfNeeded(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+							}
+
+							blockoverride "remove_mission_button_properties" {
+								enabled = "[IsValid(MilitaryFormation.RemoveNavalMission)]"
+								onclick = "[Execute(MilitaryFormation.RemoveNavalMission)]"
+							}
+
+							blockoverride "tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "tooltip_content_after" {
+											custom_tooltip_textbox = {
+												text = "[GetDesc(MilitaryFormation.CreateNavalMissionWithPreviousArea(NavalMissionType.AccessSelf))]"
+											}
+										}
+									}
+								}
+							}
+
+							blockoverride "remove_naval_mission_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "text_before" {
+											custom_tooltip_textbox_with_empty_line = {
+												tooltip = "UNASSIGN_NAVAL_MISSION_TOOLTIP_FLEET"
+											}
+										}
+									}
+								}
+							}
+						}
+
+						naval_mission_right_click_item = {
+							visible = "[Not(MilitaryFormation.HasNavalMission)]"
+
+							blockoverride "naval_mission_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "naval_mission_tooltip_desc" {
+											custom_tooltip_textbox = {
+												visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))))]"
+												text = "[GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+											}
+
+											custom_tooltip_newline = {
+												visible = "[Not(StringIsEmpty(GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))))]"
+											}
+										}
+									}
+								}
+							}
+
+							blockoverride "not_selected_visibility" {
+								visible = "[Not(MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf))]"
+							}
+
+							blockoverride "selected_visibility" {
+								visible = "[MilitaryFormation.HasNavalMissionType(NavalMissionType.AccessSelf)]"
+							}
+
+							blockoverride "add_mission_button_properties" {
+								enabled = "[IsValid(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+								onclick = "[PopupManager.ExecuteOrAskConfirmationIfNeeded(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+								onclick = "[MilitaryFormation.OnEditMissionSeaRegionsClicked]"
+							}
+
+							blockoverride "remove_mission_button_properties" {
+								enabled = "[IsValid(MilitaryFormation.RemoveNavalMission)]"
+								onclick = "[Execute(MilitaryFormation.RemoveNavalMission)]"
+							}
+
+							blockoverride "tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "tooltip_content_after" {
+											custom_tooltip_textbox = {
+												text = "[GetDesc(MilitaryFormation.CreateNavalMission(NavalMissionType.AccessSelf))]"
+											}
+										}
+									}
+								}
+							}
+
+							blockoverride "remove_naval_mission_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_NavalMissionType = {
+										blockoverride "text_before" {
+											custom_tooltip_textbox_with_empty_line = {
+												tooltip = "UNASSIGN_NAVAL_MISSION_TOOLTIP_FLEET"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				spacing = 10
+				margin = { 20 10 }
+				minimumsize = { 360 -1 }
+				direction = vertical
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				textbox = {
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					multiline = yes
+					max_width = 320
+					text = "FLEET_NAVAL_MISSION_REGIONS"
+				}
+
+				textbox = {
+					visible = "[StringIsEmpty(MilitaryFormation.GetNavalMissionRegionsDesc)]"
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					multiline = yes
+					max_width = 320
+					text = "FLEET_HAS_NO_NAVAL_MISSION"
+				}
+
+				button = {
+					parentanchor = hcenter
+					size = { 320 50 }
+					using = default_button_map_interaction
+					enabled = "[MilitaryFormation.CanEditMissionSeaRegions]"
+					onclick = "[MilitaryFormation.OnEditMissionSeaRegionsClicked]"
+					tooltip = "EDIT_NAVAL_MISSION_SEA_REGIONS_TOOLTIP"
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						margin = { 10 5 }
+						spacing = 5
+
+						expand = {}
+
+						textbox = {
+							layoutpolicy_horizontal = expanding
+							size = { 0 20 }
+							align = hcenter|nobaseline
+							elide = right
+							fontsize_min = 12
+							min_width = 52
+							text = "CHANGE_REGION"
+						}
+
+						expand = {}
+					}
+				}
+			}
+		}
+	}
+}
+
+types shared_formation_marker {
+	type military_formation_marker_right_click_menu_item = right_click_menu_item {
+		tooltipwidget = {
+			FancyTooltip_MilitaryFormation = {}
+		}
+
+		blockoverride "properties" {
+			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
+		}
+
+		blockoverride "texture" {
+			texture = "[MilitaryFormation.GetFlag]"
+		}
+
+		blockoverride "text" {
+			text = "MILITARY_FORMATION_MARKER_RIGHT_CLICK_ITEM_DESC"
+		}
+
+		blockoverride "size" {
+			size = { 360 44 }
+		}
+	}
+}
+
+right_click_menu = {
+	name = "land_formation_marker_right_click_menu"
 
 	blockoverride "title_text" {
 		text = "MILITARY_FORMATION_MARKER_SELECT_FORMATION"
@@ -4608,27 +5349,29 @@ right_click_menu = {
 				datamodel = "[FormationMarker.GetFormations]"
 
 				item = {
-					right_click_menu_item = {
-						tooltipwidget = {
-							FancyTooltip_MilitaryFormation = {}
-						}
+					military_formation_marker_right_click_menu_item = { }
+				}
+			}
+		}
+	}
+}
 
-						blockoverride "properties" {
-							onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
-						}
+right_click_menu = {
+	name = "fleet_formation_marker_right_click_menu"
 
-						blockoverride "texture" {
-							texture = "[MilitaryFormation.GetFlag]"
-						}
+	blockoverride "title_text" {
+		text = "FLEET_FORMATION_MARKER_SELECT_FORMATION"
+	}
 
-						blockoverride "text" {
-							text = "MILITARY_FORMATION_MARKER_RIGHT_CLICK_ITEM_DESC"
-						}
+	blockoverride "items" {
+		flowcontainer = {
+			spacing = 10
 
-						blockoverride "size" {
-							size = { 360 44 }
-						}
-					}
+			dynamicgridbox = {
+				datamodel = "[FleetFormationMarker.GetFormations]"
+
+				item = {
+					military_formation_marker_right_click_menu_item = { }
 				}
 			}
 		}
@@ -4644,10 +5387,10 @@ right_click_menu = {
 
 	blockoverride "items" {
 		right_click_menu_item = {		# GO TO PANEL
-			visible = "[Not(InformationPanelBar.IsPanelOpen('commander'))]"
+			visible = "[Not(InformationPanelBar.IsPanelOpen('character'))]"
 
 			blockoverride "properties" {
-				onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+				onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 				tooltip = "GO_TO_BUTTON_CHARACTER"
 			}
 
@@ -4693,6 +5436,25 @@ right_click_menu = {
 			}
 		}
 
+		right_click_menu_item = {		# TOGGLE PIN
+			blockoverride "properties" {
+				visible = "[Character.GetCountry.IsLocalPlayer]"
+				onclick = "[InformationPanelBar.OpenPanelTab('pops_overview', 'national_cast')]"
+			}
+
+			blockoverride "texture" {
+				texture = "gfx/interface/icons/notification_icons/character.dds"
+			}
+
+			blockoverride = "text" {
+				text = "NATIONAL_CAST"
+			}
+
+			blockoverride "size" {
+				size = { 360 44 }
+			}
+		}
+
 		flowcontainer = {
 			direction = vertical
 
@@ -4703,6 +5465,28 @@ right_click_menu = {
 				autoresize = yes
 				align = left|nobaseline
 				text = "CHARACTER_INTERACTIONS_HEADER"
+			}
+
+			### UNASSIGN CURRENT COMMANDER
+			right_click_menu_item = {
+				visible = "[Character.HasMilitaryFormation]"
+
+				blockoverride "properties" {
+					tooltip = "UNASSIGN_COMMANDER_TOOLTIP"
+					enabled = "[IsValid(Character.UnassignFromFormation)]"
+					onclick = "[Execute(Character.UnassignFromFormation)]"
+					onclick = "[RightClickMenuManager.Close]"
+				}
+
+				blockoverride "icon" {}
+
+				blockoverride "text" {
+					text = "UNASSIGN_COMMANDER_WITH_FORMATION"
+				}
+
+				blockoverride "size" {
+					size = { 360 44 }
+				}
 			}
 
 			right_click_menu_item = {	# PROMOTE COMMANDER
@@ -4719,25 +5503,6 @@ right_click_menu = {
 
 				blockoverride = "text" {
 					text = "CHARACTER_RIGHT_CLICK_MENU_PROMOTE_COMMANDER"
-				}
-
-				blockoverride "size" {
-					size = { 360 44 }
-				}
-			}
-
-			right_click_menu_item = {	# SPLIT INTO OWN FORMATION
-				blockoverride "properties" {
-					visible = "[And( Character.GetCountry.IsLocalPlayer, Character.IsCommander )]"
-					tooltip = "MILITARY_PANEL_SPLIT_CHARACTER_INTO_OWN_FORMATION_TOOLTIP"
-					enabled = "[IsValid(Character.SplitIntoOwnFormation)]"
-					onclick = "[PopupManager.AskConfirmation(Character.SplitIntoOwnFormation)]"
-				}
-
-				blockoverride "icon" {}
-
-				blockoverride "text" {
-					text = "CHARACTER_RIGHT_CLICK_MENU_SPLIT_INTO_OWN_FORMATION"
 				}
 
 				blockoverride "size" {
@@ -4775,7 +5540,7 @@ right_click_menu = {
 
 		flowcontainer = {
 			direction = vertical
-			visible = "[Character.GetCountry.IsLocalPlayer]"
+			visible = "[And3(Character.GetCountry.IsLocalPlayer, Character.IsGeneral, Character.HasMilitaryFormation)]"
 
 			textbox = {					# CURRENT ORDER (TEXT)
 				visible = "[And(Character.IsCommander, Not(Character.GetNextOrderType.IsValid))]"
@@ -5053,7 +5818,7 @@ right_click_menu = {
 				item = {
 					container = {
 						right_click_menu_item = {
-							visible = "[Not(Law.IsActive)]"
+							visible = "[And(Not(Law.IsActive), Law.IsVisible)]"
 
 							blockoverride "properties" {
 								tooltip = "IMPOSE_LAW_TOOLTIP"
@@ -5153,6 +5918,10 @@ right_click_menu = {
 		container = {
 			minimumsize = { 460 -1 }
 
+			background = {
+				using = fade_center_colored_black
+			}
+
 			flowcontainer = {
 				parentanchor = vcenter
 				spacing = 5
@@ -5173,6 +5942,7 @@ right_click_menu = {
 					parentanchor = vcenter
 					size = { 28 28 }
 					onclick = "[InformationPanelBar.OpenCountryPanelTab(Country.Self, 'default')]"
+					onclick = "[RightClickMenuManager.Close]"
 					tooltip = "GO_TO_BUTTON_COUNTRY"
 					input_action = "go_to_details"
 				}
@@ -5216,10 +5986,18 @@ right_click_menu = {
 
 		widget = { size = { 4 4 }} #pixelpushing tweak for flag, hack due to parentanchor and margins interacting weird
 
-		country_right_click_menu_items = {}
+		country_right_click_menu_items = {
+			blockoverride "capital_strategic_region_visibility" {
+				visible = no
+			}
+		}
 
 		container = {
 			minimumsize = { 460 -1 }
+
+			background = {
+				using = fade_center_colored_black
+			}
 
 			flowcontainer = {
 				parentanchor = vcenter
@@ -5238,6 +6016,7 @@ right_click_menu = {
 					parentanchor = vcenter
 					size = { 28 28 }
 					onclick = "[InformationPanelBar.OpenStatePanel( State.AccessSelf )]"
+					onclick = "[RightClickMenuManager.Close]"
 					tooltip = "GO_TO_BUTTON_STATE"
 				}
 			}
@@ -5592,29 +6371,70 @@ right_click_menu = {
 			}
 		}
 
-		textbox = {
-			text = "STATE_RIGHT_CLICK_MENU_STRATEGIC_REGION_TITLE"
-			autoresize = yes
-			align = left|nobaseline
-			margin_top = 15
-			margin_bottom = 2
-			using = right_click_menu_title_margin_left
-			visible = "[IsValid( GetPlayer.DeclareInterest( State.GetStateRegion.GetStrategicRegion ) )]"
-		}
+		container = {
+			minimumsize = { 460 -1 }
+			datacontext = "[State.GetStateRegion.GetStrategicRegion]"
 
-		right_click_menu_item = {
-			blockoverride "properties" {
-				tooltip = "[SelectLocalization( GetPlayer.HasDeclaredInterest( State.GetStateRegion.GetStrategicRegion ), 'STATE_RIGHT_CLICK_MENU_REVOKE_INTEREST_TOOLTIP', 'STATE_RIGHT_CLICK_MENU_DECLARE_INTEREST_TOOLTIP' )]"
-				visible = "[IsValid( GetPlayer.DeclareInterest( State.GetStateRegion.GetStrategicRegion ) )]"
-				onclick = "[Execute( GetPlayer.DeclareInterest( State.GetStateRegion.GetStrategicRegion ) )]"
+			background = {
+				using = fade_center_colored_black
 			}
 
-			blockoverride "texture" {
-				texture = "gfx/interface/icons/lens_toolbar_icons/declare_interest.dds"
+			flowcontainer = {
+				parentanchor = vcenter
+				spacing = 5
+				margin_top = 20
+				margin_left = 10
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					text = "STATE_RIGHT_CLICK_MENU_STRATEGIC_REGION_TITLE"
+				}
+
+				button_icon_goto = {
+					parentanchor = vcenter
+					size = { 28 28 }
+					onclick = "[InformationPanelBar.OpenStrategicRegionPanel(StrategicRegion.Self)]"
+					onclick = "[RightClickMenuManager.Close]"
+					tooltip = "GO_TO_BUTTON_STRATEGIC_REGION"
+					input_action = "go_to_details"
+				}
 			}
 
-			blockoverride "text" {
-				text = "[SelectLocalization( GetPlayer.HasDeclaredInterest( State.GetStateRegion.GetStrategicRegion ), 'STATE_RIGHT_CLICK_MENU_REVOKE_INTEREST', 'STATE_RIGHT_CLICK_MENU_DECLARE_INTEREST' )]"
+			flowcontainer = {
+				parentanchor = right|vcenter
+				margin_right = 10
+				spacing = 5
+
+				button_icon_zoom = {
+					parentanchor = vcenter
+					size = { 28 28 }
+					tooltip = "ZOOM_TO_STRATEGIC_REGION"
+					onclick = "[StrategicRegion.ZoomToFar]"
+					enabled = "[Not( StrategicRegion.IsZoomingTo )]"
+				}
+
+				button_icon_toggle_pin = {
+					parentanchor = vcenter
+					size = { 28 28 }
+
+					blockoverride "tooltip" {
+						tooltip = "STRATEGIC_REGION_PIN_IN_OUTLINER"
+					}
+
+					blockoverride "view_1" {
+						visible = "[Not(StrategicRegion.IsPinnedInOutliner)]"
+					}
+
+					blockoverride "view_2" {
+						visible = "[StrategicRegion.IsPinnedInOutliner]"
+					}
+
+					blockoverride "on_click" {
+						onclick = "[StrategicRegion.TogglePinInOutliner]"
+					}
+				}
 			}
 		}
 	}
@@ -6286,6 +7106,76 @@ types country_right_click_menu {
 				margin_left = 55
 			}
 		}
+
+		### STRATEGIC REGION
+		container = {
+			minimumsize = { 460 -1 }
+			datacontext = "[Country.GetCapital.GetStateRegion.GetStrategicRegion]"
+
+			block "capital_strategic_region_visibility" {}
+
+			background = {
+				using = fade_center_colored_black
+			}
+
+			flowcontainer = {
+				parentanchor = vcenter
+				spacing = 5
+				margin_top = 20
+				margin_left = 10
+
+				textbox = {
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					text = "COUNTRY_RIGHT_CLICK_MENU_STRATEGIC_REGION_TITLE"
+				}
+
+				button_icon_goto = {
+					parentanchor = vcenter
+					size = { 28 28 }
+					onclick = "[InformationPanelBar.OpenStrategicRegionPanel(StrategicRegion.Self)]"
+					onclick = "[RightClickMenuManager.Close]"
+					tooltip = "GO_TO_BUTTON_STRATEGIC_REGION"
+					input_action = "go_to_details"
+				}
+			}
+
+			flowcontainer = {
+				parentanchor = right|vcenter
+				margin_right = 10
+				spacing = 5
+
+				button_icon_zoom = {
+					parentanchor = vcenter
+					size = { 28 28 }
+					tooltip = "ZOOM_TO_STRATEGIC_REGION"
+					onclick = "[StrategicRegion.ZoomToFar]"
+					enabled = "[Not( StrategicRegion.IsZoomingTo )]"
+				}
+
+				button_icon_toggle_pin = {
+					parentanchor = vcenter
+					size = { 28 28 }
+
+					blockoverride "tooltip" {
+						tooltip = "STRATEGIC_REGION_PIN_IN_OUTLINER"
+					}
+
+					blockoverride "view_1" {
+						visible = "[Not(StrategicRegion.IsPinnedInOutliner)]"
+					}
+
+					blockoverride "view_2" {
+						visible = "[StrategicRegion.IsPinnedInOutliner]"
+					}
+
+					blockoverride "on_click" {
+						onclick = "[StrategicRegion.TogglePinInOutliner]"
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -6322,6 +7212,7 @@ right_click_menu = {
 					parentanchor = vcenter
 					size = { 28 28 }
 					onclick = "[InformationPanelBar.OpenCountryPanelTab(Country.Self, 'default')]"
+					onclick = "[RightClickMenuManager.Close]"
 					tooltip = "GO_TO_BUTTON_COUNTRY"
 					input_action = "go_to_details"
 				}
@@ -6417,6 +7308,7 @@ right_click_menu = {
 					parentanchor = vcenter
 					size = { 28 28 }
 					onclick = "[InformationPanelBar.OpenPoliticalMovementPanel(PoliticalMovement.AccessSelf)]"
+					onclick = "[RightClickMenuManager.Close]"
 					tooltip = "GO_TO_BUTTON_MOVEMENT"
 					input_action = "go_to_details"
 				}
@@ -7444,6 +8336,98 @@ template article_input_fixed_top {
 		}
 	}
 
+	### Ship Type filters
+	flowcontainer = {
+		visible = "[ArticleDraft.RequiresInput('ship')]"
+		datacontext = "[ArticleDraft.GetShipTypeFilterList]"
+		direction = vertical
+		parentanchor = hcenter
+		spacing = 5
+		margin = { 5 5 }
+
+		flowcontainer = {
+			spacing = 2
+			wrap_count = 4
+			datamodel = "[TreatyShipFilterList.GetShipTypeFilters]"
+
+			button = {
+				visible = "[TreatyShipFilterList.IsFiltered]"
+				size = { 120 40 }
+				using = default_button
+				onclick = "[TreatyShipFilterList.ResetFilters]"
+
+				textbox = {
+					size = { 100% 100% }
+					margin = { 5 0 }
+					align = hcenter|nobaseline
+					using = elide_fontsize_min
+					text = "ALL_SHIP_TYPES"
+				}
+			}
+
+			widget = {
+				visible = "[Not(TreatyShipFilterList.IsFiltered)]"
+				size = { 120 40 }
+				text = "ALL_SHIP_TYPES"
+
+				background = {
+					using = paper_bg
+				}
+
+				textbox = {
+					size = { 100% 100% }
+					margin = { 5 0 }
+					align = hcenter|nobaseline
+					using = elide_fontsize_min
+					text = "ALL_SHIP_TYPES"
+				}
+
+				icon = {
+					using = highlighted_square_selection
+				}
+			}
+
+			item = {
+				compact_ship_template = {
+					blockoverride "widget_datacontext" {
+						datacontext = "[TreatyShipFilter.GetShipType]"
+					}
+
+					size = { 120 40 }
+
+					background = {
+						using = dark_area
+						alpha = 0.01
+					}
+
+					blockoverride "tooltip" {
+						tooltip = "TREATY_COMPACT_SHIP_TYPE_TOOLTIP"
+					}
+
+					blockoverride "ship_number" {
+						raw_text = "#v [TreatyShipFilter.GetNumShipsOfType]#!"
+					}
+
+					blockoverride "button_visibility" {
+						visible = "[Not(TreatyShipFilter.IsFilterSelected)]"
+					}
+
+					blockoverride "highlight_visibility" {
+						visible = "[TreatyShipFilter.IsFilterSelected]"
+					}
+
+					blockoverride "onclick" {
+						onclick = "[TreatyShipFilter.SelectFilter]"
+					}
+				}
+			}
+		}
+
+		divider_decorative = {
+			parentanchor = hcenter
+		}
+	}
+
 	goods_filters = {
 		visible = "[ArticleDraft.RequiresInput('goods')]"
 		parentanchor = hcenter
@@ -7753,6 +8737,11 @@ template article_input_items {
 	article_input_law_list = {
 		visible = "[ArticleDraft.HasType('law_commitment')]"
 	}
+
+	### SHIP LIST
+	article_input_ship_list = {
+		visible = "[ArticleDraft.RequiresInput('ship')]"
+	}
 }
 
 template article_input_fixed_bottom {
@@ -7816,8 +8805,14 @@ template article_input_fixed_bottom {
 				visible = "[ArticleDraft.RequiresInput('law_type')]"
 			}
 
+			### TEXT
 			article_input_select_text = {
 				visible = "[ArticleDraft.RequiresInput('text')]"
+			}
+
+			### SHIP
+			selected_ship = {
+				visible = "[ArticleDraft.RequiresInput('ship')]"
 			}
 		}
 
@@ -8021,20 +9016,20 @@ template article_input_fixed_bottom {
 				spacing = 5
 				margin = { 10 10 }
 				using = tooltip_se
-				tooltip = "[SwayOffer.GetWouldAcceptSwayDesc(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry)]"
+				tooltip = "[SwayOffer.GetWouldAcceptSwayDescWithArticle(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry, ArticleDraft.Self)]"
 
 				background = {
 					using = simple_frame
 				}
 
 				icon = {
-					visible = "[SwayOffer.WouldAcceptSway(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry)]"
+					visible = "[SwayOffer.WouldAcceptSwayWithArticle(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry, ArticleDraft.Self)]"
 					size = { 22 22 }
 					texture = "gfx/interface/icons/generic_icons/approval_icon.dds"
 				}
 
 				icon = {
-					visible = "[Not(SwayOffer.WouldAcceptSway(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry))]"
+					visible = "[Not(SwayOffer.WouldAcceptSwayWithArticle(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry, ArticleDraft.Self))]"
 					size = { 22 22 }
 					texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
 				}
@@ -8045,7 +9040,7 @@ template article_input_fixed_bottom {
 					align = nobaseline
 					max_width = 40
 					using = elide_fontsize_min
-					text = "[SwayOffer.GetAcceptSwayScore(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry)|+=0]"
+					text = "[SwayOffer.GetAcceptSwayScoreWithArticle(SwayCountryPanel.GetDiplomaticPlay, GetPlayer.Self, SwayCountryPanel.GetCountry, ArticleDraft.Self)|+=0]"
 				}
 			}
 		}
@@ -8427,6 +9422,272 @@ types article_input_types
 					icon = {
 						using = highlighted_square_selection
 					}
+				}
+			}
+		}
+	}
+
+	### SHIP LIST
+	type article_input_ship_list = dynamicgridbox {
+		datamodel_wrap = 2
+		flipdirection = yes
+		datamodel = "[ArticleDraft.GetValidShips]"
+
+		item = {
+			flowcontainer = {
+				margin = { 2 2 }
+
+				button = {
+					visible = "[Not(ObjectsEqual(ArticleDraft.GetShip.Self, Ship.Self))]"
+					size = { 340 100 }
+					using = default_button
+					onclick = "[ArticleDraft.SetShip(Ship.Self)]"
+
+					tooltipwidget = {
+						FancyTooltip_Ship = {
+							blockoverride "tooltip_content_before" {
+								flowcontainer = {
+									visible = "[And(Not(PdxGuiWidget.HasContext('WarGoalDraft')), TreatyDraft.GetRightCountry.IsAI)]"
+									spacing = 5
+									tooltip = "[TreatyDraft.GetArticleTypeAcceptanceBreakdownWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self)]"
+
+									treaty_draft_input_acceptance_icon = {
+										blockoverride "approval_visibility" {
+											visible = "[GreaterThan_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
+										}
+
+										blockoverride "disapproval_visibility" {
+											visible = "[LessThan_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
+										}
+
+										blockoverride "undecided_visibility" {
+											visible = "[EqualTo_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
+										}
+									}
+
+									custom_tooltip_textbox = {
+										parentanchor = vcenter
+										max_width = 500
+										text = "TREATY_DRAFT_ACCEPTANCE_WITH_LABEL_COUNTRY"
+									}
+								}
+							}
+						}
+					}
+
+					compact_ship_info_and_silhouette = {
+						datacontext = "[Ship.GetType]"
+
+						blockoverride "more_grid_items" {
+							### SPEED
+							small_header_grid_item = {
+								tooltip = "SHIP_SPEED_TOOLTIP"
+								size = { 80 24 }
+								using = tooltip_es
+
+								blockoverride "icon_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "icon_widget_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "text" {
+									text = "[Ship.GetMovementSpeed|v^2]"
+								}
+
+								blockoverride "icon" {
+									texture = "gfx/interface/icons/military_icons/navy_icons/speed_navy.dds"
+								}
+							}
+
+							### SUPPLY CAPACITY
+							small_header_grid_item = {
+								size = { 80 24 }
+								datacontext = "[Ship.GetModifier]"
+								tooltip = "[Modifier.GetShipSupplyCapacityTooltip]"
+								using = tooltip_es
+
+								blockoverride "icon_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "icon_widget_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "text" {
+									text = "[Modifier.GetShipSupplyCapacity|v0]"
+								}
+
+								blockoverride "icon" {
+									texture = "gfx/interface/icons/military_icons/navy_icons/supply_efficiency.dds"
+								}
+							}
+						}
+					}
+
+					ship_header_and_acceptance_icon = {}
+				}
+
+				widget = {
+					visible = "[ObjectsEqual(ArticleDraft.GetShip.Self, Ship.Self)]"
+					size = { 340 100 }
+
+					tooltipwidget = {
+						FancyTooltip_Ship = {
+							blockoverride "text_before" {
+								text = "ARTICLE_SELECTED"
+							}
+
+							blockoverride "tooltip_content_before_before" {
+								flowcontainer = {
+									visible = "[Not(PdxGuiWidget.HasContext('WarGoalDraft'))]"
+									spacing = 5
+									tooltip = "[ArticleDraft.GetAcceptanceBreakdown(TreatyDraft.GetRightCountry.Self)]"
+
+									treaty_draft_input_acceptance_icon = {}
+
+									custom_tooltip_textbox = {
+										parentanchor = vcenter
+										max_width = 500
+										text = "ARTICLE_DRAFT_ACCEPTANCE_WITH_LABEL"
+									}
+								}
+							}
+						}
+					}
+
+					background = {
+						using = paper_bg
+					}
+
+					compact_ship_info_and_silhouette = {
+						datacontext = "[Ship.GetType]"
+
+						blockoverride "more_grid_items" {
+							### SPEED
+							small_header_grid_item = {
+								tooltip = "SHIP_SPEED_TOOLTIP"
+								size = { 80 24 }
+								using = tooltip_es
+
+								blockoverride "icon_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "icon_widget_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "text" {
+									raw_text = "#v [Ship.GetMovementSpeed|0]#!"
+								}
+
+								blockoverride "icon" {
+									texture = "gfx/interface/icons/military_icons/navy_icons/speed_navy.dds"
+								}
+							}
+
+							### SUPPLY CAPACITY
+							small_header_grid_item = {
+								size = { 80 24 }
+								datacontext = "[Ship.GetModifier]"
+								tooltip = "[Modifier.GetShipSupplyCapacityTooltip]"
+								using = tooltip_es
+
+								blockoverride "icon_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "icon_widget_size" {
+									size = { 24 24 }
+								}
+
+								blockoverride "text" {
+									text = "[Modifier.GetShipSupplyCapacity|v0]"
+								}
+
+								blockoverride "icon" {
+									texture = "gfx/interface/icons/military_icons/navy_icons/supply_efficiency.dds"
+								}
+							}
+						}
+					}
+
+					ship_header_and_acceptance_icon = {}
+
+					icon = {
+						using = highlighted_square_selection
+					}
+				}
+			}
+		}
+	}
+
+	type ship_header_and_acceptance_icon = widget {
+		size = { 100% 40 }
+
+		background = {
+			using = dark_area
+
+			modify_texture = {
+				using = simple_frame_mask
+			}
+		}
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			margin = { 10 5 }
+
+			button = {
+				visible = "[Ship.IsFlagship]"
+				size = { 30 30 }
+				alwaystransparent = yes
+				texture = "gfx/interface/icons/military_icons/navy_icons/flagship.dds"
+			}
+
+			### Ship name
+			textbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				align = nobaseline
+				using = elide_fontsize_min
+				text = "[Ship.GetNameNoFormatting]"
+			}
+
+			expand = {}
+
+			flowcontainer = {
+				datacontext = "[Ship.GetTemplate]"
+				spacing = 2
+				margin_right = 10
+				datamodel = "[ShipTemplate.GetModifications]"
+
+				item = {
+					icon = {
+						size = { 24 24 }
+						texture = "[ShipModificationType.GetIcon]"
+					}
+				}
+			}
+
+			### ACCEPTANCE ICON - SHIP - NOT SELECTED
+			treaty_draft_input_acceptance_button_icon = {
+				visible = "[And(Not(PdxGuiWidget.HasContext('WarGoalDraft')), TreatyDraft.GetRightCountry.IsAI)]"
+
+				blockoverride "approval_visibility" {
+					visible = "[GreaterThan_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
+				}
+
+				blockoverride "disapproval_visibility" {
+					visible = "[LessThan_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
+				}
+
+				blockoverride "undecided_visibility" {
+					visible = "[EqualTo_int32(TreatyDraft.GetArticleTypeAcceptanceWithShip(ArticleType.Self, TreatyDraft.GetRightCountry.Self, Ship.Self), '(int32)0')]"
 				}
 			}
 		}
@@ -10162,6 +11423,7 @@ types article_input_types
 		}
 	}
 
+	### SELECTED COUNTRY
 	type selected_country = container {
 		minimumsize = { 400 50 }
 
@@ -10204,6 +11466,54 @@ types article_input_types
 					using = elide_fontsize_min
 					max_width = 200
 					text = "[ArticleDraft.GetCountry.GetNameNoFlag]"
+				}
+			}
+		}
+	}
+
+	### SELECTED SHIP
+	type selected_ship = container {
+		minimumsize = { 400 50 }
+
+		flowcontainer = {
+			parentanchor = center
+			spacing = 5
+
+			textbox = {
+				visible = "[Not(ArticleDraft.HasInputValue('ship'))]"
+				parentanchor = vcenter
+				align = nobaseline
+				autoresize = yes
+				using = elide_fontsize_min
+				max_width = 380
+				text = "SELECT_A_SHIP"
+			}
+
+			flowcontainer = {
+				visible = "[ArticleDraft.HasInputValue('ship')]"
+				parentanchor = vcenter
+				spacing = 5
+
+				textbox = {
+					parentanchor = vcenter
+					align = nobaseline
+					autoresize = yes
+					using = elide_fontsize_min
+					max_width = 150
+					text = "TREATY_TRANSFER"
+				}
+
+				tiny_flag_no_interact = {
+					parentanchor = vcenter
+				}
+
+				textbox = {
+					parentanchor = vcenter
+					align = nobaseline
+					autoresize = yes
+					using = elide_fontsize_min
+					max_width = 200
+					text = "[ArticleDraft.GetShip.GetName]"
 				}
 			}
 		}
@@ -10714,59 +12024,6 @@ types article_input_types
 			}
 		}
 	}
-
-	### SELECTED MARKET TO PROHIBIT TRADE WITH
-	type selected_market_no_trade = container {
-		minimumsize = { 380 50 }
-
-		flowcontainer = {
-			parentanchor = center
-			spacing = 5
-
-			flowcontainer = {
-				#visible = "[ArticleType.HasMarketSelected]" #todo PRCAL-38358
-				#visible = no
-				parentanchor = vcenter
-				spacing = 5
-
-				textbox = {
-					parentanchor = vcenter
-					align = nobaseline
-					autoresize = yes
-					using = elide_fontsize_min
-					max_width = 200
-					text = "TREATY_NO_TRADE"
-				}
-
-				tiny_flag_no_interact = {
-					parentanchor = vcenter
-					#datacontext = "[ArticleType.GetSelectedMarket.GetOwner]" #todo PRCAL-38358
-					datacontext = "[GetPlayer]"
-				}
-
-				textbox = {
-					parentanchor = vcenter
-					align = nobaseline
-					autoresize = yes
-					using = elide_fontsize_min
-					max_width = 100
-					#text = "[ArticleType.GetSelectedMarket.GetName]" #todo PRCAL-38358
-					raw_text = "[GetPlayer.GetMarket.GetName]"
-				}
-			}
-
-			textbox = {
-				#visible = "[Not(ArticleType.HasMarketSelected)]" #todo PRCAL-38358
-				visible = no
-				parentanchor = vcenter
-				align = nobaseline
-				autoresize = yes
-				using = elide_fontsize_min
-				max_width = 350
-				text = "SELECT_A_MARKET"
-			}
-		}
-	}
 }
 
 right_click_menu = {
@@ -11014,7 +12271,7 @@ right_click_menu = {
 						visible = "[Not(MapModeList.IsSelected(MapMode.Self))]"
 						onclick = "[MapModeList.Select(MapMode.Self)]"
 						onclick = "[GetVariableSystem.Set(Concatenate('map_mode_name_', MapMode.GetName), 'true')]"
-						using = maplens_generic_sound #todo Robert - Generic select a map mode sound
+						using = maplens_generic_sound
 					}
 
 					map_mode_right_click_menu_item_selected = {
@@ -11736,7 +12993,1405 @@ right_click_menu = {
 	}
 }
 
+right_click_menu = {
+	name = "army_movement_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "MOVE_MILITARY_FORMATION"
+	}
+
+	blockoverride "resizeparent_without_fixed_bottom" {}
+
+	blockoverride "items" {
+
+		flowcontainer = {
+			direction = vertical
+
+			### Station in State
+			right_click_menu_item = {
+				size = { 260 44 }
+				tooltip = "STATION_MILITARY_FORMATION_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					onclick = "[MilitaryFormation.OnStationClicked]"
+					enabled = "[MilitaryFormation.CanStation]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/station_armies.dds"
+				}
+
+				blockoverride "text" {
+					text = "STATION_MILITARY_FORMATION_LABEL"
+				}
+
+				action_selection_number = {
+					blockoverride "text" {
+						text = "[MilitaryFormation.GetNumStationSelections|+]"
+					}
+				}
+			}
+
+			### Deploy to Front
+			right_click_menu_item = {
+				size = { 260 44 }
+				tooltip = "DEPLOY_MILITARY_FORMATION_TO_FRONT_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					onclick = "[MilitaryFormation.OnDeployToFrontClicked]"
+					enabled = "[And( MilitaryFormation.CanDeployToFront, MilitaryFormation.IsMobilized )]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/send_to_front.dds"
+				}
+
+				blockoverride "text" {
+					text = "DEPLOY_MILITARY_FORMATION_TO_FRONT_TEXT"
+				}
+
+				action_selection_number = {
+					blockoverride "text" {
+						text = "[MilitaryFormation.GetNumDeployToFrontSelections|+]"
+					}
+				}
+			}
+
+			### Embark
+			right_click_menu_item = {
+				size = { 260 44 }
+				visible = "[Not( MilitaryFormation.IsAttachedToFleet )]"
+				tooltip = "MILITARY_FORMATION_EMBARK_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[MilitaryFormation.CanEmbark]"
+					onclick = "[RightClickMenuManager.ShowForEmbarkSelectFleet( MilitaryFormation.AccessSelf )]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+				}
+
+				blockoverride "text" {
+					text = "MILITARY_FORMATION_EMBARK_LABEL"
+				}
+
+				action_selection_number = {
+					blockoverride "text" {
+						text = "[MilitaryFormation.GetNumEmbarkSelections|+]"
+					}
+				}
+			}
+
+			### Disembark
+			right_click_menu_item = {
+				size = { 260 44 }
+				visible = "[MilitaryFormation.IsAttachedToFleet]"
+				tooltip = "MILITARY_FORMATION_DISEMBARK_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[IsValid(MilitaryFormation.DisembarkFormation)]"
+					onclick = "[Execute(MilitaryFormation.DisembarkFormation)]"
+					onclick = "[RightClickMenuManager.Close]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/disembark_from_fleet.dds"
+				}
+
+				blockoverride "text" {
+					text = "MILITARY_FORMATION_DISEMBARK_LABEL"
+				}
+			}
+
+			### Rehome
+			right_click_menu_item = {
+				size = { 260 44 }
+				tooltip = "REHOME_MILITARY_FORMATION_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[MilitaryFormation.GetCountry.IsLocalPlayer]"
+					onclick = "[MilitaryFormation.OnRehomeClicked]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/generic_icons/home_hq.dds"
+				}
+
+				blockoverride "text" {
+					text = "REHOME_MILITARY_FORMATION_LABEL"
+				}
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "fleet_movement_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "MOVE_MILITARY_FORMATION"
+	}
+
+	blockoverride "resizeparent_without_fixed_bottom" {}
+
+	blockoverride "items" {
+
+		flowcontainer = {
+			direction = vertical
+
+			### Station in State
+			right_click_menu_item = {
+				visible = "[MilitaryFormation.IsFleet]"
+				size = { 260 44 }
+				tooltip = "STATION_MILITARY_FORMATION_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[MilitaryFormation.CanStation]"
+					onclick = "[MilitaryFormation.OnStationClicked]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/station_fleet.dds"
+				}
+
+				blockoverride "text" {
+					text = "STATION_MILITARY_FORMATION_LABEL"
+				}
+
+				action_selection_number = {
+					blockoverride "text" {
+						text = "[MilitaryFormation.GetNumStationSelections|+]"
+					}
+				}
+			}
+
+			### Transport
+			right_click_menu_item = {
+				visible = "[And( MilitaryFormation.IsFleet, And( Not( MilitaryFormation.IsTransportingArmies ), Not( MilitaryFormation.HasInvasion ) ) )]"
+				size = { 260 44 }
+				tooltip = "MILITARY_FORMATION_TRANSPORT_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[MilitaryFormation.CanTransportArmy]"
+					onclick = "[RightClickMenuManager.ShowForTransportSelectArmy(MilitaryFormation.AccessSelf)]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+				}
+
+				blockoverride "text" {
+					text = "MILITARY_FORMATION_TRANSPORT_LABEL"
+				}
+
+				action_selection_number = {
+					blockoverride "text" {
+						text = "[MilitaryFormation.GetNumTransportArmySelections|+]"
+					}
+				}
+			}
+
+			### Rehome
+			right_click_menu_item = {
+				visible = "[MilitaryFormation.IsFleet]"
+				size = { 260 44 }
+				tooltip = "REHOME_MILITARY_FORMATION_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[MilitaryFormation.GetCountry.IsLocalPlayer]"
+					onclick = "[MilitaryFormation.OnRehomeClicked]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/generic_icons/home_hq.dds"
+				}
+
+				blockoverride "text" {
+					text = "REHOME_MILITARY_FORMATION_LABEL"
+				}
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "fleets_on_mission_in_sea_region"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "FLEETS_ON_NAVAL_MISSION_IN_REGION_HEADER"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			spacing = 10
+
+			flowcontainer = {
+				direction = vertical
+
+				dynamicgridbox = {
+					datamodel = "[NavalMissionMarker.AccessFleetsOnMissionType(NavalMissionType.Self)]"
+
+					item = {
+						widget = {
+							using = standard_formation_item_size
+
+							military_formation_right_click_item = {
+
+								blockoverride "onclick" {
+									onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
+		                       		onclick = "[RightClickMenuManager.Close]"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "select_ship_construction_fleet"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "SELECT_DEFAULT_CONSTRUCTION_FLEET"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			spacing = 10
+
+			flowcontainer = {
+				direction = vertical
+
+				button = {
+					visible = "[Country.HasDefaultConstructionFleet]"
+					using = standard_formation_item_size
+					using = default_button
+					onclick = "[Execute(Country.ClearDefaultConstructionFleet)]"
+					onclick = "[RightClickMenuManager.Close]"
+					tooltip = "DEFAULT_SHIP_CONSTRUCTION_IS_NEW_FLEET_TOOLTIP"
+					text = "DEFAULT_SHIP_CONSTRUCTION_IS_NEW_FLEET"
+				}
+
+				widget = {
+					visible = "[Not(Country.HasDefaultConstructionFleet)]"
+					using = standard_formation_item_size
+
+					background = {
+						using = paper_bg
+					}
+
+					textbox = {
+						parentanchor = center
+						align = nobaseline
+						autoresize = yes
+						using = elide_fontsize_min
+						max_width = 340
+						text = "DEFAULT_SHIP_CONSTRUCTION_IS_NEW_FLEET"
+					}
+
+					icon = {
+						using = highlighted_square_selection
+					}
+				}
+
+				dynamicgridbox = {
+					datamodel = "[AccessPlayer.GetMilitaryFormationsFleet]"
+
+					item = {
+						widget = {
+							using = standard_formation_item_size
+
+							military_formation_right_click_item = {
+								visible = "[Not(MilitaryFormation.IsDefaultConstructionFleet)]"
+								enabled = "[IsValid(Country.SetDefaultConstructionFleet( MilitaryFormation.Self ))]"
+
+								blockoverride "default_button_template" {
+									using = default_button
+								}
+
+								blockoverride "tooltip" {
+						        	tooltipwidget = {
+										FancyTooltip_MilitaryFormation = {
+											blockoverride "tooltip_content_before" {
+												custom_tooltip_textbox = {
+													visible = "[Not(StringIsEmpty(GetDesc(Country.SetDefaultConstructionFleet(MilitaryFormation.Self))))]"
+													text = "[GetDesc(Country.SetDefaultConstructionFleet(MilitaryFormation.Self))]"
+												}
+											}
+
+											blockoverride "text_before" {
+		                        				text =  "SELECT_FLEET_AS_DEFAULT_SHIP_CONSTRUCTION"
+		                        				margin_bottom = 15
+		                        			}
+										}
+									}
+								}
+
+								blockoverride "onclick" {
+									onclick = "[Execute(Country.SetDefaultConstructionFleet( MilitaryFormation.Self ))]"
+		                       		onclick = "[RightClickMenuManager.Close]"
+								}
+							}
+
+							military_formation_right_click_item_selected = {
+								visible = "[MilitaryFormation.IsDefaultConstructionFleet]"
+
+								blockoverride "tooltip" {
+									tooltipwidget = {
+										FancyTooltip_MilitaryFormation = {
+											blockoverride "text_before" {
+		                        				text =  "CURRENTLY_SELECTED"
+		                        				margin_bottom = 15
+		                        			}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+### Ship Build Menu - Construction Panel
+right_click_menu = {
+	name = "build_ship_type_of_group"
+	parentanchor = right
+	datacontext = "[AccessPlayer]"
+	datacontext = "[AccessPlayer.GetShipList]"
+
+	blockoverride "title_text" {}
+
+	blockoverride "scrollarea_margins" {
+		margin = { 8 15 }
+		margin_top = 0
+	}
+
+	blockoverride "scrollarea_maximumsize" {
+		maximumsize = { -1 700 }
+	}
+
+	blockoverride "resizeparent_without_fixed_bottom" {}
+
+	blockoverride "fixed_top" {
+		ship_building_menu_fixed_top = {}
+	}
+
+	blockoverride "items" {
+		using = default_content_fade
+		margin_bottom = 10
+
+		flowcontainer = {
+			parentanchor = hcenter
+			direction = vertical
+			datacontext = "[ShipTemplateList]"
+
+			widget = {
+				size = { 5 5 }
+			}
+
+			divider_decorative = {}
+
+			widget = {
+				size = { 5 5 }
+			}
+
+			textbox = {
+				visible = "[IsDataModelEmpty(ShipTemplateList.GetTypesAvailableOfGroup(ShipGroup.Self))]"
+				parentanchor = hcenter
+				autoresize = yes
+				minimumsize = { 375 -1 }
+				using = empty_state_text_properties
+				align = hcenter|nobaseline
+				margin = { 0 10 }
+				text = "NO_AVAILABLE_SHIP_TYPES"
+			}
+
+			### List of ship types in this group
+			flowcontainer = {
+				spacing = 10
+				margin_right = 5
+				direction = vertical
+				datamodel = "[ShipTemplateList.GetTypesAvailableOfGroup(ShipGroup.Self)]"
+
+				item = {
+					flowcontainer = {
+						build_ship_type_flowcontainer = {
+							visible = "[Country.HasDefaultConstructionFleet]"
+							datacontext = "[Country.GetDefaultConstructionFleet]"
+							datacontext = "[ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self)]"
+
+							blockoverride "cancel_queue_enabled_and_onclick" {
+								tooltip = "FLEET_CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+								enabled = "[IsValid(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "queue_enabled_and_onclick" {
+								tooltip = "FLEET_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+								enabled = "[IsValid(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "ship_template_selected_visibility" {
+								visible = "[Not(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self))]"
+							}
+
+							blockoverride "ship_template_selected_visibility_not" {
+								visible = "[ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self)]"
+							}
+
+							blockoverride "construction_command_desc" {
+								visible = "[Not(StringIsEmpty(GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))))]"
+								text = "[GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "selected_ship_template_name" {
+								text = "[ShipType.GetNameNoFormatting]"
+							}
+
+							blockoverride "default_template_onclick" {
+								enabled = "[IsValid(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "number_of_ships_of_template" {
+								raw_text = "#v [MilitaryFormation.GetShipList.GetNumShipsOfTemplate(ShipTemplate.Self)]#!"
+							}
+
+							blockoverride "compact_ship_template"  {
+								compact_ship_template = {
+									size = { 150 40 }
+								}
+							}
+						}
+
+						build_ship_type_flowcontainer = {
+							visible = "[Not(Country.HasDefaultConstructionFleet)]"
+							datacontext = "[ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self)]"
+						}
+					}
+				}
+			}
+
+			### Unavailable ship types - list
+			flowcontainer = {
+				visible = "[GetVariableSystem.Exists('unavailable_ship_types')]"
+				direction = vertical
+
+				flowcontainer = {
+					direction = vertical
+					spacing = 10
+					margin_right = 5
+					datamodel = "[ShipTemplateList.GetTypesUnavailableOfGroup(ShipGroup.Self)]"
+
+					item = {
+						flowcontainer = {
+							direction = vertical
+
+							build_ship_type_flowcontainer = {
+								visible = "[Country.HasDefaultConstructionFleet]"
+								datacontext = "[Country.GetDefaultConstructionFleet]"
+								datacontext = "[ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self)]"
+
+								blockoverride "section_header_onclick" {
+									enabled = no
+								}
+
+								blockoverride "bottom_section_alpha" {
+									alpha = 0.3
+								}
+
+								blockoverride "default_template_name_visibility" {
+									visible = no
+								}
+
+								blockoverride "cancel_queue_enabled_and_onclick" {
+									tooltip = "FLEET_CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+									enabled = "[IsValid(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+									onclick = "[Execute(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+								}
+
+								blockoverride "queue_enabled_and_onclick" {
+									tooltip = "FLEET_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+									enabled = "[IsValid(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+									onclick = "[Execute(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+								}
+
+								blockoverride "ship_template_selected_visibility" {
+									visible = "[Not(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self))]"
+								}
+
+								blockoverride "ship_template_selected_visibility_not" {
+									visible = "[ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self)]"
+								}
+
+								blockoverride "construction_command_desc" {
+									visible = "[Not(StringIsEmpty(GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))))]"
+									text = "[GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+								}
+
+								blockoverride "selected_ship_template_name" {
+									text = "[ShipType.GetNameNoFormatting]"
+								}
+
+								blockoverride "default_template_onclick" {
+									enabled = "[IsValid(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+									onclick = "[Execute(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+								}
+
+								blockoverride "number_of_ships_of_template" {
+									raw_text = "#v [MilitaryFormation.GetShipList.GetNumShipsOfTemplate(ShipTemplate.Self)]#!"
+								}
+
+								blockoverride "compact_ship_template"  {
+									compact_ship_template = {
+										size = { 150 40 }
+
+										blockoverride "tooltip" {}
+
+										blockoverride "button_visibility" {
+											visible = no
+										}
+									}
+								}
+							}
+
+							build_ship_type_flowcontainer = {
+								visible = "[Not(Country.HasDefaultConstructionFleet)]"
+								datacontext = "[ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self)]"
+
+								blockoverride "section_header_onclick" {
+									enabled = no
+								}
+
+								blockoverride "bottom_section_alpha" {
+									alpha = 0.3
+								}
+
+								blockoverride "default_template_name_visibility" {
+									visible = no
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+### Ship Build Menu - Fleet
+right_click_menu = {
+	name = "build_ship_type_of_group_to_fleet"
+	parentanchor = right
+	datacontext = "[MilitaryFormation.GetShipList]"
+
+	blockoverride "title_text" {}
+
+	blockoverride "scrollarea_margins" {
+		margin = { 8 15 }
+		margin_top = 0
+	}
+
+	blockoverride "scrollarea_maximumsize" {
+		maximumsize = { -1 700 }
+	}
+
+	blockoverride "resizeparent_without_fixed_bottom" {}
+
+	blockoverride "fixed_top" {
+		ship_building_menu_fixed_top = {}
+	}
+
+	blockoverride "items" {
+		using = default_content_fade
+		margin_bottom = 10
+
+		widget = {
+			size = { 5 5 }
+		}
+
+		divider_decorative = {}
+
+		widget = {
+			size = { 5 5 }
+		}
+
+		textbox = {
+			visible = "[IsDataModelEmpty(ShipTemplateList.GetTypesAvailableOfGroup(ShipGroup.Self))]"
+			parentanchor = hcenter
+			autoresize = yes
+			minimumsize = { 425 -1 }
+			using = empty_state_text_properties
+			align = hcenter|nobaseline
+			margin = { 0 10 }
+			text = "NO_AVAILABLE_SHIP_TYPES"
+		}
+
+		### Available ship types - list
+		flowcontainer = {
+			direction = vertical
+			spacing = 10
+			margin_right = 5
+			datacontext = "[ShipTemplateList]"
+			datamodel = "[ShipTemplateList.GetTypesAvailableOfGroup(ShipGroup.Self)]"
+
+			item = {
+				flowcontainer = {
+					direction = vertical
+
+					build_ship_type_flowcontainer = {
+						datacontext = "[ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self)]"
+
+						blockoverride "ship_type_tooltip" {
+							tooltipwidget = {
+								FancyTooltip_ShipTemplate = {
+									blockoverride "tooltip_content_before" {
+										custom_tooltip_textbox = {
+											block "construction_command_desc" {
+												visible = "[Not(IsValid(ShipTemplate.QueueConstruction))]"
+												text = "[GetDesc(ShipTemplate.QueueConstruction)]"
+											}
+										}
+
+										custom_tooltip_textbox_with_empty_line = {
+											text = "SHIP_TEMPLATE_CONSTRUCTION_COST_WITH_LABEL"
+										}
+									}
+								}
+							}
+						}
+
+						blockoverride "cancel_queue_enabled_and_onclick" {
+							tooltip = "FLEET_CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+							enabled = "[IsValid(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+							onclick = "[Execute(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+						}
+
+						blockoverride "queue_enabled_and_onclick" {
+							tooltip = "FLEET_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+							enabled = "[IsValid(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+							onclick = "[Execute(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+						}
+
+						blockoverride "ship_template_selected_visibility" {
+							visible = "[Not(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self))]"
+						}
+
+						blockoverride "ship_template_selected_visibility_not" {
+							visible = "[ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self)]"
+						}
+
+						blockoverride "construction_command_desc" {
+							visible = "[Not(StringIsEmpty(GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))))]"
+							text = "[GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+						}
+
+						blockoverride "selected_ship_template_name" {
+							text = "[ShipType.GetNameNoFormatting]"
+						}
+
+						blockoverride "default_template_onclick" {
+							enabled = "[IsValid(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+							onclick = "[Execute(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+						}
+
+						blockoverride "number_of_ships_of_template" {
+							raw_text = "#v [MilitaryFormation.GetShipList.GetNumShipsOfTemplate(ShipTemplate.Self)]#!"
+						}
+
+						blockoverride "compact_ship_template"  {
+							compact_ship_template = {
+								size = { 150 40 }
+
+								blockoverride "tooltip" {}
+
+								blockoverride "button_visibility" {
+									visible = no
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		### Unavailable ship types - list
+		flowcontainer = {
+			visible = "[GetVariableSystem.Exists('unavailable_ship_types')]"
+			direction = vertical
+
+			flowcontainer = {
+				direction = vertical
+				spacing = 10
+				margin_right = 5
+				datacontext = "[ShipTemplateList]"
+				datamodel = "[ShipTemplateList.GetTypesUnavailableOfGroup(ShipGroup.Self)]"
+
+				item = {
+					flowcontainer = {
+						direction = vertical
+
+						build_ship_type_flowcontainer = {
+							datacontext = "[ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self)]"
+
+							blockoverride "section_header_onclick" {
+								enabled = no
+							}
+
+							blockoverride "bottom_section_alpha" {
+								alpha = 0.3
+							}
+
+							blockoverride "default_template_name_visibility" {
+								visible = no
+							}
+
+							blockoverride "cancel_queue_enabled_and_onclick" {
+								tooltip = "FLEET_CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+								enabled = "[IsValid(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "queue_enabled_and_onclick" {
+								tooltip = "FLEET_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+								enabled = "[IsValid(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "ship_template_selected_visibility" {
+								visible = "[Not(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self))]"
+							}
+
+							blockoverride "ship_template_selected_visibility_not" {
+								visible = "[ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self)]"
+							}
+
+							blockoverride "construction_command_desc" {
+								visible = "[Not(StringIsEmpty(GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))))]"
+								text = "[GetDesc(ShipTemplate.QueueConstructionForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "selected_ship_template_name" {
+								text = "[ShipType.GetNameNoFormatting]"
+							}
+
+							blockoverride "default_template_onclick" {
+								enabled = "[IsValid(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+								onclick = "[Execute(ShipTemplate.SetAsDefaultForFleet(MilitaryFormation.Self))]"
+							}
+
+							blockoverride "number_of_ships_of_template" {
+								raw_text = "#v [MilitaryFormation.GetShipList.GetNumShipsOfTemplate(ShipTemplate.Self)]#!"
+							}
+
+							blockoverride "compact_ship_template"  {
+								compact_ship_template = {
+									size = { 150 40 }
+
+									blockoverride "tooltip" {}
+
+									blockoverride "button_visibility" {
+										visible = no
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "retrofit_country_actions_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "RETROFIT_SHORT_CONCEPT"
+	}
+
+	blockoverride "items" {
+		right_click_menu_item = {
+			using = action_send_ship_to_retrofit
+
+			blockoverride "properties" {
+				enabled = "[IsValid(RetrofitShipsAndStation)]"
+				onclick = "[Execute(RetrofitShipsAndStation)]"
+			}
+
+			blockoverride "texture" {
+				texture = "gfx/interface/icons/formation_order_icons/upgrade.dds"
+			}
+
+			blockoverride "text" {
+				text = "RETROFIT_ACTION_STATION"
+			}
+		}
+
+		right_click_menu_item = {
+			using = action_send_ship_to_retrofit
+
+			blockoverride "properties" {
+				enabled = "[IsValid(RetrofitShips)]"
+				onclick = "[Execute(RetrofitShips)]"
+			}
+
+			blockoverride "texture" {
+				texture = "gfx/interface/icons/formation_order_icons/upgrade.dds"
+			}
+
+			blockoverride "text" {
+				text = "RETROFIT_ACTION"
+			}
+		}
+	}
+}
+
+right_click_menu = {
+	name = "retrofit_fleet_actions_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "RETROFIT_SHORT_CONCEPT"
+	}
+
+	blockoverride "items" {
+		right_click_menu_item = {
+			using = action_send_ship_to_retrofit
+
+			blockoverride "properties" {
+				enabled = "[IsValid(MilitaryFormation.RetrofitShipsAndStation)]"
+				onclick = "[Execute(MilitaryFormation.RetrofitShipsAndStation)]"
+			}
+
+			blockoverride "texture" {
+				texture = "gfx/interface/icons/formation_order_icons/upgrade.dds"
+			}
+
+			blockoverride "text" {
+				text = "RETROFIT_ACTION_STATION"
+			}
+		}
+
+		right_click_menu_item = {
+			using = action_send_ship_to_retrofit
+
+			blockoverride "properties" {
+				enabled = "[IsValid(MilitaryFormation.RetrofitShips)]"
+				onclick = "[Execute(MilitaryFormation.RetrofitShips)]"
+			}
+
+			blockoverride "texture" {
+				texture = "gfx/interface/icons/formation_order_icons/upgrade.dds"
+			}
+
+			blockoverride "text" {
+				text = "RETROFIT_ACTION"
+			}
+		}
+	}
+}
+
+### Bulk change template
+right_click_menu = {
+	name = "bulk_change_ship_template_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		multiline = yes
+		max_width = 460
+		text = "CURRENT_BULK_SHIP_TEMPLATES_HEADER"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			direction = vertical
+			spacing = 5
+
+			### Current Ship Templates
+			flowcontainer = {
+				direction = vertical
+				datamodel = "[ShipSelection.GetTemplatesSelected]"
+
+				item = {
+					current_ship_template = {
+						blockoverride "template_name" {
+							raw_text = "#v [ShipSelection.GetNumShipsSelectedOfTemplate(ShipTemplate.Self)]#! [ShipTemplate.GetNameNoFormatting]"
+						}
+					}
+				}
+			}
+
+			widget = {
+				size = { 5 5 }
+			}
+
+			textbox = {
+				datacontext = "[ShipSelection.GetTypeOfShipsSelected]"
+				autoresize = yes
+				align = nobaseline
+				using = elide_fontsize_min
+				max_width = 460
+				text = "AVAILABLE_BULK_SHIP_TEMPLATES_HEADER"
+			}
+
+			### No Available Ship Templates
+			textbox = {
+				visible = "[IsDataModelEmpty(ShipSelection.GetTemplatesAvailable)]"
+				layoutpolicy_horizontal = expanding
+				parentanchor = hcenter
+				autoresize = yes
+				#minimumsize = { 375 -1 }
+				using = empty_state_text_properties
+				align = hcenter|nobaseline
+				margin = { 0 10 }
+				text = "NO_AVAILABLE_SHIP_TEMPLATES"
+			}
+
+			### Available Ship Templates
+			flowcontainer = {
+				visible = "[Not(IsDataModelEmpty(ShipSelection.GetTemplatesAvailable))]"
+				direction = vertical
+				datamodel = "[ShipSelection.GetTemplatesAvailable]"
+
+				item = {
+					available_ship_template = {
+						blockoverride "onclicks" {
+							using = action_send_ship_to_retrofit
+							enabled = "[IsValid(ShipSelection.ChangeTemplate(ShipTemplate.Self))]"
+							onclick = "[Execute(ShipSelection.ChangeTemplate(ShipTemplate.Self))]"
+						}
+
+						blockoverride "template_tooltip" {
+							tooltipwidget = {
+								FancyTooltip_ShipTemplate = {
+									blockoverride "tooltip_content_before" {
+										custom_tooltip_textbox = {
+											margin_bottom = 5
+											text = "BULK_CHANGE_TEMPLATE_TOOLTIP"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+### Single ship - Change Template
+right_click_menu = {
+	name = "change_ship_template_right_click_menu"
+	parentanchor = right
+	datacontext = "[Ship.GetFleet]"
+	datacontext = "[Ship.GetType]"
+	datacontext = "[MilitaryFormation.GetShipList]"
+
+	blockoverride "title_text" {
+		text = "CURRENT_SHIP_TEMPLATE_HEADER"
+	}
+
+	blockoverride "items" {
+
+		flowcontainer = {
+			direction = vertical
+			spacing = 5
+
+			current_ship_template = {
+				datacontext = "[Ship.GetTemplate]"
+			}
+
+			widget = {
+				size = { 5 5 }
+			}
+
+			textbox = {
+				autoresize = yes
+				align = nobaseline
+				using = elide_fontsize_min
+				max_width = 460
+				text = "AVAILABLE_SHIP_TEMPLATES_HEADER"
+			}
+
+			### Available Ship Templates to change to
+			flowcontainer = {
+				direction = vertical
+				datamodel = "[ShipTemplateList.GetTemplatesOfType(ShipType.Self)]"
+
+				item = {
+					available_ship_template = {}
+				}
+			}
+		}
+	}
+}
+
 types right_click_menu {
+
+	type naval_mission_right_click_item = flowcontainer {
+		right_click_menu_item = {
+			block "not_selected_visibility" {
+				visible = "[Not(SelectedFleetsHaveNavalMissionType(NavalMissionType.Self))]"
+			}
+
+			block "naval_mission_tooltip" {
+				tooltipwidget = {
+					FancyTooltip_NavalMissionType = {}
+				}
+			}
+
+			blockoverride "properties" {
+				block "add_mission_button_properties" {
+			        enabled = "[IsValid(CreateNavalMissionsForSelectedFleets(NavalMissionType.AccessSelf))]"
+			        onclick = "[PopupManager.ExecuteOrAskConfirmationIfNeeded(CreateNavalMissionsForSelectedFleets(NavalMissionType.AccessSelf))]"
+					onclick = "[OnEditSelectedFleetsSeaRegionsClicked]"
+			    }
+
+		        onclick = "[RightClickMenuManager.Close]"
+			}
+
+			blockoverride "texture" {
+				texture = "[NavalMissionType.GetIcon]"
+			}
+
+			blockoverride "text" {
+				text = "[NavalMissionType.GetNameNoFormatting]"
+
+				block "text_properties" {}
+			}
+
+			blockoverride "size" {
+				block "button_size" {
+					size = { 360 44 }
+				}
+			}
+
+			blockoverride "text_layoutpolicies" {
+				autoresize = yes
+			}
+
+			blockoverride "right_text" {
+				expand = {}
+			}
+
+			clicksound = "[NavalMissionType.GetClickSound]"
+		}
+
+		right_click_menu_item = {
+			block "selected_visibility" {
+				visible = "[SelectedFleetsHaveNavalMissionType(NavalMissionType.Self)]"
+			}
+
+			block "remove_naval_mission_tooltip" {
+				tooltipwidget = {
+					FancyTooltip_NavalMissionType = {
+						blockoverride "text_before" {
+							custom_tooltip_textbox_with_empty_line = {
+								tooltip = "UNASSIGN_NAVAL_MISSION_TOOLTIP"
+							}
+						}
+					}
+				}
+			}
+
+			blockoverride "properties" {
+				block "remove_mission_button_properties" {
+			        enabled = "[IsValid(RemoveNavalMissionForSelectedFleets(NavalMissionType.Self))]"
+					onclick = "[Execute(RemoveNavalMissionForSelectedFleets(NavalMissionType.Self))]"
+				}
+			}
+
+			blockoverride "texture" {
+				texture = "[NavalMissionType.GetIcon]"
+			}
+
+			blockoverride "text" {
+				text = "UNASSIGN_NAVAL_MISSION_LABEL"
+
+				block "text_properties" {}
+			}
+
+			blockoverride "size" {
+				block "button_size" {
+					size = { 360 44 }
+				}
+			}
+
+			blockoverride "text_layoutpolicies" {
+				autoresize = yes
+			}
+
+			blockoverride "right_text" {
+				expand = {}
+			}
+
+			icon = {
+				using = highlighted_square_selection
+			}
+		}
+	}
+
+	type ship_building_menu_fixed_top = widget {
+		parentanchor = hcenter
+		size = { 420 75 }
+
+		widget = {
+			parentanchor = hcenter|bottom
+			size = { 100% 60 }
+
+			textbox = {
+				position = { 0 5 }
+				autoresize = yes
+				default_format = "#header"
+				align = nobaseline
+				text = "ADD_SHIPS_OF_GROUP"
+			}
+
+			flowcontainer = {
+				parentanchor = bottom
+				spacing = 5
+
+				checkbutton = {
+					using = check_button
+					size = { 24 24 }
+					using = tooltip_se
+					onclick = "[GetVariableSystem.Toggle('unavailable_ship_types')]"
+					checked = "[GetVariableSystem.Exists('unavailable_ship_types')]"
+					tooltip = "SHOW_UNAVAILABLE_SHIP_TYPES_TOOLTIP"
+				}
+
+				textbox = {
+					autoresize = yes
+					align = nobaseline
+					text = "SHOW_UNAVAILABLE_SHIP_TYPES_OF_GROUP"
+				}
+			}
+
+			button = {
+				visible = "[HasDlcFeature('ship_designer')]"
+				size = { 180 40 }
+				parentanchor = right
+				using = default_button
+				onclick = "[PopupManager.ToggleShipDesignerPopup]"
+				onclick = "[RightClickMenuManager.Close]"
+				tooltip = "SHIP_DESIGNER_CREATE_NEW_TEMPLATE"
+
+				textbox = {
+					parentanchor = center
+					autoresize = yes
+					align = nobaseline
+					max_width = 110
+					using = elide_fontsize_min
+					text = "ADD_TEMPLATE"
+				}
+			}
+
+			flowcontainer = {
+				visible = no
+				parentanchor = right|bottom
+				spacing = 5
+
+				textbox = {
+					autoresize = yes
+					align = nobaseline
+					text = "SHOW_UNAVAILABLE_SHIP_TYPES_OF_GROUP"
+				}
+
+				checkbutton = {
+					using = check_button
+					size = { 24 24 }
+					using = tooltip_se
+					onclick = "[GetVariableSystem.Toggle('unavailable_ship_types')]"
+					checked = "[GetVariableSystem.Exists('unavailable_ship_types')]"
+					tooltip = "SHOW_UNAVAILABLE_SHIP_TYPES_TOOLTIP"
+				}
+			}
+		}
+	}
+
+	type current_ship_template = widget {
+		size = { 460 44 }
+
+		background = {
+			using = paper_bg
+		}
+
+		tooltipwidget = {
+			FancyTooltip_ShipTemplate = {
+				blockoverride "tooltip_content_before" {
+					custom_tooltip_textbox = {
+						margin_bottom = 5
+						text = "CHANGE_TEMPLATE_SINGLE_SHIP_CURRENT_TEMPLATE"
+					}
+				}
+			}
+		}
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			margin_left = 10
+
+			icon = {
+				size = { 28 28 }
+				texture = "gfx/interface/icons/generic_icons/flotillas.dds"
+			}
+
+			textbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+				margin = { 5 0 }
+				align = nobaseline
+				using = fontsize_large
+				using = elide_fontsize_min
+
+				block "template_name" {
+					text = "[Ship.GetTemplate.GetNameNoFormatting]"
+				}
+			}
+
+			expand = {}
+
+			hbox = {
+				margin = { 5 0 }
+				spacing = 5
+				datamodel = "[ShipTemplate.GetUtilityModifications]"
+
+				item = {
+					icon = {
+						size = { 28 28 }
+						texture = "gfx/interface/buttons/button_icons/plus.dds"
+					}
+				}
+			}
+
+			hbox = {
+				margin_right = 10
+				spacing = 5
+				datamodel = "[ShipTemplate.GetModifications]"
+
+				item = {
+					icon = {
+						size = { 28 28 }
+						texture = "[ShipModificationType.GetIcon]"
+					}
+				}
+			}
+		}
+
+		icon = {
+			using = highlighted_square_selection
+		}
+	}
+
+	type available_ship_template = right_click_menu_item {
+
+		block "template_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_ShipTemplate = {
+					blockoverride "tooltip_content_before" {
+						custom_tooltip_textbox = {
+							margin_bottom = 5
+							text = "CHANGE_TEMPLATE_SINGLE_SHIP_TOOLTIP"
+						}
+					}
+				}
+			}
+		}
+
+		blockoverride "properties" {
+			block "onclicks" {
+				using = action_send_ship_to_retrofit
+				enabled = "[IsValid(Ship.ChangeTemplate(ShipTemplate.Self))]"
+				onclick = "[Execute(Ship.ChangeTemplate(ShipTemplate.Self))]"
+			}
+		}
+
+		blockoverride "texture" {
+			texture = "gfx/interface/icons/generic_icons/flotillas.dds"
+		}
+
+		blockoverride "text" {
+			text = "[ShipTemplate.GetNameNoFormatting]"
+		}
+
+		blockoverride "right_text" {
+			expand = {}
+
+			hbox = {
+				margin = { 5 0 }
+				spacing = 5
+				datamodel = "[ShipTemplate.GetUtilityModifications]"
+
+				item = {
+					icon = {
+						size = { 28	28 }
+						texture = "gfx/interface/buttons/button_icons/plus.dds"
+					}
+				}
+			}
+
+			hbox = {
+				margin_right = 10
+				spacing = 5
+				datamodel = "[ShipTemplate.GetModifications]"
+
+				item = {
+					icon = {
+						size = { 28	28 }
+						texture = "[ShipModificationType.GetIcon]"
+					}
+				}
+			}
+		}
+	}
+
 	type negotiate_interest_group_button = button {
 		using = default_button
 		enabled = "[IsValid(Country.StartNegotiationWith(InterestGroup.Self))]"
@@ -11961,6 +14616,353 @@ types right_click_menu {
 
 		icon = {
 			using = highlighted_square_selection
+		}
+	}
+
+	type build_ship_type_flowcontainer = flowcontainer {
+		direction = vertical
+		margin = { 5 0 }
+		margin_bottom = 5
+
+		background = {
+			using = entry_bg_simple
+		}
+
+		block "minimumsize" {
+			minimumsize = { 360 80 }
+		}
+
+		block "ship_type_tooltip" {
+			tooltipwidget = {
+				FancyTooltip_ShipType = {
+					blockoverride "tooltip_content_before" {
+						custom_tooltip_textbox = {
+							block "construction_command_desc" {
+								visible = "[Not(IsValid(ShipTemplate.QueueConstruction))]"
+								text = "[GetDesc(ShipTemplate.QueueConstruction)]"
+							}
+						}
+
+						custom_tooltip_textbox_with_empty_line = {
+							text = "SHIP_TEMPLATE_CONSTRUCTION_COST_WITH_LABEL"
+						}
+					}
+				}
+			}
+		}
+
+		section_header_button = {
+			blockoverride "layout" {
+				parentanchor = hcenter
+				size = { 410 38 }
+			}
+
+			blockoverride "left_text" {
+				block "selected_ship_template_name" {
+					text = "[ShipType.GetNameNoFormatting]"
+				}
+			}
+
+			blockoverride "right_text" {
+				flowcontainer = {
+					block "default_template_name_visibility" {}
+
+					textbox = {
+						visible = "[ShipTemplate.IsCustom]"
+						autoresize = yes
+						align = nobaseline
+						max_width = 150
+						margin_right = 10
+						using = elide_fontsize_min
+						text = "[ShipTemplate.GetNameNoFormatting]"
+					}
+
+					textbox = {
+						visible = "[ShipTemplate.IsBase]"
+						autoresize = yes
+						align = nobaseline
+						max_width = 150
+						margin_right = 10
+						using = elide_fontsize_min
+						text = "[concept_base_template]"
+					}
+				}
+			}
+
+			blockoverride "onclick" {
+				block "section_header_onclick" {
+					onclick = "[GetVariableSystem.Toggle(Concatenate('ship_type_', ShipType.GetIDString))]"
+				}
+			}
+
+			blockoverride "onclick_showmore" {
+				visible = "[Not(GetVariableSystem.Exists(Concatenate('ship_type_', ShipType.GetIDString)))]"
+			}
+
+			blockoverride "onclick_showless" {
+				visible = "[GetVariableSystem.Exists(Concatenate('ship_type_', ShipType.GetIDString))]"
+			}
+		}
+
+		widget = {
+			size = { 410 52 }
+
+			block "bottom_section_alpha" {}
+
+			hbox = {
+				layoutpolicy_horizontal = expanding
+				margin = { 5 5 }
+				spacing = 5
+
+				block "compact_ship_template"  {
+					compact_ship_template = {
+						size = { 150 40 }
+
+						blockoverride "button_visibility" {
+							visible = no
+						}
+					}
+				}
+
+				### Damage / Armor info
+				hbox = {
+					margin = { 10 10 }
+					spacing = 10
+
+					background = {
+						using = dark_area
+					}
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						raw_text = "@hull_attack_damage! #v [ShipTemplate.GetModifier.GetValueFor('ship_hull_damage_add')|0]#!"
+
+						block "text_size" {}
+					}
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						raw_text = "@ship_armor! #v [ShipTemplate.GetModifier.GetValueFor('ship_armor_add')|0]#!"
+
+						block "text_size" {}
+					}
+				}
+
+				expand = {}
+
+				flowcontainer = {
+					spacing = 5
+
+					### Cancel Construction ship type
+					button_icon_minus_action = {
+						size = { 28 28 }
+						using = fleet_panel_construction_template_build_cancel
+						using = tooltip_se
+
+						block "cancel_queue_enabled_and_onclick" {
+							tooltip = "CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+							enabled = "[IsValid(ShipTemplate.CancelConstruction)]"
+							onclick = "[Execute(ShipTemplate.CancelConstruction)]"
+						}
+					}
+
+					### Start construction of ship type
+					button_icon_plus_action = {
+						size = { 28 28 }
+						using = fleet_panel_construction_template_build
+
+						block "queue_enabled_and_onclick" {
+							tooltip = "QUEUE_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
+							enabled = "[IsValid(ShipTemplate.QueueConstruction)]"
+							onclick = "[Execute(ShipTemplate.QueueConstruction)]"
+						}
+					}
+				}
+			}
+		}
+
+		flowcontainer = {
+			visible = "[GetVariableSystem.Exists(Concatenate('ship_type_', ShipType.GetIDString))]"
+			parentanchor = hcenter
+			direction = vertical
+			datacontext = "[AccessPlayer]"
+			datacontext = "[ShipTemplateList]"
+
+			block "datamodel_ship_templates" {
+				datamodel = "[ShipTemplateList.GetTemplatesOfType(ShipType.Self)]"
+			}
+
+			item = {
+
+				widget = {
+					size = { 410 40 }
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+						spacing = 2
+						margin_left = 3
+
+						widget = {
+							size = { 336 40 }
+
+							tooltipwidget = {
+								FancyTooltip_ShipTemplate = {
+									blockoverride "tooltip_content_before" {
+										custom_tooltip_textbox_fixed_width = {
+											visible = "[PdxGuiWidget.HasContext('MilitaryFormation')]"
+											text = "[SelectLocalization(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self).Self), 'SHIP_TEMPLATE_IS_DEFAULT_FOR_FLEET', 'SHIP_TEMPLATE_IS_NOT_DEFAULT_FOR_FLEET')]"
+										}
+
+										custom_tooltip_textbox_fixed_width = {
+											visible = "[Not(PdxGuiWidget.HasContext('MilitaryFormation'))]"
+											text = "[SelectLocalization(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self).Self), 'SHIP_TEMPLATE_IS_DEFAULT', 'SHIP_TEMPLATE_IS_NOT_DEFAULT')]"
+										}
+									}
+								}
+							}
+
+							compact_ship_template_button = {
+								block "ship_template_selected_visibility" {
+									visible = "[Not(ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self).Self))]"
+								}
+
+								blockoverride "number_minimumsize" {
+									minimumsize = { -1 30 }
+								}
+							}
+
+							widget = {
+								size = { 100% 100% }
+
+								block "ship_template_selected_visibility_not" {
+									visible = "[ObjectsEqual(ShipTemplate.Self, ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self).Self)]"
+								}
+
+								background = {
+									using = paper_bg
+								}
+
+								ship_template_number_and_name_hbox = {}
+
+								icon = {
+									using = highlighted_square_selection
+								}
+							}
+						}
+
+						expand = {}
+
+						button_icon_edit = {
+							visible = "[And(ShipTemplate.IsCustom, HasDlcFeature('ship_designer'))]"
+							size = { 30 30 }
+							using = tooltip_se
+							enabled = "[ShipType.HasRequiredTech]"
+							onclick = "[PopupManager.ToggleShipDesignerPopupWithTemplate(ShipTemplate.Self)]"
+							onclick = "[RightClickMenuManager.Close]"
+							tooltip = "SHIP_DESIGNER_EDIT_EXISTING_TEMPLATE"
+						}
+
+						button_icon_cancel = {
+							visible = "[And(ShipTemplate.IsCustom, HasDlcFeature('ship_designer'))]"
+							size = { 30 30 }
+							using = tooltip_se
+							enabled = "[IsValid(ShipTemplate.DeleteTemplate)]"
+							onclick = "[PopupManager.AskConfirmation(ShipTemplate.DeleteTemplate)]"
+							tooltip = "SHIP_DESIGNER_DELETE_EXISTING_TEMPLATE"
+						}
+
+						textbox = {
+							visible = "[And(Not(ShipTemplate.IsCustom), HasDlcFeature('ship_designer'))]"
+							autoresize = yes
+							align = nobaseline
+							text = "pm_base"
+						}
+
+						expand = {}
+					}
+				}
+			}
+		}
+	}
+
+	type compact_ship_template_button = button {
+		using = default_button
+		size = { 100% 100% }
+
+		block "default_template_onclick" {
+			enabled = "[IsValid(ShipTemplate.SetAsDefaultForCountry)]"
+			onclick = "[Execute(ShipTemplate.SetAsDefaultForCountry)]"
+		}
+
+		ship_template_number_and_name_hbox = {}
+	}
+
+	type ship_template_number_and_name_hbox = hbox {
+		layoutpolicy_horizontal = expanding
+		layoutpolicy_vertical = expanding
+		spacing = 5
+		margin = { 0 2 }
+		margin_right = 5
+		margin_left = 2
+
+		textbox = {
+			margin = { 5 0 }
+			layoutpolicy_vertical = expanding
+			autoresize = yes
+			align = nobaseline
+			using = fontsize_small
+
+			block "number_of_ships_of_template" {
+				raw_text = "#v [Country.GetShipList.GetNumShipsOfTemplate(ShipTemplate.Self)]#!"
+			}
+
+			block "number_minimumsize" {
+				minimumsize = { -1 30 }
+			}
+
+			background = {
+				using = dark_area
+				alpha = 0.5
+				margin = { -2 -2 }
+			}
+		}
+
+		textbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			align = nobaseline
+			using = elide_fontsize_min
+			text = "[ShipTemplate.GetNameNoFormatting]"
+		}
+
+		expand = {}
+
+		hbox = {
+			spacing = 2
+			datamodel = "[ShipTemplate.GetUtilityModifications]"
+
+			item = {
+				icon = {
+					size = { 24	24 }
+					texture = "gfx/interface/buttons/button_icons/plus.dds"
+				}
+			}
+		}
+
+		hbox = {
+			margin_right = 5
+			spacing = 2
+			datamodel = "[ShipTemplate.GetModifications]"
+
+			item = {
+				icon = {
+					size = { 24	24 }
+					texture = "[ShipModificationType.GetIcon]"
+				}
+			}
 		}
 	}
 
@@ -12280,6 +15282,382 @@ types right_click_menu {
 
 		blockoverride "highlight_visibility" {
 			visible = "[DiplomaticAction.IsActivePact]"
+		}
+	}
+}
+
+right_click_menu = {
+	name = "assign_commander_right_click_menu"
+	parentanchor = right
+
+	blockoverride "title_text" {
+		text = "ASSIGN_COMMANDER_MENU_TITLE"
+	}
+
+	blockoverride "items" {
+		flowcontainer = {
+			direction = vertical
+			spacing = 5
+
+			### UNASSIGN CURRENT COMMANDER
+			right_click_menu_item = {
+				visible = "[MilitaryFormation.HasCommander]"
+				datacontext = "[MilitaryFormation.GetCommander]"
+
+				blockoverride "properties" {
+					tooltip = "UNASSIGN_COMMANDER_TOOLTIP"
+					enabled = "[IsValid(Character.UnassignFromFormation)]"
+					onclick = "[Execute(Character.UnassignFromFormation)]"
+					onclick = "[RightClickMenuManager.Close]"
+				}
+
+				blockoverride "icon" {}
+
+				blockoverride "text" {
+					text = "UNASSIGN_COMMANDER_TEXT"
+				}
+
+				blockoverride "size" {
+					size = { 380 44 }
+				}
+			}
+
+			flowcontainer = {
+				visible = "[Or( And( MilitaryFormation.IsArmy, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.GetUnassignedGenerals)) ), And( MilitaryFormation.IsFleet, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.GetUnassignedAdmirals)) ) )]"
+				direction = vertical
+				margin = { 10 10 }
+				margin_top = 5
+				spacing = 10
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				### UNASSIGNED HEADER
+				textbox = {
+					margin_top = 5
+					margin_left = 5
+					autoresize = yes
+					align = nobaseline
+					default_format = "#header"
+					text = "ASSIGN_COMMANDER_UNASSIGNED_HEADER"
+				}
+
+				### UNASSIGNED GENERALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsArmy]"
+					datamodel = "[MilitaryFormation.AccessCountry.GetUnassignedGenerals]"
+
+					item = {
+						military_formation_commander = {
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 20
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+
+				### UNASSIGNED ADMIRALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsFleet]"
+					datamodel = "[MilitaryFormation.AccessCountry.GetUnassignedAdmirals]"
+
+					item = {
+						military_formation_commander = {
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 10
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				visible = "[Or( And( MilitaryFormation.IsArmy, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.GetAssignedGenerals)) ), And( MilitaryFormation.IsFleet, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.GetAssignedAdmirals)) ) )]"
+				direction = vertical
+				margin = { 10 10 }
+				margin_top = 5
+				spacing = 10
+				
+				background = {
+					using = entry_bg_simple
+				}
+
+				### ASSIGNED HEADER
+				textbox = {
+					margin_top = 5
+					margin_left = 5
+					autoresize = yes
+					align = nobaseline
+					default_format = "#header"
+					text = "ASSIGN_COMMANDER_ASSIGNED_HEADER"
+				}
+
+				### ASSIGNED GENERALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsArmy]"
+					datamodel = "[MilitaryFormation.AccessCountry.GetAssignedGenerals]"
+
+					item = {
+						military_formation_commander = {
+							visible = "[Not(MilitaryFormation.IsCommander(Character.Self))]"
+
+							blockoverride "widget_size" {
+								size = { 370 78 }
+							}
+
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_SWAP_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 20
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+
+
+				### ASSIGNED ADMIRALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsFleet]"
+					datamodel = "[MilitaryFormation.AccessCountry.GetAssignedAdmirals]"
+
+					item = {
+						military_formation_commander = {
+							visible = "[Not(MilitaryFormation.IsCommander(Character.Self))]"
+
+							blockoverride "widget_size" {
+								size = { 370 78 }
+							}
+
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_SWAP_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.AssignToFormation(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = right|nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 10
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+
+			}
+
+			flowcontainer = {
+				visible = "[Or( And( MilitaryFormation.IsArmy, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.AccessGeneralsOffer)) ), And( MilitaryFormation.IsFleet, Not(IsDataModelEmpty(MilitaryFormation.AccessCountry.AccessAdmiralsOffer)) ) )]"
+				direction = vertical
+				margin = { 10 10 }
+				margin_top = 5
+				spacing = 10
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				### RECRUITABLE HEADER
+				textbox = {
+					margin_top = 5
+					margin_left = 5
+					autoresize = yes
+					align = nobaseline
+					default_format = "#header"
+					text = "ASSIGN_COMMANDER_RECRUITABLE_HEADER"
+				}
+
+				### RECRUITABLE GENERALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsArmy]"
+					datamodel = "[MilitaryFormation.AccessCountry.AccessGeneralsOffer]"
+
+					item = {
+						military_formation_commander = {
+							visible = "[Not(MilitaryFormation.IsCommander(Character.Self))]"
+
+							blockoverride "widget_size" {
+								size = { 370 78 }
+							}
+
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_RECRUIT_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 20
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+
+				#### RECRUITABLE ADMIRALS
+				dynamicgridbox = {
+					visible = "[MilitaryFormation.IsFleet]"
+					datamodel = "[MilitaryFormation.AccessCountry.AccessAdmiralsOffer]"
+
+					item = {
+						military_formation_commander = {
+							visible = "[Not(MilitaryFormation.IsCommander(Character.Self))]"
+
+							blockoverride "widget_size" {
+								size = { 370 78 }
+							}
+
+							blockoverride "assign_tooltip" {
+								tooltip = "ASSIGN_COMMANDER_RECRUIT_TOOLTIP"
+							}
+
+							blockoverride "assign_onclick" {
+								enabled = "[IsValid(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+								onclick = "[Execute(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+								onclick = "[RightClickMenuManager.Close]"
+							}
+
+							blockoverride "character_name" {
+								text = "[Character.GetFullNameNoFormatting]"
+							}
+
+							blockoverride "additional_info_to_the_right" {
+								textbox = {
+									autoresize = yes
+									align = nobaseline
+									fontsize_min = 12
+									elide = right
+									margin_right = 10
+									raw_text = "#v [Character.GetCommandLimitRaw]#!"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+types right_click_commander_items
+{
+	type right_click_commander_recruitment_item = right_click_menu_item {
+		blockoverride "icon" {
+			character_portrait_small_with_rank = {}
+		}
+
+		blockoverride "properties" {
+			tooltip = "ASSIGN_COMMANDER_RECRUIT_TOOLTIP"
+			enabled = "[IsValid(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+			onclick = "[Execute(Character.GetRecruitCommand(MilitaryFormation.Self))]"
+			onclick = "[RightClickMenuManager.Close]"
+		}
+
+		blockoverride "text" {
+			text = "ASSIGN_COMMANDER_CHARACTER_ENTRY"
+		}
+
+		blockoverride "rclick_item_after_label" {
+			textbox = {
+				autoresize = yes
+				align = nobaseline|right
+				fontsize_min = 12
+				elide = right
+				margin_right = 10
+				raw_text = "#v [Character.GetCommandLimitRaw]#!"
+			}
+		}
+
+		blockoverride "size" {
+			size = { 360 44 }
 		}
 	}
 }

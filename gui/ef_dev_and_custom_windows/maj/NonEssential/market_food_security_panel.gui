@@ -1,0 +1,588 @@
+﻿# COPY-PASTED FOR NOW
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+types market_panel
+{
+	type market_panel_food_security_content = flowcontainer {
+		using = default_list_position
+		direction = vertical
+		spacing = 10
+
+		flowcontainer = {
+			direction = vertical
+
+			### TOP ILLUSTRATION
+			top_illu = {
+				datacontext = "[Market.GetFoodSecurity]"
+
+				blockoverride "illu" {
+					texture = "gfx/interface/illustrations/top_illus/top_illu_famine.dds"
+				}
+
+				background = {
+					visible = "[FoodSecurity.HasFamine]"
+					using = colored_panel
+					color = { 0.94 0.27 0.20 1 }
+					alpha = 0.2
+				}
+
+				flowcontainer = {
+					parentanchor = center
+					direction = vertical
+					spacing = 10
+
+					flowcontainer = {
+						parentanchor = hcenter
+						spacing = 10
+
+						### FAMINE STATUS
+						flowcontainer = {
+
+							spacing = 5
+
+							icon = {
+								visible = "[FoodSecurity.HasFamine]"
+								size = { 40 40 }
+								texture = "gfx/interface/icons/famine_icons/famine_icon.dds"
+							}
+
+							textbox = {
+								visible = "[FoodSecurity.HasFamine]"
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								using = fontsize_xxl
+								max_width = 350
+								elide = right
+								fontsize_min = 14
+								text = "HAS_ONGOING_FAMINES"
+							}
+
+							textbox = {
+								visible = "[Not(FoodSecurity.HasFamine)]"
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								using = fontsize_xxl
+								max_width = 400
+								elide = right
+								fontsize_min = 14
+								text = "NO_ONGOING_FAMINES"
+							}
+						}
+					}
+				}
+			}
+
+			### BASIC FOOD POP NEED
+			flowcontainer = {
+				datacontext = "[Market.GetFoodSecurityFilter]"
+
+				parentanchor = hcenter
+				direction = vertical
+				spacing = 10
+
+				flowcontainer = {
+					parentanchor = hcenter
+					direction = vertical
+
+					default_header = {
+						blockoverride "text" {
+							text = "BASIC_FOOD_POP_NEED_HEADER"
+						}
+						blockoverride "size" {
+							size = { @panel_width_plus_14 38 }
+						}
+					}
+
+					### FILTERS
+					flowcontainer = {
+						parentanchor = hcenter
+						direction = vertical
+						minimumsize = { @panel_width_plus_14 -1 }
+						margin = { 0 5 }
+
+						background = {
+							using = dark_area
+						}
+
+						flowcontainer = {
+							parentanchor = hcenter
+							spacing = 5
+
+							button = {
+								size = { 265 40 }
+								using = default_button
+								using = tooltip_ne
+								onclick = "[RightClickMenuManager.ToggleMarketStarvationCountriesFilter(Market.AccessSelf, PdxGuiWidget.AccessSelf)]"
+								text = "FOOD_SECURITY_COUNTRY_FILTER_LABEL"
+								tooltip = "FOOD_SECURITY_COUNTRY_FILTER_TOOLTIP"
+							}
+
+							button = {
+								size = { 265 40 }
+								using = default_button
+								using = tooltip_ne
+								onclick = "[RightClickMenuManager.ToggleMarketStarvationStatesFilter(Market.AccessSelf, PdxGuiWidget.AccessSelf)]"
+								text = "FOOD_SECURITY_STATE_FILTER_LABEL"
+								tooltip = "FOOD_SECURITY_STATE_FILTER_TOOLTIP"
+							}
+						}
+					}
+
+					divider_decorative = {}
+				}
+
+				### GOODS LIST
+				flowcontainer = {
+					parentanchor = hcenter
+					direction = vertical
+					spacing = 5
+					datacontext = "[MarketPanel.GetFilteredGoodsList(FoodSecurityFilter.Self)]"
+
+					textbox = {
+						margin_left = 5
+						autoresize = yes
+						align = nobaseline
+						multiline = yes
+						max_width = 540
+						default_format = "#title"
+						text = "BASIC_FOOD_GOODS_LIST_HEADER"
+					}
+
+					### SORT BUTTONS / COLUMN HEADERS
+					flowcontainer = {
+						sort_button = {
+							size = { 50 30 }
+							tooltip = "SORT_BY_MARKET_GOODS"
+							onclick = "[GoodsList.Sort('name')]"
+							onclick = "[GoodsList.RestoreSort]"
+
+							button = {
+								texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
+								size = { 25 25 }
+								parentanchor = center
+								alwaystransparent = yes
+							}
+						}
+
+						
+						sort_button_with_textbox = {
+							size = { 90 30 }
+							onclick = "[GoodsList.Sort('price')]"
+							onclick = "[GoodsList.RestoreSort]"
+
+							blockoverride "label_text" {
+								text = "GOODS_MARKET_PRICE_HEADER_SHORT"
+							}
+						}
+						
+						sort_button_with_textbox = {
+							size = { 120 30 }
+							onclick = "[GoodsList.Sort('shortage')]"
+							onclick = "[GoodsList.RestoreSort]"
+
+							blockoverride "label_text" {
+								text = "GOODS_SHORTAGE_SHORT_CONCEPT"
+							}
+						}
+
+						widget = {
+							size = { 100 30 }
+
+							sort_button = {
+								visible = "[GoodsList.HasMarketContext]"
+								size = { 100 30 }
+								onclick = "[GoodsList.Sort('sell')]"
+								onclick = "[GoodsList.RestoreSort]"
+								tooltip = "SORT_BY_SELL_ORDERS"
+
+								button = {
+									texture = "gfx/interface/buttons/sort_button_icons/sort_sell_orders.dds"
+									size = { 25 25 }
+									parentanchor = center
+									alwaystransparent = yes
+								}
+							}
+							
+							sort_button = {
+								visible = "[GoodsList.HasStateContext]"
+								size = { 100 30 }
+								onclick = "[GoodsList.Sort('production')]"
+								onclick = "[GoodsList.RestoreSort]"
+								tooltip = "SORT_BY_PRODUCTION"
+
+								button = {
+									texture = "gfx/interface/buttons/sort_button_icons/sort_production.dds"
+									size = { 25 25 }
+									parentanchor = center
+									alwaystransparent = yes
+								}
+							}
+						}
+
+						widget = {
+							size = { 100 30 }
+
+							sort_button = {
+								visible = "[GoodsList.HasMarketContext]"
+								size = { 100 30 }
+								onclick = "[GoodsList.Sort('buy')]"
+								onclick = "[GoodsList.RestoreSort]"
+								tooltip = "SORT_BY_BUY_ORDERS"
+
+								button = {
+									texture = "gfx/interface/buttons/sort_button_icons/sort_buy_orders.dds"
+									size = { 25 25 }
+									parentanchor = center
+									alwaystransparent = yes
+								}
+							}
+
+							sort_button = {
+								visible = "[GoodsList.HasStateContext]"
+								size = { 100 30 }
+								onclick = "[GoodsList.Sort('consumption')]"
+								onclick = "[GoodsList.RestoreSort]"
+								tooltip = "SORT_BY_CONSUMPTION"
+
+								button = {
+									texture = "gfx/interface/buttons/sort_button_icons/sort_consumption.dds"
+									size = { 25 25 }
+									parentanchor = center
+									alwaystransparent = yes
+								}
+							}
+						}
+
+						sort_button = {
+							size = { 80 30 }
+							onclick = "[GoodsList.Sort('balance')]"
+							onclick = "[GoodsList.RestoreSort]"
+							tooltip = "SORT_BY_BALANCE_TOOLTIP"
+
+							button = {
+								texture = "gfx/interface/buttons/sort_button_icons/sort_balance.dds"
+								size = { 25 25 }
+								parentanchor = center
+								alwaystransparent = yes
+							}
+						}
+					}
+
+					flowcontainer = {
+						parentanchor = hcenter
+						direction = vertical
+						datamodel = "[GoodsList.GetGoods]"
+						spacing = 2
+						
+						item = {
+							container = {
+								state_goods_entry_button = {
+									visible = "[Goods.HasStateContext]"
+								}
+
+								goods_entry_button = {
+									visible = "[Not(Goods.HasStateContext)]"
+
+									blockoverride "last_column" {
+										widget = {
+											size = { 90 55 }
+
+											textbox = {
+												parentanchor = vcenter
+												align = right|nobaseline
+												size = { 80 40 }
+												fontsize_min = 12
+												elide = right
+												raw_text = "@money![Goods.GetMarketPrice|0v] [Goods.GetCompareIconAgainstBasePriceNoFormatting( Goods.GetMarketPrice )]"
+											}
+										}
+
+										vertical_divider = {}
+
+										widget = {
+											tooltip = "GOODS_SHORTAGE_TOOLTIP"
+											size = { 120 55 }
+											
+											textbox = {
+												visible = "[Goods.HasShortageInMarket]"
+												align = right|nobaseline
+												size = { 110 40 }
+												margin_right = 10
+												parentanchor = vcenter
+												margin_left = 5
+												fontsize_min = 12
+												elide = right
+												text = "FOOD_SECURITY_GOODS_ITEM_HAS_SHORTAGE_IN_MARKET"
+											}
+
+											textbox = {
+												visible = "[Not(Goods.HasShortageInMarket)]"
+												align = right|nobaseline
+												size = { 110 40 }
+												margin_right = 10
+												parentanchor = vcenter
+												margin_left = 5
+												fontsize_min = 12
+												elide = right
+												using = empty_state_text_properties
+												text = "FOOD_SECURITY_GOODS_ITEM_NO_SHORTAGE"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				### BASIC FOOD NEED BAR CHART
+				flowcontainer = {
+					parentanchor = hcenter
+					direction = vertical
+					spacing = 5
+					margin = { 10 10 }
+
+					background = {
+						using = entry_bg_simple
+					}
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						max_width = 500
+						elide = right
+						fontsize_min = 12
+						default_format = "#title"
+						text = "BASIC_FOOD_GOODS_CONTRIBUTION_BAR_CHART_HEADER"
+					}
+
+					basic_food_need_bar_chart = {}
+				}
+			}
+		}
+
+		### HARVEST CONDITIONS & STARVATION PIE CHART
+		flowcontainer = {
+			flowcontainer = {
+				spacing = 5
+				direction = vertical
+
+				default_header_clean_faded = {
+					blockoverride "text" {
+						text = "HARVEST_CONDITIONS_HEADER"
+					}
+
+					blockoverride "size" {
+						size = { @panel_width_plus_14_half 38 }
+					}
+				}
+
+				### HARVEST CONDITIONS
+				flowcontainer = {
+					parentanchor = hcenter
+					datacontext = "[MarketPanel.GetHarvestConditionList(Market.GetFoodSecurityFilter.Self)]"
+					minimumsize = { @panel_width_half -1 }
+					direction = vertical
+
+					empty_state = {
+						blockoverride "visible" {
+							visible = "[IsDataModelEmpty(HarvestConditionList.GetTypes)]"
+						}
+
+						blockoverride "text" {
+							text = "NO_HARVEST_CONDITIONS"
+						}
+
+						blockoverride "size" {
+							minimumsize = { @panel_width_half -1 }
+							maximumsize = { @panel_width_half -1 }
+						}
+					}
+
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(HarvestConditionList.GetTypes))]"
+						parentanchor = hcenter
+						direction = vertical
+
+						datamodel = "[HarvestConditionList.GetTypes]"
+
+						item = {
+							widget = {
+								alwaystransparent = no	# For highlighting
+								onmousehierarchyenter = "[AccessHighlightManager.HighlightHarvestConditionType(HarvestConditionType.Self)]"
+								onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
+
+								size = { @panel_width_plus_14_half 50 }
+								tooltip = "FOOD_SECURITY_HARVEST_CONDITION_TOOLTIP"
+
+								background = {
+									using = entry_bg_simple
+								}
+
+								flowcontainer = {
+									parentanchor = vcenter
+									margin_left = 10
+									spacing = 10
+									
+									icon = {
+										parentanchor = vcenter
+										size = { 40 40 }
+										texture = "[HarvestConditionType.GetIcon]"
+									}
+
+									textbox = {
+										parentanchor = vcenter
+										align = nobaseline
+										autoresize = yes
+										max_width = 150
+										elide = right
+										fontsize_min = 12
+										text = "[HarvestConditionType.GetNameNoFormatting]"
+									}
+								}
+
+								textbox = {
+									parentanchor = right|vcenter
+									margin_right = 10
+									align = nobaseline
+									autoresize = yes
+									max_width = 60
+									elide = right
+									fontsize_min = 12
+									raw_text = "#v [HarvestConditionList.GetNumStatesWithType(HarvestConditionType.Self)]#!"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			vertical_divider_full = {}
+
+			### STARVATION PIE CHART
+			flowcontainer = {
+				spacing = 5
+				direction = vertical
+
+				default_header_clean_faded = {
+					blockoverride "text" {
+						text = "STARVATION_PIECHART_HEADER"
+					}
+
+					blockoverride "size" {
+						size = { @panel_width_plus_14_half 38 }
+					}
+				}
+
+				flowcontainer = {
+					minimumsize = { @panel_width_half -1 }
+
+					market_starvation_piechart = {}
+				}
+			}		
+		}
+	}
+
+	type basic_food_need_bar_chart = v3_stacked_barchart {
+		datacontext = "[MarketPanel.GetFilteredGoodsList(Market.GetFoodSecurityFilter.Self)]"
+
+		block "barchart_size" {
+			size = { 520 40 }
+		}
+
+		blockoverride "barchart_datamodel" {
+			datamodel = "[GoodsList.GetGoods]"
+		}
+
+		blockoverride "barchart_item_stretchfactor" {
+			layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(GoodsList.GetPopConsumptionRatio(Goods.Self), '(CFixedPoint)100'))]"
+		}
+
+		blockoverride "barchart_item_tooltip" {
+			tooltip = "POP_NEEDS_GOOD_BAR_CHART_ITEM_TOOLTIP"
+		}
+
+		blockoverride "barchart_item_icon" {
+			icon = {
+				texture = "gfx/interface/market_view/trade_good_icon_bg.dds"
+				size = { 30 30 }
+				color = "[Goods.GetCategoryColor]"
+				
+				icon = {
+					texture = "[Goods.GetTexture]"
+					size = { 75% 75% }
+					parentanchor = center
+				}
+			}
+		}
+
+		blockoverride "barchart_item_margins" {
+			margin = { 0 0 }
+		}
+
+		blockoverride "barchart_item_background" {
+
+			background = {
+				texture = "gfx/interface/tooltip/stacked_barchart_small_item.dds"
+				color = "[Goods.GetCategoryColor]"
+				spriteType = Corneredstretched
+				spriteborder = { 3 3 }
+			}
+
+			blockoverride "barchart_item_bg_texture_fade_left" {
+				using = progressbar_texture_properties
+			}
+
+			background = {
+				visible = no
+				using = simple_header_colored
+				texture = "gfx/interface/tooltip/tooltip_bg_texture.dds"
+				color = "[Goods.GetCategoryColor]"
+				spriteType = Corneredtiled
+			    spriteborder = { 0 0 }
+				texture_density = 5
+
+				modify_texture = {
+					using = simple_frame_mask
+				}
+			}
+
+			### ADDS TEXTURE
+			background = {
+				using = entry_bg_simple_colored
+				texture = "gfx/interface/tooltip/tooltip_bg_texture.dds"
+				#color = "[Goods.GetCategoryColor]"
+				spriteType = Corneredtiled
+			    spriteborder = { 3 3 }
+			    alpha = 0.2 
+
+			    modify_texture = {
+					using = simple_frame_mask
+				}
+			}
+
+			
+		}
+
+		blockoverride "barchart_frame" {
+			background = {
+				name = "frame"
+				texture = "gfx/interface/progressbar/progressbar_frame.dds"
+				spriteType = Corneredstretched
+				spriteborder = { 6 6 }
+				texture_density = 2
+				margin = { 3 3 }
+			}
+		}
+	}
+}

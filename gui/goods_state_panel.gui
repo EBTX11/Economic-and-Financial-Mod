@@ -432,7 +432,7 @@ types goods_state_panel_types
 										}
 
 										blockoverride "trade_center_revenue" {		
-											raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetState.GetExportRevenue(Goods.Self)|+K]"
+											raw_text = "[State.GetOwner.GetCustom('currency_symbol')][Building.GetState.GetExportRevenue(Goods.Self)|+K]"
 										}
 
 										blockoverride "trade_center_provider" {
@@ -443,11 +443,7 @@ types goods_state_panel_types
 							}
 						}
 					}				
-				}
-				
-				not_yet_initialized = {
-					visible = "[EqualTo_CFixedPoint(GoodsStatePanel.GetGoods.GetStatePrice, '(CFixedPoint)0')]"
-				}
+				}	
 			}
 		}
 	}
@@ -493,7 +489,13 @@ types goods_state_panel {
 			}
 
 			icon = {
-				visible = "[Not(GoodsPanelValue.HasBuildingInfo)]"
+				visible = "[GoodsPanelValue.IsPiracy]"
+				texture = "gfx/interface/icons/commander_order_icons/piracy_privateering.dds"
+				size = { 25 25 }
+			}
+
+			icon = {
+				visible = "[And(Not(GoodsPanelValue.HasBuildingInfo),Not(GoodsPanelValue.IsPiracy))]"
 				texture = "gfx/interface/icons/generic_icons/population.dds"
 				size = { 25 25 }
 			}
@@ -594,7 +596,7 @@ types goods_state_panel {
 					tooltip = "[Building.GetDownsizeTooltip]"
 					onclick = "[Execute( Building.Downsize )]"
 					enabled = "[IsValid( Building.Downsize )]"
-					visible = "[And(Not( ShouldAskConfirmation( Building.Downsize ) ), Not(BuildingType.IsMilitaryBuilding))]"
+					visible = "[And(Not( ShouldAskConfirmation( Building.Downsize ) ), Not(BuildingType.GeneratesCombatUnits))]"
 					using = tooltip_below
 				}
 
@@ -605,7 +607,7 @@ types goods_state_panel {
 					tooltip = "[Building.GetDownsizeTooltip]"
 					onclick = "[PopupManager.AskConfirmation( Building.Downsize )]"
 					enabled = "[IsValid( Building.Downsize )]"
-					visible = "[And(ShouldAskConfirmation( Building.Downsize ), Not(BuildingType.IsMilitaryBuilding))]"
+					visible = "[And(ShouldAskConfirmation( Building.Downsize ), Not(BuildingType.GeneratesCombatUnits))]"
 					using = tooltip_below
 				}
 
@@ -614,7 +616,7 @@ types goods_state_panel {
 					size = { 35 35 }
 					parentanchor = vcenter
 					tooltip = "[Building.GetCancelConstructionTooltip]"
-					visible = "[And(IsValid( Building.CancelConstruction ), Not(BuildingType.IsMilitaryBuilding))]"
+					visible = "[And(IsValid( Building.CancelConstruction ), Not(BuildingType.GeneratesCombatUnits))]"
 					onclick = "[Execute( Building.CancelConstruction )]"
 					using = tooltip_below
 				}
@@ -821,7 +823,7 @@ types goods_state_panel {
 
 									textbox = {
 										block "trade_center_revenue" {		
-											raw_text = "[GetPlayer.GetCustom('currency_symbol')][Building.GetState.GetImportRevenue(Goods.Self)|+K]"
+											raw_text = "[State.GetOwner.GetCustom('currency_symbol')][Building.GetState.GetImportRevenue(Goods.Self)|+K]"
 										}
 										autoresize = yes
 										align = nobaseline

@@ -76,6 +76,49 @@ types TooltipTypes
 		}
 	}
 
+	type custom_tooltip_2_columns_text_values = widget {
+		size = { 245 24 }
+
+		divider_clean = {}
+
+
+		flowcontainer = {
+			parentanchor = vcenter
+			spacing = 2
+
+			textbox = {
+				size = { 100 24 }
+				parentanchor = vcenter
+				align = nobaseline
+				using = elide_fontsize_min
+				fonttintcolor = "[TooltipInfo.GetTintColor]"
+
+				block "first_text" {
+					raw_text = "[concept_concept]"
+				}
+			}
+
+			block "whole_icon" {
+				icon = {
+					size = { 24 24 }
+
+					block "icon_texture" {
+						texture = "gfx/interface/icons/generic_icons/disapproval_icon.dds"
+					}
+				}
+			}
+
+			custom_tooltip_textbox = {
+				parentanchor = vcenter
+				max_width = 120
+
+				block "second_text" {
+					raw_text = "#b Cool Value#!"
+				}
+			}
+		}
+	}
+
 	type FancyTooltip_DecreeType = FancyTooltipWidgetType {
 		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
 
@@ -889,6 +932,15 @@ types TooltipTypes
 				}
 			}
 
+			### SHIP INPUT
+			ship_input_article = {
+				parentanchor = vcenter
+
+				blockoverride "text_format" {
+					fonttintcolor = "[TooltipInfo.GetTintColor]"
+				}
+			}
+
 			### STRATEGIC REGION INPUT
 			strategic_region_input_article = {
 				parentanchor = vcenter
@@ -1228,6 +1280,13 @@ types TooltipTypes
 					text = "ARTICLE_EFFECTS_RELATION"
 				}
 
+				### INVOLVEMENT EFFECTS
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(Article.GetInvolvementEffectsDesc))]"
+					margin_left = 10
+					text = "ARTICLE_EFFECTS_INVOLVEMENT"
+				}
+
 				custom_tooltip_newline = {
 					visible = "[Not(StringIsEmpty(Article.GetMutualModifierDesc))]"
 				}
@@ -1488,6 +1547,13 @@ types TooltipTypes
 				text = "ARTICLE_DRAFT_EFFECTS_RELATION"
 			}
 
+			### INVOLVEMENT EFFECTS
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ArticleDraft.GetInvolvementEffectsDesc))]"
+				margin_left = 10
+				text = "ARTICLE_DRAFT_EFFECTS_INVOLVEMENT"
+			}
+
 			custom_tooltip_newline = {
 				visible = "[Not(StringIsEmpty(ArticleDraft.GetMutualModifierDesc))]"
 			}
@@ -1539,6 +1605,18 @@ types TooltipTypes
 				text = "ARTICLE_DRAFT_TARGET_MODIFIERS"
 			}
 
+			custom_tooltip_newline = {
+				datacontext = "[ArticleDraft.GetShip]"
+				visible = "[And(Ship.IsValid, Ship.IsFlagship)]"
+			}
+
+			### WARNINGS
+			custom_tooltip_textbox = {
+				datacontext = "[ArticleDraft.GetShip]"
+				visible = "[And(Ship.IsValid, Ship.IsFlagship)]"
+				text = "ARTICLE_WARNING_SHIP_TRANSFER_FLAGSHIP"
+			}
+
 			tooltip_divider = {
 				visible = "[Not(StringIsEmpty(ArticleDraft.GetArticleType.GetDesc))]"
 			}
@@ -1563,6 +1641,12 @@ types TooltipTypes
 			}
 
 			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				visible = "[TreatyDraft.WillThreatenNavalHostilities]"
+				max_width = @tooltip_fixed_width
+				text = "[TreatyDraft.GetThreatenNavalHostilitiesInfamyWarning]"
+			}
 
 			custom_tooltip_textbox = {
 				max_width = @tooltip_fixed_width
@@ -1965,7 +2049,7 @@ types TooltipTypes
 				parentanchor = hcenter
 				spacing = 2
 				direction = vertical
-				
+
 				block "war_goal_before_text" {}
 
 				flowcontainer = {
@@ -2284,21 +2368,7 @@ types TooltipTypes
 				}
 			}
 
-			custom_tooltip_newline = {
-				visible = "[Not(Or(Law.IsActive, Law.IsBeingEnacted))]"
-			}
-
-			custom_tooltip_textbox = {
-				visible = "[Not(StringIsEmpty(Law.GetLawType.GetBlockingRequirements(GetPlayer.Self)))]"
-				default_format = "#title"
-				text = "DATA_LAW_REQUIREMENTS_HEADER"
-			}
-
-			custom_tooltip_textbox_with_empty_line = {
-				visible = "[Not(StringIsEmpty(Law.GetLawType.GetBlockingRequirements(GetPlayer.Self)))]"
-				margin_left = 10
-				text = "[Law.GetLawType.GetBlockingRequirements(GetPlayer.Self)]"
-			}
+			custom_tooltip_newline = {}
 
 			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(Law.GetLawType.GetAdditionalEffectDesc))]"
@@ -2318,7 +2388,7 @@ types TooltipTypes
 				text = "DATA_LAW_EFFECTS_HEADER"
 			}
 
-			custom_tooltip_textbox = {
+			custom_tooltip_textbox_with_empty_line = {
 				visible = "[Not(StringIsEmpty(Law.GetLawType.GetEffectDesc(GetPlayer.Self)))]"
 				margin_left = 10
 				text = "[Law.GetLawType.GetEffectDesc(GetPlayer.Self)]"
@@ -2342,13 +2412,17 @@ types TooltipTypes
 				text = "[Law.GetOnActivateDesc]"
 			}
 
+			custom_tooltip_newline = {
+				visible = "[And(Or(Not(StringIsEmpty(Law.GetOnEnactDesc)), Not(StringIsEmpty(Law.GetOnActivateDesc))), Not(Law.IsActive))]"
+			}
+
 			custom_tooltip_textbox = {
 				visible = "[And(Not(StringIsEmpty(Law.GetOnDeactivateDesc)), Law.IsActive)]"
 				default_format = "#title"
 				text = "ON_REVOKE"
 			}
 
-			custom_tooltip_textbox = {
+			custom_tooltip_textbox_with_empty_line = {
 				visible = "[And(Not(StringIsEmpty(Law.GetOnDeactivateDesc)), Law.IsActive)]"
 				margin_left = 10
 				text = "[Law.GetOnDeactivateDesc]"
@@ -2356,7 +2430,9 @@ types TooltipTypes
 
 			amendment_list_flowcontainer = {}
 
-			custom_tooltip_newline = {}
+			custom_tooltip_newline = {
+				visible = "[Not(IsDataModelEmpty(Law.GetAllAmendments))]"
+			}
 
 			custom_tooltip_textbox = {
 				visible = "[Law.IsSupported]"
@@ -2373,7 +2449,7 @@ types TooltipTypes
 			custom_tooltip_textbox = {
 				text = "DATA_LAW_MOVEMENT_AND_AGITATORS_TITLE"
 			}
-			
+
 			agitators_movements_endorsement_list = {
 				margin_left = 10
 			}
@@ -2488,27 +2564,6 @@ types TooltipTypes
 			custom_tooltip_newline = {}
 
 			custom_tooltip_textbox = {
-				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
-				text = "[Amendment.GetType.GetUnlocks]"
-			}			
-
-			tooltip_divider = {
-				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
-			}		
-		
-			custom_tooltip_textbox = {
-				visible = "[Not(StringIsEmpty(Amendment.GetType.GetEffectsDesc))]"
-				default_format = "#title"
-				text = "DATA_AMENDMENTS_EFFECTS_HEADER"
-			}
-
-			custom_tooltip_textbox_with_empty_line = {
-				visible = "[Not(StringIsEmpty(Amendment.GetType.GetEffectsDesc))]"
-				margin_left = 10
-				text = "[Amendment.GetType.GetEffectsDesc]"
-			}
-
-			custom_tooltip_textbox = {
 				visible = "[Not(Amendment.GetType.GetModifier.IsEmpty)]"
 				default_format = "#title"
 				text = "DATA_AMENDMENTS_MODIFIERS_HEADER"
@@ -2547,6 +2602,39 @@ types TooltipTypes
 				visible = "[Not(Amendment.GetType.GetSponsorModifier.IsEmpty)]"
 				margin_left = 10
 				text = "[Amendment.GetType.GetSponsorModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
+				text = "[Amendment.GetType.GetUnlocks]"
+			}
+
+			tooltip_divider = {
+				visible = "[Not(StringIsEmpty(Amendment.GetType.GetUnlocks))]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetOnAmendedEffectsDesc))]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_AMENDED_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(Amendment.GetOnAmendedEffectsDesc))]"
+				margin_left = 10
+				text = "[Amendment.GetOnAmendedEffectsDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(Amendment.GetOnRepealEffectsDesc))]"
+				default_format = "#title"
+				text = "DATA_AMENDMENTS_REPEAL_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(Amendment.GetOnRepealEffectsDesc))]"
+				margin_left = 10
+				text = "[Amendment.GetOnRepealEffectsDesc]"
 			}
 
 			tooltip_divider = {}
@@ -2713,10 +2801,16 @@ types TooltipTypes
 				text = "DATA_LAW_EFFECTS_HEADER"
 			}
 
-			custom_tooltip_textbox_with_empty_line = {
+			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(Law.GetLawType.GetEffectDesc(Country.Self)))]"
 				margin_left = 10
 				text = "[Law.GetLawType.GetEffectDesc(Country.Self)]"
+			}
+
+			amendment_list_flowcontainer = {}
+
+			custom_tooltip_newline = {
+				visible = "[Not(IsDataModelEmpty(Law.GetAllAmendments))]"
 			}
 
 			custom_tooltip_textbox = {
@@ -2779,12 +2873,12 @@ types TooltipTypes
 		blockoverride "type" {
 			text = "[concept_amendment]"
 		}
-		
+
 		blockoverride "tooltip_content_after" {
 			custom_tooltip_textbox = {
 				text = "DATA_AMENDMENT_TYPE_PARENT_LAW_OR_NONE"
 			}
-			
+
 			tooltip_divider = {
 				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
 			}
@@ -2792,7 +2886,7 @@ types TooltipTypes
 			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
 				text = "[AmendmentType.GetUnlocks]"
-			}			
+			}
 
 			tooltip_divider = {}
 
@@ -2811,13 +2905,102 @@ types TooltipTypes
 				default_format = "#lore"
 				text = "SPONSOR_MODIFIER_HEADER"
 			}
-			
+
 			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(AmendmentType.GetSponsorModifier.GetDesc))]"
 				default_format = "#lore"
 				text = "[AmendmentType.GetSponsorModifier.GetDesc]"
 			}
-			
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetDesc]"
+			}
+		}
+	}
+
+	type FancyTooltip_AmendmentTypeWithLaw = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_size" {
+			size = { 70% 70% }
+		}
+
+		blockoverride "name" {
+			raw_text = "[AmendmentType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_amendment]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "DATA_AMENDMENT_TYPE_PARENT_LAW_OR_NONE"
+			}
+
+			tooltip_divider = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetUnlocks))]"
+				text = "[AmendmentType.GetUnlocks]"
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				text = "EFFECTS_TITLE"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetSponsorModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "SPONSOR_MODIFIER_HEADER"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetSponsorModifier.GetDesc))]"
+				default_format = "#lore"
+				text = "[AmendmentType.GetSponsorModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetOnAmendedEffectsDesc(Law.Self)))]"
+				default_format = "#lore"
+				text = "DATA_AMENDMENTS_AMENDED_HEADER"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetOnAmendedEffectsDesc(Law.Self)))]"
+				default_format = "#lore"
+				margin_left = 10
+				text = "[AmendmentType.GetOnAmendedEffectsDesc(Law.Self)]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetOnRepealEffectsDesc(Law.Self)))]"
+				default_format = "#lore"
+				text = "DATA_AMENDMENTS_REPEAL_HEADER"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(AmendmentType.GetOnRepealEffectsDesc(Law.Self)))]"
+				default_format = "#lore"
+				margin_left = 10
+				text = "[AmendmentType.GetOnRepealEffectsDesc(Law.Self)]"
+			}
+
 			tooltip_divider = {}
 
 			custom_tooltip_textbox = {
@@ -3620,6 +3803,16 @@ types TooltipTypes
 
 		blockoverride "icon_frame" {}
 
+		### Changed position due to using a flag
+		blockoverride "tooltip_icon_position"{
+			position = { 11 3 }
+		}
+
+		### Changed margin due to changing the position of the flag
+		blockoverride "header_text_margin_left" {
+			margin_left = 72
+		}
+
 		blockoverride "go_to_button_visibility" {
 			visible = yes
 		}
@@ -4176,6 +4369,7 @@ types TooltipTypes
 
 		blockoverride "table_datamodel" {
 			datamodel = "[Party.GetMembers]"
+			visible = "[Not(IsDataModelEmpty(Party.GetMembers))]"
 		}
 
 		blockoverride "table_header_1" {
@@ -5452,10 +5646,6 @@ types TooltipTypes
 			color = "[Country.GetMapColor]"
 		}
 
-		blockoverride "icon_background_texture" {}
-
-		blockoverride "icon_frame" {}
-
 		blockoverride "replace_icon" {
 			small_flag = {
 				visible = "[And(IsInGame, Country.IsValid)]"
@@ -5478,6 +5668,20 @@ types TooltipTypes
 				blockoverride "flag_tooltip" {}
 				blockoverride "flag_click" {}
 			}
+		}
+
+		blockoverride "icon_background_texture" {}
+
+		blockoverride "icon_frame" {}
+
+		### Changed position due to using a flag
+		blockoverride "tooltip_icon_position"{
+			position = { 11 3 }
+		}
+
+		### Changed margin due to changing the position of the flag
+		blockoverride "header_text_margin_left" {
+			margin_left = 72
 		}
 
 		blockoverride "go_to_button_visibility" {
@@ -5943,6 +6147,16 @@ types TooltipTypes
 
 		blockoverride "icon_frame" {}
 
+		### Changed position due to using a flag
+		blockoverride "tooltip_icon_position"{
+			position = { 11 3 }
+		}
+
+		### Changed margin due to changing the position of the flag
+		blockoverride "header_text_margin_left" {
+			margin_left = 72
+		}
+
 		blockoverride "go_to_button_visibility" {
 			visible = yes
 		}
@@ -5968,6 +6182,7 @@ types TooltipTypes
 
 			custom_tooltip_2_columns = {
 				blockoverride "bg" {}
+
 				blockoverride "left_column" {
 					custom_tooltip_textbox_column_width = {
 						text = "STATE_TT_STATE_TYPE"
@@ -6076,11 +6291,15 @@ types TooltipTypes
 				custom_tooltip_textbox_column_width = {
 					text = "STATE_TT_WORLD_MARKET_ACCESS"
 				}
+
+				custom_tooltip_textbox_column_width = {
+					text = "STATE_TT_TRADE_CAPACITY"
+				}
 			}
 
 			blockoverride "right_column" {
 				custom_tooltip_textbox_column_width = {
-					text = "STATE_TT_TRADE_CAPACITY"
+					raw_text = "[State.GetStateRegion.GetNavalExitStateRegionDesc]"
 				}
 			}
 		}
@@ -6329,6 +6548,13 @@ types TooltipTypes
 				text = "BUILDING_GROUP_MILITARY_INDUSTRY_TYPES"
 			}
 
+			### MILITARY SHIPYARD
+			custom_tooltip_textbox = {
+				visible = "[BuildingGroup.IsBuildingGroup('bg_ship_construction')]"
+				margin_left = 10
+				text = "BUILDING_GROUP_SHIP_CONSTRUCTION_TYPES"
+			}
+
 			### MONUMENTS
 			custom_tooltip_textbox = {
 				visible = "[BuildingGroup.IsBuildingGroup('bg_monuments')]"
@@ -6338,7 +6564,7 @@ types TooltipTypes
 
 			### NAVY
 			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_navy')]"
+				visible = "[BuildingGroup.IsBuildingGroup('bg_naval_administration')]"
 				margin_left = 10
 				text = "BUILDING_GROUP_NAVY_TYPES"
 			}
@@ -6590,17 +6816,6 @@ types TooltipTypes
 										texture = "[TimedModifier.GetIcon]"
 										size = { 30 30 }
 									}
-								}
-							}
-
-							block "productivity" {
-								textbox = {
-									visible = "[And(Not(Building.IsGovernmentFunded), Not(Building.IsSubsistenceBuilding))]"
-									using = productivity_tooltip_with_graph
-									using = tooltip_ne
-									raw_text = "[State.GetOwner.GetCustom('currency_symbol')][Building.GetAverageAnnualEarningsPerEmployeeFormatted|+]"
-									align = hcenter|nobaseline
-									autoresize = yes
 								}
 							}
 
@@ -6895,11 +7110,11 @@ types TooltipTypes
 		}
 
 		blockoverride "go_to_button_properties" {
-			onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 		}
 
 		blockoverride "go_to_button_properties" {
-			onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+			onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 		}
 
 		blockoverride "tooltip_content_after" {
@@ -6941,6 +7156,15 @@ types TooltipTypes
 		}
 
 		blockoverride "tooltip_content_after" {
+
+			custom_tooltip_newline = {
+				visible = "[CharacterTrait.HasAffectedNavalMissionTypes]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[CharacterTrait.HasAffectedNavalMissionTypes]"
+				text = "AFFECTED_NAVAL_MISSION_TYPES"
+			}
 
 			widget = {
 				visible = "[Not(IsDataModelEmpty(CharacterTrait.AccessUnlockedOrders))]"
@@ -7087,6 +7311,8 @@ types TooltipTypes
 					text = "START_RESEARCHING"
 					size = { 300 40 }
 					enabled = "[IsValid(Technology.Research(GetPlayer.Self))]"
+					visible = "[Not(Technology.HasResearchedTech(GetPlayer.Self))]"
+
 					tooltip = "START_RESEARCH_COMMANDS"
 
 					click_modifiers = {
@@ -7351,6 +7577,1098 @@ types TooltipTypes
 			using = tooltip_segment_margin
 			default_format = "#lore"
 			max_width = @tooltip_fixed_width
+		}
+	}
+
+	type RegularTooltip_RetrofitShip = RegularTooltip {
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "RETROFIT_SHIP_BUTTON_TOOLTIP"
+			}
+
+			flowcontainer = {
+				visible = "[Ship.IsOutdated]"
+				direction = vertical
+
+				tooltip_divider = {}
+
+				custom_tooltip_textbox = {
+					text = "SHIP_IS_OUTDATED"
+				}
+
+				### Changed Modifications Slots
+				flowcontainer = {
+					direction = vertical
+					datamodel = "[Ship.GetModificationSlotsChanged]"
+
+					item = {
+						flowcontainer = {
+							margin = { 10 5 }
+							spacing = 7
+
+							background = {
+								using = entry_bg_simple
+							}
+
+							### Modification Slot
+							textbox = {
+								parentanchor = vcenter
+								size = { 140 30 }
+								align = nobaseline
+								using = elide_fontsize_min
+								text = "[ShipModificationSlotType.GetName]"
+							}
+
+							### Old Modification
+							flowcontainer = {
+								parentanchor = vcenter
+								spacing = 5
+								datacontext = "[Ship.GetModificationTypeOld(ShipModificationSlotType.Self)]"
+
+								tooltipwidget = {
+									FancyTooltip_ShipModificationType = {}
+								}
+
+								icon = {
+									parentanchor = vcenter
+									size = { 25 25 }
+									texture = "[ShipModificationType.GetIcon]"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									size = { 120 30 }
+									align = nobaseline
+									using = elide_fontsize_min
+									text = "[ShipModificationType.GetNameNoFormatting]"
+								}
+							}
+
+							icon = {
+								parentanchor = vcenter
+								size = { 25 25 }
+								texture = "gfx/interface/icons/generic_icons/arrow_right_small.dds"
+							}
+
+							### New Modification
+							flowcontainer = {
+								parentanchor = vcenter
+								spacing = 5
+								datacontext = "[Ship.GetModificationTypeNew(ShipModificationSlotType.Self)]"
+
+								tooltipwidget = {
+									FancyTooltip_ShipModificationType = {}
+								}
+
+								icon = {
+									parentanchor = vcenter
+									size = { 25 25 }
+									texture = "[ShipModificationType.GetIcon]"
+								}
+
+								textbox = {
+									parentanchor = vcenter
+									size = { 120 30 }
+									align = nobaseline
+									using = elide_fontsize_min
+									default_format = "#b"
+									text = "[ShipModificationType.GetNameNoFormatting]"
+								}
+							}
+						}
+					}
+				}
+
+				### Changed Additional Modifications
+				flowcontainer = {
+					spacing = 5
+					wrap_count = 2
+					datamodel = "[Ship.GetUtilityModificationsChanged]"
+
+					item = {
+						flowcontainer = {
+							margin = { 10 5 }
+							spacing = 5
+							using = tooltip_se
+							tooltip = "RETROFIT_SHIP_UTILITY_MOD_TOOLTIP"
+
+							### RED
+							background = {
+								visible = "[Ship.IsUtilityModificationNew(ShipModificationType.Self)]"
+								texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
+								color = { 0.78 0.25 0.25 1 }
+								alpha = 0.5
+
+								modify_texture = {
+									using = texture_velvet
+								}
+							}
+
+							### GREEN
+							background = {
+								visible = "[Ship.IsUtilityModificationOld(ShipModificationType.Self)]"
+								texture = "gfx/interface/tooltip/tooltip_title_bg.dds"
+								color = { 0.54 0.78 0.33 1 }
+								alpha = 0.5
+
+								modify_texture = {
+									using = texture_velvet
+								}
+							}
+
+							### Red Cross
+							icon = {
+								visible = "[Ship.IsUtilityModificationNew(ShipModificationType.Self)]"
+								parentanchor = vcenter
+								size = { 25 25 }
+								texture = "gfx/interface/icons/generic_icons/red_cross.dds"
+							}
+
+							### Green Checkmark
+							icon = {
+								visible = "[Ship.IsUtilityModificationOld(ShipModificationType.Self)]"
+								parentanchor = vcenter
+								size = { 25 25 }
+								texture = "gfx/interface/icons/generic_icons/green_checkmark.dds"
+							}
+
+							background = {
+								using = entry_bg_simple
+							}
+
+							textbox = {
+								parentanchor = vcenter
+								size = { 205 30 }
+								align = nobaseline
+								using = elide_fontsize_min
+								text = "[ShipModificationType.GetName]"
+							}
+						}
+					}
+				}
+
+				custom_tooltip_newline = {}
+
+				custom_tooltip_textbox = {
+					text = "RETROFIT_SHIP_CONSTRUCTION_COST"
+				}
+
+				custom_tooltip_textbox = {
+					text = "RETROFIT_SHIP_TOTAL_WEEKS"
+				}
+			}
+		}
+	}
+
+	type FancyTooltip_Ship = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			text = "SHIP_TOOLTIP_NAME"
+		}
+
+		blockoverride "type" {
+			text = "SHIP_TOOLTIP_TYPES"
+		}
+
+		blockoverride "header_text_margin_left" {
+			margin_left = 130
+		}
+
+		blockoverride "whole_icon" {
+			ship_type_silhouette = {
+				datacontext = "[Ship.GetType]"
+				position = { 10 13 }
+				size = { 110 30 }
+			}
+		}
+
+		blockoverride "go_to_button_visibility" {
+			visible = yes
+		}
+
+		blockoverride "go_to_button_properties" {
+			onclick = "[InformationPanelBar.OpenShipPanel(Ship.Self)]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				visible = "[Ship.IsFlagship]"
+				text = "SHIP_FLAGSHIP"
+			}
+
+			flowcontainer = {
+				spacing = 5
+
+				DefaultTooltipTextBox = {
+					parentanchor = vcenter
+					fonttintcolor = "[TooltipInfo.GetTintColor]"
+					multiline = yes
+					max_width = 450
+					text = "SHIP_PART_OF_FLEET"
+				}
+
+				button_icon_goto = {
+					visible = "[Ship.GetFleet.IsValid]"
+					datacontext = "[Ship.GetFleet]"
+					size = { 25 25 }
+					onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
+					tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				text = "SHIP_TEMPLATE_IN_TOOLTIP"
+			}
+
+			flowcontainer = {
+				visible = "[Or(Ship.IsOutdated, Ship.IsToRetrofit)]"
+				direction = vertical
+
+				flowcontainer = {
+					spacing = 5
+
+					DefaultTooltipTextBox = {
+						visible = "[Ship.IsOutdated]"
+						parentanchor = vcenter
+						fonttintcolor = "[TooltipInfo.GetTintColor]"
+						multiline = yes
+						max_width = 450
+						text = "SHIP_TEMPLATE_IS_OUTDATED"
+					}
+
+					DefaultTooltipTextBox = {
+						visible = "[Ship.IsToRetrofit]"
+						parentanchor = vcenter
+						fonttintcolor = "[TooltipInfo.GetTintColor]"
+						multiline = yes
+						max_width = 450
+						text = "RETROFIT_SHIP_IS_BEING_RETROFITTED"
+					}
+
+					### Retrofit ship
+					retrofit_ship_button = {
+						size = { 26 26 }
+					}
+
+					### Cancel Retrofit
+					cancel_retrofit_ship_button = {
+						size = { 26 26 }
+					}
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Ship.IsToRetrofit]"
+					margin_left = 10
+					text = "RETROFIT_SHIP_WEEKS_LEFT"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			block "icons_and_bars" {
+
+				military_formation_icon_and_bars = {
+					datacontext = "[Ship.GetFleet]"
+					size = { 500 80 }
+
+					blockoverride "text_parentanchor" {
+						parentanchor = vcenter
+					}
+
+					blockoverride "first_bar_size" {
+						size = { 500 25 }
+					}
+
+					blockoverride "second_bar_size" {
+						size = { 500 18 }
+					}
+
+					blockoverride "third_bar_size" {
+						size = { 500 18 }
+					}
+
+					blockoverride "first_bar_tooltip" {
+						tooltip = "SHIP_HIT_POINTS_TOOLTIP"
+					}
+
+					blockoverride "second_bar_tooltip" {
+						tooltip = "SHIP_CREW_TOOLTIP"
+					}
+
+					blockoverride "first_bar_values" {
+						min = 0
+						max = 1
+						value = "[FixedPointToFloat(Ship.GetHitPointsPercentage)]"
+					}
+
+					blockoverride "second_bar_values" {
+						min = 0
+						max = "[Ship.GetCrewMax]"
+						value = "[Ship.GetTotalCrew]"
+					}
+
+					blockoverride "first_bar_text" {
+						raw_text = "@ship_hp! #b [Ship.GetHitPoints|0]#! / [Ship.GetHitPointsMax|0]" #todo
+					}
+
+					blockoverride "second_bar_text" {
+						raw_text = "@crew! #b [Ship.GetTotalCrew|D]#! / [Ship.GetCrewMax|D]"
+					}
+
+					blockoverride "entire_icon" {}
+				}
+			}
+
+			### Main Stats
+			ship_modifier_stats_list = {}
+
+			### Battle Against Ship Type Stats
+			flowcontainer = {
+				wrap_count = 2
+				datacontext = "[Ship.GetModifier]"
+
+				ship_modifier_battle_against_torpedo_boat_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_torpedo_boat_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_submarine_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_submarine_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_modern_ironclad_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_modern_ironclad_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_pre_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_pre_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_super_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_super_dreadnought_hull_damage_mult'))]"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				datacontext = "[Ship.GetType]"
+				visible = "[Not(ShipType.GetConstructionGoodsModifier.IsEmpty)]"
+				text = "SHIP_TYPE_CONSTRUCTION_GOODS"
+			}
+
+			custom_tooltip_newline = {
+				visible = "[GreaterThanZero(Ship.GetMaxDistanceToPort)]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[GreaterThanZero(Ship.GetMaxDistanceToPort)]"
+				text = "SHIP_DISTANCE_TO_PORT_MODIFIER_DESC"
+			}
+		}
+	}
+
+	type FancyTooltip_ShipGroup = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			text = "[ShipGroup.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_ship_group]"
+		}
+
+		blockoverride "icon_background_texture" {}
+
+		blockoverride "icon_frame" {}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "SHIP_GROUP_TYPES_HEADER"
+			}
+
+			flowcontainer = {
+				margin_top = 2
+				spacing = 2
+				wrap_count = 2
+				datamodel = "[ShipGroup.GetShipTypes]"
+
+				item = {
+					ship_silhouette_for_tooltips = {
+						blockoverride "ship_type_name" {
+							text = "[ShipType.GetNameNoFormatting]"
+						}
+					}
+				}
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				default_format = "#lore"
+				max_width = 382
+				text = "[ShipGroup.GetDescription]"
+			}
+		}
+	}
+
+	type FancyTooltip_ShipType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			text = "[ShipType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "SHIP_TYPE_TOOLTIP_TYPES"
+		}
+
+		blockoverride "header_text_margin_left" {
+			margin_left = 130
+		}
+
+		blockoverride "whole_icon" {
+			ship_type_silhouette = {
+				position = { 10 13 }
+				size = { 110 30 }
+			}
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox_with_empty_line = {
+				text = "SHIP_TYPE_NUMBER_OF_TEMPLATES_TOOLTIP"
+			}
+
+			### Main Stats
+			ship_modifier_stats_list = {
+				visible = "[Not(ShipType.GetModifier.IsEmpty)]"
+
+				blockoverride "datacontext" {
+					datacontext = "[ShipType.GetModifier]"
+				}
+
+				blockoverride "ship_template_maintenance" {}
+
+				blockoverride "ship_template_construction_cost" {}
+			}
+
+			flowcontainer = {
+				wrap_count = 2
+				datacontext = "[ShipType.GetModifier]"
+
+				ship_modifier_battle_against_torpedo_boat_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_torpedo_boat_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_submarine_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_submarine_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_modern_ironclad_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_modern_ironclad_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_pre_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_pre_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_super_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_super_dreadnought_hull_damage_mult'))]"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(ShipType.GetConstructionGoodsModifier.IsEmpty)]"
+				text = "SHIP_TYPE_CONSTRUCTION_GOODS"
+			}
+
+			custom_tooltip_newline = {
+				visible = "[GreaterThanZero(ShipType.GetMaxDistanceToPort)]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[GreaterThanZero(ShipType.GetMaxDistanceToPort)]"
+				text = "SHIP_TYPE_DISTANCE_TO_PORT_MODIFIER_DESC"
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				default_format = "#lore"
+				text = "[ShipType.GetDescription]"
+			}
+		}
+	}
+
+	type FancyTooltip_ShipTemplate = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+		datacontext = "[ShipTemplate.GetType]"
+
+		blockoverride "name" {
+			text = "[ShipTemplate.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "SHIP_TEMPLATE_TOOLTIP_TYPES"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "gfx/interface/icons/generic_icons/flotillas.dds"
+		}
+
+		blockoverride "icon_background_texture" {}
+
+		blockoverride "icon_frame" {}
+
+		blockoverride "tooltip_content_after" {
+
+			background = {
+				texture = "gfx/interface/illustrations/war/defeat_navy.dds"
+				fittype = centercrop
+				alpha = 0.4
+			}
+
+			custom_tooltip_2_columns = {
+				blockoverride "left_column" {
+					datamodel = "[ShipTemplate.GetModifications]"
+
+					item = {
+						flowcontainer = {
+							spacing = 2
+
+							icon = {
+								size = { 24 24 }
+								texture = "[ShipModificationType.GetIcon]"
+							}
+
+							custom_tooltip_textbox = {
+								parentanchor = vcenter
+								max_width = 220
+								text = "[ShipModificationType.GetName]"
+							}
+						}
+					}
+				}
+
+				blockoverride "right_column" {
+
+					textbox = {
+						visible = "[IsDataModelEmpty(ShipTemplate.GetUtilityModifications)]"
+						autoresize = yes
+						align = nobaseline
+						max_width = @tooltip_fixed_column_width
+						using = elide_fontsize_min
+						using = empty_state_text_properties
+						text = "NO_UTILITY_MODIFICATIONS"
+					}
+
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(ShipTemplate.GetUtilityModifications))]"
+						direction = vertical
+						datamodel = "[ShipTemplate.GetUtilityModifications]"
+
+						item = {
+							flowcontainer = {
+								spacing = 2
+
+								icon = {
+									size = { 24 24 }
+									texture = "gfx/interface/buttons/button_icons/plus.dds"
+								}
+
+								custom_tooltip_textbox = {
+									parentanchor = vcenter
+									max_width = 220
+									text = "[ShipModificationType.GetName]"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			### Main Stats
+			ship_template_stats_list = {}
+
+			flowcontainer = {
+				wrap_count = 2
+				datacontext = "[ShipType.GetModifier]"
+
+				ship_modifier_battle_against_torpedo_boat_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_torpedo_boat_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_submarine_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_submarine_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_modern_ironclad_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_modern_ironclad_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_pre_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_pre_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_super_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_super_dreadnought_hull_damage_mult'))]"
+				}
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox_fixed_width = {
+				default_format = "#lore"
+				text = "[ShipType.GetDescription]"
+			}
+		}
+	}
+
+	### Ship Template Stats list
+	type ship_template_stats_list = flowcontainer
+	{
+		wrap_count = 2
+		datacontext = "[ShipTemplate.GetModifier]"
+
+		### Maintenance
+		ship_stat = {
+			size = { 245 36 }
+
+			blockoverride "stat_icon" {
+				texture = "gfx/interface/icons/generic_icons/money.dds"
+			}
+
+			blockoverride "stat_tooltip" {
+				tooltip = "SHIP_TEMPLATE_MAINTENANCE_COST_TOOLTIP"
+			}
+
+			blockoverride "stat_label" {
+				text = "SHIP_MAINTENANCE_LABEL"
+			}
+
+			blockoverride "stat_value" {
+				text = "[ShipTemplate.GetSupplyGoodsCost|vD-]"
+			}
+		}
+
+		ship_template_stat_vulnerability = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_hit_points = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_movement_speed = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_armor = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_visibility = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_crew_damage = {
+			size = { 245 36 }
+		}
+
+
+		ship_template_stat_screening = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_hull_damage = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_supply_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_critical_hit_chance = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_supply_efficiency = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_critical_hit_damage = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_carrying_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_marine_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_detection = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_accuracy = {
+			size = { 245 36 }
+		}
+	}
+
+	### Ship Stats List
+	type ship_modifier_stats_list = flowcontainer
+	{
+		wrap_count = 2
+
+		block "datacontext" {
+			datacontext = "[Ship.GetTemplate]"
+			datacontext = "[Ship.GetModifier]"
+		}
+
+
+		block "ship_template_maintenance" {
+			### Maintenance
+			ship_stat = {
+				size = { 245 36 }
+
+				blockoverride "stat_icon" {
+					texture = "gfx/interface/icons/generic_icons/money.dds"
+				}
+
+				blockoverride "stat_tooltip" {
+					tooltip = "SHIP_TEMPLATE_MAINTENANCE_COST_TOOLTIP"
+				}
+
+				blockoverride "stat_label" {
+					text = "SHIP_MAINTENANCE_LABEL"
+				}
+
+				blockoverride "stat_value" {
+					text = "[ShipTemplate.GetSupplyGoodsCost|vD-]"
+				}
+			}
+		}
+
+		block "ship_template_construction_cost" {
+			### Construction Cost
+			ship_stat = {
+				size = { 245 36 }
+
+				blockoverride "stat_icon" {
+					texture = "gfx/interface/icons/state_status_icons/ship_construction.dds"
+				}
+
+				blockoverride "stat_tooltip" {
+					tooltip = "SHIP_TEMPLATE_CONSTRUCTION_COST_TOOLTIP"
+				}
+
+				blockoverride "stat_label" {
+					text = "SHIP_CONSTRUCTION_SHORT_CONCEPT"
+				}
+
+				blockoverride "stat_value" {
+					text = "[ShipTemplate.GetConstructionCost|V0]"
+				}
+			}
+		}
+
+		ship_modifier_stat_armor = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_vulnerability = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_hull_damage = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_movement_speed = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_crew_damage = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_screening = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_critical_hit_chance = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_supply_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_critical_hit_damage = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_supply_efficiency = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_visibility = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_carrying_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_detection = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_marine_capacity = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_accuracy = {
+			size = { 245 36 }
+		}
+	}
+
+	type FancyTooltip_ShipModificationType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			text = "[ShipModificationType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_ship_modification]"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "[ShipModificationType.GetIcon]"
+		}
+
+		blockoverride "icon_background_texture" {}
+
+		blockoverride "icon_frame" {}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(ShipModificationType.GetTechRequirements(GetPlayer.Self)))]"
+				text = "SHIP_MODIFICATION_TECH_REQUIREMENTS_DESC"
+			}
+
+			flowcontainer = {
+				direction = vertical
+				datacontext = "[ShipModificationType.GetModifier]"
+
+				custom_tooltip_textbox_with_empty_line = {
+					visible = "[Not(IsDataModelEmpty(ShipModificationType.GetApplicableShipTypes))]"
+					text = "SHIP_MODIFICATION_APPLICABLE_SHIP_TYPES_DESC"
+				}
+
+				ship_modifier_stat_hit_points = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipHitPointsMax)]"
+				}
+
+				ship_modifier_stat_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipAccuracy)]"
+				}
+
+				ship_modifier_stat_armor = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipArmor)]"
+				}
+
+				ship_modifier_stat_blockade_strength = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipBlockadeStrength)]"
+				}
+
+				ship_modifier_stat_movement_speed = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipSpeed)]"
+				}
+
+				ship_modifier_stat_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipHullDamage)]"
+				}
+
+				ship_modifier_stat_crew_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipCrewDamage)]"
+				}
+
+				ship_modifier_stat_critical_hit_chance = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipCriticalHitChance)]"
+				}
+
+				ship_modifier_stat_critical_hit_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipCriticalHitMultiplier)]"
+				}
+
+				ship_modifier_stat_vulnerability = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipVulnerability)]"
+				}
+
+				ship_modifier_stat_screening = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipScreening)]"
+				}
+
+				ship_modifier_stat_carrying_capacity = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipCarryingCapacity)]"
+				}
+
+				ship_modifier_stat_supply_capacity = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipSupplyCapacity)]"
+				}
+
+				ship_modifier_stat_supply_efficiency = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipSupplyEfficiency)]"
+				}
+
+				ship_modifier_stat_marine_capacity = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipMarineCapacity)]"
+				}
+
+				ship_modifier_stat_readiness_gain = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipReadinessGain)]"
+				}
+
+				ship_modifier_stat_visibility = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipVisibility)]"
+				}
+
+				ship_modifier_stat_detection = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetShipDetection)]"
+				}
+
+				ship_modifier_accuracy_mult = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_condition_accuracy_penalty = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_condition_accuracy_penalty_mult'))]"
+				}
+
+				ship_modifier_blockade_strength_mult = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_blockade_strength_mult'))]"
+				}
+
+				ship_modifier_critical_hit_chance_mult = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_critical_hit_chance_mult'))]"
+				}
+
+				ship_modifier_hull_damage_mult = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_hull_damage_mult'))]"
+				}
+
+				ship_modifier_naval_invasion_efficiency = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_naval_invasion_efficiency_mult'))]"
+				}
+
+				ship_modifier_suffered_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_accuracy_mult'))]"
+				}
+
+				ship_modifier_suffered_crew_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_crew_damage_mult'))]"
+				}
+
+				ship_modifier_suffered_crit_chance = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_crit_chance_mult'))]"
+				}
+
+				ship_modifier_suffered_crit_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_crit_damage_mult'))]"
+				}
+
+				ship_modifier_suffered_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_hull_damage_mult'))]"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox_with_empty_line = {
+				align = nobaseline
+				fontsize_min = 14
+				text = "SHIP_MOD_GOODS_COST"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[ShipModificationType.IsUtility]"
+				default_format = "#lore"
+				text = "[ShipModificationType.GetDescription]"
+			}
+		}
+	}
+
+	type RegularTooltip_AdditionalShipTypes = RegularTooltip {
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				block "header_text"{
+					text = "MORE_SHIP_TEMPLATES_IN_GROUP_TOOLTIP"
+				}
+			}
+
+			tooltip_divider = {}
+
+			flowcontainer = {
+				spacing = 5
+				wrap_count = 4
+
+				block "datamodel" {
+					datamodel = "[DataModelSkipFirst(Country.GetShipList.GetShipTemplatesOfGroup(ShipGroup.Self), '(int32)4')]"
+				}
+
+				item = {
+					compact_ship_template = {
+						blockoverride "number_minimumsize" {
+							minimumsize = { -1 40 }
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -7953,7 +9271,7 @@ types TooltipTypes
 									size = { 100% 100% }
 								}
 
-	 							onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+	 							onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 								tooltip = "GO_TO_BUTTON_CHARACTER"
 	 						}
 						}
@@ -8177,9 +9495,7 @@ types TooltipTypes
 
 
 	type FancyTooltip_StrategicRegion = FancyTooltipWidgetType {
-		blockoverride "text" {
-			text = "DATA_STRATEGIC_REGION_NAME_TOOLTIP"
-		}
+		blockoverride "text" {} #all content is in 'blockoverride "tooltip_content_after"
 
 		blockoverride "name" {
 			text = "[StrategicRegion.GetNameNoFormatting]"
@@ -8189,83 +9505,341 @@ types TooltipTypes
 			text = "TOOLTIP_TYPE_STRATEGIC_REGION"
 		}
 
+		blockoverride "go_to_button" {
+			button_icon_goto = {
+				size = { 30 30 }
+				input_action = "go_to_details"
+				using = tooltip_ne
+				onclick = "[InformationPanelBar.OpenStrategicRegionPanel(StrategicRegion.Self)]"
+				tooltip = "GO_TO_BUTTON_STRATEGIC_REGION"
+			}
+		}
+
+		blockoverride "instruction_text" {
+			visible = no
+		}
+
+		blockoverride "table_visibility" {
+			visible = yes
+			minimumsize = { @tooltip_fixed_width -1 }
+		}
+
+		blockoverride "row_background" {
+			using = dark_area
+		}
+
+		blockoverride "table_datamodel" {
+			datamodel = "[DataModelFirst(StrategicRegion.GetCountriesWithInterest, '(int32)10')]"
+		}
+
+		blockoverride "content_after_table" {
+			hbox = {
+				layoutpolicy_horizontal = expanding
+
+				custom_tooltip_textbox = {
+					visible = "[GreaterThan_int32(GetDataModelSize(StrategicRegion.GetCountriesWithInterest), '(int32)10')]"
+					default_format = "#tooltippable"
+					text = "DATA_STRATEGIC_REGION_AND_X_MORE_COUNTRIES"
+
+					tooltipwidget = {
+						RegularTooltip_CountriesWithInterest_MoreThan10 = {}
+					}
+				}
+
+				expand = {}
+			}
+		}
+
+		blockoverride "table_header_1" {
+			text = "[concept_country]"
+		}
+
+		blockoverride "table_header_2" {
+			align = nobaseline
+			margin_left = 25
+			text = "[concept_involvement]"
+		}
+
+		blockoverride "table_header_3" {
+			tooltip = "STANCE_TOOLTIP"
+			text = "STANCE"
+			align = hcenter|nobaseline
+		}
+
+		blockoverride "table_header_4" {
+			text = "[concept_locality]"
+		}
+
+		blockoverride "table_value_1" {
+			minimumsize = { 190 -1 }
+			maximumsize = { 190 -1 }
+			text = "[Country.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			minimumsize = { 125 -1 }
+			maximumsize = { 125 -1 }
+			align = nobaseline
+			raw_text = "[Country.GetCurrentInterestTierTypeIn(StrategicRegion.Self).GetName]"
+		}
+
+		blockoverride "table_value_3" {
+			minimumsize = { 50 -1 }
+			maximumsize = { 50 -1 }
+
+			icon = {
+				visible = "[Not(Country.IsPlayer)]"
+				parentanchor = center
+				size = { 24 24 }
+				datacontext = "[Country.GetAIStrategicRegionStanceTypeIn(StrategicRegion.Self)]"
+				texture = "[AIStrategicRegionStanceType.GetIcon]"
+
+				tooltipwidget = {
+					FancyTooltip_AIStrategicRegionStanceType = {}
+				}
+			}
+
+			textbox = {
+				visible = "[Country.IsPlayer]"
+				parentanchor = center
+				align = nobaseline
+				autoresize = yes
+				alpha = 0.5
+				text = "NONE"
+			}
+		}
+
+		blockoverride "table_value_4" {
+			minimumsize = { 70 -1 }
+			maximumsize = { 70 -1 }
+			margin_right = 5
+			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
+		}
+
 		blockoverride "tooltip_content_after" {
-			overlappingitembox = {
-					size = { 540 25 }
-					datamodel = "[StrategicRegion.GetInterests]"
+			max_width = @tooltip_fixed_width
+			min_width = @tooltip_fixed_width
 
-					item = {
-						container = {
-							tooltip = "INTEREST_MARKER_TOOLTIP"
-							using = tooltip_above
+			background = {
+				texture = "[StrategicRegion.GetBestTexture]"
+				fittype = centercrop
+				alpha = 0.15
+			}
 
-							widget = {
-								size = { 35 33 }
+			custom_tooltip_textbox = {
+				text = "DATA_STRATEGIC_REGION_PLAYER_HAS_INTEREST"
+			}
 
-								tiny_flag = {
-									position = { 0 -2 }
-									visible = "[Not(Interest.IsActive)]"
-									datacontext = "[Interest.GetOwner]"
-									blockoverride "tooltip" {}
-									parentanchor = center
-									alpha = 0.3
-								}
-								tiny_flag = {
-									position = { 0 -2 }
-									visible = "[Interest.IsActive]"
-									datacontext = "[Interest.GetOwner]"
-									blockoverride "tooltip" {}
-									parentanchor = center
-								}
+			custom_tooltip_textbox_with_empty_line = {
+				text = "DATA_STRATEGIC_REGION_GDP"
+			}
 
-								widget = {
-									size = { 25 4 }
-									position = { 0 12 }
-									visible = "[Interest.ShouldShowProgressBar]"
-									parentanchor = center
+			widget = {
+				visible = "[GreaterThan_CFixedPoint(GetPlayer.GetCurrentInvolvementIn(StrategicRegion.Self), '(CFixedPoint)0')]"
+				datacontext = "[GetPlayer]"
+				datacontext = "[GetPlayer.GetCurrentInterestTierTypeIn(StrategicRegion.Self)]"
+				size = { 470 50 }
 
-									bad_progressbar_horizontal = {
-										visible = "[Interest.IsActive]"
-										size = { 100% 100% }
-										blockoverride "values" {
-											min = 0
-											max = 1
-											value = "[Interest.GetProgress]"
-										}
-									}
+				country_involvement_bar_with_label = {
+					margin_right = 10
 
-									default_progressbar_horizontal = {
-										visible = "[Not(Interest.IsActive)]"
-										size = { 100% 100% }
-										blockoverride "values" {
-											min = 0
-											max = 1
-											value = "[Interest.GetProgress]"
-										}
-									}
-								}
+					blockoverride "above_bar_text_hbox" {
+						hbox = {
+							layoutpolicy_horizontal = expanding
+
+							custom_tooltip_textbox = {
+								text = "DATA_STRATEGIC_REGION_CURRENT_PLAYER_INVOLVEMENT"
+								max_width = 300
 							}
+
+							expand = {}
 						}
 					}
 				}
+			}
+
+			custom_tooltip_newline = {
+				visible = "[GreaterThan_CFixedPoint(GetPlayer.GetCurrentInvolvementIn(StrategicRegion.Self), '(CFixedPoint)0')]"
+			}
 		}
 	}
 
-	type FancyTooltip_CanalType = FancyTooltipWidgetType {
-		blockoverride "text" {
-			text = "DATA_CANAL_TYPE_NAME_FORMAT_TOOLTIP"
+	type RegularTooltip_CountriesWithInterest_MoreThan10 = RegularTooltip {
+		blockoverride "table_visibility" {
+			visible = yes
+			minimumsize = { @tooltip_fixed_width -1 }
 		}
 
-		blockoverride "icon_texture" {
-			texture = "[CanalType.GetTexture]"
+		blockoverride "table_margins" {
+			margin_right = 10
 		}
 
-		blockoverride "name" {
-			text = "[CanalType.GetNameNoFormatting]"
+		blockoverride "row_background" {
+			using = dark_area
 		}
 
-		blockoverride "type" {
-			text = "TOOLTIP_TYPE_CANAL_TYPE"
+		blockoverride "table_datamodel" {
+			datamodel = "[DataModelSkipFirst(StrategicRegion.GetCountriesWithInterest, '(int32)10')]"
+		}
+
+		blockoverride "content_after_table" {
+			hbox = {
+				layoutpolicy_horizontal = expanding
+
+				custom_tooltip_textbox = {
+					visible = "[GreaterThan_int32(GetDataModelSize(StrategicRegion.GetCountriesWithInterest), '(int32)25')]"
+					default_format = "#tooltippable"
+					text = "DATA_STRATEGIC_REGION_AND_25_MORE_COUNTRIES"
+
+					tooltipwidget = {
+						RegularTooltip_CountriesWithInterest_MoreThan25 = {}
+					}
+				}
+
+				expand = {}
+			}
+		}
+
+		blockoverride "table_header_1" {
+			text = "[concept_country]"
+		}
+
+		blockoverride "table_header_2" {
+			align = nobaseline
+			margin_left = 20
+			text = "[concept_involvement]"
+		}
+
+		blockoverride "table_header_3" {
+			tooltip = "STANCE_TOOLTIP"
+			text = "STANCE"
+			align = hcenter|nobaseline
+		}
+
+		blockoverride "table_header_4" {
+			text = "[concept_locality]"
+		}
+
+		blockoverride "table_value_1" {
+			minimumsize = { 150 -1 }
+			text = "[Country.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			minimumsize = { 150 -1 }
+			align = nobaseline
+			raw_text = "[Country.GetCurrentInterestTierTypeIn(StrategicRegion.Self).GetName]"
+		}
+
+		blockoverride "table_value_3" {
+			minimumsize = { 70 -1 }
+
+			icon = {
+				visible = "[Not(Country.IsPlayer)]"
+				parentanchor = center
+				size = { 24 24 }
+				datacontext = "[Country.GetAIStrategicRegionStanceTypeIn(StrategicRegion.Self)]"
+				texture = "[AIStrategicRegionStanceType.GetIcon]"
+
+				tooltipwidget = {
+					FancyTooltip_AIStrategicRegionStanceType = {}
+				}
+			}
+
+			textbox = {
+				visible = "[Country.IsPlayer]"
+				parentanchor = center
+				align = nobaseline
+				autoresize = yes
+				alpha = 0.5
+				text = "NONE"
+			}
+		}
+
+		blockoverride "table_value_4" {
+			minimumsize = { 70 -1 }
+			margin_right = 5
+			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
+		}
+	}
+
+	type RegularTooltip_CountriesWithInterest_MoreThan25 = RegularTooltip {
+		blockoverride "table_visibility" {
+			visible = yes
+			minimumsize = { @tooltip_fixed_width -1 }
+		}
+
+		blockoverride "row_background" {
+			using = dark_area
+		}
+
+		blockoverride "table_datamodel" {
+			datamodel = "[DataModelSkipFirst(StrategicRegion.GetCountriesWithInterest, '(int32)25')]"
+		}
+
+		blockoverride "table_header_1" {
+			text = "[concept_country]"
+		}
+
+		blockoverride "table_header_2" {
+			align = nobaseline
+			margin_left = 20
+			text = "[concept_involvement]"
+		}
+
+		blockoverride "table_header_3" {
+			tooltip = "STANCE_TOOLTIP"
+			text = "STANCE"
+			align = hcenter|nobaseline
+		}
+
+		blockoverride "table_header_4" {
+			text = "[concept_locality]"
+		}
+
+		blockoverride "table_value_1" {
+			minimumsize = { 150 -1 }
+			text = "[Country.GetName]"
+		}
+
+		blockoverride "table_value_2" {
+			minimumsize = { 150 -1 }
+			align = nobaseline
+			raw_text = "[Country.GetCurrentInterestTierTypeIn(StrategicRegion.Self).GetName]"
+		}
+
+		blockoverride "table_value_3" {
+			minimumsize = { 70 -1 }
+
+			icon = {
+				visible = "[Not(Country.IsPlayer)]"
+				parentanchor = center
+				size = { 24 24 }
+				datacontext = "[Country.GetAIStrategicRegionStanceTypeIn(StrategicRegion.Self)]"
+				texture = "[AIStrategicRegionStanceType.GetIcon]"
+
+				tooltipwidget = {
+					FancyTooltip_AIStrategicRegionStanceType = {}
+				}
+			}
+
+			textbox = {
+				visible = "[Country.IsPlayer]"
+				parentanchor = center
+				align = nobaseline
+				autoresize = yes
+				alpha = 0.5
+				text = "NONE"
+			}
+		}
+
+		blockoverride "table_value_4" {
+			minimumsize = { 70 -1 }
+			margin_right = 5
+			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
 		}
 	}
 
@@ -8285,7 +9859,7 @@ types TooltipTypes
 		blockoverride "type" {
 			text = "TOOLTIP_TYPE_GEOGRAPHIC_REGION"
 		}
-		
+
 		blockoverride "tooltip_content_after" {
 			custom_tooltip_textbox = {
 				visible = "[Not(StringIsEmpty(GeographicRegion.GetUnlocks))]"
@@ -8341,24 +9915,24 @@ types TooltipTypes
 				max_width = @tooltip_fixed_width
 				min_width = @tooltip_fixed_width
 
-			custom_tooltip_textbox_with_empty_line = {
-				datacontext = "[Company.GetCompanyType]"
-				text = "DATA_COMPANY_TYPE_CATEGORY"
-			}
-
-			custom_tooltip_textbox = {
-				text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP"
-			}
-
-			flowcontainer = {
-				direction = horizontal
-				spacing = 5
-				datamodel = "[Company.GetBuildingTypes]"
-
-				item = {
-					company_building_item = {}
+				custom_tooltip_textbox_with_empty_line = {
+					datacontext = "[Company.GetCompanyType]"
+					text = "DATA_COMPANY_TYPE_CATEGORY"
 				}
-			}
+
+				custom_tooltip_textbox = {
+					text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP"
+				}
+
+				flowcontainer = {
+					direction = horizontal
+					spacing = 5
+					datamodel = "[Company.GetBuildingTypes]"
+
+					item = {
+						company_building_item = {}
+					}
+				}
 			}
 
 			flowcontainer = {
@@ -8373,7 +9947,7 @@ types TooltipTypes
 					spacing = 7
 					datacontext = "[Company.GetBuilding]"
 
-			custom_tooltip_textbox = {
+					custom_tooltip_textbox = {
 						raw_text = "[concept_company_hq]:"
 					}
 
@@ -8406,9 +9980,10 @@ types TooltipTypes
 						size = { 21 21 }
 						using = tooltip_above
 						tooltip = "GO_TO_BUTTON_CHARACTER"
-						onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
+						onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
 					}
 				}
+
 				flowcontainer = {
 					spacing = 7
 					visible = "[Not(IsDataModelEmpty(Company.GetPrestigeGoods))]"
@@ -8447,9 +10022,9 @@ types TooltipTypes
 				using = tooltip_segment_margin
 
 				custom_tooltip_textbox = {
-				text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP_PT2"
+					text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP_PT2"
+				}
 			}
-		}
 
 			flowcontainer = {
 				direction = vertical
@@ -8499,7 +10074,7 @@ types TooltipTypes
 					visible = "[Not(Or(Or(Or(Or(Company.HasAnyIndustryCharterActive, Company.HasAnyColonizationCharterActive), Company.HasAnyInvestmentCharterActive), Company.HasAnyMonopolyCharterActive), Company.HasAnyTradeCharterActive))]"
 					using = empty_state_text_properties
 					text = "NONE"
-			}
+				}
 			}
 
 			flowcontainer = {
@@ -8659,6 +10234,31 @@ types TooltipTypes
 			custom_tooltip_textbox = {
 				default_format = "#lore"
 				text = "DATA_COMPANY_CHARTER_TYPE_LORE" #todo - PRCAL-38246
+			}
+		}
+	}
+
+	type FancyTooltip_AIStrategicRegionStanceType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			raw_text = "[Country.GetAIStrategicRegionStanceTypeIn(StrategicRegion.Self).GetNameNoFormatting]"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "[Country.GetAIStrategicRegionStanceTypeIn(StrategicRegion.Self).GetIcon]"
+		}
+
+		blockoverride "type" {
+			text = "STRATEGIC_REGION_AI_STANCE_TYPE"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "STRATEGIC_REGION_AI_STANCE_TT_HEADER"
+			}
+			custom_tooltip_textbox = {
+				text = "[Country.GetAIStrategicRegionStanceDescIn(StrategicRegion.Self)]"
 			}
 		}
 	}
@@ -9087,6 +10687,152 @@ types TooltipTypes
 		}
 	}
 
+	type FancyTooltip_InterestTierType = FancyTooltipWidgetType {
+		blockoverride "text" {}
+
+		blockoverride "name" {
+			text = "[InterestTierType.GetNameNoFormatting]"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "[InterestTierType.GetIcon]"
+		}
+
+		blockoverride "type" {
+			text = "TOOLTIP_TYPE_INTEREST_TIER_TYPE"
+		}
+
+		blockoverride "tooltip_content_after"
+		{
+			custom_tooltip_textbox = {
+				text = "INTEREST_TIER_BOUNDS_DESC"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(InterestTierType.GetTradeAdvantageDesc))]"
+				margin_left = 10
+				text = "[InterestTierType.GetTradeAdvantageDesc]"
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				default_format = "#lore"
+				text = "[InterestTierType.GetDescription]"
+			}
+		}
+	}
+
+	type FancyTooltip_InterestTierTypeWithCountryAndStrategicRegionContext = FancyTooltipWidgetType {
+		blockoverride "text" {}
+
+		blockoverride "name" {
+			text = "[InterestTierType.GetNameNoFormatting]"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "[InterestTierType.GetIcon]"
+		}
+
+		blockoverride "type" {
+			text = "TOOLTIP_TYPE_INTEREST_TIER_TYPE"
+		}
+
+		blockoverride "tooltip_content_after"
+		{
+			custom_tooltip_textbox = {
+				visible = "[ObjectsEqual(InterestTierType.Self, Country.GetCurrentInterestTierTypeIn(StrategicRegion.Self).Self)]"
+				text = "INTEREST_TIER_ACTIVE"
+			}
+
+			custom_tooltip_textbox = {
+				text = "INTEREST_TIER_BOUNDS_DESC"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[EqualTo_CFixedPoint(Country.GetCurrentInvolvementIn(StrategicRegion.Self), Country.GetTargetInvolvementIn(StrategicRegion.Self))]"
+				text = "INTEREST_TIER_CURRENT_INVOLVEMENT_DESC"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(EqualTo_CFixedPoint(Country.GetCurrentInvolvementIn(StrategicRegion.Self), Country.GetTargetInvolvementIn(StrategicRegion.Self)))]"
+				text = "INTEREST_TIER_TARGET_INVOLVEMENT_DESC"
+			}
+
+			### EFFECTS
+			flowcontainer = {
+				direction = vertical
+				spacing = 2
+
+				custom_tooltip_textbox = {
+					text = "INTEREST_TIER_EFFECTS_TITLE"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(InterestTierType.GetStateModifier.GetDesc))]"
+					margin_left = 10
+					text = "[InterestTierType.GetStateModifier.GetDesc]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(InterestTierType.GetOnActivateEffectDesc(Country.Self, StrategicRegion.Self)))]"
+					margin_left = 10
+					text = "[InterestTierType.GetOnActivateEffectDesc(Country.Self, StrategicRegion.Self)]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(InterestTierType.GetTradeAdvantageDesc))]"
+					margin_left = 10
+					text = "[InterestTierType.GetTradeAdvantageDesc]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[And(And(StringIsEmpty(InterestTierType.GetOnActivateEffectDesc(Country.Self, StrategicRegion.Self)), StringIsEmpty(InterestTierType.GetStateModifier.GetDesc)), StringIsEmpty(InterestTierType.GetTradeAdvantageDesc))]"
+					margin_left = 10
+					text = "INTEREST_TIER_NO_EFFECT"
+				}
+			}
+
+			flowcontainer = {
+				direction = vertical
+				spacing = 2
+
+				visible = "[Not(StringIsEmpty(InterestTierType.GetOnDeactivateEffectDesc(Country.Self, StrategicRegion.Self)))]"
+
+				custom_tooltip_newline = {}
+
+				custom_tooltip_textbox = {
+					default_format = "#title"
+					text = "INTEREST_TIER_ON_DEACTIVATE_EFFECT"
+				}
+
+				custom_tooltip_textbox = {
+					margin_left = 10
+					text = "[InterestTierType.GetOnDeactivateEffectDesc(Country.Self, StrategicRegion.Self)]"
+				}
+			}
+
+			custom_tooltip_newline = {}
+
+			### INVOLVEMENT BREAKDOWN
+			custom_tooltip_textbox = {
+				text = "INTERST_TIER_INVOLVEMENT_BREAKDOWN_TITLE"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				margin_left = 10
+				text = "INTERST_TIER_INVOLVEMENT_BREAKDOWN"
+			}
+
+			tooltip_divider = {}
+
+			custom_tooltip_textbox = {
+				default_format = "#lore"
+				text = "[InterestTierType.GetDescription]"
+			}
+		}
+	}
+
     type FancyTooltip_LibertyDesireLevel = FancyTooltipWidgetType {
 		blockoverride "text" {
 			text = "DATA_LIBERTY_DESIRE_LEVEL_TOOLTIP"
@@ -9148,6 +10894,39 @@ types TooltipTypes
 
 		blockoverride "type" {
 			text = "[concept_battle_condition]"
+		}
+	}
+
+	type FancyTooltip_NavalBattleCondition = FancyTooltipWidgetType {
+		blockoverride "text" {}
+
+		blockoverride "icon_texture" {
+			texture = "[NavalBattleCondition.GetTexture]"
+		}
+
+		blockoverride "icon_size" {
+			size = { 100% 100% }
+		}
+
+		blockoverride "name" {
+			text = "[NavalBattleCondition.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_naval_battle_condition]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(StringIsEmpty(NavalBattleCondition.GetModifierDesc))]"
+				text = "[NavalBattleCondition.GetModifierDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(NavalBattleCondition.GetDesc))]"
+				default_format = "#lore"
+				text = "[NavalBattleCondition.GetDesc]"
+			}
 		}
 	}
 
@@ -9932,7 +11711,7 @@ types TooltipTypes
 		blockoverride "icon_frame" {}
 
 		blockoverride "name" {
-			text = "[MilitaryFormation.GetNameNoFormatting]"
+			text = "DATA_MILITARY_FORMATION_NAME"
 		}
 
 		blockoverride "type" {
@@ -9966,6 +11745,24 @@ types TooltipTypes
 					max_width = @tooltip_fixed_width
 					text = "SELECTED_STRATEGIC_OBJECTIVE"
 				}
+
+				flowcontainer = {
+					visible = "[MilitaryFormation.HasNavalMission]"
+					datacontext = "[MilitaryFormation.GetNavalMission]"
+					spacing = 5
+
+					icon = {
+						parentanchor = vcenter
+						size = { 30 30 }
+						texture = "[NavalMission.GetType.GetIcon]"
+					}
+
+					custom_tooltip_textbox = {
+						parentanchor = vcenter
+						max_width = @tooltip_fixed_width
+						text = "SELECTED_NAVAL_MISSION"
+					}
+				}
 			}
 
 			custom_tooltip_2_columns = {
@@ -9973,10 +11770,21 @@ types TooltipTypes
 					custom_tooltip_textbox_column_width = {
 						text = "DATA_MILITARY_FORMATION_UNITS"
 					}
+
+					custom_tooltip_textbox_column_width = {
+						visible = "[MilitaryFormation.GetFlagship.IsValid]"
+						text = "FLEET_FLAGSHIP_STATUS_IN_TOOLTIP"
+					}
 				}
 				blockoverride "right_column" {
 					custom_tooltip_textbox_column_width = {
+						visible = "[Not(MilitaryFormation.IsFleet)]"
 						text = "DATA_MILITARY_FORMATION_UPKEEP"
+					}
+					custom_tooltip_textbox_column_width = {
+						visible = "[MilitaryFormation.IsFleet]"
+						text = "DATA_MILITARY_FORMATION_FLEET_SUPPLY"
+						tooltip = "[MilitaryFormation.GetShipList.GetSupplyExpensesDesc]"
 					}
 				}
 			}
@@ -9985,90 +11793,152 @@ types TooltipTypes
 				blockoverride "bg" {}
 
 				blockoverride "left_column" {
-			flowcontainer = {
-				spacing = 5
+					flowcontainer = {
+						visible = "[MilitaryFormation.IsArmy]"
+						spacing = 5
 						margin_left = 1
 
-				manpower_bar = {
-					size = { 6 15 }
-					parentanchor = vcenter
-					alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
-				}
+						manpower_bar = {
+							size = { 6 15 }
+							parentanchor = vcenter
+							alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
+						}
 
-				DefaultTooltipTextBox = {
-					parentanchor = vcenter
-					align = nobaseline
-					autoresize = yes
-					multiline = yes
-					fonttintcolor = "[TooltipInfo.GetTintColor]"
-					text = "DATA_MILITARY_FORMATION_MANPOWER"
-				}
-			}
+						DefaultTooltipTextBox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							multiline = yes
+							fonttintcolor = "[TooltipInfo.GetTintColor]"
+							text = "DATA_MILITARY_FORMATION_MANPOWER"
+						}
+					}
 
-			flowcontainer = {
-				spacing = 5
+					flowcontainer = {
+						visible = "[MilitaryFormation.IsFleet]"
+						datacontext = "[MilitaryFormation.GetShipList]"
+						spacing = 5
 						margin_left = 1
 
-				organization_bar = {
-					tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
-					parentanchor = vcenter
-					size = { 6 15 }
+						hit_points_bar = {
+							size = { 6 18 }
+							parentanchor = vcenter
+							tooltip = "MILITARY_FORMATION_HIT_POINTS_TOOLTIP"
 
-					blockoverride "organization_value" {
-						value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+							blockoverride "hit_points_value" {
+								value = "[FixedPointToFloat(MilitaryFormation.GetHitPointsPercentage)]"
+							}
+							blockoverride "hit_points_color" {
+								color = "[GetMoraleColorVec(MilitaryFormation.GetHitPointsPercentage)]"
+							}
+							alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetHitPointsPercentage, '(CFixedPoint)1'))]"
+						}
+
+						DefaultTooltipTextBox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							multiline = yes
+							fonttintcolor = "[TooltipInfo.GetTintColor]"
+							text = "DATA_MILITARY_FORMATION_SHIP_HITPOINTS"
+						}
 					}
-					blockoverride "organization_color" {
-						color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
-					}
-					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
-				}
 
-				DefaultTooltipTextBox = {
-					parentanchor = vcenter
-					align = nobaseline
-					autoresize = yes
-					multiline = yes
-					fonttintcolor = "[TooltipInfo.GetTintColor]"
-					text = "DATA_MILITARY_FORMATION_ORGANIZATION"
-				}
-			}
-
-			flowcontainer = {
-				spacing = 5
+					flowcontainer = {
+						visible = "[MilitaryFormation.IsFleet]"
+						datacontext = "[MilitaryFormation.GetShipList]"
+						spacing = 5
 						margin_left = 1
 
-				morale_bar = {
-					size = { 6 15 }
-					parentanchor = vcenter
-					tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+						crew_bar = {
+							size = { 6 15 }
+							parentanchor = vcenter
+							alpha = "[TransparentIfTrue(EqualTo_int32(ShipList.GetCrewMax, ShipList.GetCrew))]"
+						}
 
-					blockoverride "morale_value" {
-						value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
+						DefaultTooltipTextBox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							multiline = yes
+							fonttintcolor = "[TooltipInfo.GetTintColor]"
+							text = "DATA_MILITARY_FORMATION_SHIP_CREW"
+						}
 					}
-					blockoverride "morale_color" {
-						color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
-					}
-					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetMorale, '(CFixedPoint)1'))]"
-				}
 
-				DefaultTooltipTextBox = {
-					parentanchor = vcenter
-					align = nobaseline
-					autoresize = yes
-					multiline = yes
-					fonttintcolor = "[TooltipInfo.GetTintColor]"
-					text = "DATA_MILITARY_FORMATION_MORALE"
-				}
-			}
+					flowcontainer = {
+						spacing = 5
+						margin_left = 1
+
+						organization_bar = {
+							tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+							parentanchor = vcenter
+							size = { 6 15 }
+							alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
+
+							blockoverride "organization_value" {
+								value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+							}
+
+							blockoverride "organization_color" {
+								color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+							}
+						}
+
+						DefaultTooltipTextBox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							multiline = yes
+							fonttintcolor = "[TooltipInfo.GetTintColor]"
+							text = "DATA_MILITARY_FORMATION_ORGANIZATION"
+						}
+					}
+
+					flowcontainer = {
+						visible = "[MilitaryFormation.IsArmy]"
+						spacing = 5
+						margin_left = 1
+
+						morale_bar = {
+							size = { 6 15 }
+							parentanchor = vcenter
+							tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+
+							blockoverride "morale_value" {
+								value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
+							}
+							blockoverride "morale_color" {
+								color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
+							}
+							alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetMorale, '(CFixedPoint)1'))]"
+						}
+
+						DefaultTooltipTextBox = {
+							parentanchor = vcenter
+							align = nobaseline
+							autoresize = yes
+							multiline = yes
+							fonttintcolor = "[TooltipInfo.GetTintColor]"
+							text = "DATA_MILITARY_FORMATION_MORALE"
+						}
+					}
 				}
 
 				blockoverride "right_column" {
 					maximumsize = { 305 -1 }
 
 					custom_tooltip_textbox_column_width = {
+						visible = "[MilitaryFormation.IsArmy]"
 						maximumsize = { 305 -1 }
-						text = "DATA_MILITARY_FORMATION_COLUMN_ONE"
-			}
+						text = "DATA_MILITARY_FORMATION_COLUMN_ONE_ARMY"
+					}
+
+					custom_tooltip_textbox_column_width = {
+						visible = "[MilitaryFormation.IsFleet]"
+						maximumsize = { 305 -1 }
+						text = "DATA_MILITARY_FORMATION_COLUMN_ONE_FLEET"
+					}
 				}
 			}
 
@@ -10089,18 +11959,21 @@ types TooltipTypes
 				direction = vertical
 
 				custom_tooltip_textbox = {
-					text = "concept_units"
+					visible = "[Not(IsDataModelEmpty(MilitaryFormation.GetCombatUnitEntries))]"
+					default_format = "#title"
+					text = "COMBAT_UNITS_CONCEPT"
 				}
 
 				flowcontainer = {
-					datamodel = "[MilitaryFormation.GetCombatUnitEntries]"
+					visible = "[Not(IsDataModelEmpty(MilitaryFormation.GetCombatUnitEntries))]"
 					spacing = 3
 					margin_left = -2
+					datamodel = "[MilitaryFormation.GetCombatUnitEntries]"
 
 					item = {
 						flowcontainer = {
-							datacontext = "[MilitaryFormationUnitEntry.GetUnitType]"
 							visible = "[GreaterThan_int32(MilitaryFormationUnitEntry.GetExpectedNumTotalUnits, '(int32)0')]"
+							datacontext = "[MilitaryFormationUnitEntry.GetUnitType]"
 							direction = vertical
 
 							background = {
@@ -10160,13 +12033,13 @@ types TooltipTypes
 
 									custom_tooltip_textbox = {
 										visible = "[MilitaryFormation.IsFleet]"
-				autoresize = yes
+										autoresize = yes
 										align = nobaseline
 										using = elide_fontsize_min
 										parentanchor = hcenter
-										text = "MILITARY_FORMATION_NUMBER_OF_FLOTILLAS"
-										tooltip = "UNIT_TYPE_FLOTILLAS_TOOLTIP_FOR_GUI"
-			}
+										text = "MILITARY_FORMATION_NUMBER_OF_SHIPS"
+										tooltip = "SHIP_TYPE_TOOLTIP_FOR_GUI"
+									}
 
 									custom_tooltip_textbox = {
 										visible = "[And( MilitaryFormation.IsArmy, Not( MilitaryFormation.HasRaisedConscripts ))]"
@@ -10198,6 +12071,245 @@ types TooltipTypes
 						}
 					}
 				}
+
+				custom_tooltip_textbox = {
+					visible = "[MilitaryFormation.IsFleet]"
+					text = "SHIPS_CONCEPT"
+				}
+
+				flowcontainer = {
+					wrap_count = 2
+					datacontext = "[MilitaryFormation.GetShipList]"
+
+					### SHIP TYPES - 6 or less
+					flowcontainer = {
+						visible = "[LessThan_int32(GetDataModelSize(ShipList.GetShipTemplates), '(int32)6')]"
+						datamodel = "[ShipList.GetShipTemplates]"
+						wrap_count = 2
+						spacing = 2
+
+						item = {
+							flowcontainer = {
+								visible = "[NotZero(ShipList.GetNumShipsOfTemplate(ShipTemplate.Self))]"
+
+								ship_silhouette_for_tooltips = {
+									datacontext = "[ShipTemplate.GetType]"
+
+									blockoverride "ship_type_name" {
+										text = "NUMBER_OF_SHIPS_OF_TEMPLATE_IN_FLEET"
+									}
+								}
+							}
+						}
+					}
+
+					### SHIP TYPES - More than 6
+					flowcontainer = {
+						visible = "[GreaterThan_int32(GetDataModelSize(ShipList.GetShipTemplates), '(int32)6')]"
+						datamodel = "[DataModelFirst(ShipList.GetShipTemplates, '(int32)6')]"
+						wrap_count = 2
+						spacing = 2
+
+						item = {
+							flowcontainer = {
+								visible = "[NotZero(ShipList.GetNumShipsOfTemplate(ShipTemplate.Self))]"
+
+								ship_silhouette_for_tooltips = {
+									datacontext = "[ShipTemplate.GetType]"
+
+									blockoverride "ship_type_name" {
+										text = "NUMBER_OF_SHIPS_OF_TEMPLATE_IN_FLEET"
+									}
+								}
+							}
+						}
+					}
+
+					### Additional ship types number
+					textbox = {
+						visible = "[GreaterThan_int32(GetDataModelSize(ShipList.GetShipTemplates), '(int32)6')]"
+						autoresize = yes
+						align = nobaseline
+						parentanchor = vcenter
+						raw_text = "#v [GetDataModelSize(DataModelSkipFirst(ShipList.GetShipTemplates, '(int32)6'))|=]#!"
+
+						tooltipwidget = {
+							RegularTooltip_AdditionalShipTypes = {
+								blockoverride "header_text" {
+									text = "MORE_THAN_6_SHIP_TEMPLATES_TOOLTIP_FLEET"
+								}
+
+								blockoverride "datamodel" {
+									datamodel = "[DataModelSkipFirst(ShipList.GetShipTemplates, '(int32)6')]"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				visible = "[And( MilitaryFormation.IsFleet, Not( IsDataModelEmpty( MilitaryFormation.GetTransportedFormations ) ) )]"
+				using = tooltip_segment_background
+				using = tooltip_segment_margin
+				min_width = @tooltip_fixed_width
+				direction = vertical
+
+				custom_tooltip_textbox = {
+					default_format = "#title"
+					text = "FLEET_TRANSPORTED_ARMIES_HEADER"
+				}
+
+				flowcontainer = {
+					direction = vertical
+					datamodel = "[MilitaryFormation.GetTransportedFormations]"
+
+					item = {
+						flowcontainer = {
+							spacing = 5
+							margin = { 2 2 }
+
+							icon = {
+								parentanchor = vcenter
+								size = { 24 24 }
+								texture = "[MilitaryFormation.GetFlag]"
+								color = "[MilitaryFormation.GetFlagColor]"
+							}
+
+							DefaultTooltipTextBox = {
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								max_width = 160
+								elide = right
+								fontsize_min = 12
+								fonttintcolor = "[TooltipInfo.GetTintColor]"
+								text = "[MilitaryFormation.GetNameNoFormatting]"
+							}
+
+							button_icon_goto = {
+								parentanchor = vcenter
+								size = { 25 25 }
+								tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+								onclick = "[InformationPanelBar.OpenMilitaryFormationPanel(MilitaryFormation.Self)]"
+
+								blockoverride "icon_size" {
+									size = { 100% 100% }
+								}
+							}
+
+							DefaultTooltipTextBox = {
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								fonttintcolor = "[TooltipInfo.GetTintColor]"
+								raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
+							}
+
+							manpower_bar = {
+								size = { 6 15 }
+								parentanchor = vcenter
+								alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
+							}
+
+							organization_bar = {
+								tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+								parentanchor = vcenter
+								size = { 6 15 }
+
+								blockoverride "organization_value" {
+									value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+								}
+								blockoverride "organization_color" {
+									color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+								}
+								alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
+							}
+						}
+					}
+				}
+			}
+
+			flowcontainer = {
+				visible = "[And( MilitaryFormation.IsFleet, Not( IsDataModelEmpty( MilitaryFormation.GetAttachedFormations ) ) )]"
+				using = tooltip_segment_background
+				using = tooltip_segment_margin
+				min_width = @tooltip_fixed_width
+				direction = vertical
+
+				custom_tooltip_textbox = {
+					default_format = "#title"
+					text = "FLEET_EMBARKED_ARMIES_HEADER"
+				}
+
+				flowcontainer = {
+					direction = vertical
+					datamodel = "[MilitaryFormation.GetAttachedFormations]"
+
+					item = {
+						flowcontainer = {
+							spacing = 5
+							margin = { 2 2 }
+
+							icon = {
+								parentanchor = vcenter
+								size = { 24 24 }
+								texture = "[MilitaryFormation.GetFlag]"
+								color = "[MilitaryFormation.GetFlagColor]"
+							}
+
+							DefaultTooltipTextBox = {
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								max_width = 160
+								elide = right
+								fontsize_min = 12
+								fonttintcolor = "[TooltipInfo.GetTintColor]"
+								text = "[MilitaryFormation.GetNameNoFormatting]"
+							}
+
+							button_icon_goto = {
+								parentanchor = vcenter
+								size = { 25 25 }
+								tooltip = "GO_TO_BUTTON_MILITARY_FORMATION"
+								onclick = "[InformationPanelBar.OpenMilitaryFormationPanel(MilitaryFormation.Self)]"
+
+								blockoverride "icon_size" {
+									size = { 100% 100% }
+								}
+							}
+
+							DefaultTooltipTextBox = {
+								parentanchor = vcenter
+								align = nobaseline
+								autoresize = yes
+								fonttintcolor = "[TooltipInfo.GetTintColor]"
+								raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
+							}
+
+							manpower_bar = {
+								size = { 6 15 }
+								parentanchor = vcenter
+								alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
+							}
+
+							organization_bar = {
+								tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+								parentanchor = vcenter
+								size = { 6 15 }
+
+								blockoverride "organization_value" {
+									value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+								}
+								blockoverride "organization_color" {
+									color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+								}
+								alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
+							}
+						}
+					}
+				}
 			}
 
 			flowcontainer = {
@@ -10207,109 +12319,104 @@ types TooltipTypes
 				direction = vertical
 
 				custom_tooltip_textbox = {
-					visible = "[IsDataModelEmpty(MilitaryFormation.GetCommanders)]"
+					visible = "[Not(MilitaryFormation.HasCommander)]"
 					text = "NO_COMMANDERS_IN_MILITARY_FORMATION"
 				}
 
 				custom_tooltip_textbox = {
-				visible = "[Not(IsDataModelEmpty(MilitaryFormation.GetCommanders))]"
-				text = "MILITARY_FORMATION_COMMANDERS_TOOLTIP_TITLE"
-			}
+					visible = "[MilitaryFormation.HasCommander]"
+					text = "MILITARY_FORMATION_COMMANDERS_TOOLTIP_TITLE"
+				}
 
-			dynamicgridbox = {
-				visible = "[Not(IsDataModelEmpty(MilitaryFormation.GetCommanders))]"
-				datamodel = "[MilitaryFormation.GetCommanders]"
+				flowcontainer = {
+					visible = "[MilitaryFormation.HasCommander]"
+					datacontext = "[MilitaryFormation.GetCommander]"
+					spacing = 5
 
-				item = {
-					flowcontainer = {
-						spacing = 5
+					icon = {
+						visible = "[MilitaryFormation.IsArmy]"
+						datacontext = "[Character.GetOrderType]"
+						parentanchor = vcenter
+						size = { 40 40 }
+						texture = "[CommanderOrderType.GetTexture]"
 
-						icon = {
-							datacontext = "[Character.GetOrderType]"
-							parentanchor = vcenter
-							size = { 40 40 }
-							texture = "[CommanderOrderType.GetTexture]"
-							tooltipwidget = {
-								FancyTooltip_CommanderOrderType = {
-									blockoverride "text_before" {
-										using = visible_if_either_current_or_next_order
-										text =  "NEXT_OR_CURRENT_ORDER"
-										margin_bottom = 15
-									}
+						tooltipwidget = {
+							FancyTooltip_CommanderOrderType = {
+								blockoverride "text_before" {
+									using = visible_if_either_current_or_next_order
+									text =  "NEXT_OR_CURRENT_ORDER"
+									margin_bottom = 15
 								}
 							}
-
-							icon = {
-								visible = "[Not(CommanderOrderType.IsBasicOrderType)]"
-								parentanchor = bottom
-								position = { -4 4 }
-								size = { 20 20 }
-								texture = "gfx/interface/icons/generic_icons/most_senior_front_commander.dds"
-							}
 						}
 
 						icon = {
-							visible = "[Character.GetNextOrderType.IsValid]"
-							parentanchor = vcenter
-							size = { 25 25 }
-							texture = "gfx/interface/icons/generic_icons/turns_into.dds"
+							visible = "[Not(CommanderOrderType.IsBasicOrderType)]"
+							parentanchor = bottom
+							position = { -4 4 }
+							size = { 20 20 }
+							texture = "gfx/interface/icons/generic_icons/most_senior_front_commander.dds"
 						}
+					}
 
-						icon = {
-							visible = "[Character.GetNextOrderType.IsValid]"
-							datacontext = "[Character.GetNextOrderType]"
-							parentanchor = vcenter
-							size = { 40 40 }
-							texture = "[CommanderOrderType.GetTexture]"
-							tooltipwidget = {
-								FancyTooltip_CommanderOrderType = {
-									blockoverride "text_before" {
-										using = visible_if_either_current_or_next_order
-										text =  "NEXT_OR_CURRENT_ORDER"
-										margin_bottom = 15
-									}
+					icon = {
+						visible = "[And(Character.GetNextOrderType.IsValid, MilitaryFormation.IsArmy)]"
+						parentanchor = vcenter
+						size = { 25 25 }
+						texture = "gfx/interface/icons/generic_icons/turns_into.dds"
+					}
+
+					icon = {
+						visible = "[And(Character.GetNextOrderType.IsValid, MilitaryFormation.IsArmy)]"
+						datacontext = "[Character.GetNextOrderType]"
+						parentanchor = vcenter
+						size = { 40 40 }
+						texture = "[CommanderOrderType.GetTexture]"
+
+						tooltipwidget = {
+							FancyTooltip_CommanderOrderType = {
+								blockoverride "text_before" {
+									using = visible_if_either_current_or_next_order
+									text =  "NEXT_OR_CURRENT_ORDER"
+									margin_bottom = 15
 								}
 							}
-
-							icon = {
-								visible = "[Not(CommanderOrderType.IsBasicOrderType)]"
-								parentanchor = bottom
-								position = { -4 4 }
-								size = { 20 20 }
-								texture = "gfx/interface/icons/generic_icons/most_senior_front_commander.dds"
-							}
 						}
 
-						character_portrait_small = {
-							blockoverride "portrait_button_onrightclick" {}
-
-							blockoverride "commander_order_icon" {}
+						icon = {
+							visible = "[And(Not(CommanderOrderType.IsBasicOrderType), MilitaryFormation.IsArmy)]"
+							parentanchor = bottom
+							position = { -4 4 }
+							size = { 20 20 }
+							texture = "gfx/interface/icons/generic_icons/most_senior_front_commander.dds"
 						}
+					}
 
-						DefaultTooltipTextBox = {
-							parentanchor = vcenter
-							text = "[Character.GetFullName]"
-							align = nobaseline
-							autoresize = yes
-							multiline = yes
-							maximumsize = { 500 -1 }
-							fonttintcolor = "[TooltipInfo.GetTintColor]"
+					character_portrait_small = {
+						blockoverride "portrait_button_onrightclick" {}
+					}
+
+					DefaultTooltipTextBox = {
+						parentanchor = vcenter
+						text = "[Character.GetFullName]"
+						align = nobaseline
+						autoresize = yes
+						multiline = yes
+						maximumsize = { 500 -1 }
+						fonttintcolor = "[TooltipInfo.GetTintColor]"
+					}
+
+					button_icon_goto = {
+						parentanchor = vcenter
+						size = { 30 30 }
+						onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
+						tooltip = "GO_TO_BUTTON_CHARACTER"
+
+						blockoverride "icon_size" {
+							size = { 100% 100% }
 						}
-
-						button_icon_goto = {
-							parentanchor = vcenter
-							size = { 30 30 }
-
-							blockoverride "icon_size" {
-								size = { 100% 100% }
-							}
-
- 							onclick = "[InformationPanelBar.OpenCommanderPanel(Character.AccessSelf)]"
-							tooltip = "GO_TO_BUTTON_CHARACTER"
- 						}
 					}
 				}
-			}
 			}
 
 			flowcontainer = {
@@ -10320,25 +12427,48 @@ types TooltipTypes
 				direction = vertical
 				visible = "[MilitaryFormation.IsArmy]"
 
-			military_formation_mobilize_button = {
-				parentanchor = hcenter
+				military_formation_mobilize_button = {
+					parentanchor = hcenter
 
-				blockoverride "size" {
-						size = { 500 50 }
-				}
+					blockoverride "size" {
+							size = { 500 50 }
+					}
 
-				blockoverride "button_size" {
-						size = { 485 75% }
-				}
+					blockoverride "button_size" {
+							size = { 485 75% }
+					}
 
-				blockoverride "fontsize" {}
+					blockoverride "fontsize" {}
 
-				blockoverride "mobilization_icon_size" {
-					size = { 50 50 }
+					blockoverride "mobilization_icon_size" {
+						size = { 50 50 }
+					}
 				}
 			}
 		}
-	}
+		flowcontainer = {
+			min_width = @tooltip_fixed_width
+			max_width = @tooltip_fixed_width
+			direction = vertical
+			visible = "[InDebugMode]"
+
+			DefaultTooltipTextBox = {
+				text = "[MilitaryFormation.GetCommonDebugInfo]"
+				align = nobaseline
+				autoresize = yes
+				multiline = yes
+				maximumsize = { 500 -1 }
+			}
+
+			DefaultTooltipTextBox = {
+				visible = "[Not(MilitaryFormation.GetCountry.IsPlayer)]"
+				text = "[MilitaryFormation.GetAIDebugInfo]"
+				align = nobaseline
+				autoresize = yes
+				multiline = yes
+				maximumsize = { 500 -1 }
+			}
+		}
 	}
 
 	type FancyTooltip_MilitaryFormation_MapMarker = FancyTooltip_MilitaryFormation {
@@ -10435,6 +12565,109 @@ types TooltipTypes
         }
 	}
 
+	type FancyTooltip_NavalMissionType = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			texture = "[NavalMissionType.GetIcon]"
+		}
+
+		blockoverride "name" {
+			raw_text = "[NavalMissionType.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_naval_mission]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			block "naval_mission_tooltip_desc" {
+				custom_tooltip_textbox = {
+					visible = "[Not(StringIsEmpty(GetDesc(CreateNavalMissionsForSelectedFleets(NavalMissionType.AccessSelf))))]"
+					text = "[GetDesc(CreateNavalMissionsForSelectedFleets(NavalMissionType.AccessSelf))]"
+				}
+
+				custom_tooltip_newline = {
+					visible = "[Not(StringIsEmpty(GetDesc(CreateNavalMissionsForSelectedFleets(NavalMissionType.AccessSelf))))]"
+				}
+			}
+
+			custom_tooltip_textbox = {
+				text = "[NavalMissionType.GetDesc]"
+			}
+
+			custom_tooltip_newline = {
+				visible = "[Or(Not(NavalMissionType.GetModifier.IsEmpty), Not(NavalMissionType.GetCommandModifier.IsEmpty))]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Or(Not(NavalMissionType.GetModifier.IsEmpty), Not(NavalMissionType.GetCommandModifier.IsEmpty))]"
+				default_format = "#title"
+				text = "MODIFIERS_HEADER"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(NavalMissionType.GetModifier.IsEmpty)]"
+				margin_left = 10
+				text = "[NavalMissionType.GetModifier.GetDesc]"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(NavalMissionType.GetCommandModifier.IsEmpty)]"
+				margin_left = 10
+				text = "[NavalMissionType.GetCommandModifier.GetDesc]"
+			}
+		}
+	}
+
+	type FancyTooltip_NavalMission = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "icon_texture" {
+			texture = "[NavalMission.GetType.GetIcon]"
+		}
+
+		blockoverride "name" {
+			raw_text = "[NavalMission.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_naval_mission]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				text = "[NavalMission.GetType.GetDesc]"
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				text = "NAVAL_MISSION_FLEET_DESC"
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				text = "NAVAL_MISSION_SEA_REGIONS_LIST"
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(NavalMission.GetType.GetModifier.IsEmpty)]"
+				default_format = "#title"
+				text = "MODIFIERS_HEADER"
+			}
+
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(NavalMission.GetType.GetModifier.IsEmpty)]"
+				margin_left = 10
+				text = "[NavalMission.GetType.GetModifier.GetDesc]"
+			}
+		}
+	}
+
 	type FancyTooltip_DiplomaticAction = FancyTooltipWidgetType {
 		blockoverride "text" {
 			text = "DATA_DIPLOMATIC_ACTION_NAME_TOOLTIP"
@@ -10479,6 +12712,376 @@ types TooltipTypes
         blockoverride "type" {
             text = "DATA_DIPLOMATIC_ACTION_PACT_OR_ONGOING_ACTION"
         }
+	}
+
+	type FancyTooltip_Strait = FancyTooltipWidgetType {
+		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
+
+		blockoverride "name" {
+			text = "[Strait.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "TOOLTIP_TYPE_STRAIT"
+		}
+
+		blockoverride "go_to_button_visibility" {
+			visible = yes
+		}
+
+		blockoverride "go_to_button_properties" {
+			onclick = "[InformationPanelBar.OpenStraitPanel(Strait.AccessSelf)]"
+		}
+
+		blockoverride "icon_texture" {
+			texture = "gfx/interface/icons/state_trait_icons/straits.dds"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox_fixed_width = {
+				visible = "[Not( IsObserver )]"
+
+				text = "STRAIT_ACCESS_PLAYER"
+			}
+
+			custom_tooltip_textbox_fixed_width = {
+				visible = "[Or(Strait.GetFirstState.GetController.IsLocalPlayer, Strait.GetSecondState.GetController.IsLocalPlayer)]"
+				text = "STRAIT_TOLLS_PLAYER"
+			}
+
+			custom_tooltip_newline = {}
+
+			custom_tooltip_2_columns = {
+				blockoverride "left_column" {
+
+
+					flowcontainer = {
+						direction = vertical
+						datacontext = "[Strait.GetFirstState]"
+						datacontext = "[Strait.GetFirstController]"
+
+						custom_tooltip_textbox_column_width = {
+							raw_text = "#b [State.GetController.GetFlagTextIcon] [State.GetName]#!"
+						}
+
+						flowcontainer = {
+				    		visible = "[State.GetBuilding('building_naval_fortification').IsValid]"
+				    		parentanchor = hcenter
+
+							icon = {
+								size = { 60 60 }
+								parentanchor = vcenter
+								texture = "[State.GetBuilding('building_naval_fortification').GetIcon]"
+							}
+
+							flowcontainer = {
+								direction = vertical
+								spacing = 2
+
+								button = {
+									size = { 180 30 }
+									using = default_button
+
+									textbox = {
+										parentanchor = vcenter
+										margin_left = 10
+										autoresize = yes
+										align = nobaseline
+										max_width = 175
+										text = "[State.GetBuilding('building_naval_fortification').GetNameNoFormatting]"
+									}
+								}
+
+								building_controls = {
+									datacontext = "[State.GetBuilding('building_naval_fortification')]"
+									parentanchor = right
+								}
+							}
+						}
+
+						flowcontainer = {
+				    		visible = "[Not(State.GetBuilding('building_naval_fortification').IsValid)]"
+				    		parentanchor = hcenter
+				    		tooltip = "NO_NAVAL_FORTIFICATION_TOOLTIP"
+
+							icon = {
+								size = { 60 60 }
+								parentanchor = vcenter
+								alpha = 0.3
+								texture = "[GetBuildingType('building_naval_fortification').GetIcon]"
+							}
+
+							flowcontainer = {
+								direction = vertical
+								spacing = 2
+
+								button = {
+									size = { 180 30 }
+									using = default_button
+									enabled = no
+
+									textbox = {
+										parentanchor = vcenter
+										margin_left = 10
+										autoresize = yes
+										align = nobaseline
+										max_width = 175
+										text = "[GetBuildingType('building_naval_fortification').GetNameNoFormatting]"
+									}
+								}
+
+								building_controls = {
+									datacontext = "[State.GetBuilding('building_naval_fortification')]"
+									parentanchor = right
+								}
+							}
+						}
+
+						widget = {
+							size = { 5 5 }
+						}
+
+						flowcontainer = {
+							alpha = "[TransparentIfTrue(IsZero(State.GetBuilding('building_naval_fortification').GetExpansionLevel))]"
+							direction = vertical
+
+							### Tolls - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_TOLL_TOOLTIP"
+
+								blockoverride "first_text" {
+									raw_text = "[concept_tolls]"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateTollIcon(State.Self)]"
+								}
+
+								blockoverride "second_text" {
+									raw_text = "#b [Strait.GetStateTollStatus(State.Self)]#!"
+								}
+							}
+
+							### Strait Access - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_ACCESS_TOOLTIP"
+
+								blockoverride "first_text" {
+									raw_text = "[concept_strait_access]"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateStraitAccessIcon(State.Self)]"
+								}
+
+								blockoverride "second_text" {
+									raw_text = "#b [Strait.GetStateStraitAccessStatus(State.Self)]#!"
+								}
+							}
+
+							### Strait Access - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_ALLOWED_COUNTRIES_TOOLTIP"
+
+								blockoverride "first_text" {
+									text = "ALLOWED_COUNTRIES_SHORT_CONCEPT"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateAllowedCountriesIcon(State.Self)]"
+								}
+
+								blockoverride "whole_icon" {
+									icon = {
+										visible = "[Not(Strait.IsAllowedCountriesOnlyController(State.Self))]"
+										size = { 24 24 }
+										texture = "[Strait.GetStateAllowedCountriesIcon(State.Self)]"
+									}
+
+									widget = {
+										visible = "[Strait.IsAllowedCountriesOnlyController(State.Self)]"
+										size = { 24 24 }
+
+										miniature_flag_no_interact = {
+											visible = "[State.GetController.IsSubject]"
+											parentanchor = vcenter
+											datacontext = "[State.GetController.GetTopOverlord]"
+
+											blockoverride "is_player_glow" {
+												visible = no
+											}
+										}
+
+										miniature_flag_no_interact = {
+											visible = "[Not(State.GetController.IsSubject)]"
+											parentanchor = vcenter
+											datacontext = "[State.GetController]"
+
+											blockoverride "is_player_glow" {
+												visible = no
+											}
+										}
+									}
+								}
+
+								blockoverride "second_text" {
+									raw_text = "#b [Strait.GetStateAllowedCountriesStatus(State.Self)]#!"
+								}
+							}
+
+							divider_clean = {}
+						}
+					}
+				}
+
+				blockoverride "right_column" {
+					flowcontainer = {
+						direction = vertical
+						datacontext = "[Strait.GetSecondState]"
+						datacontext = "[Strait.GetSecondController]"
+
+						custom_tooltip_textbox_column_width = {
+							raw_text = "#b [State.GetController.GetFlagTextIcon] [State.GetName]#!"
+						}
+
+						flowcontainer = {
+				    		visible = "[State.GetBuilding('building_naval_fortification').IsValid]"
+				    		parentanchor = hcenter
+
+							icon = {
+								size = { 60 60 }
+								parentanchor = vcenter
+								texture = "[State.GetBuilding('building_naval_fortification').GetIcon]"
+							}
+
+							flowcontainer = {
+								direction = vertical
+								spacing = 2
+
+								button = {
+									size = { 180 30 }
+									using = default_button
+
+									textbox = {
+										parentanchor = vcenter
+										margin_left = 10
+										autoresize = yes
+										align = nobaseline
+										max_width = 175
+										text = "[State.GetBuilding('building_naval_fortification').GetNameNoFormatting]"
+									}
+								}
+
+								building_controls = {
+									datacontext = "[State.GetBuilding('building_naval_fortification')]"
+									parentanchor = right
+								}
+							}
+						}
+
+						flowcontainer = {
+				    		visible = "[Not(State.GetBuilding('building_naval_fortification').IsValid)]"
+				    		parentanchor = hcenter
+				    		tooltip = "NO_NAVAL_FORTIFICATION_TOOLTIP"
+
+							icon = {
+								size = { 60 60 }
+								parentanchor = vcenter
+								alpha = 0.3
+								texture = "[GetBuildingType('building_naval_fortification').GetIcon]"
+							}
+
+							flowcontainer = {
+								direction = vertical
+								spacing = 2
+
+								button = {
+									size = { 180 30 }
+									using = default_button
+									enabled = no
+
+									textbox = {
+										parentanchor = vcenter
+										margin_left = 10
+										autoresize = yes
+										align = nobaseline
+										max_width = 175
+										text = "[GetBuildingType('building_naval_fortification').GetNameNoFormatting]"
+									}
+								}
+
+								building_controls = {
+									datacontext = "[State.GetBuilding('building_naval_fortification')]"
+									parentanchor = right
+								}
+							}
+						}
+
+						widget = {
+							size = { 5 5 }
+						}
+
+						flowcontainer = {
+							alpha = "[TransparentIfTrue(IsZero(State.GetBuilding('building_naval_fortification').GetExpansionLevel))]"
+							direction = vertical
+
+							### Tolls - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_TOLL_TOOLTIP"
+
+								blockoverride "first_text" {
+									raw_text = "[concept_tolls]"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateTollIcon(State.Self)]"
+								}
+
+								blockoverride "second_text" {
+									raw_text = "#b [Strait.GetStateTollStatus(State.Self)]#!"
+								}
+							}
+
+							### Strait Access - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_ACCESS_TOOLTIP"
+
+								blockoverride "first_text" {
+									raw_text = "[concept_strait_access]"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateStraitAccessIcon(State.Self)]"
+								}
+
+								blockoverride "second_text" {
+									text = "#b [Strait.GetStateStraitAccessStatus(State.Self)]#!"
+								}
+							}
+
+							### Strait Access - First State
+							custom_tooltip_2_columns_text_values = {
+								tooltip = "STRAIT_ALLOWED_COUNTRIES_TOOLTIP"
+
+								blockoverride "first_text" {
+									text = "ALLOWED_COUNTRIES_SHORT_CONCEPT"
+								}
+
+								blockoverride "icon_texture" {
+									texture = "[Strait.GetStateAllowedCountriesIcon(State.Self)]"
+								}
+
+								blockoverride "second_text" {
+									text = "#b [Strait.GetStateAllowedCountriesStatus(State.Self)]#!"
+								}
+							}
+
+							divider_clean = {}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	### THIS SHOULD ONLY BE USED IN GENERIC PLACES AND NEVER ON BUTTONS FOR THE DIPLOMATIC ACTION

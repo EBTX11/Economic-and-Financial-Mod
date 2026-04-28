@@ -12,8 +12,8 @@
  PRESTIGE_FROM_PRESTIGE_GOODS_LEADERBOARDS: "#tooltippable #tooltip:[Country.GetTooltipTag],PRESTIGE_FROM_PRESTIGE_GOODS_LEADERBOARDS_BREAKDOWN #v $VAL|+=$#!#!#! from being leading [Concept('concept_prestige_good', '$concept_prestige_goods$')] producer"
  PRESTIGE_FROM_PRESTIGE_GOODS_LEADERBOARDS_BREAKDOWN: "[Country.GetPrestigeGoodsLeaderboardDesc]"
  NO_PRESTIGE_RANKING:0 "This [concept_country] has no [concept_prestige] ranking due to #variable $COUNTRY_TYPE$#! status"
- ARMY_POWER_PROJECTION_DESC:0 "#header $ADJECTIVE$ Army [concept_power_projection]: $VALUE|v0$#!\n$TOOLTIP_DELIMITER$\n$DETAILS$"
- NAVY_POWER_PROJECTION_DESC:0 "#header $ADJECTIVE$ Navy [concept_power_projection]: $VALUE|v0$#!\n$TOOLTIP_DELIMITER$\n$DETAILS$"
+ ARMY_POWER_PROJECTION_DESC: "#tooltip_header [concept_power_projection]#!\n$VALUE|Dv$ for the $ADJECTIVE$ Army\n$TOOLTIP_DELIMITER$\n$DETAILS$"
+ NAVY_POWER_PROJECTION_DESC: "#tooltip_header [concept_power_projection]#!\n$VALUE|Dv$ for the $ADJECTIVE$ Navy\n$TOOLTIP_DELIMITER$\n$DETAILS$"
  great_power:1 "[concept_great_power]"
  great_power_desc:0 "[concept_great_power_desc]"
  major_power:1 "[concept_major_power]"
@@ -245,6 +245,7 @@
  PLAYER_MIGHT_ACCEPT_DESC:0 "[DiplomaticAction.GetSecondCountry.GetName] is a player ([DiplomaticAction.GetSecondCountry.GetPlayedByDesc]), and will decide for themselves if they accept or not"
  AI_WILL_ACCEPT_ENTRY_FORMAT:1 "$SCRIPT_VALUE_KEY_AFTER_FORMAT$"
  AI_DIPLOMATIC_PLAY_SUPPORT_FORMAT: "$VALUE|+=0$ from $KEY$"
+ AI_REGION_STANCE_STRATEGY_VALUE_FORMAT: "$VALUE|+=0$ from $KEY$"
 
  DIPLOMATIC_ACCEPTANCE_TREATY_FAIRNESS: "from perceived fairness of current [Concept('concept_treaty', '$concept_treaties$')]"
  DIPLOMATIC_ACCEPTANCE_RELATIONS:1 "from [SCOPE.GetRootScope.GetCountry.GetAdjectiveNoFormatting]-[SCOPE.sCountry('actor').GetAdjectiveNoFormatting] [concept_relations] being [SCOPE.GetRootScope.GetCountry.GetRelationsWithDesc(SCOPE.sCountry('actor'))]"
@@ -362,6 +363,9 @@
  DIPLOMATIC_ACCEPTANCE_UNTRUSTWORTHY_COUNTRY: "$modifier_untrustworthy_country$"
  DIPLOMATIC_ACCEPTANCE_GIFT: "from being happy to be gifted this [concept_treaty]"
  DIPLOMATIC_ACCEPTANCE_BINDING_PERIOD: "from [concept_binding_period]"
+ DIPLOMATIC_ACCEPTANCE_SHIP_VALUE: "from the $concept_construction$ value of the ship"
+ DIPLOMATIC_ACCEPTANCE_SHIP_OBSOLETE: "from the ship being obsolete for them"
+ DIPLOMATIC_ACCEPTANCE_ONE_SIDED_SHIP_TRADE: "from refusing to trade away a ship for nothing in return"
  DIPLOMATIC_ACCEPTANCE_DEAL_IS_WORSE: "from the renegotiated treaty being worse for them"
  DIPLOMATIC_ACCEPTANCE_BASE_ADDITIONAL: "from base $concept_article$ #b reluctance#!"
  DIPLOMATIC_ACCEPTANCE_COLONIAL_INTEREST: "from colonial interest in the [concept_strategic_region]"
@@ -389,6 +393,11 @@
  DIPLOMATIC_ACCEPTANCE_TRADE_SUBJECT_SOURCE: "from offered $concept_subject$"
  DIPLOMATIC_ACCEPTANCE_TRADE_SUBJECT_TARGET: "from ceding $concept_subject$"
  DIPLOMATIC_ACCEPTANCE_TRADE_SUBJECT_REJECT: "from #b not#! wanting this $concept_subject$"
+ DIPLOMATIC_ACCEPTANCE_NAVAL_HOSTILITIES_PAST_DAMAGE: "damage inflicted by [SCOPE.sCountry('other_country').GetName] in previous [concept_naval_hostilities]"
+ DIPLOMATIC_ACCEPTANCE_NAVAL_HOSTILITIES_RANK: "higher [concept_rank] than [SCOPE.sCountry('other_country').GetName]"
+ DIPLOMATIC_ACCEPTANCE_NAVAL_VULNERABILITY: "[concept_world_market] reliance, coastal $GDP_SHORT$ and naval [concept_prestige]"
+
+ DIPLOMATIC_ACCEPTANCE_OPIUM_DEALER: "from #b 'No, we want to sell you opium'#!"
 
  LOBBY_OPPORTUNITY_BONUS: "from an opportunity bonus from Pro-[SCOPE.GetRootScope.GetCountry.GetAdjectiveNoFormatting] [Concept('concept_political_lobby', '$concept_political_lobbies_short$')]"
  AT_WAR_WITH_UNFRIENDLY_COUNTRY: "from us being at [concept_war] with a mutually hostile [concept_country]"
@@ -434,8 +443,8 @@
  DIPLO_ACTION_REVERSE_PENDING:0 "Their proposal is pending approval"
  DIPLO_PACT_RELATIONS_CHANGE_POS: "[concept_relations] will improve by #g +1#! in $DAYS|v$ days. Total progress is #v $PROGRESS_DAILY|%+=2$#! per day" #translation note: followed by: , due to  and some listed modifiers
  DIPLO_PACT_RELATIONS_CHANGE_NEG: "[concept_relations] will worsen by #r -1#! in $DAYS|v$ days. Total progress is #v $PROGRESS_DAILY|%+=2$#! per day" #translation note: followed by: , due to  and some listed modifiers
- DIPLO_PACT_RELATIONS_NO_CHANGE: "[concept_relations] will currently remain unchanged. Total progress is #v $PROGRESS_DAILY|%+=0$#! per day" #translation note: followed by: , due to  and some listed modifiers
- DIPLO_ACTION_FORCED_DURATION:0 "We cannot break this [Concept('concept_diplomatic_pact','$concept_diplomatic_pact_short$')] for another $TIME_LEFT$ ($DATE$)"
+ DIPLO_PACT_INVOLVEMENT_CHANGE: "Currently increasing the [concept_involvement] of [TARGET_COUNTRY.GetName] by a maximum of $AMOUNT|v0$ in all [Concept('concept_strategic_region', '$concept_strategic_regions$')] where [COUNTRY.GetName] is [Concept('concept_local_country', '$concept_local_country_short$')]"
+ DIPLO_PACT_RELATIONS_NO_CHANGE: "[concept_relations] will currently remain unchanged. Total progress is #v $PROGRESS_DAILY|%+=0$#! per day" #translation note: followed by: , due to  and some listed modifiers DIPLO_ACTION_FORCED_DURATION:0 We cannot break this [Concept('concept_diplomatic_pact','$concept_diplomatic_pact_short$')] for another $TIME_LEFT$ ($DATE$)
  DIPLOMATIC_PACT_HEADER:0 "#header [DiplomaticPact.GetName]#!"
  DIPLOMATIC_PACT_DESC:0 "[DiplomaticPact.GetDesc]"
  DIPLOMATIC_PACT_TOOLTIP:0 "$DIPLOMATIC_PACT_HEADER$\n$TOOLTIP_DELIMITER$\n$DIPLOMATIC_PACT_DESC$"
@@ -1962,7 +1971,7 @@
  goods_transfer_effects_desc: "• Establishes a deal between two [Concept('concept_country', '$concept_countries$')] where one $concept_country$ agrees to send a fixed sum of [Concept('concept_good', '$concept_goods$')] to the other $concept_country$ on a weekly basis"
  goods_transfer_article_short_desc: "[SOURCE_COUNTRY.GetNameNoFormatting] transfers $concept_goods$ to [TARGET_COUNTRY.GetNameNoFormatting] every week"
  TREATY_DRAFT_ARTICLE_FLAG_IS_GOODS_TRANSFER_EFFECT: "• [SOURCE_COUNTRY.GetName] transfers [AddTextIf(ArticleDraft.GetGoods.IsValid, ArticleDraft.GetGoods.GetTextIcon)]#v [ArticleDraft.GetQuantity|D]#! [AddTextIf(ArticleDraft.GetGoods.IsValid, ArticleDraft.GetGoods.GetName)][AddLocalizationIf(Not(ArticleDraft.GetGoods.IsValid), 'concept_goods')] to [TARGET_COUNTRY.GetName] every week"
- TREATY_ARTICLE_FLAG_IS_GOODS_TRANSFER_EFFECT: "• [SOURCE_COUNTRY.GetName] is transferring [AddTextIf(Article.GetGoods.IsValid, Article.GetGoods.GetTextIcon)]#v [Article.GetQuantity|D]#! [AddTextIf(Article.GetGoods.IsValid, Article.GetGoods.GetName)][AddLocalizationIf(Not(Article.GetGoods.IsValid), 'concept_goods')] to [TARGET_COUNTRY.GetName] every week"
+ TREATY_ARTICLE_FLAG_IS_GOODS_TRANSFER_EFFECT: "• [SOURCE_COUNTRY.GetName] is transferring [AddTextIf(Article.GetGoods.IsValid, Article.GetGoods.GetTextIcon)][Nbsp]#v [Article.GetQuantity|D]#! [AddTextIf(Article.GetGoods.IsValid, Article.GetGoods.GetNameNoIcon)][AddLocalizationIf(Not(Article.GetGoods.IsValid), 'concept_goods')] to [TARGET_COUNTRY.GetName] every week"
 
  military_access: "Military Access"
  military_access_desc: ""
@@ -2058,6 +2067,34 @@
  TREATY_DRAFT_ARTICLE_FLAG_IS_INVESTMENT_RIGHTS_EFFECT: "• Allows [TARGET_COUNTRY.GetName] to build in [SOURCE_COUNTRY.GetName]"
  TREATY_ARTICLE_FLAG_IS_INVESTMENT_RIGHTS_EFFECT: "• Allows [TARGET_COUNTRY.GetName] to build in [SOURCE_COUNTRY.GetName]"
 
+ strait_access: "Strait Access"
+ strait_access_desc: ""
+ strait_access_effects_desc: "• Establishes an agreement between two [Concept('concept_country', '$concept_countries$')] where one $concept_country$ is granted full access through straits controlled by the other $concept_country$"
+ strait_access_article_short_desc: "[TARGET_COUNTRY.GetNameNoFormatting] is granted access through $concept_straits$ controlled by [SOURCE_COUNTRY.GetNameNoFormatting]"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_STRAIT_ACCESS_EFFECT: "• [TARGET_COUNTRY.GetName] is granted access through $concept_straits$ controlled by [SOURCE_COUNTRY.GetName]"
+ TREATY_ARTICLE_FLAG_IS_STRAIT_ACCESS_EFFECT: "• [TARGET_COUNTRY.GetName] is granted access through [Concept('concept_strait', '$concept_straits$')] controlled by [SOURCE_COUNTRY.GetName]"
+
+ no_strait_closure: "No Strait Closure"
+ no_strait_closure_desc: ""
+ no_strait_closure_effects_desc: "• Establishes an agreement between two [Concept('concept_country', '$concept_countries$')] where one $concept_country$ agrees to not restrict access to any [Concept('concept_strait', '$concept_straits$')] it controls."
+ no_strait_closure_article_short_desc: "[SOURCE_COUNTRY.GetNameNoFormatting] will #bold_black not#! restrict access to $concept_straits$ it controls"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_NO_STRAIT_CLOSURE_EFFECT: "• [SOURCE_COUNTRY.GetName] will #bold_black not#! restrict access to [Concept('concept_strait', '$concept_straits$')] it controls"
+ TREATY_ARTICLE_FLAG_IS_NO_STRAIT_CLOSURE_EFFECT: "• [SOURCE_COUNTRY.GetName] will #bold_black not#! restrict access to [Concept('concept_strait', '$concept_straits$')] it controls"
+
+ toll_exemption: "Toll Exemption"
+ toll_exemption_desc: ""
+ toll_exemption_effects_desc: "• Exempts a [concept_country] from paying [concept_tolls] to the other $concept_country$."
+ toll_exemption_article_short_desc: "Exempts [TARGET_COUNTRY.GetNameNoFormatting] from paying $concept_tolls$ to [SOURCE_COUNTRY.GetNameNoFormatting]"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_TOLL_EXEMPTION_EFFECT: "• Exempts [TARGET_COUNTRY.GetName] from paying [concept_tolls] to [SOURCE_COUNTRY.GetName]"
+ TREATY_ARTICLE_FLAG_IS_TOLL_EXEMPTION_EFFECT: "• Exempts [TARGET_COUNTRY.GetName] from paying [concept_tolls] to [SOURCE_COUNTRY.GetName]"
+
+ no_tolls: "No Tolls"
+ no_tolls_desc: ""
+ no_tolls_effects_desc: "• Establishes an agreement between two [Concept('concept_country', '$concept_countries$')] where one $concept_country$ agrees to not impose [concept_tolls] on any [Concept('concept_strait', '$concept_straits$')] it controls."
+ no_tolls_article_short_desc: "[SOURCE_COUNTRY.GetNameNoFormatting] will #bold_black not#! impose $concept_tolls$ on any $concept_straits$ it controls"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_NO_TOLLS_EFFECT: "• [SOURCE_COUNTRY.GetName] will #b not#! impose [concept_tolls] on [Concept('concept_strait', '$concept_straits$')]"
+ TREATY_ARTICLE_FLAG_IS_NO_TOLLS_EFFECT: "• [SOURCE_COUNTRY.GetName] will #b not#! impose [concept_tolls] on [Concept('concept_strait', '$concept_straits$')]"
+
  alliance: "Alliance"
  alliance_desc: ""
  alliance_effects_desc: "• Establishes an [concept_alliance] between two [Concept('concept_country', '$concept_countries$')]\n• Both [Concept('concept_country', '$concept_countries$')] may march their [Concept('concept_army', '$concept_armies$')] through the territory of their [concept_ally]"
@@ -2114,6 +2151,20 @@
  TREATY_DRAFT_ARTICLE_FLAG_IS_MILITARY_ASSISTANCE_EFFECT: "• [SOURCE_COUNTRY.GetName] will grant $military_assistance$ to [TARGET_COUNTRY.GetName]"
  TREATY_ARTICLE_FLAG_IS_MILITARY_ASSISTANCE_EFFECT: "• [SOURCE_COUNTRY.GetName] is granting $military_assistance$ to [TARGET_COUNTRY.GetName]"
 
+ non_piracy_agreement: "Non-Piracy Agreement"
+ non_piracy_agreement_desc: ""
+ non_piracy_agreement_effects_desc: "• An agreement where one $concept_country$ stops engaging in [concept_piracy] against the other [concept_country]"
+ non_piracy_agreement_article_short_desc: "[SOURCE_COUNTRY.GetNameNoFormatting] stops engaging in $concept_piracy$ against [TARGET_COUNTRY.GetNameNoFormatting]"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_NON_PIRACY_AGREEMENT_EFFECT: "• $non_piracy_agreement_article_short_desc$"
+ TREATY_ARTICLE_FLAG_IS_NON_PIRACY_AGREEMENT_EFFECT: "• $non_piracy_agreement_article_short_desc$"
+
+ abandon_piracy: "Abandon Piracy"
+ abandon_piracy_desc: ""
+ abandon_piracy_effects_desc: "• An agreement where one $concept_country$ abandons $concept_piracy$"
+ abandon_piracy_article_short_desc: "[SOURCE_COUNTRY.GetNameNoFormatting] abandons $concept_piracy$"
+ TREATY_DRAFT_ARTICLE_FLAG_IS_ABANDON_PIRACY_GLOBAL_EFFECT: "• $abandon_piracy_article_short_desc$"
+ TREATY_ARTICLE_FLAG_IS_ABANDON_PIRACY_GLOBAL_EFFECT: "• $abandon_piracy_article_short_desc$"
+
  recognize_independence: "Recognize Independence"
  recognize_independence_desc: ""
  recognize_independence_effects_desc: "• An agreement where #b $SPA$#! will formally recognize the independence of her formal colony"
@@ -2131,6 +2182,10 @@
  TREATY_RELATIONS_CHANGE_EFFECT_NEG: "• Reduces [concept_relations] by #n -1#! every #tooltippable #tooltip:[GetRawTextTooltipTag('$BREAKDOWN$')] #variable $DAYS|v$#!#!#! days$CAPDESC$"
  ARTICLE_TYPE_RELATIONS_EFFECT_POS: "• Improves [concept_relations] by #g +1#! every $DAYS|v$ days$CAPDESC$"
  ARTICLE_TYPE_RELATIONS_EFFECT_NEG: "• Reduces [concept_relations] by #n -1#! every $DAYS|v$ days$CAPDESC$"
+ ARTICLE_TYPE_INVOLVEMENT_EFFECT_SOURCE: "• Increases the [concept_involvement] of the target [concept_country] by a maximum of $AMOUNT|v0$ in all [Concept('concept_strategic_region', '$concept_strategic_regions$')] where the source $concept_country$ is [Concept('concept_local_country', '$concept_local_country_short$')]"
+ ARTICLE_TYPE_INVOLVEMENT_EFFECT_TARGET: "• Increases the [concept_involvement] of the source [concept_country] by a maximum of $AMOUNT|v0$ in all [Concept('concept_strategic_region', '$concept_strategic_regions$')] where the target $concept_country$ is [Concept('concept_local_country', '$concept_local_country_short$')]"
+ ARTICLE_TYPE_INVOLVEMENT_EFFECT_MUTUAL: "• Increases the [concept_involvement] of both [Concept('concept_country', '$concept_countries$')] by a maximum of $AMOUNT|v0$ in all [Concept('concept_strategic_region', '$concept_strategic_regions$')] where the other $concept_country$ is [Concept('concept_local_country', '$concept_local_country_short$')]"
+ ARTICLE_INVOLVEMENT_EFFECT: "• Increases the [concept_involvement] of [TARGET_COUNTRY.GetName] by a maximum of $AMOUNT|v0$ in all [Concept('concept_strategic_region', '$concept_strategic_regions$')] where [SOURCE_COUNTRY.GetName] is [Concept('concept_local_country', '$concept_local_country_short$')]"
  TREATY_RELATIONS_EFFECT_BASE_VALUE: "#v $VAL|%2=+$#! base value"
  TREATY_RELATIONS_BREAKDOWN_FORMAT: "#header [concept_relations] progress#!\n#v $DAYS$#! days to [SelectLocalization( LessThan_CFixedPoint( '(CFixedPoint)$PROGRESS_DAILY|5$', '(CFixedPoint)0' ), '#r -', '#g ' )]100%#!\n$TOOLTIP_DELIMITER$\n#v $PROGRESS_DAILY|%2=+$#! daily progress due to:\n$BREAKDOWN$"
 
@@ -2149,6 +2204,17 @@
  TREATY_DRAFT_OWE_OBLIGATION_ALREADY_EFFECTUATED: "@red_cross! The [Concept('concept_obligation', '$concept_obligations$')] exchange sanctioned by this [concept_treaty] has already taken place, either because the original [concept_binding_period] has expired, or because $INTERVAL$ passed since it originally entered into force on $DATE|v$"
  TREATY_DRAFT_OWE_OBLIGATION_ALREADY_ASKING: "@red_cross! [COUNTRY.GetName] cannot promise an [concept_obligation] to [OTHER_COUNTRY.GetName] at the same time that [OTHER_COUNTRY.GetName] is promising an obligation to [COUNTRY.GetName]"
 
+ THREATEN_NAVAL_HOSTILITIES: "Threaten [concept_naval_hostilities]"
+ THREATEN_NAVAL_HOSTILITIES_TOOLTIP: "#header Threaten [COUNTRY.GetName] with [concept_naval_hostilities]#!\n#tooltippable;tooltip:$ACCEPTANCE_BREAKDOWN$ $ACCEPTANCE_VAL|+=$#! to [COUNTRY.GetAdjective] acceptance\n\n$INCIDENT_DESC$\n\nIf our proposal is rejected, temporary [concept_naval_hostilities] will commence for $DURATION|v$ days.\n\n@information! $THREATEN_HOSTILITIES_NO_NEGOTIATION$"
+ THREATEN_NAVAL_HOSTILITIES_ACCEPTANCE: "#tooltippable;tooltip:$BREAKDOWN$ $VALUE|D+=$#! from threatening [concept_naval_hostilities]"
+ THREATEN_NAVAL_HOSTILITIES_ALREADY_PENDING: "We already have a pending [concept_treaty] proposal threatening [concept_naval_hostilities]"
+ THREATEN_NAVAL_HOSTILITIES_ON_COOLDOWN: "We have recently threatened this country with [concept_naval_hostilities], we can do so again on $DATE|v$ ($DAYS|v$ days)"
+ THREATEN_NAVAL_HOSTILITIES_SUBJECT_PROTECTED: "[TARGET_COUNTRY.GetName] is protected by [COUNTRY.GetName]"
+ THREATEN_NAVAL_HOSTILITIES_NOTIFICATION: "[COUNTRY.GetName] will commence [concept_naval_hostilities] if this [concept_treaty] proposal is refused!"
+
+ THREATEN_HOSTILITIES_NO_NEGOTIATION: "Negotiation is disabled for proposals backed by threats. The proposal must be accepted or rejected outright."
+ THREATEN_NAVAL_HOSTILITIES_NAVY_MUST_BE_STRONGER: "We must have a stronger navy than [SCOPE.sCountry('other_country').GetName] (Currently [SCOPE.GetRootScope.GetCountry.GetRelativeNavyCombatPower(SCOPE.sCountry('other_country'))|%v] of theirs)"
+ THREATEN_NAVAL_HOSTILITIES_NOT_LANDLOCKED: "[SCOPE.sCountry('other_country').GetName] must have a $coastal_state$"
  TREATY_OPTIONS_VALIDATE_NO_ARTICLES_TO_CREATE: "Add at least one [concept_article]"
 
  support_separatism: "Support Separatism"
@@ -2197,8 +2263,33 @@
  INFAMY_QUANTITY_FACTOR: "Input quantity"
  INFAMY_MONEY_TRANSFER_QUANTITY_ROOT_HAS_ALREADY_ESTABLISHED_FACTOR: "Input quantity of Money Transfer [Concept('concept_article', '$concept_articles$')] [SCOPE.GetRootScope.GetCountry.GetName]"
  INFAMY_TARGET_COUNTRY_DEDUCTION_FACTOR: "[Concept('concept_diplomatic_play', '$concept_diplomatic_plays$')] targeting [SCOPE.GetRootScope.GetCountry.GetNameNoFormatting] enforcing Money Transfer [Concept('concept_article', '$concept_articles$')]"
+ INFAMY_FROM_LOYAL_SUBJECT: "[SCOPE.sCountry('target_country').GetName] is a $ai_attitude_loyal$ subject of [ROOT.GetCountry.GetName]"
+ INFAMY_FROM_REBELLIOUS_SUBJECT: "[SCOPE.sCountry('target_country').GetName] is a $ai_attitude_rebellious$ subject of [ROOT.GetCountry.GetName]"
+ INFAMY_MINIMUM_VALUE: "Reached minimum $concept_infamy$ for this $concept_war_goal$"
 
  MANEUVERS_BASE_VALUE: "Base Value"
  MANEUVERS_TARGET_COUNTRY_POPULATION_FACTOR: "[SCOPE.sCountry('target_country').GetAdjectiveNoFormatting] total [Concept('concept_pop', '$concept_population$')] of [SCOPE.sCountry('target_country').GetTotalPopulation|Dv]"
  MANEUVERS_QUANTITY_FACTOR: "Input quantity"
- MANEUVERS_TARGET_STATE_POPULATION_FACTOR: "[SCOPE.sState('target_state').GetAdjectiveNoFormatting] total [Concept('concept_pop', '$concept_population$')] of [SCOPE.sState('target_state').GetPopulationSize|Dv]"
+ MANEUVERS_TARGET_STATE_POPULATION_FACTOR: "[SCOPE.sState('target_state').GetName] total [Concept('concept_pop', '$concept_population$')] of [SCOPE.sState('target_state').GetPopulationSize|Dv]"
+
+ orchestrate_coup:0 "Orchestrate Coup"
+ orchestrate_coup_action_name:0 "Orchestrate Coup"
+ orchestrate_coup_action_propose_name:0 "Orchestrate Coup"
+ orchestrate_coup_desc: "Orchestrates a [concept_coup] attempt by a friendly [concept_political_lobby] in the target country, at the cost of [concept_infamy]."
+ orchestrate_coup_action_notification_name:0 "Coup Orchestrated"
+ orchestrate_coup_action_notification_desc:2 "[INITIATOR_COUNTRY.GetName] is colluding with a pro-[INITIATOR_COUNTRY.GetAdjectiveNoFlag] [concept_political_lobby] to arrange a [concept_coup] in our country. Their [concept_attitude] towards [GetPlayer.GetName] is #tooltippable #tooltip:[INITIATOR_COUNTRY.GetTooltipTag],COUNTRY_ATTITUDE_TOOLTIP [INITIATOR_COUNTRY.GetAttitudeTowards(GetPlayer).GetName]#!#!."
+ orchestrate_coup_action_break_name: "Stop Orchestrating Coup"
+ orchestrate_coup_pact_desc: "[SCOPE.GetRootScope.GetDiplomaticPact.GetFirstCountry.GetName] is colluding with a pro-[SCOPE.GetRootScope.GetDiplomaticPact.GetFirstCountry.GetAdjectiveNoFlag] [concept_political_lobby] to arrange a [concept_coup] in [SCOPE.GetRootScope.GetDiplomaticPact.GetSecondCountry.GetName]."
+ orchestrate_coup_action_notification_break_name: "[INITIATOR_COUNTRY.GetName] stopped Orchestrating [concept_coup]"
+ orchestrate_coup_action_notification_break_desc: "[INITIATOR_COUNTRY.GetName] has ceased orchestrating a [concept_coup] in our [concept_country]."
+
+ COUP_IS_ONGOING_TT: "The orchestrated [concept_coup] is underway"
+
+ begin_coup_tt: "[SCOPE.sCharacter('orchestrated_coupist').GetPrimaryRoleTitle] [SCOPE.sCharacter('orchestrated_coupist').GetFullName] will begin a [concept_coup] to install a pro-[ROOT.GetCountry.GetName] in [SCOPE.sCountry('target_country').GetName]"
+ begin_coup_scopeless_tt: "A [SCOPE.sCountry('target_country').GetAdjective] [concept_commander] will begin a [concept_coup] to install a pro-[ROOT.GetCountry.GetAdjective] government in [SCOPE.sCountry('target_country').GetNameNoFlag]"
+
+ lobby_is_friendly_tt: "[Concept('concept_political_lobby', '$concept_political_lobby_short$')] endorses [ROOT.GetCountry.GetName]"
+ HAS_PRO_LOBBY: "[SCOPE.sCountry('target_country').GetName] has a Pro-[SCOPE.sCountry('actor').GetAdjective] [concept_political_lobby]"
+
+ revoke_coup_support_tt: "Would revoke support for the ongoing [concept_coup], likely leading to the $concept_coup$ #b failing#!, or being #b aborted#!"
+ orchestrate_coup_warning_tt: "@warning! If the [concept_coup] #b fails#! or is #b aborted#!, a negative [concept_diplomatic_catalyst] will be triggered with [SCOPE.sCountry('target_country').GetName]"

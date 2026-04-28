@@ -1,0 +1,1120 @@
+﻿@panel_width_minus_10 = 530
+@panel_width = 540
+@panel_width_half = 270
+@panel_width_plus_10 = 550
+@panel_width_plus_14 = 554
+@panel_width_plus_14_half = 277
+@panel_width_plus_20 = 560
+@panel_width_plus_30 = 570
+@panel_width_plus_70 = 610
+
+
+
+types strait_panel_types
+{
+    type strait_panel = default_block_window_two_lines
+    {
+        name = "strait_panel"
+        datacontext = "[StraitPanel.GetStrait]"
+
+        blockoverride "window_header_name" {
+			text = "[LabelingHelper.CapitalizeOnlyFirst(Strait.GetNameNoFormatting)]"
+
+			tooltipwidget = {
+				FancyTooltip_Strait = {}
+			}
+		}
+
+        blockoverride "window_header_name_line_two" {
+			text = "[concept_strait]"
+		}
+
+		blockoverride "animation_state_block" {
+			state = {
+				name = _show
+				using = straits_panel_open_sound
+			}
+
+			state = {
+				name = _hide
+				#using = straits_access_close_sound # there is no straits_panel_closed_sound
+			}
+		}
+
+		blockoverride "scrollarea_content" {
+
+			flowcontainer = {
+				parentanchor = hcenter|vcenter
+				direction = vertical
+
+				### TOP PART
+				top_illu = {
+					blockoverride "illu" {
+						texture = "gfx/interface/illustrations/top_illus/top_illu_navy.dds"
+					}
+
+					size = { @panel_width_plus_20 130 }
+
+					flowcontainer = {
+						parentanchor = center
+						direction = vertical
+						spacing = 2
+
+						textbox = {
+							parentanchor = hcenter
+							autoresize = yes
+							margin_top = 8
+							align = nobaseline
+							text = "[concept_strait_access]"
+						}
+
+						textbox = {
+							parentanchor = hcenter
+							autoresize = yes
+							margin_top = -5
+							align = nobaseline
+							using = fontsize_xl
+							text = "[Strait.GetAccessStatusFor(GetPlayer.Self)]"
+						}
+						icon = {
+							visible = "[Strait.HasOpenAccess(GetPlayer.Self)]"
+							parentanchor = hcenter
+							size = { 50 50 }
+							texture = "[Strait.GetAccessOpenIcon]"
+						}
+
+						icon = {
+							visible = "[Strait.HasNoMilitaryAccess(GetPlayer.Self)]"
+							parentanchor = hcenter
+							size = { 50 50 }
+							texture = "[Strait.GetAccessNoMilitaryIcon]"
+						}
+
+						icon = {
+							visible = "[Strait.HasNoAccess(GetPlayer.Self)]"
+							parentanchor = hcenter
+							size = { 50 50 }
+							texture = "[Strait.GetAccessClosedIcon]"
+						}
+					}
+
+				}
+
+				### Naval Fortification
+				flowcontainer = {
+					parentanchor = hcenter
+					spacing = 5
+					margin_top = 1
+					margin_bottom = 5
+
+					### Left side - Controller is a Subject
+					strait_state_and_fortification = {
+						visible = "[State.GetController.IsSubject]"
+						datacontext = "[Strait.GetFirstState]"
+						datacontext = "[State.GetController.GetTopOverlord]"
+					}
+
+					### Left side - Controller is not a Subject
+					strait_state_and_fortification = {
+						visible = "[Not(State.GetController.IsSubject)]"
+						datacontext = "[Strait.GetFirstState]"
+						datacontext = "[State.GetController]"
+					}
+
+					vertical_divider_strongest_full = {}
+
+					### Right side - Controller is a Subject
+					strait_state_and_fortification = {
+						visible = "[State.GetController.IsSubject]"
+						datacontext = "[Strait.GetSecondState]"
+						datacontext = "[State.GetController.GetTopOverlord]"
+					}
+
+					### Right side - Controller is not a Subject
+					strait_state_and_fortification = {
+						visible = "[Not(State.GetController.IsSubject)]"
+						datacontext = "[Strait.GetSecondState]"
+						datacontext = "[State.GetController]"
+					}
+				}
+
+				divider_stronger_full = {}
+
+				### Strait controls & info
+				flowcontainer = {
+					parentanchor = hcenter
+					spacing = 5
+
+					### Left side - Controller is a Subject
+					strait_state_info = {
+						visible = "[State.GetController.IsSubject]"
+						datacontext = "[Strait.GetFirstState]"
+						datacontext = "[State.GetController.GetTopOverlord]"
+					}
+
+					### Left side - Controller is not a Subject
+					strait_state_info = {
+						visible = "[Not(State.GetController.IsSubject)]"
+						datacontext = "[Strait.GetFirstState]"
+						datacontext = "[State.GetController]"
+					}
+
+					vertical_divider_strongest_full = {}
+
+					### Right side - Controller is a Subject
+					strait_state_info = {
+						visible = "[State.GetController.IsSubject]"
+						datacontext = "[Strait.GetSecondState]"
+						datacontext = "[State.GetController.GetTopOverlord]"
+					}
+
+					### Right side - Controller is not a Subject
+					strait_state_info = {
+						visible = "[Not(State.GetController.IsSubject)]"
+						datacontext = "[Strait.GetSecondState]"
+						datacontext = "[State.GetController]"
+					}
+				}
+
+				### Trade through strait
+				flowcontainer = {
+					direction = vertical
+					parentanchor = hcenter
+					margin_top = 10
+
+					default_header_clean_faded = {
+						size = { @panel_width 44 }
+
+						blockoverride "text" {
+							text = "STRAIT_TRADE_HEADER"
+						}
+					}
+
+
+					flowcontainer = {
+						visible = "[Not(IsDataModelEmpty(StraitPanel.GetTradedGoods))]"
+						direction = vertical
+
+						flowcontainer = {
+							sort_button = {
+								onclick = "[StraitPanel.Sort('name')]"
+								tooltip = "SORT_BY_MARKET_GOODS"
+								size = { 50 20 }
+
+								button = {
+									texture = "gfx/interface/buttons/sort_button_icons/sort_icon_good.dds"
+									size = { 25 25 }
+									parentanchor = center
+									alwaystransparent = yes
+								}
+							}
+
+							sort_button = {
+								text = "concept_trade"
+								onclick = "[StraitPanel.Sort('amount')]"
+								size = { 70 20 }
+								align = hcenter|nobaseline
+								elide = right
+							}
+
+							sort_button = {
+								text = "IMPORTS"
+								enabled = no
+								size = { 210 20 }
+								align = hcenter|nobaseline
+								elide = right
+							}
+
+							sort_button = {
+								text = "EXPORTS"
+								enabled = no
+								size = { 210 20 }
+								align = hcenter|nobaseline
+								elide = right
+							}
+						}
+
+						flowcontainer = {
+							direction = vertical
+							datamodel = "[StraitPanel.GetTradedGoods]"
+
+							item = {
+								strait_traded_goods_item = {}
+							}
+						}
+					}
+					textbox = {
+						margin_top = 10
+						margin_bottom = 10
+						visible = "[IsDataModelEmpty(StraitPanel.GetTradedGoods)]"
+						autoresize = yes
+						parentanchor = hcenter
+						align = center|nobaseline
+						using = fontsize_xxl
+						text = "STRAIT_NO_TRADE"
+						using = empty_state_text_properties
+					}
+				}
+			}
+		}
+    }
+
+    ### State and Naval Fortification
+    type strait_state_and_fortification = flowcontainer {
+    	direction = vertical
+
+    	default_header_clean_faded = {
+			size = { 270 44 }
+
+			blockoverride "text" {
+				using = elide_fontsize_min
+				max_width = 270
+				raw_text = "[State.GetController.GetFlagTextIcon][Nbsp][State.GetName]"
+			}
+
+			blockoverride "text_mod" {
+				size = { 100% 100% }
+				max_width = 240
+			}
+
+			blockoverride "additional_items_right_of_text" {
+				button_icon_goto = {
+					size = { 26 26 }
+					using = tooltip_above
+					tooltip = "GO_TO_BUTTON_STATE"
+					onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+				}
+			}
+		}
+
+    	flowcontainer = {
+    		visible = "[State.GetBuilding('building_naval_fortification').IsValid]"
+    		parentanchor = hcenter
+    		margin_top = 10
+
+			icon = {
+				size = { 80 80 }
+				parentanchor = vcenter
+				texture = "[State.GetBuilding('building_naval_fortification').GetIcon]"
+			}
+
+			flowcontainer = {
+				direction = vertical
+				spacing = 5
+				margin_top = -4
+				margin_left = 2
+
+				button = {
+					size = { 180 40 }
+					using = default_button
+
+					textbox = {
+						parentanchor = vcenter
+						margin_left = 10
+						autoresize = yes
+						align = nobaseline
+						max_width = 175
+						text = "[State.GetBuilding('building_naval_fortification').GetNameNoFormatting]"
+					}
+				}
+
+				building_controls = {
+					datacontext = "[State.GetBuilding('building_naval_fortification')]"
+				}
+			}
+		}
+
+		flowcontainer = {
+    		visible = "[Not(State.GetBuilding('building_naval_fortification').IsValid)]"
+    		parentanchor = hcenter
+    		tooltip = "NO_NAVAL_FORTIFICATION_TOOLTIP"
+    		margin_top = 10
+
+			icon = {
+				size = { 80 80 }
+				parentanchor = vcenter
+				alpha = 0.3
+				texture = "[GetBuildingType('building_naval_fortification').GetIcon]"
+			}
+
+			flowcontainer = {
+				direction = vertical
+				spacing = 5
+				margin_top = -4
+				margin_left = 2
+
+				button = {
+					size = { 180 40 }
+					using = default_button
+					enabled = no
+
+					textbox = {
+						parentanchor = vcenter
+						margin_left = 10
+						autoresize = yes
+						align = nobaseline
+						max_width = 175
+						text = "[GetBuildingType('building_naval_fortification').GetNameNoFormatting]"
+					}
+				}
+
+				building_controls = {
+					datacontext = "[State.GetBuilding('building_naval_fortification')]"
+				}
+			}
+		}
+	}
+
+	 ### Strait State's specific info
+    type strait_state_info = flowcontainer {
+    	direction = vertical
+
+    	### Tolls
+    	strait_state_info_item = {}
+
+    	divider_clean = {}
+
+    	### Strait Access
+    	strait_state_info_item = {
+    		blockoverride "highlight_visibility" {
+				visible = "[Strait.StateHasMostSevereStraitAccess(State.Self)]"
+			}
+
+    		blockoverride "strait_state_info_tooltip" {
+				tooltip = "STRAIT_ACCESS_TOOLTIP"
+			}
+
+    		blockoverride "label" {
+				text = "[concept_strait_access]"
+			}
+
+			blockoverride "status" {
+				text = "[Strait.GetStateStraitAccessStatus(State.Self)]"
+			}
+
+			blockoverride "controller" {
+				hbox = {
+					layoutpolicy_horizontal = expanding
+
+					expand = {}
+
+					strait_access_controller = {
+						datacontext = "[State.GetController]"
+					}
+				}
+			}
+
+			blockoverride "not_controller" {
+				icon = {
+					size = { 40 40 }
+					texture = "[Strait.GetStateStraitAccessIcon(State.Self)]"
+				}
+			}
+    	}
+
+    	divider_clean = {}
+
+    	### Allowed Countries
+    	strait_state_info_item = {
+    		alpha = "[TransparentIfTrue(Or(IsZero(State.GetBuilding('building_naval_fortification').GetExpansionLevel),  Strait.IsOpen))]"
+
+    		blockoverride "highlight_visibility" {
+				visible = "[Strait.StateHasMostSevereAllowedCountries(State.Self)]"
+			}
+
+    		blockoverride "strait_state_info_tooltip" {
+				tooltip = "STRAIT_ALLOWED_COUNTRIES_TOOLTIP"
+			}
+
+    		blockoverride "label" {
+				text = "[concept_strait_allowed_countries]"
+			}
+
+			blockoverride "status" {
+				text = "[Strait.GetStateAllowedCountriesStatus(State.Self)]"
+			}
+
+			blockoverride "controller" {
+				hbox = {
+					layoutpolicy_horizontal = expanding
+
+					expand = {}
+
+					strait_allowed_countries_controller = {
+						datacontext = "[State.GetController]"
+					}
+				}
+			}
+
+			blockoverride "not_controller" {
+				icon = {
+					visible = "[Not(Strait.IsAllowedCountriesOnlyController( State.Self ))]"
+					size = { 40 40 }
+					texture = "[Strait.GetStateAllowedCountriesIcon(State.Self)]"
+				}
+				flag_icon = {
+					visible = "[Strait.IsAllowedCountriesOnlyController( State.Self )]"
+					size = { 40 26 }
+					framesize = "[GetMediumFlagFrameSize]"
+
+					block "flag_definition" {
+						texture = "[Country.GetFlag.GetMediumFlagTexture]"
+						frame = "[Country.GetFlag.GetMediumFlagFrame]"
+					}
+
+					block "flag_tooltip" {
+						tooltipwidget = {
+							FancyTooltip_Country = {}
+						}
+					}
+				}
+			}
+    	}
+    }
+
+	type building_controls = container {
+		minimumsize = { 180 35 }
+		using = building_size_tooltip_with_ownership
+
+
+		background = {
+			using = entry_bg
+			margin = { -3 -1 }
+		}
+
+		building_size_with_ownership = {
+			parentanchor = center
+		}
+
+		### DOWNSIZE
+		button_icon_minus_action = {
+			visible = "[And5(Building.GetOwner.IsLocalPlayer, Building.IsValid, Building.IsDownsizeable, Not( ShouldAskConfirmation( Building.Downsize )), Not(Building.IsMilitaryBuilding))]"
+			size = { 28 28 }
+			parentanchor = vcenter
+			position = { 5 0 }
+			tooltip = "[Building.GetDownsizeTooltip]"
+			onclick = "[Execute( Building.Downsize )]"
+			enabled = "[IsValid( Building.Downsize )]"
+			using = tooltip_below
+		}
+
+		### DOWNSIZE WITH CONFIRMATION
+		button_icon_minus_action = {
+			visible = "[And5(Building.GetOwner.IsLocalPlayer, Building.IsValid, Building.IsDownsizeable, ShouldAskConfirmation(Building.Downsize), Not(Building.IsMilitaryBuilding))]"
+			size = { 28 28 }
+			parentanchor = vcenter
+			position = { 5 0 }
+			tooltip = "[Building.GetDownsizeTooltip]"
+			onclick = "[PopupManager.AskConfirmation( Building.Downsize )]"
+			enabled = "[IsValid( Building.Downsize )]"
+			using = tooltip_below
+		}
+
+		### CANCEL CONSTRUCTION
+		button_icon_minus_action = {
+			visible = "[And4(Building.GetOwner.IsLocalPlayer, IsValid(Building.CancelConstruction), Not(Building.IsMilitaryBuilding), Building.GeneratesNavy)]"
+			size = { 28 28 }
+			parentanchor = vcenter
+			position = { 5 0 }
+			tooltip = "[Building.GetCancelConstructionTooltip]"
+			onclick = "[Execute( Building.CancelConstruction )]"
+			using = tooltip_below
+		}
+
+		### EXPAND BUTTON
+		expand_building_button = {
+			parentanchor = vcenter|right
+			position = { -5 0 }
+
+			blockoverride "foreign_investment_visibility" {
+ 				visible = no
+			}
+
+			blockoverride "button_size" {
+				size = { 28 28 }
+			}
+		}
+	}
+
+	### Strait State info item
+	type strait_state_info_item = widget {
+		size = { 270 70 }
+		alpha = "[TransparentIfTrue(IsZero(State.GetBuilding('building_naval_fortification').GetExpansionLevel))]"
+
+		block "strait_state_info_tooltip" {
+			tooltip = "STRAIT_TOLL_TOOLTIP"
+		}
+
+		background = {
+			using = paper_bg
+
+			block "highlight_visibility" {
+				visible = no
+			}
+		}
+
+		icon = {
+			using = highlighted_active_square_selection
+
+			block "highlight_visibility" {
+				visible = no
+			}
+		}
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			margin = { 10 5 }
+
+			### Label and Status
+			vbox = {
+				layoutpolicy_horizontal = expanding
+				layoutpolicy_vertical = expanding
+
+				expand = {}
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						max_width = 115
+						using = elide_fontsize_min
+
+						block "label" {
+							text = "[concept_tolls]"
+						}
+					}
+
+					expand = {}
+				}
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						using = fontsize_large
+						max_width = 115
+						using = elide_fontsize_min
+
+						block "status" {
+							text = "[Strait.GetStateTollStatus(State.Self)]"
+						}
+					}
+
+					expand = {}
+				}
+
+				expand = {}
+			}
+
+			expand = {}
+
+			### Controller
+			vbox = {
+				visible = "[Country.IsLocalPlayer]"
+
+				block "controller" {
+					hbox = {
+						layoutpolicy_horizontal = expanding
+
+						expand = {}
+
+						textbox = {
+							visible = "[Not(Strait.StateHasNoTolls(State.Self))]"
+							autoresize = yes
+							align = nobaseline
+							max_width = 100
+							using = elide_fontsize_min
+							raw_text = "@money!#v [Strait.GetStateTollProfit(State.Self)|D+]#!"
+						}
+
+						textbox = {
+							visible = "[Strait.StateHasNoTolls(State.Self)]"
+							autoresize = yes
+							align = nobaseline
+							max_width = 100
+							using = elide_fontsize_min
+							text = "NOT_AVAILABLE_MONEY"
+						}
+					}
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+
+						expand = {}
+
+						toll_rate_controller = {}
+					}
+				}
+			}
+
+			### Not controller
+			vbox = {
+				visible = "[Not(Country.IsLocalPlayer)]"
+
+				block "not_controller" {
+					hbox = {
+						layoutpolicy_horizontal = expanding
+
+						expand = {}
+
+						icon = {
+							size = { 40 40 }
+							texture = "[Strait.GetStateTollIcon(State.Self)]"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	### Toll Controller
+	type toll_rate_controller = flowcontainer {
+		using = setting_bar_background
+
+		### No Tolls
+		setting_bar_item = {
+			tooltip = "STRAIT_NO_TOLLS_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetTollNoTollsIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetControllerTollRateNoTolls( Country.Self ) )]"
+				onclick = "[Execute( Strait.SetControllerTollRateNoTolls( Country.Self ) )]"
+				using = budget_coins_lvl_0_button_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.ControllerHasTollRateNoTolls( Country.Self )]"
+			}
+
+			blockoverride "is_clickable_alpha" {
+				alpha = "[TransparentIfFalse( IsValid( Strait.SetControllerTollRateNoTolls( Country.Self ) ) )]"
+			}
+		}
+
+		### Low
+		setting_bar_item = {
+			tooltip = "STRAIT_LOW_TOLLS_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetTollLowIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetControllerTollRateLowTolls( Country.Self ) )]"
+				onclick = "[Execute( Strait.SetControllerTollRateLowTolls( Country.Self ) )]"
+				using = budget_coins_lvl_3_button_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.ControllerHasTollRateLowTolls( Country.Self )]"
+			}
+
+			blockoverride "is_clickable_alpha" {
+				alpha = "[TransparentIfFalse( IsValid( Strait.SetControllerTollRateLowTolls( Country.Self ) ) )]"
+			}
+		}
+
+		### Medium
+		setting_bar_item = {
+			tooltip = "STRAIT_MEDIUM_TOLLS_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetTollMediumIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetControllerTollRateMediumTolls( Country.Self ) )]"
+				onclick = "[Execute( Strait.SetControllerTollRateMediumTolls( Country.Self ) )]"
+				using = budget_coins_lvl_4_button_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.ControllerHasTollRateMediumTolls( Country.Self )]"
+			}
+
+			blockoverride "is_clickable_alpha" {
+				alpha = "[TransparentIfFalse( IsValid( Strait.SetControllerTollRateMediumTolls( Country.Self ) ) )]"
+			}
+		}
+
+		### High
+		setting_bar_item = {
+			tooltip = "STRAIT_HIGH_TOLLS_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetTollHighIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetControllerTollRateHighTolls( Country.Self ) )]"
+				onclick = "[Execute( Strait.SetControllerTollRateHighTolls( Country.Self ) )]"
+				using = budget_coins_lvl_5_button_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.ControllerHasTollRateHighTolls( Country.Self )]"
+			}
+
+			blockoverride "is_clickable_alpha" {
+				alpha = "[TransparentIfFalse( IsValid( Strait.SetControllerTollRateHighTolls( Country.Self ) ) )]"
+			}
+		}
+	}
+
+	### Strait Access Controller
+	type strait_access_controller = flowcontainer {
+		using = setting_bar_background
+
+		### Open
+		setting_bar_item = {
+			tooltip = "STRAIT_ACCESS_OPEN_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetAccessOpenIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetStateAccessOpen( State.Self ) )]"
+				onclick = "[Execute( Strait.SetStateAccessOpen( State.Self ) )]"
+				using = straits_access_open_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAccessOpen( State.Self )]"
+			}
+		}
+
+		### No Military
+		setting_bar_item = {
+			tooltip = "STRAIT_ACCESS_NO_MILITARY_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetAccessNoMilitaryIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetStateAccessNoMilitary( State.Self ) )]"
+				onclick = "[Execute( Strait.SetStateAccessNoMilitary( State.Self ) )]"
+				using = straits_access_no_military_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAccessNoMilitary( State.Self )]"
+			}
+		}
+
+		### Closed
+		setting_bar_item = {
+			tooltip = "STRAIT_ACCESS_CLOSED_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetAccessClosedIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetStateAccessClosed( State.Self ) )]"
+				onclick = "[Execute( Strait.SetStateAccessClosed( State.Self ) )]"
+				using = straits_access_close_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAccessClosed( State.Self )]"
+			}
+		}
+	}
+
+	### Strait Allowed Countries
+	type strait_allowed_countries_controller = flowcontainer {
+		using = setting_bar_background
+
+		### No Enemies
+		setting_bar_item = {
+			tooltip = "STRAIT_NO_ENEMIES_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetAllowedNoEnemiesIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetStateAllowedCountriesNoEnemies( State.Self ) )]"
+				onclick = "[Execute( Strait.SetStateAllowedCountriesNoEnemies( State.Self ) )]"
+				using = straits_allowedcountries_no_enemies_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAllowedCountriesNoEnemies( State.Self )]"
+			}
+		}
+
+		### Only Allies
+		setting_bar_item = {
+			tooltip = "STRAIT_ONLY_ALLIES_TOOLTIP"
+
+			blockoverride "button_texture" {
+				texture = "[Strait.GetAllowedOnlyAlliesIcon]"
+			}
+
+			blockoverride "click" {
+				enabled = "[IsValid( Strait.SetStateAllowedCountriesOnlyAllies( State.Self ) )]"
+				onclick = "[Execute( Strait.SetStateAllowedCountriesOnlyAllies( State.Self ) )]"
+				using = straits_allowedcountries_allies_sound
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAllowedCountriesOnlyAllies( State.Self )]"
+			}
+		}
+
+		### Only Controller & Subjects (subject owns state)
+		setting_bar_item = {
+			visible = "[Country.IsSubject]"
+			tooltip = "STRAIT_ONLY_CONTROLLER_TOOLTIP"
+			blockoverride "size" {
+				size = { 42 34 }
+			}
+
+			blockoverride "button" {
+				miniature_flag = {
+					parentanchor = center
+					blockoverride "onhover" {}
+					blockoverride "tooltip" {}
+
+					blockoverride "is_player_glow" {
+						visible = no
+					}
+
+					blockoverride "flag_texture" {
+						datacontext = "[State.GetController.GetTopOverlord]"
+						texture = "[Country.GetFlag.GetSmallFlagTexture]"
+					}
+
+					blockoverride "flag_click" {
+						enabled = "[IsValid( Strait.SetStateAllowedCountriesOnlyController( State.Self ) )]"
+						onclick = "[Execute( Strait.SetStateAllowedCountriesOnlyController( State.Self ) )]"
+					}
+
+					blockoverride "sound" {
+						using = straits_allowedcountries_subjects_sound
+					}
+				}
+			}
+
+			blockoverride "button_selected" {
+				tiny_flag = {
+					visible = "[Strait.StateHasAllowedCountriesOnlyController( State.Self )]"
+					parentanchor = center
+					blockoverride "onhover" {}
+					blockoverride "tooltip" {}
+
+					blockoverride "is_player_glow" {
+						visible = no
+					}
+
+					block "flag_texture" {
+						datacontext = "[State.GetController.GetTopOverlord]"
+						texture = "[Country.GetFlag.GetSmallFlagTexture]"
+					}
+
+					blockoverride "flag_click" {}
+				}
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAllowedCountriesOnlyController( State.Self )]"
+			}
+		}
+		### Only Controller & Subjects
+		setting_bar_item = {
+			visible = "[Not(Country.IsSubject)]"
+			tooltip = "STRAIT_ONLY_CONTROLLER_TOOLTIP"
+			blockoverride "size" {
+				size = { 42 34 }
+			}
+
+			blockoverride "button" {
+				miniature_flag = {
+					parentanchor = center
+					blockoverride "onhover" {}
+					blockoverride "tooltip" {}
+
+					blockoverride "is_player_glow" {
+						visible = no
+					}
+
+					blockoverride "flag_click" {
+						enabled = "[IsValid( Strait.SetStateAllowedCountriesOnlyController( State.Self ) )]"
+						onclick = "[Execute( Strait.SetStateAllowedCountriesOnlyController( State.Self ) )]"
+					}
+
+					blockoverride "sound" {
+						using = straits_allowedcountries_subjects_sound
+					}
+				}
+			}
+
+			blockoverride "button_selected" {
+				tiny_flag = {
+					visible = "[Strait.StateHasAllowedCountriesOnlyController( State.Self )]"
+					parentanchor = center
+					blockoverride "onhover" {}
+					blockoverride "tooltip" {}
+
+					blockoverride "is_player_glow" {
+						visible = no
+					}
+
+					blockoverride "flag_click" {}
+				}
+			}
+
+			blockoverride "is_selected_visibility" {
+				visible = "[Strait.StateHasAllowedCountriesOnlyController( State.Self )]"
+			}
+		}
+	}
+
+	### SETTING BAR ITEM
+	type setting_bar_item = widget {
+		using = tooltip_se
+
+		block "size" {
+			size = { 34 34 }
+		}
+
+		### BUTTON
+		button = {
+			parentanchor = center
+
+			block "button_size" {
+				size = { 34 34 }
+			}
+
+			block "click" {}
+
+			block "is_clickable_alpha" {}
+
+			block "button" {
+				button = {
+					parentanchor = center
+					alwaystransparent = yes
+
+					block "button_texture" {}
+
+					block "texture_size" {
+						size = { 26 26 }
+					}
+				}
+			}
+		}
+
+		### SELECTED (icon)
+		block "button_selected" {
+			button = {
+				parentanchor = center
+
+				block "button_texture" {}
+
+				block "is_selected_visibility" {}
+
+				block "selected_texture_size" {
+					size = { 28 28 }
+				}
+			}
+		}
+
+		### SELECTED FRAME
+		widget = {
+			parentanchor = center
+
+			block "selected_frame_size" {
+				size = { 100% 100% }
+			}
+
+			block "is_selected_visibility" {}
+
+			state = {
+				name = _show
+				duration = 0.35
+				alpha = 1
+			}
+
+			state = {
+				name = _hide
+				duration = 0
+				alpha = 0
+			}
+
+			icon = {
+				using = highlighted_square_selection
+			}
+		}
+	}
+
+	type strait_traded_goods_item = button {
+		tooltip = "STRAIT_TRADE_TOOLTIP"
+		onclick = "[InformationPanelBar.OpenGoodsWorldMarketPanel(Goods.Self)]"
+		onrightclick = "[RightClickMenuManager.ShowForGoods(Goods.AccessSelf)]"
+
+		size = { @panel_width 42 }
+		using = default_button
+
+		flowcontainer = {
+			margin_left = 10
+			parentanchor = vcenter
+			spacing = 10
+
+			icon = {
+				texture = "[Goods.GetTexture]"
+				size = { 36 36 }
+				parentanchor = vcenter
+			}
+
+			textbox = {
+				raw_text = "[StraitPanel.GetNumTraded(Goods.Self)|v0D]"
+				parentanchor = vcenter
+				align = center|nobaseline
+				size = { 60 23 }
+				fontsize_min = 12
+			}
+
+			overlappingitembox = {
+				datamodel = "[StraitPanel.GetImporters(Goods.Self)]"
+				size = { 190 18 }
+				parentanchor = vcenter
+
+				item = {
+					small_market_flag = {}
+				}
+			}
+
+			widget = { size = { 1 1 }}
+
+			overlappingitembox = {
+				datamodel = "[StraitPanel.GetExporters(Goods.Self)]"
+				size = { 190 18 }
+				parentanchor = vcenter
+
+				item = {
+					small_market_flag = {}
+				}
+			}
+		}
+	}
+}
+
+template setting_bar_background {
+	margin = { 2 0 }
+
+	background = {
+		using = dark_area_rounded
+		alpha = 0.3
+	}
+}
