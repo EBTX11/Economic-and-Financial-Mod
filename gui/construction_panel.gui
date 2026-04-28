@@ -1,0 +1,1327 @@
+# COPY-PASTED FOR NOW
+@panel_width_minus_10 = 530			# used to be 450
+@panel_width = 540  				# used to be 460
+@panel_width_half = 270				# used to be 230
+@panel_width_plus_10 = 550  		# used to be 470
+@panel_width_plus_14 = 554			# used to be 474
+@panel_width_plus_14_half = 277		# used to be 237
+@panel_width_plus_20 = 560			# used to be 480
+@panel_width_plus_30 = 570			# used to be 490
+@panel_width_plus_70 = 610			# used to be 530
+
+@foreign_invest_icon_size = 30
+
+@ship_queue_item_width = 540
+@ship_queue_item_height = 40
+
+types construction_panel
+{
+	type construction_panel_ships_content = flowcontainer {
+		visible = "[InformationPanel.IsTabSelected('ships')]"
+		direction = vertical
+		datacontext = "[AccessPlayer]"
+
+		flowcontainer = {
+			using = default_list_position
+			direction = vertical
+
+			### Production Methods related to Ship Construction
+			flowcontainer = {
+				parentanchor = hcenter
+				margin_top = 10
+				margin_bottom = 10
+				datacontext = "[GetBuildingType('building_shipyard')]"
+
+				datacontext_from_model = {
+					datamodel = "[ConstructionPanel.GetShipConstructionProductionMethodEntries(GetBuildingType('building_shipyard').Self)]"
+					index = 0
+				}
+
+				### Military Shipyard Production Methods
+				old_buildings_production_method_item = {
+					blockoverride "construction_content" {
+						ship_construction_sector_actions = {
+							layoutpolicy_horizontal = expanding
+							layoutpolicy_vertical = expanding
+						}
+					}
+				}
+
+				### No Military Shipyards
+				widget = {
+					size = { @panel_width_plus_14 95 }
+					visible = "[IsDataModelEmpty(BuildingProductionMethodsEntry.GetBuildings)]"
+
+					### Building icon
+					icon = {
+						texture = "[BuildingType.GetIcon]"
+						enabled = no
+						size = { 100 100 }
+						position = { 7 0 }
+						parentanchor = vcenter
+					}
+
+					### Dropdown / Expand
+					textbox = {
+						position = { 110 0 }
+						size = { 440 38 }
+
+						raw_text = "CONSTRUCTION_QUEUE_NO_CONSTRUCTION_SECTOR"
+
+						align = nobaseline
+						margin = { 10 0 }
+
+						using = empty_state_text_properties
+						using = fontsize_large
+
+						background = {
+							using = entry_bg_simple
+						}
+					}
+
+					### Info area below the dropdown
+					widget = {
+						position = { 110 38 }
+						size = { 440 57 }
+
+						ship_construction_sector_actions = {
+							layoutpolicy_horizontal = expanding
+							layoutpolicy_vertical = expanding
+						}
+					}
+				}
+			}
+
+			tax_exp_frame_coin = {
+				parentanchor = hcenter
+				minimumsize = { @panel_width 50 }
+
+				blockoverride "divider" {}
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				blockoverride "tutorial_highilight_name" {
+					name = "tutorial_highlight_supply_ship_construction"
+				}
+
+				blockoverride "text_upper" {
+					margin_left = 10
+					text = "SUPPLY_SHIPS_RATIO"
+				}
+
+				blockoverride "second_line" {}
+
+				blockoverride "text_money" {
+					raw_text = ""
+				}
+
+				### 100% TO MILITARY BUTTON 1
+				blockoverride "button_1_click" {
+					onclick = "[Execute(GetPlayer.SetSupplyShipConstructionLevelVeryLow)]"
+				}
+
+				blockoverride "texture_1" {
+					texture = "gfx/interface/navy/points_to_military_2.dds"
+				}
+
+				### 75% TO MILITARY BUTTON 2
+				blockoverride "button_2_click" {
+					onclick = "[Execute(GetPlayer.SetSupplyShipConstructionLevelLow)]"
+				}
+
+				blockoverride "texture_2" {
+					texture = "gfx/interface/navy/points_to_military_1.dds"
+				}
+
+				### 50% TO MILITARTY AND SUPPLIES BUTTON 3
+				blockoverride "button_3_click" {
+					onclick = "[Execute(GetPlayer.SetSupplyShipConstructionLevelMedium)]"
+				}
+
+				blockoverride "texture_3" {
+					texture = "gfx/interface/navy/points_to_military_supply.dds"
+				}
+
+				### 75% TO SUPPLY BUTTON 4
+				blockoverride "button_4_click" {
+					onclick = "[Execute(GetPlayer.SetSupplyShipConstructionLevelHigh)]"
+				}
+
+				blockoverride "texture_4" {
+					texture = "gfx/interface/navy/points_to_supply_1.dds"
+				}
+
+				### 100% TO SUPPLY BUTTON 5
+				blockoverride "button_5_click" {
+					onclick = "[Execute(GetPlayer.SetSupplyShipConstructionLevelVeryHigh)]"
+				}
+
+				blockoverride "texture_5" {
+					texture = "gfx/interface/navy/points_to_supply_2.dds"
+				}
+
+				blockoverride "tooltip_1" {
+					tooltip = "[GetPlayer.GetSupplyShipConstructionLevelDescVeryLow]"
+				}
+				blockoverride "tooltip_2" {
+					tooltip = "[GetPlayer.GetSupplyShipConstructionLevelDescLow]"
+				}
+				blockoverride "tooltip_3" {
+					tooltip = "[GetPlayer.GetSupplyShipConstructionLevelDescMedium]"
+				}
+				blockoverride "tooltip_4" {
+					tooltip = "[GetPlayer.GetSupplyShipConstructionLevelDescHigh]"
+				}
+				blockoverride "tooltip_5" {
+					tooltip = "[GetPlayer.GetSupplyShipConstructionLevelDescVeryHigh]"
+				}
+
+				blockoverride "is_selected_visibility_1" {
+					visible = "[Not(IsValid(GetPlayer.SetSupplyShipConstructionLevelVeryLow))]"
+				}
+				blockoverride "is_clickable_alpha_1" {
+					alpha = "[TransparentIfFalse(IsValid(GetPlayer.SetSupplyShipConstructionLevelVeryLow))]"
+				}
+
+				blockoverride "is_selected_visibility_2" {
+					visible = "[Not(IsValid(GetPlayer.SetSupplyShipConstructionLevelLow))]"
+				}
+				blockoverride "is_clickable_alpha_2" {
+					alpha = "[TransparentIfFalse(IsValid(GetPlayer.SetSupplyShipConstructionLevelLow))]"
+				}
+
+				blockoverride "is_selected_visibility_3" {
+					visible = "[Not(IsValid(GetPlayer.SetSupplyShipConstructionLevelMedium))]"
+				}
+				blockoverride "is_clickable_alpha_3" {
+					alpha = "[TransparentIfFalse(IsValid(GetPlayer.SetSupplyShipConstructionLevelMedium))]"
+				}
+
+				blockoverride "is_selected_visibility_4" {
+					visible = "[Not(IsValid(GetPlayer.SetSupplyShipConstructionLevelHigh))]"
+				}
+				blockoverride "is_clickable_alpha_4" {
+					alpha = "[TransparentIfFalse(IsValid(GetPlayer.SetSupplyShipConstructionLevelHigh))]"
+				}
+
+				blockoverride "is_selected_visibility_5" {
+					visible = "[Not(IsValid(GetPlayer.SetSupplyShipConstructionLevelVeryHigh))]"
+				}
+				blockoverride "is_clickable_alpha_5" {
+					alpha = "[TransparentIfFalse(IsValid(GetPlayer.SetSupplyShipConstructionLevelVeryHigh))]"
+				}
+			}
+
+			widget = {
+				size = { 2 2 }
+			}
+
+			widget = {
+				parentanchor = hcenter
+				minimumsize = { @panel_width 50 }
+
+				background = {
+					using = entry_bg_simple
+				}
+
+				### Navy maintenance cost
+				textbox = {
+					visible = "[GreaterThan_CFixedPoint(Country.GetTotalMaintenanceDemand, '(CFixedPoint)0')]"
+					parentanchor = vcenter
+					autoresize = yes
+					align = nobaseline
+					margin_left = 10
+					text = "NAVY_MAINTENANCE_COST_LABEL"
+					tooltip = "NAVY_MAINTENANCE_COST_TOOLTIP"
+				}
+			}
+
+			widget = {
+				size = { 5 5 }
+			}
+
+			### Queue new ship construction
+			ship_construction_add_to_queue = {}
+
+			### Current ship construction queue
+			ship_construction_queue = {}
+		}
+	}
+
+	type ship_construction_add_to_queue = flowcontainer {
+		using = default_list_position
+		direction = vertical
+		minimumsize = { @panel_width -1 }
+		margin_bottom = 10
+		spacing = 5
+
+		### Header
+		default_header = {
+			blockoverride "text" {
+				text = "concept_ship_construction"
+			}
+		}
+
+		flowcontainer = {
+			parentanchor = hcenter
+
+			widget = {
+				parentanchor = vcenter
+				size = { @panel_width_minus_10 110 }
+
+				textbox = {
+					parentanchor = hcenter
+					size = { @panel_width_minus_10 30 }
+					align = nobaseline
+					margin = { 5 0 }
+					multiline = yes
+					text = "DEFAULT_CONSTRUCTION_FLEET"
+				}
+
+				military_formation_right_click_item = {
+					visible = "[Country.HasDefaultConstructionFleet]"
+					size = { @panel_width_minus_10 80 }
+					parentanchor = bottom|hcenter
+					datacontext = "[Country.GetDefaultConstructionFleet]"
+
+					blockoverride "default_button_template" {
+						using = default_button
+					}
+
+					blockoverride "onclick" {
+						onclick = "[RightClickMenuManager.ToggleShipConstructionFleets(GetPlayer.Self, PdxGuiWidget.AccessSelf, 'select_ship_construction_fleet')]"
+					}
+				}
+
+				button = {
+					visible = "[Not(Country.HasDefaultConstructionFleet)]"
+					parentanchor = bottom
+					size = { @panel_width_minus_10 80 }
+					using = default_button
+					using = fontsize_large
+					text = "DEFAULT_SHIP_CONSTRUCTION_IS_NEW_FLEET"
+					onclick = "[RightClickMenuManager.ToggleShipConstructionFleets(GetPlayer.Self, PdxGuiWidget.AccessSelf, 'select_ship_construction_fleet')]"
+				}
+			}
+		}
+
+		### List of potential ship constructions
+		flowcontainer = {
+			direction = vertical
+			parentanchor = hcenter
+			spacing = 5
+			datamodel = "[GetShipGroups]"
+
+			item = {
+				container = {
+					ship_group = {}
+
+					icon = {
+						visible = "[Country.GetShipList.IsEditModeActiveForGroup(ShipGroup.Self)]"
+						using = highlighted_active_square_selection
+					}
+				}
+			}
+		}
+
+		retrofit_all_ships = {
+			datacontext = "[Country.GetShipList]"
+			visible = "[ShipList.HasAnyShipOutdated]"
+
+			blockoverride "can_retrofit_visibility" {
+				visible = "[And(GreaterThanZero(ShipList.GetNumShipsCanRetrofit),Not(ShipList.IsToRetrofit))]"
+			}
+
+			blockoverride "can_retrofit_properties" {
+				tooltip = "RETROFIT_SHIPS_IN_COUNTRY_BUTTON_TOOLTIP"
+				using = tooltip_above
+				enabled = "[IsValid(RetrofitShips)]"
+				onclick = "[RightClickMenuManager.ToggleCountryRetrofitActions(Country.AccessSelf, PdxGuiWidget.AccessSelf)]"
+			}
+
+			blockoverride "can_retrofit_button_text" {
+				text = "RETROFIT_SHIPS_BUTTON"
+			}
+
+			blockoverride "cancel_retrofit_visibility" {
+				visible = "[And(ShipList.IsToRetrofit, Not(ShouldAskConfirmation(CancelRetrofitShips)))]"
+			}
+
+			blockoverride "cancel_retrofit_properties" {
+				using = fleet_panel_construction_template_build_cancel
+				tooltip = "COUNTRY_CANCEL_RETROFIT_SHIPS_BUTTON_TOOLTIP"
+				enabled = "[IsValid(CancelRetrofitShips)]"
+				onclick = "[Execute(CancelRetrofitShips)]"
+			}
+
+			blockoverride "cancel_retrofit_visibility_with_confirmation" {
+				visible = "[And(ShipList.IsToRetrofit, ShouldAskConfirmation(CancelRetrofitShips))]"
+			}
+
+			blockoverride "cancel_retrofit_properties_with_confirmation" {
+				tooltip = "COUNTRY_CANCEL_RETROFIT_SHIPS_BUTTON_TOOLTIP"
+				enabled = "[IsValid(CancelRetrofitShips)]"
+				onclick = "[PopupManager.AskConfirmation(CancelRetrofitShips)]"
+			}
+
+			blockoverride "cancel_retrofit_button_text" {
+				text = "CANCEL_RETROFIT_SHIPS_BUTTON"
+			}
+		}
+	}
+
+	type ship_construction_queue = flowcontainer {
+		using = default_list_position
+		direction = vertical
+		minimumsize = { @panel_width -1 }
+		margin_bottom = 10
+
+		### Header
+		default_header_2texts = {
+			blockoverride "text1" {
+				block "text" {
+					text = "[concept_ship_construction]"
+				}
+			}
+			blockoverride "text2" {
+				block "text" {
+					visible = "[Country.HasShipConstructionQueued]"
+					text = "QUEUE_SHIP_CONSTRUCTION_POINTS_SUMMARY"
+					tooltip = "QUEUE_SHIP_CONSTRUCTION_POINTS_SUMMARY_TOOLTIP"
+				}
+			}
+		}
+
+		flowcontainer = {
+			spacing = 5
+			datacontext = "[ConstructionPanel.GetCountry]"
+
+			textbox = {
+				size = { 140 40 }
+				text = "CONSTRUCTION_SHIP_QUEUE_TYPE"
+				align = right|nobaseline
+				margin_right = 10
+				margin_left = 10
+				fontsize_min = 14
+				elide = right
+			}
+
+			filter_button = {
+				visible = "[Not(ConstructionPanel.IsShowingMilitaryShipConstructions)]"
+				tooltip = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_MILITARY_TT"
+
+				blockoverride "text" {
+					text = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_MILITARY"
+				}
+
+				blockoverride "onclick" {
+					onclick = "[ConstructionPanel.ShowMilitaryShipConstructions]"
+				}
+			}
+
+			filter_background_selected = {
+				visible = "[ConstructionPanel.IsShowingMilitaryShipConstructions]"
+				tooltip = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_MILITARY_TT"
+
+				blockoverride "text" {
+					text = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_MILITARY"
+				}
+			}
+
+			filter_button = {
+				visible = "[Not(ConstructionPanel.IsShowingSupplyShipConstructions)]"
+				tooltip = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_SUPPLY_TT"
+
+				blockoverride "text" {
+					text = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_SUPPLY"
+				}
+
+				blockoverride "onclick" {
+					onclick = "[ConstructionPanel.ShowSupplyShipConstructions]"
+				}
+			}
+
+			filter_background_selected = {
+				visible = "[ConstructionPanel.IsShowingSupplyShipConstructions]"
+				tooltip = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_SUPPLY_TT"
+
+				blockoverride "text" {
+					text = "CONSTRUCTION_SHIP_QUEUE_TYPE_FILTER_SUPPLY"
+				}
+			}
+		}
+
+		### List of queued ship constructions
+		fixedgridbox = {
+			visible = "[And(Country.HasShipConstructionQueued, ConstructionPanel.IsShowingMilitaryShipConstructions)]"
+			addcolumn = @ship_queue_item_width
+			addrow = @ship_queue_item_height
+			parentanchor = hcenter
+			datamodel = "[ConstructionPanel.GetShipConstructions]"
+
+			item = {
+				ship_construction_queue_item = {
+					draggable_behavior = {
+						draggable_id = "ship_construction_queue_element"
+
+						drag_widget = {
+							widget = {
+								size = { 1 1 }
+
+								ship_construction_queue_item = {
+									position = "[GuiCurrentDrag.CurrentPosition]"
+									widgetanchor = center
+								}
+							}
+						}
+					}
+
+					drop_target = {
+						accept_draggable_id = "ship_construction_queue_element"
+						on_receive_drop = "[Execute( GetDraggedDatacontext( 'ShipConstruction' ).MoveToIndex( ShipConstruction.GetIndex ) )]"
+					}
+				}
+			}
+		}
+
+		fixedgridbox = {
+			visible = "[ConstructionPanel.IsShowingSupplyShipConstructions]"
+			addcolumn = @ship_queue_item_width
+			addrow = @ship_queue_item_height
+			parentanchor = hcenter
+			datamodel = "[ConstructionPanel.GetSupplyShipConstructions]"
+
+			item = {
+				supply_ship_construction_queue_item = {}
+			}
+		}
+
+		### No queued ship constructions
+		empty_state = {
+			blockoverride "visible" {
+				visible = "[Or(And(ConstructionPanel.IsShowingMilitaryShipConstructions, IsDataModelEmpty(ConstructionPanel.GetShipConstructions)), And(ConstructionPanel.IsShowingSupplyShipConstructions, IsDataModelEmpty(ConstructionPanel.GetSupplyShipConstructions)))]"
+			}
+			blockoverride "text" {
+				text = "CONSTRUCTION_QUEUE_IS_EMPTY_SHIPS"
+			}
+		}
+	}
+
+	type ship_construction_queue_item = widget {
+		size = { @ship_queue_item_width @ship_queue_item_height }
+
+		### Background color
+		background = {
+			using = fade_right_entry_header_colored
+			color = { 1 0.674 0.454 1 }
+		}
+
+		alwaystransparent = no
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			spacing = 5
+
+			block "shiptype_datacontext" {
+				datacontext = "[ShipConstruction.GetShipType]"
+			}
+
+			### Place in queue
+			textbox = {
+				autoresize = yes
+				align = right|nobaseline
+				min_width = 25
+
+				block "place_in_queue_text" {
+					raw_text = "##[ShipConstruction.GetPlaceInQueue]"
+				}
+			}
+
+			block "ship_content" {
+				### Ship type icon
+				ship_type_silhouette = {
+					size = { 110 30 }
+				}
+
+				### Progress bar and name
+				margin_widget = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					margin = { 0 8 }
+
+					margin_widget = {
+						size = { 100% 100% }
+						margin_right = 4 #the default progressbar leaks out to the right by 4 pixels...
+
+						default_progressbar_horizontal = {
+							tooltip = "[SelectLocalization(ShipConstruction.IsRepair, 'SHIP_REPAIR_TOOLTIP', SelectLocalization(ShipConstruction.IsRetrofit, 'SHIP_RETROFIT_TOOLTIP', 'SHIP_CONSTRUCTION_TOOLTIP'))]"
+							size = { 100% 100% }
+
+							blockoverride "values" {
+								value = "[ShipConstruction.GetProgressPercent]"
+								min = 0
+								max = 1
+							}
+
+							hbox = {
+								layoutpolicy_horizontal = expanding
+								layoutpolicy_vertical = expanding
+								spacing = 5
+								margin = { 5 0 }
+
+								textbox = {
+									visible = "[ShipConstruction.IsRepair]"
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+									align = nobaseline
+									using = elide_fontsize_min
+									text = "SHIP_REPAIR"
+								}
+
+								textbox = {
+									visible = "[ShipConstruction.IsRetrofit]"
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+									align = nobaseline
+									using = elide_fontsize_min
+									text = "SHIP_RETROFIT"
+								}
+
+								textbox = {
+									visible = "[Not(Or(ShipConstruction.IsRepair, ShipConstruction.IsRetrofit))]"
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+									align = nobaseline
+									using = elide_fontsize_min
+									text = "[SelectLocalization(ShipConstruction.GetShipTemplate.IsCustom, 'SHIP_CONSTRUCTION_QUEUE_NAME_CUSTOM', 'SHIP_CONSTRUCTION_QUEUE_NAME_BASE')]"
+								}
+
+								button_icon_round = {
+									visible = "[ShipConstruction.GetFleet.IsValid]"
+									datacontext = "[ShipConstruction.GetFleet]"
+									size = { 24 24 }
+									onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab(MilitaryFormation.Self, 'default')]"
+									onrightclick = "[RightClickMenuManager.ToggleMilitaryFormation(MilitaryFormation.AccessSelf, PdxGuiWidget.AccessSelf)]"
+									texture = "[ShipConstruction.GetFleet.GetFlag]"
+									tooltip = "SHIP_CONSTRUCTION_IN_FLEET"
+
+									blockoverride "icon_size" { size = { 90% 90% } }
+
+									blockoverride "icon" {
+										texture = "[ShipConstruction.GetFleet.GetFlag]"
+										color = "[ShipConstruction.GetFleet.GetFlagColor]"
+									}
+								}
+
+								ship_construction_queue_item_texts = {
+									visible = "[Not(LessThanZero_CFixedPoint(ShipConstruction.GetEfficiency))]"
+								}
+
+								ship_construction_queue_item_texts = {
+									visible = "[LessThanZero_CFixedPoint(ShipConstruction.GetEfficiency)]"
+									blockoverride "default_format" {
+										default_format = "#n"
+									}
+								}
+							}
+						}
+
+						background = {
+							visible = "[GreaterThanZero_CFixedPoint(ShipConstruction.GetConstructionSpeed)]"
+							using = paper_bg
+							margin_right = -4
+						}
+					}
+				}
+
+				### Move up in queue
+				button_icon_round_action = {
+					size = { 30 30 }
+					blockoverride "icon" {
+						texture = "gfx/interface/icons/generic_icons/up_up.dds"
+					}
+					blockoverride "icon_size" {
+						size = { 75% 75% }
+					}
+					tooltip = "SHIP_CONSTRUCTION_MOVE_UP"
+					enabled = "[IsValid(ShipConstruction.MoveUp)]"
+
+					click_modifiers = {
+						ondefault = "[Execute(ShipConstruction.MoveUp)]"
+						onalt = "[Execute(ShipConstruction.MoveToTop)]"
+					}
+				}
+
+				### Move down in queue
+				button_icon_round_action = {
+					size = { 30 30 }
+					blockoverride "icon" {
+						texture = "gfx/interface/icons/generic_icons/down_down.dds"
+					}
+					blockoverride "icon_size" {
+						size = { 75% 75% }
+					}
+					tooltip = "SHIP_CONSTRUCTION_MOVE_DOWN"
+					enabled = "[IsValid(ShipConstruction.MoveDown)]"
+
+					click_modifiers = {
+						ondefault = "[Execute(ShipConstruction.MoveDown)]"
+						onalt = "[Execute(ShipConstruction.MoveToBottom)]"
+					}
+				}
+
+				### Cancel construction
+				button_icon_cancel = {
+					visible = "[Not(ShouldAskConfirmation(ShipConstruction.Cancel))]"
+					size = { 30 30 }
+					using = fleet_panel_construction_template_build_cancel
+					tooltip = "[SelectLocalization(ShipConstruction.IsRepair, 'CANCEL_SHIP_REPAIR', 'CANCEL_SHIP_CONSTRUCTION')]"
+					enabled = "[IsValid(ShipConstruction.Cancel)]"
+					onclick = "[Execute(ShipConstruction.Cancel)]"
+				}
+
+				### Cancel construction with confirmation
+				button_icon_cancel = {
+					visible = "[ShouldAskConfirmation(ShipConstruction.Cancel)]"
+					size = { 30 30 }
+					tooltip = "[SelectLocalization(ShipConstruction.IsRepair, 'CANCEL_SHIP_REPAIR', 'CANCEL_SHIP_CONSTRUCTION')]"
+					enabled = "[IsValid(ShipConstruction.Cancel)]"
+					onclick = "[PopupManager.AskConfirmationWithSound(ShipConstruction.Cancel, 'event:/SFX/UI/FleetPanel/fleetpanel_construction_template_build_cancel')]"
+				}
+			}
+		}
+	}
+
+	type ship_construction_queue_item_texts = hbox {
+		spacing = 10
+
+		textbox = {
+			visible = "[GreaterThanZero_CFixedPoint(ShipConstruction.GetConstructionSpeed)]"
+			align = right|nobaseline
+			autoresize = yes
+			block "default_format" {}
+			raw_text = "@ship_construction! [ShipConstruction.GetConstructionUsage|1]"
+		}
+
+		textbox = {
+			visible = "[Not(GreaterThanZero_CFixedPoint(ShipConstruction.GetConstructionSpeed))]"
+			align = right|nobaseline
+			max_width = 70
+			autoresize = yes
+			using = elide_fontsize_min
+			alpha = "[TransparentIfFalse(GreaterThanZero_CFixedPoint(ShipConstruction.GetConstructionSpeed))]"
+			block "default_format" {}
+			text = "QUEUED"
+		}
+
+		textbox = {
+			visible = "[ShipConstruction.IsInProgress]"
+			autoresize = yes
+			align = right|nobaseline
+			alpha = "[TransparentIfFalse(GreaterThanZero_CFixedPoint(ShipConstruction.GetConstructionSpeed))]"
+			block "default_format" {}
+			text = "SHIP_CONSTRUCTION_WEEKS_LEFT_SHORT"
+		}
+	}
+
+	type supply_ship_construction_queue_item_texts = hbox {
+		spacing = 10
+
+		textbox = {
+			visible = "[GreaterThanZero_CFixedPoint(SupplyShipConstruction.GetConstructionSpeed)]"
+			align = right|nobaseline
+			autoresize = yes
+			block "default_format" {}
+			raw_text = "@ship_construction! [SupplyShipConstruction.GetConstructionUsage|1]"
+		}
+
+		textbox = {
+			visible = "[Not(GreaterThanZero_CFixedPoint(SupplyShipConstruction.GetConstructionSpeed))]"
+			align = right|nobaseline
+			max_width = 70
+			autoresize = yes
+			using = elide_fontsize_min
+			alpha = "[TransparentIfFalse(GreaterThanZero_CFixedPoint(SupplyShipConstruction.GetConstructionSpeed))]"
+			block "default_format" {}
+			text = "QUEUED"
+		}
+
+		textbox = {
+			visible = "[SupplyShipConstruction.IsInProgress]"
+			autoresize = yes
+			align = right|nobaseline
+			alpha = "[TransparentIfFalse(GreaterThanZero_CFixedPoint(SupplyShipConstruction.GetConstructionSpeed))]"
+			block "default_format" {}
+			text = "SUPPLY_SHIP_CONSTRUCTION_WEEKS_LEFT_SHORT"
+		}
+	}
+
+	type supply_ship_construction_queue_item = widget {
+		size = { @ship_queue_item_width @ship_queue_item_height }
+
+		### Background color
+		background = {
+			using = fade_right_entry_header_colored
+			color = { 1 0.674 0.454 1 }
+		}
+
+		alwaystransparent = no
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			layoutpolicy_vertical = expanding
+			spacing = 5
+
+			block "shiptype_datacontext" {
+				datacontext = "[SupplyShipConstruction.GetShipType]"
+			}
+
+			### Place in queue
+			textbox = {
+				autoresize = yes
+				align = right|nobaseline
+				min_width = 25
+
+				block "place_in_queue_text" {
+					raw_text = "##[SupplyShipConstruction.GetPlaceInQueue]"
+				}
+			}
+
+			block "ship_content" {
+				### Ship type icon
+				ship_type_silhouette = {
+					size = { 110 30 }
+				}
+
+				### Progress bar and name
+				margin_widget = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					margin = { 0 8 }
+
+					margin_widget = {
+						size = { 100% 100% }
+						margin_right = 4 #the default progressbar leaks out to the right by 4 pixels...
+
+						default_progressbar_horizontal = {
+							size = { 100% 100% }
+							tooltip = "SUPPLY_SHIP_CONSTRUCTION_TOOLTIP"
+
+							blockoverride "values" {
+								value = "[SupplyShipConstruction.GetProgressPercent]"
+								min = 0
+								max = 1
+							}
+
+							hbox = {
+								layoutpolicy_horizontal = expanding
+								layoutpolicy_vertical = expanding
+								spacing = 5
+								margin = { 5 0 }
+
+								textbox = {
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+									align = nobaseline
+									using = elide_fontsize_min
+									text = "[ShipType.GetName]"
+								}
+
+								supply_ship_construction_queue_item_texts = {}
+							}
+						}
+
+						background = {
+							visible = "[GreaterThanZero_CFixedPoint(SupplyShipConstruction.GetConstructionSpeed)]"
+							using = paper_bg
+							margin_right = -4
+						}
+					}
+				}
+			}
+		}
+	}
+
+	type construction_panel = default_block_window_two_lines {
+		name = "construction_panel"
+
+		blockoverride "window_header_name"
+		{
+			text = "CONSTRUCTION"
+		}
+
+		blockoverride "window_header_container_line_two"
+		{
+
+		}
+
+		#TOP
+		blockoverride "fixed_top"
+		{
+			#TABS
+			tab_buttons = {
+				blockoverride "first_button"
+				{
+					text = "CONSTRUCTION_TAB_DOMESTIC"
+				}
+				blockoverride "first_button_tooltip" {
+					tooltip = "CONSTRUCTION_TAB_DOMESTIC"
+				}
+				blockoverride "first_button_click"
+				{
+					onclick = "[InformationPanel.SelectTab('default')]"
+				}
+				blockoverride "first_button_visibility"
+				{
+					visible = "[InformationPanel.IsTabSelected('default')]"
+				}
+				blockoverride "first_button_visibility_checked"
+				{
+					visible = "[Not( InformationPanel.IsTabSelected('default') )]"
+				}
+				blockoverride "first_button_selected"
+				{
+					text = "CONSTRUCTION_TAB_DOMESTIC"
+				}
+
+				blockoverride "second_button"
+				{
+					text = "CONSTRUCTION_TAB_FOREIGN"
+				}
+				blockoverride "second_button_tooltip" {
+					tooltip = "CONSTRUCTION_TAB_FOREIGN"
+				}
+				blockoverride "second_button_click"
+				{
+					onclick = "[InformationPanel.SelectTab('foreign_queues')]"
+				}
+				blockoverride "second_button_visibility"
+				{
+					visible = "[InformationPanel.IsTabSelected('foreign_queues')]"
+				}
+				blockoverride "second_button_visibility_checked"
+				{
+					visible = "[Not( InformationPanel.IsTabSelected('foreign_queues') )]"
+				}
+				blockoverride "second_button_selected"
+				{
+					text = "CONSTRUCTION_TAB_FOREIGN"
+				}
+
+				blockoverride "third_button" {
+					text = "SHIPS"
+				}
+				blockoverride "third_button_tooltip" {
+					tooltip = "SHIPS"
+				}
+				blockoverride "third_button_click" {
+					onclick = "[InformationPanel.SelectTab('ships')]"
+				}
+				blockoverride "third_button_visibility" {
+					visible = "[InformationPanel.IsTabSelected('ships')]"
+				}
+				blockoverride "third_button_visibility_checked" {
+					visible = "[Not(InformationPanel.IsTabSelected('ships'))]"
+				}
+				blockoverride "third_button_selected" {
+					text = "SHIPS"
+				}
+			}
+
+			widget = { size = { 1 10 }}
+		}
+
+		blockoverride "scrollarea_content" {
+			# DOMESTIC QUEUE TAB CONTENTS
+			flowcontainer = {
+				name = "domestic_queue"
+				visible = "[InformationPanel.IsTabSelected('default')]"
+				direction = vertical
+
+				flowcontainer = {
+					using = default_list_position
+					direction = vertical
+
+
+					flowcontainer = {
+						name = "construction_sector_or_no_sector"
+						parentanchor = hcenter
+						margin_top = 10
+						margin_bottom = 10
+
+
+						datacontext_from_model = {
+						    datamodel = "[ConstructionPanel.GetConstructionEntries]"
+						    index = 0
+						}
+
+						# Construction Sector
+						old_buildings_production_method_item = {
+							#visible check in type
+						}
+ 
+						# No Construction Sector
+						widget = {
+							size = { @panel_width_plus_14 95 }
+							visible = "[IsDataModelEmpty(BuildingProductionMethodsEntry.GetBuildings)]"
+							datacontext = "[GetBuildingType('building_construction_sector')]"
+
+
+					    	### building icon
+					    	icon = {
+					    		texture = "[BuildingType.GetIcon]"
+					    		enabled = no
+					    		size = { 100 100 }
+					    		position = { 7 0 }
+					    		parentanchor = vcenter
+					    	}
+
+							### DROPDOWN / EXPAND
+							textbox = {
+								position = { 110 0 }
+								size = { 440 38 }
+
+								raw_text = "CONSTRUCTION_QUEUE_NO_CONSTRUCTION_SECTOR"
+
+								align = nobaseline
+								margin = {10 0}
+
+								using = empty_state_text_properties
+								using = fontsize_large
+
+								background = {
+									using = entry_bg_simple
+								}
+							}
+
+							# INFO AREA BELOW THE DROPDOWN
+							widget = {
+								position = { 110 38 }
+								size = { 440 57 }
+
+								construction_queue_sector_actions = {
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+								}
+
+							}
+						}  
+					}  
+
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+
+					# ███╗   ███╗ ██████╗ ██████╗ 
+					# ████╗ ████║██╔═══██╗██╔══██╗
+					# ██╔████╔██║██║   ██║██║  ██║
+					# ██║╚██╔╝██║██║   ██║██║  ██║
+					# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+					# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+					#E&F mod
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+ 
+					flowcontainer = {
+						name = "pcs_or_no_pcs"
+						parentanchor = hcenter
+						margin_top = 10
+						margin_bottom = 10
+    
+						datacontext_from_model = {
+							datamodel = "[ConstructionPanel.GetShipConstructionProductionMethodEntries(GetBuildingType('building_ef_private_construction').Self)]"
+						    index = 0
+						}
+
+						# Construction Sector
+						old_buildings_production_method_item = {
+							#visible check in type
+						} 
+
+						# No Construction Sector
+						widget = {
+							size = { @panel_width_plus_14 95 }
+							visible = "[IsDataModelEmpty(BuildingProductionMethodsEntry.GetBuildings)]"
+							datacontext = "[GetBuildingType('building_ef_private_construction')]"
+
+
+					    	### building icon
+					    	icon = {
+					    		texture = "[BuildingType.GetIcon]"
+					    		enabled = no
+					    		size = { 100 100 }
+					    		position = { 7 0 }
+					    		parentanchor = vcenter
+					    	}
+
+							### DROPDOWN / EXPAND
+							textbox = {
+								position = { 110 0 }
+								size = { 440 38 }
+
+								raw_text = "CONSTRUCTION_QUEUE_NO_CONSTRUCTION_SECTOR"
+
+								align = nobaseline
+								margin = {10 0}
+
+								using = empty_state_text_properties
+								using = fontsize_large
+
+								background = {
+									using = entry_bg_simple
+								}
+							}
+
+							# INFO AREA BELOW THE DROPDOWN
+							widget = {
+								position = { 110 38 }
+								size = { 440 57 }
+
+								construction_queue_sector_actions = {
+									layoutpolicy_horizontal = expanding
+									layoutpolicy_vertical = expanding
+								}
+
+							}
+						}  
+					}    
+					
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+
+					# ███╗   ███╗ ██████╗ ██████╗ 
+					# ████╗ ████║██╔═══██╗██╔══██╗
+					# ██╔████╔██║██║   ██║██║  ██║
+					# ██║╚██╔╝██║██║   ██║██║  ██║
+					# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
+					# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+
+					#E&F
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+					############################################################################################################################################################
+ 
+					datacontext = "[AccessPlayer]"
+
+					construction_queue = {}
+				}
+			}
+
+			# FOREIGN QUEUE TAB CONTENTS
+			flowcontainer = {
+				visible = "[InformationPanel.IsTabSelected('foreign_queues')]"
+
+				parentanchor = hcenter
+				datamodel = "[AccessPlayer.GetPotentialInvestors]"
+				direction = vertical
+
+				textbox = {
+					parentanchor = hcenter
+					align = hcenter|nobaseline
+					autoresize = yes
+					multiline = yes
+					margin = { 10 10 }
+					max_width = @panel_width_minus_10
+					using = empty_state_text_properties
+					visible = "[IsDataModelEmpty(AccessPlayer.GetPotentialInvestors)]"
+					text = "FOREIGN_QUEUE_NO_INVESTORS_EMPTY_STATE"
+				}
+
+				item = { # ITEM FOR EACH COUNTRY
+					flowcontainer = {
+						parentanchor = hcenter
+						direction = vertical
+
+						default_header_2texts = {
+							blockoverride "text1" {
+								text = "FOREIGN_QUEUE_COUNTRY_HEADER"
+							}
+							blockoverride "right" {
+								flowcontainer = {
+									position = { -12 0 }
+									parentanchor = right|vcenter
+									datacontext = "[Country]"
+
+									icon = {
+										visible = "[GetPlayer.IsAnySubjectOf( Country.Self )]"
+										name = "overlord"
+										texture = "gfx/interface/icons/lens_toolbar_icons/overlord.dds"
+										size = { @foreign_invest_icon_size @foreign_invest_icon_size }
+										tooltip = FOREIGN_QUEUE_COUNTRY_OVERLORD_TT
+
+									}
+
+									icon = {
+										visible = "[GetPlayer.HasDiplomaticPactWith( Country.Self, 'foreign_investment_agreement' )]"
+										name = "mutual_pact"
+										texture = "gfx/interface/icons/lens_toolbar_icons/foreign_investment_agreement.dds"
+										size = { @foreign_invest_icon_size @foreign_invest_icon_size }
+										tooltip = FOREIGN_QUEUE_COUNTRY_MUTUAL_PACT_TT
+									}
+									icon = {
+										visible = "[GetPlayer.HasDiplomaticPactWith( Country.Self, 'foreign_investment_rights' )]"
+										name = "one_way_pact"
+										texture = "gfx/interface/icons/lens_toolbar_icons/foreign_investment_rights.dds"
+										size = { @foreign_invest_icon_size @foreign_invest_icon_size }
+										tooltip = FOREIGN_QUEUE_COUNTRY_ONE_WAY_PACT_TT
+									}
+								}
+							}
+						}
+
+
+						fixedgridbox = {
+							datamodel = "[Country.GetConstructionsInCountry(AccessPlayer.Self)]"
+
+							addcolumn = 540
+							addrow = 40
+
+							parentanchor = hcenter
+
+							item = { # ITEM FOR EACH QUEUED CONSTRUCTION
+								construction_queue_item = {}
+							}
+						}
+
+						textbox = {
+							parentanchor = hcenter
+							margin = { 10 10 }
+							align = hcenter|nobaseline
+							autoresize = yes
+							multiline = yes
+							max_width = @panel_width_minus_10
+							using = empty_state_text_properties
+							visible = "[IsDataModelEmpty(Country.GetConstructionsInCountry(AccessPlayer.Self))]"
+							text = "FOREIGN_QUEUE_NO_CONSTRUCTION_EMPTY_STATE"
+						}
+					}
+				}
+			}
+
+			### Ship construction tab content
+			construction_panel_ships_content = {
+				visible = "[InformationPanel.IsTabSelected('ships')]"
+				using = default_content_fade
+			}
+		}
+
+		blockoverride "fixed_bottom" {
+			# DOMESTIC QUEUE PAGE BUTTONS
+			vbox = {
+				name = "construction_queue_pages"
+				layoutpolicy_horizontal = expanding
+				visible = "[InformationPanel.IsTabSelected('default')]"
+
+
+				divider_clean = {
+					visible = "[Or(And(ConstructionPanel.IsShowingGovernmentConstructions, GreaterThan_int32(ConstructionPanel.GetNumGovernmentConstructionQueuePages(GetMetaPlayer.GetPlayedOrObservedCountry), '(int32)1')), And(ConstructionPanel.IsShowingPrivateConstructions,GreaterThan_int32(ConstructionPanel.GetNumPrivateConstructionQueuePages(GetMetaPlayer.GetPlayedOrObservedCountry), '(int32)1')))]"
+					size = { @panel_width_plus_14 2 }
+				}
+
+				flowcontainer = {
+					margin_top = 10
+					margin_bottom = 5
+					flowcontainer = {
+						visible = "[And(ConstructionPanel.IsShowingGovernmentConstructions, GreaterThan_int32(ConstructionPanel.GetNumGovernmentConstructionQueuePages(GetMetaPlayer.GetPlayedOrObservedCountry), '(int32)1'))]"
+						spacing = 20
+
+						button_select_arrow = {
+							size = { 25 25 }
+							mirror = horizontal
+							parentanchor = vcenter
+							using = decrease_button_sound
+							using = tooltip_above
+
+							block "tooltip_left_arrow" {
+								tooltip = "PREVIOUS_PAGE"
+							}
+
+							block "onclick_prev"
+							{
+								onclick = "[ConstructionPanel.PrevGovernmentConstructionQueuePage(GetMetaPlayer.GetPlayedOrObservedCountry)]"
+							}
+						}
+
+						text_single = {
+							text = "CONSTRUCTION_CURRENT_PAGE"
+							parentanchor = vcenter
+							align = nobaseline
+						}
+
+						button_select_arrow = {
+							size = { 25 25 }
+							parentanchor = vcenter
+							using = increase_button_sound
+							using = tooltip_above
+
+							block "tooltip_right_arrow" {
+								tooltip = "NEXT_PAGE"
+							}
+
+							block "onclick_next"
+							{
+								onclick = "[ConstructionPanel.NextGovernmentConstructionQueuePage(GetMetaPlayer.GetPlayedOrObservedCountry)]"
+							}
+						}
+					}
+
+					flowcontainer = {
+						visible = "[And(ConstructionPanel.IsShowingPrivateConstructions,GreaterThan_int32(ConstructionPanel.GetNumPrivateConstructionQueuePages(GetMetaPlayer.GetPlayedOrObservedCountry), '(int32)1'))]"
+						spacing = 20
+
+						button_select_arrow = {
+							size = { 25 25 }
+							mirror = horizontal
+							parentanchor = vcenter
+							using = decrease_button_sound
+							using = tooltip_above
+
+							block "tooltip_left_arrow" {
+								tooltip = "PREVIOUS_PAGE"
+							}
+
+							block "onclick_prev"
+							{
+								onclick = "[ConstructionPanel.PrevPrivateConstructionQueuePage(GetMetaPlayer.GetPlayedOrObservedCountry)]"
+							}
+						}
+
+						text_single = {
+							text = "CONSTRUCTION_CURRENT_PAGE_PRIVATE"
+							parentanchor = vcenter
+							align = nobaseline
+						}
+
+						button_select_arrow = {
+							size = { 25 25 }
+							parentanchor = vcenter
+							using = increase_button_sound
+							using = tooltip_above
+
+							block "tooltip_right_arrow" {
+								tooltip = "NEXT_PAGE"
+							}
+
+							block "onclick_next"
+							{
+								onclick = "[ConstructionPanel.NextPrivateConstructionQueuePage(GetMetaPlayer.GetPlayedOrObservedCountry)]"
+							}
+						}
+					}
+				}
+			}
+
+
+		}
+	}
+}
