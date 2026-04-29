@@ -918,9 +918,11 @@ is_valid_country_JAP = {
 	root = {
 		c:JAP ?= this  #1870
 		or = {
-			game_date > 1870.1.1
-			has_journal_entry = je_meiji_economy
-			has_global_variable = meiji_restoration_complete
+			#game_date > 1870.1.1
+			#game_date > 1860.1.1
+			has_journal_entry = je_meiji_economy 
+			has_variable = japan_emperor_restored
+			has_variable = japan_restoration_complete  
 		}
 	}
 }
@@ -1069,13 +1071,28 @@ macro_facilities_on_action_bc_limit = {
 	is_revolutionary = no
 	or = {
 		is_invalid_country = no
-		is_player = yes
+		AND = {
+			is_player = yes 
+			NOT = {
+				c:JAP ?= this # JAP is valided by is_valid_country 
+			}
+		}  
 	}
 	or = {
 		is_valid_country = yes #date de la bc
 		country_already_central_bank = yes
-		var:gdp_view >= 1 #AI que à partir de 5M  GDP
-		is_player = yes
+		AND = {
+			var:gdp_view >= 1
+			NOT = {
+				c:JAP ?= this # JAP is valided by is_valid_country 
+			}
+		} 
+		AND = {
+			is_player = yes 
+			NOT = {
+				c:JAP ?= this # JAP is valided by is_valid_country 
+			}
+		}  
 	}
 	#Si crise en lien avec la BC coupe toute possibilité de croissance ou de création de nouvelle currency
 	#Pb avec 
