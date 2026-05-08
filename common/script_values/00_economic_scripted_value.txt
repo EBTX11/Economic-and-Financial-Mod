@@ -15,8 +15,129 @@
 ############################################################################################################################################################
 ############################################################################################################################################################
 
+#silver
+base_demande_silver = {
+	value = scope:central_bank_scope.modifier:goods_input_silver_add
+}
+base_demande_silver_fix = {
+	value = var:base_demande_silver_fix
+}
+silver_price = {
+	value = 50
+	subtract = {
+		value = 50
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:silver.market_goods_pricier
+				multiply = 50
+			}
+			divide = 50
+		}
+	}
+} 
+base_demande_silver_price = {
+	value = base_demande_silver_fix
+	multiply = silver_price
+}
 
+#gold
+base_demande_gold = {
+	value = scope:central_bank_scope.modifier:goods_input_gold_add
+}
+base_demande_gold_fix = {
+	value = var:base_demande_gold_fix
+}
+gold_price = {
+	value = 100
+	subtract = {
+		value = 100
+		multiply = {
+			value = 0
+			subtract = {
+				value = market.mg:gold.market_goods_pricier
+				multiply = 100
+			}
+			divide = 100
+		}
+	}
+} 
+base_demande_gold_price = {
+	value = base_demande_gold_fix
+	multiply = gold_price
+}
+ 
+central_bank_metal_purchases = { #Central Bank Metal Purchases 
+	value = 0
+	if = {
+		limit = {
+			has_law = law_type:law_silver_standard
+		} 
+		add = base_demande_silver_price
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_bimetallism_standard
+		} 
+		add = base_demande_silver_price
+		add = base_demande_gold_price
+	}
+	if = {
+		limit = {
+			has_law = law_type:law_gold_standard
+		} 
+		add = base_demande_gold_price
+	}
+
+}  
+ 
+############################################################################################################################################################
+############################################################################################################################################################
+
+financial_crash_count_reset_var_pourcentage = {
+	if = {
+		limit = {
+			var:financial_crash = 1 
+		}
+		value = 1
+		multiply = var:je_efcc_1_global_variable_progress_bar_1
+		divide = 12 
+	}
+}
+ 
+economic_crisis_count_reset_var_pourcentage = { 
+	if = {
+		limit = {
+			var:economic_crisis = 1 
+		}
+		value = 1
+		multiply = var:je_efcc_1_global_variable_progress_bar_1
+		divide = 12 
+	}
+}
+
+currency_crisis_count_reset_var_pourcentage = { 
+	if = {
+		limit = {
+			var:currency_crisis = 1 
+		}
+		value = 1
+		multiply = var:je_efcc_1_global_variable_progress_bar_1
+		divide = 12 
+	}
+}
   
+country_bankruptcy_count_var_pourcentage = { 
+	if = {
+		limit = {
+			has_modifier = declared_bankruptcy 
+		}
+		value = 1
+		multiply = var:country_bankruptcy_count_var_pourcentage
+		divide = 120 
+	}
+}
+
 ############################################################################################################################################################
 ############################################################################################################################################################
 

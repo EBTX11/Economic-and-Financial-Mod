@@ -1554,3 +1554,177 @@ silver_crisis_je_1 = {
 #bimetalic_gestion_je_
 #pour le bimetalisme je peut faire une sorte de journal entry dynamique ou le joeur doit progressivement faire passer des traiter pour essayer constament d'aranger le taux argent or dans sont pays avec des attaque sur ces reserve d'or et le JE est dinit quans il passe au gold standart
 
+je_ef_efcc_situation = {
+	icon = "gfx/interface/icons/event_icons/je_ef_efcc_situation.dds"
+
+	group = je_group_ef
+	should_be_pinned_by_default_uninvolved_or_context = yes
+
+	is_shown_when_inactive = {
+		always = yes 
+	}
+	possible = { 
+		or = { 
+			has_modifier = has_central_bank
+			has_financial_center = yes
+		} 
+	} 
+	
+	complete = { 
+	}  
+
+	status_desc = {
+		first_valid = {
+			#economic_crisis
+			triggered_desc = { 
+				desc = status_economic_crisis_1
+				trigger = { var:economic_crisis = 0 }
+			}             
+			triggered_desc = { 
+				desc = status_economic_crisis_2
+				trigger = { var:economic_crisis = 1 var:economic_instability_count <= 1 }
+			}             
+			triggered_desc = { 
+				desc = status_economic_crisis_3
+				trigger = { var:economic_crisis = 1 var:economic_instability_count >= 2 }
+			} 
+		}
+
+		first_valid = {
+			#currency_crisis
+			triggered_desc = { 
+				desc = status_currency_crisis_1
+				trigger = { var:currency_crisis = 0 }
+			}             
+			triggered_desc = { 
+				desc = status_currency_crisis_2
+				trigger = { var:currency_crisis = 1 var:economic_instability_count <= 1 }
+			}             
+			triggered_desc = { 
+				desc = status_currency_crisis_3
+				trigger = { var:currency_crisis = 1 var:economic_instability_count >= 2 }
+			}
+		}
+
+		first_valid = {
+			#financial_crash
+			triggered_desc = { 
+				desc = status_financial_crash_1
+				trigger = { var:financial_crash = 0 }
+			}             
+			triggered_desc = { 
+				desc = status_financial_crash_2
+				trigger = { var:financial_crash = 1 var:economic_instability_count <= 1 }
+			}             
+			triggered_desc = { 
+				desc = status_financial_crash_3
+				trigger = { var:financial_crash = 1 var:economic_instability_count >= 2 }
+			} 
+		}
+
+		first_valid = {
+			#central_bank_bankruptcy
+			triggered_desc = { 
+				desc = status_central_bank_bankruptcy_1
+				trigger = { var:central_bank_bankruptcy = 0 }
+			}             
+			triggered_desc = { 
+				desc = status_central_bank_bankruptcy_2
+				trigger = { var:central_bank_bankruptcy = 1 var:economic_instability_count <= 1}
+			}             
+			triggered_desc = { 
+				desc = status_central_bank_bankruptcy_3
+				trigger = { var:central_bank_bankruptcy = 1 var:economic_instability_count >= 2 }
+			} 
+		}
+
+		first_valid = {
+			#country_bankruptcy
+			triggered_desc = { 
+				desc = status_country_bankruptcy_1
+				trigger = { var:country_bankruptcy = 0 }
+			}             
+			triggered_desc = { 
+				desc = status_country_bankruptcy_2
+				trigger = { var:country_bankruptcy = 1 var:economic_instability_count <= 1 }
+			}             
+			triggered_desc = { 
+				desc = status_country_bankruptcy_3
+				trigger = { var:country_bankruptcy = 1 var:economic_instability_count >= 2 }
+			}  
+		}
+	}  
+	
+	scripted_progress_bar = je_efcc_progress_bar
+	 
+	widget = {
+		gui = "gui/journal_entry_widgets/00_ef_custom_widgets.gui"
+		name = "widget_je_ef_efcc_situation"
+		container = "custom_widget_container_3" 
+	}
+ 
+	#progressbar and var
+	on_monthly_pulse = {
+		effect = {
+            if = {
+                limit = {
+                   	var:je_efcc_1_global_variable_progress_bar_1 < 12  
+                    var:economic_instability_count >= 1
+                	or = { 
+						var:currency_crisis = 1
+						#var:central_bank_bankruptcy = 1
+						var:economic_crisis = 1
+						var:financial_crash = 1 
+                	}
+					##is_at_war = no
+ 
+					#economic_instability_count_reset reset le economic_instability_count
+					#financial_crash_count_reset_condition
+					# central_bank_bankruptcy_count_reset_condition
+					# economic_crisis_count_reset_condition
+					# currency_crisis_count_reset_condition
+
+                }
+                change_variable = {
+                    name = je_efcc_1_global_variable_progress_bar_1
+                    add = 1
+                } 
+            }
+			je:je_ef_efcc_situation ?= { 
+				set_bar_progress = {
+					value = owner.var:je_efcc_1_global_variable_progress_bar_1
+					name = je_efcc_progress_bar
+				}
+			}
+			if = {
+                limit = {
+                    var:je_efcc_1_global_variable_progress_bar_1 >= 12  
+                    var:economic_instability_count = 0
+                }
+                set_variable = {
+                    name = je_efcc_1_global_variable_progress_bar_1
+                    value = 0
+                }
+            }
+			#country_bankruptcy
+			if = {
+				limit  = {
+					has_modifier = declared_bankruptcy 
+				}
+                change_variable = {
+                    name = country_bankruptcy_count_var_pourcentage
+                    add = 1
+                }  
+			}
+			if = {
+				limit  = {
+					var:country_bankruptcy_count_var_pourcentage >= 120
+				}
+                set_variable = {
+                    name = country_bankruptcy_count_var_pourcentage
+                    value = 0
+                } 
+			}
+		}
+	}
+}
