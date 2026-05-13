@@ -202,47 +202,6 @@ types companies_panel
 					text = "GLOBAL_CULTURE"
 				}
 			}
-
-			### sort buttons
-			widget = {
-				visible = "[InformationPanel.IsTabSelected('ranking')]"
-				size = { @panel_width 30 }
-				
-				hbox = {
-
-					sort_button = {
-						layoutpolicy_horizontal = preferred
-						size = { 70 30 }
-						text = "COUNTRY"
-						onclick = "[CompaniesPanel.Sort('owner')]"
-						tooltip = "SORT_BY_COUNTRY"
-					}
-
-					sort_button = {
-						layoutpolicy_horizontal = preferred
-						size = { 220 30 }
-						text = "NAME"
-						onclick = "[CompaniesPanel.Sort('name')]"
-						tooltip = "SORT_BY_NAME"
-					}
-
-					sort_button = {
-						enabled = no
-						layoutpolicy_horizontal = preferred
-						size = { 110 30 }
-						text = "BUILDINGS"
-						tooltip = "BUILDINGS"
-					}
-
-					sort_button = {
-						layoutpolicy_horizontal = preferred
-						size = { 110 30 }
-						text = "concept_building_balance_profit"
-						onclick = "[CompaniesPanel.Sort('profit')]"
-						tooltip = "concept_building_balance_profit"
-					}
-				}
-			}
 		}
 		
 		blockoverride "scrollarea_content"
@@ -334,103 +293,61 @@ types companies_panel
 					}
 				}
 
+				### ESTABLISHED COMPANIES HEADER
+				section_header_button = {
+					blockoverride "left_text" {
+						text = "ESTABLISHED_COMPANIES"
+					}
 
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-
-				# ███╗   ███╗ ██████╗ ██████╗ 
-				# ████╗ ████║██╔═══██╗██╔══██╗
-				# ██╔████╔██║██║   ██║██║  ██║
-				# ██║╚██╔╝██║██║   ██║██║  ██║
-				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
-
-				#E&F mod remplace en copie/colle dans le fichier vanila
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-
-				flowcontainer = {
-					visible = "[Not(GetVariableSystem.Exists('hide_current_companies'))]"
-					parentanchor = hcenter
-					direction = vertical
-					default_header_2texts = {
-						blockoverride "text1" {
-							text = "ESTABLISHED_COMPANIES"
-						}
-						blockoverride "text2" {
+					blockoverride "right_text" {
+						section_header_right_text = {
 							text = "COMPANIES_AMOUNT_HEADER"
 						}
 					}
+					blockoverride "onclick" {
+						onclick = "[GetVariableSystem.Toggle('established_companies')]"
+					}
+					
+					blockoverride "onclick_showmore" {
+						visible = "[GetVariableSystem.Exists('established_companies')]" # Flipped to show by default
+					}
 
-					flowcontainer = {
-						direction = vertical
-						parentanchor = hcenter
-						margin = { 0 10 }
-						spacing = 10
-
-						flowcontainer = {
-							parentanchor = hcenter
-							visible = "[GreaterThan_int32(AccessPlayer.GetNumAvailableCompanies, '(int32)0')]"
-							minimumsize = { @panel_width -1 }
-							maximumsize = { @panel_width -1 }
-							datamodel = "[DataModelRepeatedItem(AccessPlayer.GetNumAvailableCompanies)]"
-							direction = vertical
-							spacing = 10
-
-							#item = {
-								button_icon_plus_square = {
-									size = { @panel_width 100 }
-									onclick = "[GetVariableSystem.Toggle('hide_current_companies')]"
-									onclick = "[GetVariableSystem.Clear('available_companies')]"
-									onclick = "[ScrollPanelToTop('companies_panel')]"
-									
-									blockoverride "icon_size" {
-										size = { 80 80 }
-									}
-								}
-							#}
-						}
-
-						### COMPANIES
-						flowcontainer = {
-							parentanchor = hcenter
-							visible = "[Not(IsDataModelEmpty(AccessPlayer.GetCompanies))]"
-							minimumsize = { @panel_width -1 }
-							maximumsize = { @panel_width -1 }
-							datamodel = "[AccessPlayer.GetCompanies]"
-							direction = vertical
-							spacing = 10
-
-							item = {
-								company_item = {}
-							}
-						}
-
+					blockoverride "onclick_showless" {
+						visible = "[Not(GetVariableSystem.Exists('established_companies'))]" # Flipped to show by default
 					}
 				}
 
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
+				### ESTABLISHED COMPANIES LIST
+				flowcontainer = {
+					visible = "[Not(GetVariableSystem.Exists('established_companies'))]" # Flipped to show by default
+					parentanchor = hcenter
+					direction = vertical
 
-				# ███╗   ███╗ ██████╗ ██████╗ 
-				# ████╗ ████║██╔═══██╗██╔══██╗
-				# ██╔████╔██║██║   ██║██║  ██║
-				# ██║╚██╔╝██║██║   ██║██║  ██║
-				# ██║ ╚═╝ ██║╚██████╔╝██████╔╝
-				# ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ 
+					flowcontainer = {
+						parentanchor = hcenter
+						visible = "[Not(IsDataModelEmpty(AccessPlayer.GetCompanies))]"
+						datamodel = "[AccessPlayer.GetCompanies]"
+						direction = vertical
+						spacing = 10
 
-				#E&F mod
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
-				############################################################################################################################################################
- 
+						item = {
+							company_item = {}
+						}
+					}
+				}
+
+				widget = {
+					size = { 10 10 }
+				}
+
+				default_header = {
+					blockoverride "text" {
+						text = "NOT_YET_ESTABLISHED_COMPANIES"
+					}
+				}
+
+				company_filter = {}
+
 				### sort buttons
 				widget = {
 					size = { @panel_width_plus_14 30 }
@@ -457,56 +374,26 @@ types companies_panel
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
 							onclick = "[AccessPlayer.SortCompanies('productivity')]"
-							tooltip = "SORT_BY_BUILDING_PRODUCTIVITY"
-							text = "concept_productivity"
+							text = "[concept_productivity]"
 						}
 
 						sort_button = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
 							onclick = "[AccessPlayer.SortCompanies('levels')]"
-							tooltip = "SORT_BY_BUILDING_SIZE"
-							text = "concept_building_levels"
+							text = "[concept_building_level]"
 						}
 					}
 				}
-				
-				section_header_button = {
-					visible = "[Not(IsDataModelEmpty(AccessPlayer.GetAvailableCompanies))]"
-						
-					blockoverride "left_text" {
-						text = "AVAILABLE_COMPANIES"
-					}
 
-					blockoverride "right_text" {
-						section_header_right_text = {
-							text = "[GetDataModelSize(AccessPlayer.GetAvailableCompanies)]"
-						}
-					}
-
-					blockoverride "onclick" {
-						onclick = "[GetVariableSystem.Toggle('available_companies')]"
-					}
-					
-					blockoverride "onclick_showmore" {
-						visible = "[GetVariableSystem.Exists('available_companies')]"
-					}
-
-					blockoverride "onclick_showless" {
-						visible = "[Not(GetVariableSystem.Exists('available_companies'))]"
-					}
-				}
-
-				### AVAILABLE COMPANIES
+				### All Companies
 				flowcontainer = {
 					parentanchor = hcenter
 					direction = vertical
-					visible = "[Not(GetVariableSystem.Exists('available_companies'))]"
 
 					flowcontainer = {
 						parentanchor = hcenter
-						visible = "[Not(IsDataModelEmpty(AccessPlayer.GetAvailableCompanies))]"
-						datamodel = "[AccessPlayer.GetAvailableCompanies]"
+						datamodel = "[CompaniesPanel.GetFilteredCompanyTypes]"
 						direction = vertical
 						spacing = 5
 
@@ -514,90 +401,14 @@ types companies_panel
 							potential_company_item = {}
 						}
 					}
-				}
 
-				# ATTAINABLE COMPANIES
-				section_header_button = {
-					blockoverride "left_text" {
-						text = "ATTAINABLE_COMPANIES"
-					}
-
-					blockoverride "right_text" {
-						section_header_right_text = {
-							text = "[GetDataModelSize(AccessPlayer.GetAttainableCompanies)]"
+					empty_state = {
+						blockoverride "visible" {
+							visible = "[EqualTo_int32(CompaniesPanel.GetNumFilteredCompanies, '(int32)0')]"
 						}
-					}
-					blockoverride "onclick" {
-						onclick = "[GetVariableSystem.Toggle('potential_companies')]"
-					}
-					
-					blockoverride "onclick_showmore" {
-						visible = "[Not(GetVariableSystem.Exists('potential_companies'))]"
-					}
 
-					blockoverride "onclick_showless" {
-						visible = "[GetVariableSystem.Exists('potential_companies')]"
-					}
-				}
-
-				### ATTAINABLE COMPANIES
-				flowcontainer = {
-					parentanchor = hcenter
-					direction = vertical
-					visible = "[GetVariableSystem.Exists('potential_companies')]"
-
-					flowcontainer = {
-						parentanchor = hcenter
-						visible = "[Not(IsDataModelEmpty(AccessPlayer.GetAttainableCompanies))]"
-						datamodel = "[AccessPlayer.GetAttainableCompanies]"
-						direction = vertical
-						spacing = 5
-
-						item = {
-							potential_company_item = {}
-						}
-					}
-				}		
-
-				# POTENTIAL COMPANIES
-				section_header_button = {
-					blockoverride "left_text" {
-						text = "POTENTIAL_COMPANIES"
-					}
-
-					blockoverride "right_text" {
-						section_header_right_text = {
-							text = "[GetDataModelSize(AccessPlayer.GetPotentialCompanies)]"
-						}
-					}
-					blockoverride "onclick" {
-						onclick = "[GetVariableSystem.Toggle('unavailable_companies')]"
-					}
-					
-					blockoverride "onclick_showmore" {
-						visible = "[Not(GetVariableSystem.Exists('unavailable_companies'))]"
-					}
-
-					blockoverride "onclick_showless" {
-						visible = "[GetVariableSystem.Exists('unavailable_companies')]"
-					}
-				}
-
-				### POTENTIAL COMPANIES
-				flowcontainer = {
-					parentanchor = hcenter
-					direction = vertical
-					visible = "[GetVariableSystem.Exists('unavailable_companies')]"
-
-					flowcontainer = {
-						parentanchor = hcenter
-						visible = "[Not(IsDataModelEmpty(AccessPlayer.GetPotentialCompanies))]"
-						datamodel = "[AccessPlayer.GetPotentialCompanies]"
-						direction = vertical
-						spacing = 5
-
-						item = {
-							potential_company_item = {}
+						blockoverride "text" {
+							text = "NONE"
 						}
 					}
 				}			
@@ -605,8 +416,60 @@ types companies_panel
 
 			flowcontainer = {
 				parentanchor = hcenter
-
+				direction = vertical
+				
 				visible = "[InformationPanel.IsTabSelected('ranking')]"
+
+				flowcontainer = {
+					direction = vertical
+					company_filter = {
+						blockoverride "filter_visible" {}
+						blockoverride "companies_ranking" {
+							text = "COMPANIES_RANKED_TOTAL_COUNT"
+						}
+					}
+				}
+
+				### sort buttons
+				widget = {
+					visible = "[InformationPanel.IsTabSelected('ranking')]"
+					size = { @panel_width 30 }
+					
+					hbox = {
+
+						sort_button = {
+							layoutpolicy_horizontal = preferred
+							size = { 70 30 }
+							text = "COUNTRY"
+							onclick = "[CompaniesPanel.Sort('owner')]"
+							tooltip = "SORT_BY_COUNTRY"
+						}
+
+						sort_button = {
+							layoutpolicy_horizontal = preferred
+							size = { 220 30 }
+							text = "NAME"
+							onclick = "[CompaniesPanel.Sort('name')]"
+							tooltip = "SORT_BY_NAME"
+						}
+
+						sort_button = {
+							enabled = no
+							layoutpolicy_horizontal = preferred
+							size = { 110 30 }
+							text = "BUILDINGS"
+							tooltip = "BUILDINGS"
+						}
+
+						sort_button = {
+							layoutpolicy_horizontal = preferred
+							size = { 110 30 }
+							text = "concept_building_balance_profit"
+							onclick = "[CompaniesPanel.Sort('profit')]"
+							tooltip = "concept_building_balance_profit"
+						}
+					}
+				}
 
 				flowcontainer = {
 					direction = vertical
@@ -1395,6 +1258,301 @@ types companies_panel
 
 		tooltipwidget = {
 			FancyTooltip_BuildingType = {}
+		}
+	}
+	### FILTERS
+	type company_filter = flowcontainer {
+		direction = vertical
+
+		flowcontainer = {
+			direction = vertical
+
+			background = {
+				using = dropdown_background
+				margin = { 0 -2 }
+			}
+
+			section_header_button = {
+				blockoverride "left_text" {
+					text = "FILTERS"
+					elide = right
+				}
+
+				blockoverride "right_text" {
+					section_header_right_text = {
+						block "companies_ranking" {
+							text = "COMPANIES_FILTER_COUNT"
+						}
+					}
+				}
+
+				blockoverride "onclick" {
+					onclick = "[GetVariableSystem.Toggle( 'companies_filters' )]"
+				}
+
+				blockoverride "onclick_showmore" {
+					visible = "[Not(GetVariableSystem.Exists( 'companies_filters' ))]"
+				}
+
+				blockoverride "onclick_showless" {
+					visible = "[GetVariableSystem.Exists( 'companies_filters' )]"
+				}
+			}
+
+			flowcontainer = {
+				visible = "[GetVariableSystem.Exists( 'companies_filters' )]"
+				minimumsize = { @panel_width_plus_14 -1 }
+				parentanchor = hcenter
+				margin_top = 5
+				margin_bottom = 10
+				direction = vertical
+
+				### Visibility Filter
+				block "filter_visible" {
+					building_browser_filter_line = {
+						parentanchor = hcenter
+						blockoverride "line_background" {}
+
+						blockoverride "line_size" {
+							size = { @panel_width 38 }
+						}
+
+						blockoverride "filter_line_label"
+						{
+							text = "FILTER_VISIBILITY"
+						}
+
+						blockoverride "filter_line_buttons"
+						{
+							building_browser_filter_line_button = {
+								text = "COMPANY_AVAILABLE_FILTER_NAME"
+								align = hcenter
+
+								blockoverride "line_button_tooltip"{
+									tooltip = "COMPANY_AVAILABLE_FILTER_NAME"
+								}
+
+								blockoverride "line_button_onclick" {
+									onclick = "[CompaniesPanel.SetVisibilityFilter('available')]"
+								}
+
+								blockoverride "line_button_icon_texture" {
+									visible = no
+								}
+
+								blockoverride "line_button_selected" {
+									visible = "[CompaniesPanel.IsVisibilityFilterSelected('available')]"
+								}
+							}
+
+							building_browser_filter_line_button = {
+								text = "COMPANY_POTENTIAL_FILTER_NAME"
+								align = hcenter
+
+								blockoverride "line_button_tooltip"{
+									tooltip = "COMPANY_POTENTIAL_FILTER_NAME"
+								}
+
+								blockoverride "line_button_onclick" {
+									onclick = "[CompaniesPanel.SetVisibilityFilter('potential')]"
+								}
+
+								blockoverride "line_button_icon_texture" {
+									visible = no
+								}
+
+								blockoverride "line_button_selected" {
+									visible = "[CompaniesPanel.IsVisibilityFilterSelected('potential')]"
+								}
+							}
+
+							building_browser_filter_line_button = {
+								text = "COMPANY_ATTAINABLE_FILTER_NAME"
+								align = hcenter
+
+								blockoverride "line_button_tooltip"{
+									tooltip = "COMPANY_ATTAINABLE_FILTER_NAME"
+								}
+
+								blockoverride "line_button_onclick" {
+									onclick = "[CompaniesPanel.SetVisibilityFilter('attainable')]"
+								}
+
+								blockoverride "line_button_icon_texture" {
+									visible = no
+								}
+
+								blockoverride "line_button_selected" {
+									visible = "[CompaniesPanel.IsVisibilityFilterSelected('attainable')]"
+								}
+							}
+						}
+					}
+				}
+				### Historical filter
+				building_browser_filter_line = {
+					parentanchor = hcenter
+					blockoverride "line_background" {}
+
+					blockoverride "line_size" {
+						size = { @panel_width 38 }
+					}
+
+					blockoverride "filter_line_label"
+					{
+						text = "FILTER_HISTORICAL"
+					}
+
+					blockoverride "filter_line_buttons"
+					{
+						building_browser_filter_line_button = {
+							text = "HISTORICAL_FILTER_NAME"
+							align = hcenter
+
+							blockoverride "line_button_tooltip"{
+								tooltip = "HISTORICAL_FILTER_NAME"
+							}
+
+							blockoverride "line_button_onclick" {
+								onclick = "[CompaniesPanel.SetHistoricalFilter('historical_only')]"
+							}
+
+							blockoverride "line_button_icon_texture" {
+								visible = no
+							}
+
+							blockoverride "line_button_selected" {
+								visible = "[CompaniesPanel.IsHistoricalFilterSelected('historical_only')]"
+							}
+						}
+
+						building_browser_filter_line_button = {
+							text = "NON_HISTORICAL_FILTER_NAME"
+							align = hcenter
+
+							blockoverride "line_button_tooltip"{
+								tooltip = "NON_HISTORICAL_FILTER_NAME"
+							}
+
+							blockoverride "line_button_onclick" {
+								onclick = "[CompaniesPanel.SetHistoricalFilter('non_historical_only')]"
+							}
+
+							blockoverride "line_button_icon_texture" {
+								visible = no
+							}
+
+							blockoverride "line_button_selected" {
+								visible = "[CompaniesPanel.IsHistoricalFilterSelected('non_historical_only')]"
+							}
+						}
+					}
+				}
+				### Prestige Goods filter
+				building_browser_filter_line = {
+					parentanchor = hcenter
+					blockoverride "line_background" {}
+
+					blockoverride "line_size" {
+						size = { @panel_width 38 }
+					}
+
+					blockoverride "filter_line_label"
+					{
+						text = "FILTER_PRESTIGE_GOODS"
+					}
+
+					blockoverride "filter_line_buttons"
+					{
+						building_browser_filter_line_button = {
+							text = "YES"
+							align = hcenter
+
+							blockoverride "line_button_tooltip"{
+								tooltip = "YES"
+							}
+
+							blockoverride "line_button_onclick" {
+								onclick = "[CompaniesPanel.SetPrestigeGoodsFilter('with_prestige_goods')]"
+							}
+
+							blockoverride "line_button_icon_texture" {
+								visible = no
+							}
+
+							blockoverride "line_button_selected" {
+								visible = "[CompaniesPanel.IsPrestigeGoodsFilterSelected('with_prestige_goods')]"
+							}
+						}
+
+						building_browser_filter_line_button = {
+							text = "NO"
+							align = hcenter
+
+							blockoverride "line_button_tooltip"{
+								tooltip = "NO"
+							}
+
+							blockoverride "line_button_onclick" {
+								onclick = "[CompaniesPanel.SetPrestigeGoodsFilter('without_prestige_goods')]"
+							}
+
+							blockoverride "line_button_icon_texture" {
+								visible = no
+							}
+
+							blockoverride "line_button_selected" {
+								visible = "[CompaniesPanel.IsPrestigeGoodsFilterSelected('without_prestige_goods')]"
+							}
+						}
+					}
+				}
+				### Building filter
+				flowcontainer = {
+					parentanchor = hcenter
+					minimumsize = { @panel_width 38 }
+					margin = { 2 0 }
+					spacing = 2
+
+					textbox = {
+						size = { 132 38 }
+						margin = { 8 8 }
+						align = nobaseline
+						alpha = 0.5
+						using = elide_fontsize_min
+						text = "FILTER_BUILDING_TYPE"
+					}
+
+					flowcontainer = {
+						wrap_count = 10
+						datamodel = "[CompaniesPanel.GetAllBuildingTypes]"
+
+						item = {
+							widget = {
+								size = { 40 40 }
+
+								button = {
+									size = { 38 38 }
+									parentanchor = center
+									using = tooltip_se
+									tooltip = "[BuildingType.GetName]"
+									texture = "[BuildingType.GetIcon]"
+
+									click_modifiers = {
+										ondefault = "[CompaniesPanel.SetBuildingFilter(BuildingType.Self)]"
+										onshift = "[CompaniesPanel.ToggleBuildingFilter(BuildingType.Self)]"
+									}
+								}
+
+								icon = {
+									visible = "[CompaniesPanel.IsBuildingFilterSelected(BuildingType.Self)]"
+									using = highlighted_square_selection
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
