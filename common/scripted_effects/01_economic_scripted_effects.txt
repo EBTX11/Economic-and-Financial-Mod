@@ -14616,7 +14616,7 @@ global_monetary_reference_reset = {
 		#reset currency
 		if = {
 			limit = {
-				var:extreme_weak_currency_solution_count >= 0 #3
+				var:extreme_weak_currency_solution_count >= 3 #3 #passe les 2ans des modificateur puis 1 ans après recrer une currency/protege aussi les pays revolutionnaire qui on perdu leur capital sans dé"calncher de centralbank bankrupcy
 				not = {
 					or = {
 						has_modifier = central_bank_bankruptcy_country
@@ -42285,14 +42285,14 @@ global_monetary_reference_reset = {
 				name = money_value_target_1
 				value = var:money_value_target_valided
 			}
-
-
-
+ 
 			############# Reset
 			set_variable = {
 				name = devaluation_on_time
 				value = 0
 			}
+			activate_law = law_type:law_no_monetary_policy #test
+			monetary_policy_ideology_dynamic_reset = yes
 		}
 	}
 	revaluation_on = {
@@ -42313,16 +42313,67 @@ global_monetary_reference_reset = {
 				name = money_value_target_1
 				value = var:money_value_target_valided
 			}
-
-
+ 
 			############# Reset
 			set_variable = {
 				name = revaluation_on_time
 				value = 0
 			}
+			activate_law = law_type:law_no_monetary_policy #test
+			monetary_policy_ideology_dynamic_reset = yes
 		}
 	}
 
+	monetary_policy_ideology_dynamic = {  
+		capital= {
+			save_scope_as = capital_state
+		}
+		save_scope_as = target_country
+
+		random_interest_group = {
+			limit = {
+				not = {
+					has_ideology = ideology:ideology_monetary_policy
+				}
+			}
+			save_scope_as = ig_want_a_large_monetary_policy
+		}
+		if = {
+			limit = {
+				exists = scope:ig_want_a_large_monetary_policy
+				or = {
+					central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 1.25
+					central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 0.75 
+				}
+			}
+			trigger_event = 00_ef_economic_event.106
+		}  
+
+		random_interest_group = {
+			limit = {
+				has_ideology = ideology:ideology_monetary_policy 
+			}
+			save_scope_as = ig_no_want_a_large_monetary_policy 
+		}
+		if = {
+			limit = {
+				exists = scope:ig_no_want_a_large_monetary_policy
+ 				AND = {
+					central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent < 1.25
+					central_bank_metal_reserves_state_to_ensure_the_conversion_pourcent > 0.75 
+				}
+			}
+			trigger_event = 00_ef_economic_event.107
+		}  
+	}  
+	monetary_policy_ideology_dynamic_reset = { 
+		every_interest_group = {
+			limit = {
+				has_ideology = ideology:ideology_monetary_policy 
+			}
+			remove_ideology = ideology_monetary_policy 
+		} 
+	} 
 #brace
 
 ############################################################################################################################################################
@@ -42357,8 +42408,7 @@ stockpiling_central_bank_metal_reserves_state = {
 	# 			has_law = law_type:law_bimetallism_standard
 	# 		}
 	# 	}
-	# 	storing_gold_1 = yes
-
+	# 	storing_gold_1 = yes 
 	# }
 	# if = {
 	# 	limit = {
@@ -42369,8 +42419,7 @@ stockpiling_central_bank_metal_reserves_state = {
 	# 	}
 	# 	storing_silver_1 = yes
 
-	# }
-
+	# }  
 	storing_gold_1 = yes
 	storing_silver_1 = yes
 }
