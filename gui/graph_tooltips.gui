@@ -327,13 +327,13 @@ template money_tooltip_with_graph
 					}
 					blockoverride "line_plotpoints" {
 						visible = "[Not(IsDynTrendEmpty(GetPlayer.GetBalanceTrend))]"
-						plotpoints = "[GetDynTrendPlotPoints(GetPlayer.GetBalanceTrend, GetDynTrendMin(GetPlayer.GetBalanceTrend), GetDynTrendMax(GetPlayer.GetBalanceTrend))]"
+						plotpoints = "[GetDynTrendPlotPoints(GetPlayer.GetBalanceTrend, GetDynTrendMinPadded(GetPlayer.GetBalanceTrend), GetDynTrendMaxPadded(GetPlayer.GetBalanceTrend))]"
 					}
 					blockoverride "maxvalue" {
-						text = "[GetDynTrendMax(GetPlayer.GetBalanceTrend)|K+=]"
+						text = "[GetDynTrendMaxPadded(GetPlayer.GetBalanceTrend)|K+=]"
 					}
 					blockoverride "minvalue" {
-						text = "[GetDynTrendMin(GetPlayer.GetBalanceTrend)|K+=]"
+						text = "[GetDynTrendMinPadded(GetPlayer.GetBalanceTrend)|K+=]"
 					}
 					blockoverride "startdate" {
 						text = "[CalcDynTrendOldestDate(GetPlayer.GetBalanceTrend)]"
@@ -345,7 +345,7 @@ template money_tooltip_with_graph
 
 					blockoverride "extra_plotlines" {
 						plotline = {
-							visible = "[And(GreaterThan_CFixedPoint(GetDynTrendMax(GetPlayer.GetBalanceTrend), '(CFixedPoint)0'), LessThan_CFixedPoint(GetDynTrendMin(GetPlayer.GetBalanceTrend), '(CFixedPoint)0'))]"
+							visible = "[And(GreaterThan_CFixedPoint(GetDynTrendMaxPadded(GetPlayer.GetBalanceTrend), '(CFixedPoint)0'), LessThan_CFixedPoint(GetDynTrendMinPadded(GetPlayer.GetBalanceTrend), '(CFixedPoint)0'))]"
 							size = { 100% 100% }
 							using = plot_line
 							width = 3.5
@@ -380,10 +380,10 @@ template money_tooltip_with_graph
 					}
 					blockoverride "line_plotpoints" {
 						visible = "[Not(IsDynTrendEmpty(GetPlayer.GetGoldReservesTrend))]"
-						plotpoints = "[GetDynTrendPlotPoints(GetPlayer.GetGoldReservesTrend, Negate_CFixedPoint(GetPlayer.GetMaxCredit), GetDynTrendMax( GetPlayer.GetGoldReservesTrend ))]"
+						plotpoints = "[GetDynTrendPlotPoints(GetPlayer.GetGoldReservesTrend, Negate_CFixedPoint(GetPlayer.GetMaxCredit), GetDynTrendMaxPadded( GetPlayer.GetGoldReservesTrend ))]"
 					}
 					blockoverride "maxvalue" {
-						text = "[GetDynTrendMax(GetPlayer.GetGoldReservesTrend)|K]"
+						text = "[GetDynTrendMaxPadded(GetPlayer.GetGoldReservesTrend)|K]"
 					}
 					blockoverride "minvalue" {
 						text = "[Negate_CFixedPoint(GetPlayer.GetMaxCredit)|K]"
@@ -398,7 +398,7 @@ template money_tooltip_with_graph
 
 					blockoverride "extra_plotlines" {
 						plotline = {
-							visible = "[GreaterThan_CFixedPoint(GetDynTrendMax(GetPlayer.GetGoldReservesTrend), '(CFixedPoint)0')]"
+							visible = "[GreaterThan_CFixedPoint(GetDynTrendMaxPadded(GetPlayer.GetGoldReservesTrend), '(CFixedPoint)0')]"
 							size = { 100% 100% }
 							using = plot_line
 							width = 3.5
@@ -744,10 +744,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Goods.GetPriceTrend)]"
@@ -799,10 +799,10 @@ types graph_tooltips {
 					plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetWorldPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Goods.GetWorldPriceTrend)]"
@@ -851,7 +851,7 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Building.GetProfitabilityTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetProfitabilityTrend, Min_CFixedPoint('(CFixedPoint)0', GetMin(Building.GetProfitabilityTrend)), Max_CFixedPoint('(CFixedPoint)0', GetMax(Building.GetProfitabilityTrend)))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetProfitabilityTrend, Min_CFixedPoint('(CFixedPoint)0', GetMinPadded(Building.GetProfitabilityTrend)), Max_CFixedPoint('(CFixedPoint)0', GetMaxPadded(Building.GetProfitabilityTrend)))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[Max_CFixedPoint('(CFixedPoint)0', GetMax(Building.GetProfitabilityTrend))|%=+0]"
@@ -896,7 +896,7 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Building.GetProfitabilityInTypeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetProfitabilityInTypeTrend, Min_CFixedPoint('(CFixedPoint)0', GetMin(Building.GetProfitabilityInTypeTrend)), Max_CFixedPoint('(CFixedPoint)0', GetMax(Building.GetProfitabilityInTypeTrend)))]"
+					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetProfitabilityInTypeTrend, Min_CFixedPoint('(CFixedPoint)0', GetMinPadded(Building.GetProfitabilityInTypeTrend)), Max_CFixedPoint('(CFixedPoint)0', GetMaxPadded(Building.GetProfitabilityInTypeTrend)))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[Max_CFixedPoint('(CFixedPoint)0', GetMax(Building.GetProfitabilityInTypeTrend))|%=+0]"
@@ -941,10 +941,10 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Building.GetEarningsPerEmployeeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetEarningsPerEmployeeTrend, '(CFixedPoint)0', GetMax(Building.GetEarningsPerEmployeeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetEarningsPerEmployeeTrend, GetMinPadded(Building.GetEarningsPerEmployeeTrend), GetMaxPadded(Building.GetEarningsPerEmployeeTrend))]"
 				}
 				blockoverride "maxvalue" {
-					raw_text = "[Building.GetState.GetOwner.GetCustom('currency_symbol')][GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
+					raw_text = "[Market.GetOwner.GetCustom('currency_symbol')][GetMax(Building.GetEarningsPerEmployeeTrend)|1]"
 				}
 				blockoverride "minvalue" {
 					raw_text = "0.0"
@@ -986,13 +986,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Building.GetCashReservesTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetCashReservesTrend, '(CFixedPoint)0', GetMax(Building.GetCashReservesTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(Building.GetCashReservesTrend, GetMinPadded(Building.GetCashReservesTrend), GetMaxPadded(Building.GetCashReservesTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(Building.GetCashReservesTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(Building.GetCashReservesTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Building.GetCashReservesTrend)]"
@@ -1031,13 +1031,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTaxIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTaxIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTaxIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTaxIncomeTrend, GetMinPadded(GetPlayer.GetTaxIncomeTrend), GetMaxPadded(GetPlayer.GetTaxIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTaxIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTaxIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTaxIncomeTrend)]"
@@ -1076,13 +1076,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetPollTaxTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPollTaxTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetPollTaxTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPollTaxTrend, GetMinPadded(GetPlayer.GetPollTaxTrend), GetMaxPadded(GetPlayer.GetPollTaxTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetPollTaxTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetPollTaxTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetPollTaxTrend)]"
@@ -1121,13 +1121,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetAdditionalIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetAdditionalIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetAdditionalIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetAdditionalIncomeTrend, GetMinPadded(GetPlayer.GetAdditionalIncomeTrend), GetMaxPadded(GetPlayer.GetAdditionalIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetAdditionalIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetAdditionalIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetAdditionalIncomeTrend)]"
@@ -1166,13 +1166,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMintingTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMintingTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMintingTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMintingTrend, GetMinPadded(GetPlayer.GetMintingTrend), GetMaxPadded(GetPlayer.GetMintingTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMintingTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMintingTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMintingTrend)]"
@@ -1211,13 +1211,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTariffTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTariffTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTariffTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTariffTrend, GetMinPadded(GetPlayer.GetTariffTrend), GetMaxPadded(GetPlayer.GetTariffTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTariffTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTariffTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTariffTrend)]"
@@ -1256,13 +1256,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetGovernmentShareDividendsTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentShareDividendsTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetGovernmentShareDividendsTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentShareDividendsTrend, GetMinPadded(GetPlayer.GetGovernmentShareDividendsTrend), GetMaxPadded(GetPlayer.GetGovernmentShareDividendsTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetGovernmentShareDividendsTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetGovernmentShareDividendsTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetGovernmentShareDividendsTrend)]"
@@ -1301,13 +1301,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetGovernmentShareLossesTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentShareLossesTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetGovernmentShareLossesTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentShareLossesTrend, GetMinPadded(GetPlayer.GetGovernmentShareLossesTrend), GetMaxPadded(GetPlayer.GetGovernmentShareLossesTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetGovernmentShareLossesTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetGovernmentShareLossesTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetGovernmentShareLossesTrend)]"
@@ -1346,13 +1346,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetInvestmentIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInvestmentIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetInvestmentIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInvestmentIncomeTrend, GetMinPadded(GetPlayer.GetInvestmentIncomeTrend), GetMaxPadded(GetPlayer.GetInvestmentIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetInvestmentIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetInvestmentIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetInvestmentIncomeTrend)]"
@@ -1391,13 +1391,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetAdditionalExpensesTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetAdditionalExpensesTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetAdditionalExpensesTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetAdditionalExpensesTrend, GetMinPadded(GetPlayer.GetAdditionalExpensesTrend), GetMaxPadded(GetPlayer.GetAdditionalExpensesTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetAdditionalExpensesTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetAdditionalExpensesTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetAdditionalExpensesTrend)]"
@@ -1436,13 +1436,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetWelfarePaymentsTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetWelfarePaymentsTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetWelfarePaymentsTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetWelfarePaymentsTrend, GetMinPadded(GetPlayer.GetWelfarePaymentsTrend), GetMaxPadded(GetPlayer.GetWelfarePaymentsTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetWelfarePaymentsTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetWelfarePaymentsTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetWelfarePaymentsTrend)]"
@@ -1481,13 +1481,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetConsumptionTaxTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetConsumptionTaxTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetConsumptionTaxTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetConsumptionTaxTrend, GetMinPadded(GetPlayer.GetConsumptionTaxTrend), GetMaxPadded(GetPlayer.GetConsumptionTaxTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetConsumptionTaxTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetConsumptionTaxTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetConsumptionTaxTrend)]"
@@ -1526,13 +1526,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetDividendsTaxTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDividendsTaxTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetDividendsTaxTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDividendsTaxTrend, GetMinPadded(GetPlayer.GetDividendsTaxTrend), GetMaxPadded(GetPlayer.GetDividendsTaxTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetDividendsTaxTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetDividendsTaxTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetDividendsTaxTrend)]"
@@ -1571,13 +1571,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetDiplomaticPactsIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDiplomaticPactsIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetDiplomaticPactsIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDiplomaticPactsIncomeTrend, GetMinPadded(GetPlayer.GetDiplomaticPactsIncomeTrend), GetMaxPadded(GetPlayer.GetDiplomaticPactsIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetDiplomaticPactsIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetDiplomaticPactsIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetDiplomaticPactsIncomeTrend)]"
@@ -1616,13 +1616,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTreatiesIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTreatiesIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTreatiesIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTreatiesIncomeTrend, GetMinPadded(GetPlayer.GetTreatiesIncomeTrend), GetMaxPadded(GetPlayer.GetTreatiesIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTreatiesIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTreatiesIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTreatiesIncomeTrend)]"
@@ -1661,13 +1661,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetPowerBlocIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPowerBlocIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetPowerBlocIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPowerBlocIncomeTrend, GetMinPadded(GetPlayer.GetPowerBlocIncomeTrend), GetMaxPadded(GetPlayer.GetPowerBlocIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetPowerBlocIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetPowerBlocIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetPowerBlocIncomeTrend)]"
@@ -1706,13 +1706,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetPiracyIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPiracyIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetPiracyIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPiracyIncomeTrend, GetMinPadded(GetPlayer.GetPiracyIncomeTrend), GetMaxPadded(GetPlayer.GetPiracyIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetPiracyIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetPiracyIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetPiracyIncomeTrend)]"
@@ -1752,13 +1752,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetGovernmentSlavesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentSlavesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetGovernmentSlavesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentSlavesExpenseTrend, GetMinPadded(GetPlayer.GetGovernmentSlavesExpenseTrend), GetMaxPadded(GetPlayer.GetGovernmentSlavesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetGovernmentSlavesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetGovernmentSlavesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetGovernmentSlavesExpenseTrend)]"
@@ -1797,13 +1797,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetGovernmentGoodsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentGoodsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetGovernmentGoodsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentGoodsExpenseTrend, GetMinPadded(GetPlayer.GetGovernmentGoodsExpenseTrend), GetMaxPadded(GetPlayer.GetGovernmentGoodsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetGovernmentGoodsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetGovernmentGoodsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetGovernmentGoodsExpenseTrend)]"
@@ -1842,13 +1842,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetGovernmentWagesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentWagesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetGovernmentWagesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetGovernmentWagesExpenseTrend, GetMinPadded(GetPlayer.GetGovernmentWagesExpenseTrend), GetMaxPadded(GetPlayer.GetGovernmentWagesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetGovernmentWagesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetGovernmentWagesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetGovernmentWagesExpenseTrend)]"
@@ -1887,13 +1887,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMilitarySlavesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitarySlavesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitarySlavesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitarySlavesExpenseTrend, GetMinPadded(GetPlayer.GetMilitarySlavesExpenseTrend), GetMaxPadded(GetPlayer.GetMilitarySlavesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMilitarySlavesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMilitarySlavesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMilitarySlavesExpenseTrend)]"
@@ -1932,13 +1932,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryGoodsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryGoodsExpenseTrend, GetMinPadded(GetPlayer.GetMilitaryGoodsExpenseTrend), GetMaxPadded(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMilitaryGoodsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMilitaryGoodsExpenseTrend)]"
@@ -1977,13 +1977,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryWagesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryWagesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryWagesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryWagesExpenseTrend, GetMinPadded(GetPlayer.GetMilitaryWagesExpenseTrend), GetMaxPadded(GetPlayer.GetMilitaryWagesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMilitaryWagesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMilitaryWagesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMilitaryWagesExpenseTrend)]"
@@ -2022,13 +2022,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryWagesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryWagesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryWagesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryWagesExpenseTrend, GetMinPadded(GetPlayer.GetMilitaryWagesExpenseTrend), GetMaxPadded(GetPlayer.GetMilitaryWagesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMilitaryWagesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMilitaryWagesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMilitaryWagesExpenseTrend)]"
@@ -2062,13 +2062,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryGoodsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetMilitaryGoodsExpenseTrend, GetMinPadded(GetPlayer.GetMilitaryGoodsExpenseTrend), GetMaxPadded(GetPlayer.GetMilitaryGoodsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetMilitaryGoodsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetMilitaryGoodsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetMilitaryGoodsExpenseTrend)]"
@@ -2107,13 +2107,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetConstructionGoodsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetConstructionGoodsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetConstructionGoodsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetConstructionGoodsExpenseTrend, GetMinPadded(GetPlayer.GetConstructionGoodsExpenseTrend), GetMaxPadded(GetPlayer.GetConstructionGoodsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetConstructionGoodsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetConstructionGoodsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetConstructionGoodsExpenseTrend)]"
@@ -2152,13 +2152,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetSubsidiesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetSubsidiesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetSubsidiesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetSubsidiesExpenseTrend, GetMinPadded(GetPlayer.GetSubsidiesExpenseTrend), GetMaxPadded(GetPlayer.GetSubsidiesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetSubsidiesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetSubsidiesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetSubsidiesExpenseTrend)]"
@@ -2197,13 +2197,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetSubventionsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetSubventionsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetSubventionsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetSubventionsExpenseTrend, GetMinPadded(GetPlayer.GetSubventionsExpenseTrend), GetMaxPadded(GetPlayer.GetSubventionsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetSubventionsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetSubventionsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetSubventionsExpenseTrend)]"
@@ -2242,13 +2242,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetInterestExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInterestExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetInterestExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInterestExpenseTrend, GetMinPadded(GetPlayer.GetInterestExpenseTrend), GetMaxPadded(GetPlayer.GetInterestExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetInterestExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetInterestExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetInterestExpenseTrend)]"
@@ -2287,13 +2287,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetDiplomaticPactsExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDiplomaticPactsExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetDiplomaticPactsExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetDiplomaticPactsExpenseTrend, GetMinPadded(GetPlayer.GetDiplomaticPactsExpenseTrend), GetMaxPadded(GetPlayer.GetDiplomaticPactsExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetDiplomaticPactsExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetDiplomaticPactsExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetDiplomaticPactsExpenseTrend)]"
@@ -2332,13 +2332,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTreatiesExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTreatiesExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTreatiesExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTreatiesExpenseTrend, GetMinPadded(GetPlayer.GetTreatiesExpenseTrend), GetMaxPadded(GetPlayer.GetTreatiesExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTreatiesExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTreatiesExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTreatiesExpenseTrend)]"
@@ -2377,13 +2377,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetPowerBlocExpenseTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPowerBlocExpenseTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetPowerBlocExpenseTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetPowerBlocExpenseTrend, GetMinPadded(GetPlayer.GetPowerBlocExpenseTrend), GetMaxPadded(GetPlayer.GetPowerBlocExpenseTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetPowerBlocExpenseTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetPowerBlocExpenseTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetPowerBlocExpenseTrend)]"
@@ -2440,13 +2440,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetInvestmentFundTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInvestmentFundTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetInvestmentFundTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetInvestmentFundTrend, GetMinPadded(GetPlayer.GetInvestmentFundTrend), GetMaxPadded(GetPlayer.GetInvestmentFundTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetInvestmentFundTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetInvestmentFundTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetInvestmentFundTrend)]"
@@ -2485,13 +2485,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTotalIncomeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTotalIncomeTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTotalIncomeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTotalIncomeTrend, GetMinPadded(GetPlayer.GetTotalIncomeTrend), GetMaxPadded(GetPlayer.GetTotalIncomeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTotalIncomeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTotalIncomeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTotalIncomeTrend)]"
@@ -2530,13 +2530,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(GetPlayer.GetTotalExpensesTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTotalExpensesTrend, '(CFixedPoint)0', GetMax(GetPlayer.GetTotalExpensesTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized(GetPlayer.GetTotalExpensesTrend, GetMinPadded(GetPlayer.GetTotalExpensesTrend), GetMaxPadded(GetPlayer.GetTotalExpensesTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(GetPlayer.GetTotalExpensesTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(GetPlayer.GetTotalExpensesTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(GetPlayer.GetTotalExpensesTrend)]"
@@ -2575,7 +2575,7 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(InterestGroup.GetCloutTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( InterestGroup.GetCloutTrend, '(CFixedPoint)0', GetMax(InterestGroup.GetCloutTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( InterestGroup.GetCloutTrend, GetMinPadded(InterestGroup.GetCloutTrend), GetMaxPadded(InterestGroup.GetCloutTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(InterestGroup.GetCloutTrend)|%0]"
@@ -2620,13 +2620,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Pop.GetSizeTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetSizeTrend, '(CFixedPoint)0', GetMax(Pop.GetSizeTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetSizeTrend, GetMinPadded(Pop.GetSizeTrend), GetMaxPadded(Pop.GetSizeTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(Pop.GetSizeTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(Pop.GetSizeTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Pop.GetSizeTrend)]"
@@ -2665,13 +2665,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Pop.GetCurrentStandardOfLivingTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetCurrentStandardOfLivingTrend, '(CFixedPoint)0', GetMax(Pop.GetCurrentStandardOfLivingTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetCurrentStandardOfLivingTrend, GetMinPadded(Pop.GetCurrentStandardOfLivingTrend), GetMaxPadded(Pop.GetCurrentStandardOfLivingTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(Pop.GetCurrentStandardOfLivingTrend)|0]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(Pop.GetCurrentStandardOfLivingTrend)|0]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Pop.GetCurrentStandardOfLivingTrend)]"
@@ -2710,13 +2710,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(Pop.GetPoliticalStrengthTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetPoliticalStrengthTrend, '(CFixedPoint)0', GetMax(Pop.GetPoliticalStrengthTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( Pop.GetPoliticalStrengthTrend, GetMinPadded(Pop.GetPoliticalStrengthTrend), GetMaxPadded(Pop.GetPoliticalStrengthTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(Pop.GetPoliticalStrengthTrend)|D]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(Pop.GetPoliticalStrengthTrend)|D]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(Pop.GetPoliticalStrengthTrend)]"
@@ -2752,13 +2752,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(PoliticalMovement.GetSupportTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetSupportTrend, '(CFixedPoint)0', GetMax(PoliticalMovement.GetSupportTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetSupportTrend, GetMinPadded(PoliticalMovement.GetSupportTrend), GetMaxPadded(PoliticalMovement.GetSupportTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(PoliticalMovement.GetSupportTrend)|%0]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(PoliticalMovement.GetSupportTrend)|%0]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(PoliticalMovement.GetSupportTrend)]"
@@ -2797,13 +2797,13 @@ types graph_tooltips {
 				}
 				blockoverride "line_plotpoints" {
 					visible = "[Not(IsEmpty(PoliticalMovement.GetRadicalismTrend))]"
-					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetRadicalismTrend, '(CFixedPoint)0', GetMax(PoliticalMovement.GetRadicalismTrend) )]"
+					plotpoints = "[GetTrendPlotPointsNormalized( PoliticalMovement.GetRadicalismTrend, GetMinPadded(PoliticalMovement.GetRadicalismTrend), GetMaxPadded(PoliticalMovement.GetRadicalismTrend))]"
 				}
 				blockoverride "maxvalue" {
 					text = "[GetMax(PoliticalMovement.GetRadicalismTrend)|%0]"
 				}
 				blockoverride "minvalue" {
-					raw_text = "0"
+					text = "[GetMin(PoliticalMovement.GetRadicalismTrend)|%0]"
 				}
 				blockoverride "startdate" {
 					text = "[GetOldestDate(PoliticalMovement.GetRadicalismTrend)]"

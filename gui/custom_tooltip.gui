@@ -547,12 +547,19 @@ types TooltipTypes
 								item = {
 									container = {
 										treaty_tooltip_article = {
-											visible = "[Not(Article.HasType('acquire_monopoly_for_company'))]"
+											visible = "[Not(Or(Article.HasType('acquire_monopoly_for_company'), Article.HasType('free_text')))]"
 										}
 
 										treaty_tooltip_article = {
 											visible = "[Article.HasType('acquire_monopoly_for_company')]"
 											size = { 220 75 }
+										}
+
+										treaty_tooltip_article = {
+											visible = "[Article.HasType('free_text')]"
+											blockoverride "text_maximumsize" {
+												maximumsize = { 160 20}
+											}
 										}
 									}
 								}
@@ -980,6 +987,9 @@ types TooltipTypes
 			### TEXT INPUT
 			text_input_article = {
 				parentanchor = vcenter
+				blockoverride "raw_text" {
+					raw_text = "[Article.GetNameNoFormatting]"
+				}
 
 				blockoverride "text_format" {
 					fonttintcolor = "[TooltipInfo.GetTintColor]"
@@ -2069,8 +2079,14 @@ types TooltipTypes
 				}
 
 				custom_tooltip_textbox = {
+					visible = "[GreaterThan_int32(WarGoalDraft.GetManeuversCostToAdd, '(int32)0')]"
 					tooltip = "ADD_WARGOAL_MANEUVERS_COST_TOOLTIP"
 					text = "ADD_WARGOAL_MANEUVERS_COST_WITH_LABEL"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[Not(GreaterThan_int32(WarGoalDraft.GetManeuversCostToAdd, '(int32)0'))]"
+					text = "[WarGoalDraft.GetManeuversCostToAddDesc]"
 				}
 
 				custom_tooltip_textbox = {
@@ -4866,10 +4882,10 @@ types TooltipTypes
 						plotpoints = "[GetTrendPlotPointsNormalized( Goods.GetPriceTrend, Goods.GetMinPrice, Goods.GetMaxPrice )]"
 					}
 					blockoverride "maxvalue" {
-						raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
+						raw_text = "[State.GetOwner.GetCustom('currency_symbol')][Goods.GetMaxPrice]"
 					}
 					blockoverride "minvalue" {
-						raw_text = "[Goods.GetMarket.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
+						raw_text = "[State.GetOwner.GetCustom('currency_symbol')][Goods.GetMinPrice]"
 					}
 					blockoverride "startdate" {
 						text = "[GetOldestDate(Goods.GetPriceTrend)]"
@@ -6345,305 +6361,32 @@ types TooltipTypes
 				text = "THIS_BUILDING_GROUP_CONSIST_OF"
 			}
 
-			### AGRICULTURE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_agriculture')]"
+			flowcontainer = {
+				direction = vertical
 				margin_left = 10
-				text = "BUILDING_GROUP_AGRICULTURE_TYPES"
-			}
+				spacing = 2
+				datamodel = "[BuildingGroup.GetBuildingTypes]"
 
-			### MANUFACTURING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_manufacturing')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MANUFACTURING_TYPES"
-			}
+				item = {
+					flowcontainer = {
+						spacing = 6
 
-			### LIGHT INDUSTRY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_light_industry')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_LIGHT_INDUSTRY_TYPES"
-			}
+						icon = {
+							size = { 24 24 }
+							parentanchor = vcenter
+							texture = "[BuildingType.GetIcon]"
+						}
 
-			### HEAVY INDUSTRY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_heavy_industry')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_HEAVY_INDUSTRY_TYPES"
-			}
-
-			### STAPLE CROPS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_staple_crops')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_STAPLE_CROPS_TYPES"
-			}
-
-			### SUBSISTENCE AGRICULTURE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_subsistence_agriculture')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_SUBSISTENCE_AGRICULTURE_TYPES"
-			}
-
-			### RANCHING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_ranching')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_RANCHING_TYPES"
-			}
-
-			### PLANTATIONS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_plantations')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_PLANTATIONS_TYPES"
-			}
-
-			### EXTRACTION
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_extraction')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_EXTRACTION_TYPES"
-			}
-
-			### MINING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_mining')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MINING_TYPES"
-			}
-
-			### URBAN FACILITIES
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_urban_facilities')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_URBAN_FACILITIES_TYPES"
-			}
-
-			### OWNER BUILDINGS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_owner_buildings')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_OWNER_BUILDINGS_TYPES"
-			}
-
-			### ARMY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_army')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_ARMY_TYPES"
-			}
-
-			### ARTS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_arts')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_ARTS_TYPES"
-			}
-
-			### BUREAUCRACY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_bureaucracy')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_BUREAUCRACY_TYPES"
-			}
-
-			### CANALS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_canals')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_CANALS_TYPES"
-			}
-
-			### COMPANY HEADQUARTER
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_company_headquarter')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_COMPANY_HEADQUARTER_TYPES"
-			}
-
-			### COMPANY REGIONAL HEADQUARTER
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_company_regional_headquarter')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_COMPANY_REGIONAL_HEADQUARTER_TYPES"
-			}
-
-			### CONSCRIPTION
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_conscription')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_CONSCRIPTION_TYPES"
-			}
-
-			### CONSTRUCTION
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_construction')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_CONSTRUCTION_TYPES"
-			}
-
-			### FINANCIAL DISTRICTS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_financial_districts')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_FINANCIAL_DISTRICTS_TYPES"
-			}
-
-			### FISHING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_fishing')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_FISHING_TYPES"
-			}
-
-			### GOLD FIELDS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_gold_fields')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_GOLD_FIELDS_TYPES"
-			}
-
-			### GOVERNMENT
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_government')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_GOVERNMENT_TYPES"
-			}
-
-			### INFRASTRUCTURE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_infrastructure')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_INFRASTRUCTURE_TYPES"
-			}
-
-			### LOGGING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_logging')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_LOGGING_TYPES"
-			}
-
-			### MANOR HOUSES
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_manor_houses')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MANOR_HOUSES_TYPES"
-			}
-
-			### MILITARY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_military')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MILITARY_TYPES"
-			}
-
-			### MILITARY INDUSTRY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_military_industry')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MILITARY_INDUSTRY_TYPES"
-			}
-
-			### MILITARY SHIPYARD
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_ship_construction')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_SHIP_CONSTRUCTION_TYPES"
-			}
-
-			### MONUMENTS
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_monuments')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_MONUMENTS_TYPES"
-			}
-
-			### NAVY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_naval_administration')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_NAVY_TYPES"
-			}
-
-			### OIL EXTRACTION
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_oil_extraction')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_OIL_EXTRACTION_TYPES"
-			}
-
-			### POWER
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_power')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_POWER_TYPES"
-			}
-
-			### PRIVATE INFRASTRUCTURE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_private_infrastructure')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_PRIVATE_INFRASTRUCTURE_TYPES"
-			}
-
-			### PUBLIC INFRASTRUCTURE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_public_infrastructure')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_PUBLIC_INFRASTRUCTURE_TYPES"
-			}
-
-			### RUBBER
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_rubber')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_RUBBER_TYPES"
-			}
-
-			### SERVICE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_service')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_SERVICE_TYPES"
-			}
-
-			### SKYSCRAPER
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_skyscraper')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_SKYSCRAPER_TYPES"
-			}
-
-			### SUBSISTENCE RANCHING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_subsistence_ranching')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_SUBSISTENCE_RANCHING_TYPES"
-			}
-
-			### TECHNOLOGY
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_technology')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_TECHNOLOGY_TYPES"
-			}
-
-			### TRADE
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_trade')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_TRADE_TYPES"
-			}
-
-			### WHALING
-			custom_tooltip_textbox = {
-				visible = "[BuildingGroup.IsBuildingGroup('bg_whaling')]"
-				margin_left = 10
-				text = "BUILDING_GROUP_WHALING_TYPES"
+						textbox = {
+							autoresize = yes
+							align = nobaseline
+							parentanchor = vcenter
+							using = elide_fontsize_min
+							max_width = 400
+							text = "[BuildingType.GetName]"
+						}
+					}
+				}
 			}
 		}
 	}
@@ -6992,6 +6735,43 @@ types TooltipTypes
 
 
 
+				### HOLDING CHARACTER
+				flowcontainer = {
+					direction = vertical
+					visible = "[Building.HasHoldingCharacter]"
+					datacontext = "[Building.AccessHoldingCharacter]"
+
+					using = tooltip_segment_background
+					using = tooltip_segment_margin
+					min_width = @tooltip_fixed_width
+
+					custom_tooltip_textbox = {
+						text = "HOLDING"
+					}
+
+					flowcontainer = {
+						spacing = 8
+						margin_top = 3
+
+						button = {
+							size = { 35 35 }
+							onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
+							onrightclick = "[RightClickMenuManager.ShowForCharacter(Character.AccessSelf)]"
+							tooltip = "GO_TO_BUTTON_CHARACTER"
+
+							character_portrait_small = {}
+						}
+
+						textbox = {
+							text = "[Character.GetFullName]"
+							autoresize = yes
+							align = nobaseline
+							parentanchor = vcenter
+							using = tooltip_font
+						}
+					}
+				}
+
 				flowcontainer = {
 					direction = vertical
 					visible = "[Not(IsDataModelEmpty(Building.GetBuildingAssets))]"
@@ -7298,7 +7078,7 @@ types TooltipTypes
 		}
 
 		blockoverride "go_to_button_properties" {
-			onclick = "[InformationPanelBar.OpenPanelCycleTabs('tech_tree', 'production|military|society')]"
+			onclick = "[InformationPanelBar.OpenTechnologyPanel( Technology.Self )]"
 		}
 
 		blockoverride "buttons" {
@@ -7792,6 +7572,7 @@ types TooltipTypes
 		}
 
 		blockoverride "tooltip_content_after" {
+			spacing = 1
 			custom_tooltip_textbox = {
 				visible = "[Ship.IsFlagship]"
 				text = "SHIP_FLAGSHIP"
@@ -7821,6 +7602,44 @@ types TooltipTypes
 
 			custom_tooltip_textbox = {
 				text = "SHIP_TEMPLATE_IN_TOOLTIP"
+			}
+
+			flowcontainer = {
+				spacing = 2
+
+				flowcontainer = {
+					spacing = 2
+					datamodel = "[Ship.GetModifications]"
+
+					item = {
+						icon = {
+							using = tooltip_se
+							size = { 24 24 }
+							texture = "[ShipModificationType.GetIcon]"
+
+							tooltipwidget = {
+								FancyTooltip_ShipModificationType = {}
+							}
+						}
+					}
+				}
+
+				flowcontainer = {
+					spacing = 2
+					datamodel = "[Ship.GetUtilityModifications]"
+
+					item = {
+						icon = {
+							using = tooltip_se
+							size = { 24 24 }
+							texture = "[ShipModificationType.GetIcon]"
+
+							tooltipwidget = {
+								FancyTooltip_ShipModificationType = {}
+							}
+						}
+					}
+				}
 			}
 
 			flowcontainer = {
@@ -7985,6 +7804,10 @@ types TooltipTypes
 	type FancyTooltip_ShipGroup = FancyTooltipWidgetType {
 		blockoverride "text" {} # Fully replaced by everything in tooltip_content_after
 
+		blockoverride "icon_texture" {
+			texture = "[ShipGroup.GetIcon]"
+		}
+
 		blockoverride "name" {
 			text = "[ShipGroup.GetNameNoFormatting]"
 		}
@@ -8065,6 +7888,8 @@ types TooltipTypes
 				blockoverride "ship_template_maintenance" {}
 
 				blockoverride "ship_template_construction_cost" {}
+
+				blockoverride "ship_template_veterancy" {}
 			}
 
 			flowcontainer = {
@@ -8202,7 +8027,7 @@ types TooltipTypes
 
 								icon = {
 									size = { 24 24 }
-									texture = "gfx/interface/buttons/button_icons/plus.dds"
+									texture = "[ShipModificationType.GetIcon]"
 								}
 
 								custom_tooltip_textbox = {
@@ -8296,19 +8121,11 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-		ship_template_stat_hit_points = {
-			size = { 245 36 }
-		}
-
-		ship_template_stat_movement_speed = {
-			size = { 245 36 }
-		}
-
 		ship_template_stat_armor = {
 			size = { 245 36 }
 		}
 
-		ship_template_stat_visibility = {
+		ship_template_stat_screening = {
 			size = { 245 36 }
 		}
 
@@ -8316,8 +8133,7 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-
-		ship_template_stat_screening = {
+		ship_template_stat_movement_speed = {
 			size = { 245 36 }
 		}
 
@@ -8325,7 +8141,7 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-		ship_template_stat_supply_capacity = {
+		ship_template_stat_supply_efficiency = {
 			size = { 245 36 }
 		}
 
@@ -8333,7 +8149,7 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-		ship_template_stat_supply_efficiency = {
+		ship_template_stat_supply_capacity = {
 			size = { 245 36 }
 		}
 
@@ -8345,6 +8161,10 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
+		ship_template_stat_visibility = {
+			size = { 245 36 }
+		}
+
 		ship_template_stat_marine_capacity = {
 			size = { 245 36 }
 		}
@@ -8353,7 +8173,15 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
+		ship_template_stat_readiness_gain = {
+			size = { 245 36 }
+		}
+
 		ship_template_stat_accuracy = {
+			size = { 245 36 }
+		}
+
+		ship_template_stat_blockade_strength = {
 			size = { 245 36 }
 		}
 	}
@@ -8423,14 +8251,6 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-		ship_modifier_stat_hull_damage = {
-			size = { 245 36 }
-		}
-
-		ship_modifier_stat_movement_speed = {
-			size = { 245 36 }
-		}
-
 		ship_modifier_stat_crew_damage = {
 			size = { 245 36 }
 		}
@@ -8439,11 +8259,19 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
+		ship_modifier_stat_hull_damage = {
+			size = { 245 36 }
+		}
+
+		ship_modifier_stat_movement_speed = {
+			size = { 245 36 }
+		}
+
 		ship_modifier_stat_critical_hit_chance = {
 			size = { 245 36 }
 		}
 
-		ship_modifier_stat_supply_capacity = {
+		ship_modifier_stat_supply_efficiency = {
 			size = { 245 36 }
 		}
 
@@ -8451,7 +8279,7 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
-		ship_modifier_stat_supply_efficiency = {
+		ship_modifier_stat_supply_capacity = {
 			size = { 245 36 }
 		}
 
@@ -8471,9 +8299,24 @@ types TooltipTypes
 			size = { 245 36 }
 		}
 
+		block "ship_template_veterancy" {
+			ship_stat_veterancy = {
+				size = { 245 36 }
+			}
+		}
+
+		ship_modifier_stat_readiness_gain = {
+			size = { 245 36 }
+		}
+
 		ship_modifier_stat_accuracy = {
 			size = { 245 36 }
 		}
+
+		ship_modifier_stat_blockade_strength = {
+			size = { 245 36 }
+		}
+
 	}
 
 	type FancyTooltip_ShipModificationType = FancyTooltipWidgetType {
@@ -8625,6 +8468,38 @@ types TooltipTypes
 				ship_modifier_suffered_hull_damage = {
 					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_suffered_hull_damage_mult'))]"
 				}
+
+				ship_modifier_battle_against_torpedo_boat_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_torpedo_boat_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_torpedo_boat_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_submarine_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_submarine_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_destroyer_accuracy = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_destroyer_accuracy_mult'))]"
+				}
+
+				ship_modifier_battle_against_modern_ironclad_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_modern_ironclad_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_pre_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_pre_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_dreadnought_hull_damage_mult'))]"
+				}
+
+				ship_modifier_battle_against_super_dreadnought_hull_damage = {
+					visible = "[NotZero_CFixedPoint(Modifier.GetValueFor('ship_battle_against_ship_type_super_dreadnought_hull_damage_mult'))]"
+				}
 			}
 
 			custom_tooltip_newline = {}
@@ -8666,6 +8541,35 @@ types TooltipTypes
 						blockoverride "number_minimumsize" {
 							minimumsize = { -1 40 }
 						}
+					}
+				}
+			}
+		}
+	}
+
+	type RegularTooltip_AdditionalSeaRegions = RegularTooltip {
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox = {
+				block "header_text"{
+					text = "MORE_SEA_REGIONS_TOOLTIP"
+				}
+			}
+
+			tooltip_divider = {}
+
+			flowcontainer = {
+				spacing = 5
+				direction = vertical
+
+				block "datamodel" {
+					datamodel = "[DataModelSkipFirst(GetSelectedFleetsMissionSeaRegions, '(int32)6')]"
+				}
+
+				item = {
+					textbox = {
+						autoresize = yes
+						align = nobaseline
+						text = "STATE_REGION_LIST_ENTRY"
 					}
 				}
 			}
@@ -9613,7 +9517,7 @@ types TooltipTypes
 			minimumsize = { 70 -1 }
 			maximumsize = { 70 -1 }
 			margin_right = 5
-			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			raw_text = "#b [Country.GetLocalityInDisplay(StrategicRegion.Self)|0%]#!"
 			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
 		}
 
@@ -9760,7 +9664,7 @@ types TooltipTypes
 		blockoverride "table_value_4" {
 			minimumsize = { 70 -1 }
 			margin_right = 5
-			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			raw_text = "#b [Country.GetLocalityInDisplay(StrategicRegion.Self)|0%]#!"
 			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
 		}
 	}
@@ -9838,7 +9742,7 @@ types TooltipTypes
 		blockoverride "table_value_4" {
 			minimumsize = { 70 -1 }
 			margin_right = 5
-			raw_text = "#b [Country.GetLocalityIn(StrategicRegion.Self)|0%]#!"
+			raw_text = "#b [Country.GetLocalityInDisplay(StrategicRegion.Self)|0%]#!"
 			tooltip = "COUNTRY_STRATEGIC_REGION_LOCALITY_TOOLTIP"
 		}
 	}
@@ -9909,23 +9813,43 @@ types TooltipTypes
 		blockoverride "tooltip_content_after" {
 			datacontext = "[Company.GetCountry]"
 
+			### EXECUTIVE
+			flowcontainer = {
+				spacing = 7
+				datacontext = "[Company.GetExecutive]"
+
+				custom_tooltip_textbox = {
+					parentanchor = vcenter
+					raw_text = "[concept_executive]:"
+				}
+
+				character_portrait_mini = {}
+
+				custom_tooltip_textbox = {
+					parentanchor = vcenter
+					text = "[Character.GetFullName]"
+				}
+
+				button_icon_goto = {
+					parentanchor = vcenter
+					size = { 21 21 }
+					using = tooltip_above
+					tooltip = "GO_TO_BUTTON_CHARACTER"
+					onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
+				}
+			}
+
 			flowcontainer = {
 				direction = vertical
 				using = tooltip_segment_margin
 				max_width = @tooltip_fixed_width
 				min_width = @tooltip_fixed_width
 
-				custom_tooltip_textbox_with_empty_line = {
-					datacontext = "[Company.GetCompanyType]"
-					text = "DATA_COMPANY_TYPE_CATEGORY"
-				}
-
 				custom_tooltip_textbox = {
 					text = "DATA_COMPANY_NAME_FORMAT_TOOLTIP"
 				}
 
 				flowcontainer = {
-					direction = horizontal
 					spacing = 5
 					datamodel = "[Company.GetBuildingTypes]"
 
@@ -9963,25 +9887,9 @@ types TooltipTypes
 					}
 				}
 
-				### EXECUTIVE
-				flowcontainer = {
-					spacing = 7
-					datacontext = "[Company.GetExecutive]"
-
-					custom_tooltip_textbox = {
-						raw_text = "[concept_executive]:"
-					}
-
-					custom_tooltip_textbox = {
-						text = "[Character.GetFullName]"
-					}
-
-					button_icon_goto = {
-						size = { 21 21 }
-						using = tooltip_above
-						tooltip = "GO_TO_BUTTON_CHARACTER"
-						onclick = "[InformationPanelBar.OpenCharacterPanel(Character.AccessSelf)]"
-					}
+				custom_tooltip_textbox = {
+					datacontext = "[Company.GetCompanyType]"
+					text = "DATA_COMPANY_TYPE_CATEGORY"
 				}
 
 				flowcontainer = {
@@ -10037,6 +9945,7 @@ types TooltipTypes
 			}
 
 			flowcontainer = {
+				visible = "[HasDlcFeature('mp1_charter_companies')]"
 				direction = vertical
 				using = tooltip_segment_margin
 				max_width = @tooltip_fixed_width
@@ -10138,10 +10047,12 @@ types TooltipTypes
 			custom_tooltip_newline = {}
 
 			custom_tooltip_textbox = {
+				visible = "[HasDlcFeature('mp1_charter_companies')]"
 				text = "DATA_COMPANY_TYPE_POTENTIAL_ADDITIONAL_INDUSTRIES_HEADER"
 			}
 
 			flowcontainer = {
+				visible = "[HasDlcFeature('mp1_charter_companies')]"
 				direction = horizontal
 				spacing = 5
 				datamodel = "[CompanyType.GetPotentialBuildingTypes(GetPlayer.Self)]"
@@ -10714,6 +10625,12 @@ types TooltipTypes
 				text = "[InterestTierType.GetTradeAdvantageDesc]"
 			}
 
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(InterestTierType.GetLeverageGenerationMultDesc))]"
+				margin_left = 10
+				text = "[InterestTierType.GetLeverageGenerationMultDesc]"
+			}
+
 			tooltip_divider = {}
 
 			custom_tooltip_textbox = {
@@ -10787,7 +10704,13 @@ types TooltipTypes
 				}
 
 				custom_tooltip_textbox = {
-					visible = "[And(And(StringIsEmpty(InterestTierType.GetOnActivateEffectDesc(Country.Self, StrategicRegion.Self)), StringIsEmpty(InterestTierType.GetStateModifier.GetDesc)), StringIsEmpty(InterestTierType.GetTradeAdvantageDesc))]"
+					visible = "[Not(StringIsEmpty(InterestTierType.GetLeverageGenerationMultDesc))]"
+					margin_left = 10
+					text = "[InterestTierType.GetLeverageGenerationMultDesc]"
+				}
+
+				custom_tooltip_textbox = {
+					visible = "[And4(StringIsEmpty(InterestTierType.GetOnActivateEffectDesc(Country.Self, StrategicRegion.Self)), StringIsEmpty(InterestTierType.GetStateModifier.GetDesc), StringIsEmpty(InterestTierType.GetTradeAdvantageDesc), StringIsEmpty(InterestTierType.GetLeverageGenerationMultDesc))]"
 					margin_left = 10
 					text = "INTEREST_TIER_NO_EFFECT"
 				}
@@ -10929,6 +10852,43 @@ types TooltipTypes
 			}
 		}
 	}
+
+	type FancyTooltip_ShipVeterancyLevel = FancyTooltipWidgetType {
+		blockoverride "text" {}
+
+		blockoverride "icon_texture" {
+			texture = "[ShipVeterancyLevel.GetTexture]"
+		}
+
+		blockoverride "icon_size" {
+			size = { 100% 100% }
+		}
+
+		blockoverride "name" {
+			text = "[ShipVeterancyLevel.GetNameNoFormatting]"
+		}
+
+		blockoverride "type" {
+			text = "[concept_veterancy_level]"
+		}
+
+		blockoverride "tooltip_content_after" {
+			custom_tooltip_textbox_with_empty_line = {
+				visible = "[Not(ShipVeterancyLevel.IsMaxLevel)]"
+				text = "SHIP_VETERANCY_LEVEL_EXPERIENCE_THRESHOLD"
+			}
+
+			custom_tooltip_textbox = {
+				visible = "[Not(StringIsEmpty(ShipVeterancyLevel.GetModifierDesc))]"
+				text = "[ShipVeterancyLevel.GetModifierDesc]"
+			}
+			custom_tooltip_textbox = {
+				visible = "[StringIsEmpty(ShipVeterancyLevel.GetModifierDesc)]"
+				text = "NO_VETERANCY_MODIFIERS"
+			}
+		}
+	}
+
 
 	type FancyTooltip_JournalEntry = FancyTooltipWidgetType {
 		blockoverride "text" {
@@ -11636,6 +11596,11 @@ types TooltipTypes
 		}
 	}
 
+	type RegularTooltip_MarketFeesIncome = RegularTooltip {
+		blockoverride "tooltip_content_after" {
+		}
+	}
+
 	type RegularTooltip_Leverage = RegularTooltip {
 		blockoverride "tooltip_content_after" {
 			custom_tooltip_textbox = {
@@ -11768,7 +11733,13 @@ types TooltipTypes
 			custom_tooltip_2_columns = {
 				blockoverride "left_column" {
 					custom_tooltip_textbox_column_width = {
-						text = "DATA_MILITARY_FORMATION_UNITS"
+						text = "DATA_MILITARY_FORMATION_REGULARS"
+					}
+
+					custom_tooltip_textbox_column_width = {
+						visible = "[MilitaryFormation.IsArmy]"
+						alpha = "[TransparentIfTrue(Not(MilitaryFormation.HasRaisedConscripts))]"
+						text = "DATA_MILITARY_FORMATION_CONSCRIPTS"
 					}
 
 					custom_tooltip_textbox_column_width = {
@@ -12004,6 +11975,7 @@ types TooltipTypes
 									modify_texture = {
 										using = simple_frame_mask
 									}
+
 									icon = {
 										using = simple_frame
 										size = { 100% 100% }
@@ -12011,6 +11983,11 @@ types TooltipTypes
 
 									offense_defense_info_small = {
 										position = { -2 -2 }
+
+										background = {
+											using = dark_area
+											alpha = 0.7
+										}
 									}
 								}
 
@@ -12022,7 +11999,6 @@ types TooltipTypes
 										visible = "[MilitaryFormation.IsArmy]"
 										autoresize = yes
 										align = nobaseline
-										using = fontsize_large
 										using = elide_fontsize_min
 										max_width = 65
 										parentanchor = hcenter
@@ -12446,27 +12422,29 @@ types TooltipTypes
 				}
 			}
 		}
-		flowcontainer = {
-			min_width = @tooltip_fixed_width
-			max_width = @tooltip_fixed_width
-			direction = vertical
-			visible = "[InDebugMode]"
 
-			DefaultTooltipTextBox = {
-				text = "[MilitaryFormation.GetCommonDebugInfo]"
-				align = nobaseline
-				autoresize = yes
-				multiline = yes
-				maximumsize = { 500 -1 }
-			}
+		blockoverride "buttons" {
+			flowcontainer = {
+				min_width = @tooltip_fixed_width
+				max_width = @tooltip_fixed_width
+				direction = vertical
+				visible = "[InDebugMode]"
 
-			DefaultTooltipTextBox = {
-				visible = "[Not(MilitaryFormation.GetCountry.IsPlayer)]"
-				text = "[MilitaryFormation.GetAIDebugInfo]"
-				align = nobaseline
-				autoresize = yes
-				multiline = yes
-				maximumsize = { 500 -1 }
+				DefaultTooltipTextBox = {
+					text = "[MilitaryFormation.GetCommonDebugInfo]"
+					align = nobaseline
+					autoresize = yes
+					multiline = yes
+					maximumsize = { 500 -1 }
+				}
+
+				DefaultTooltipTextBox = {
+					text = "[MilitaryFormation.GetAIDebugInfo]"
+					align = nobaseline
+					autoresize = yes
+					multiline = yes
+					maximumsize = { 500 -1 }
+				}
 			}
 		}
 	}

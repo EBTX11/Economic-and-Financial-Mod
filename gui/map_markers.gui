@@ -936,10 +936,10 @@ container = {
 
         ### Interest Tier Icon
         container = {
+            visible = "[Or(NotZero_CFixedPoint(Country.GetTargetInvolvementIn(StrategicRegion.Self)), NotZero_CFixedPoint(Country.GetCurrentInvolvementIn(StrategicRegion.Self)))]"
             parentanchor = hcenter
             datacontext = "[GetPlayer]"
             datacontext = "[GetPlayer.GetCurrentInterestTierTypeIn(StrategicRegion.Self)]"
-            visible = "[Or(NotZero_CFixedPoint(Country.GetTargetInvolvementIn(StrategicRegion.Self)), NotZero_CFixedPoint(Country.GetCurrentInvolvementIn(StrategicRegion.Self)))]"
 
             button = {
                 size = { 65 65 }
@@ -2801,7 +2801,7 @@ button = {
 	}
 
 	is_mobilizing_progressbar = {
-		visible = "[Not(FormationMarker.HasMultipleFormations)]"
+		visible = "[And(MilitaryFormation.IsMobilizing, Not(FormationMarker.HasMultipleFormations))]"
 		blockoverride "textbox" {}
 
 		blockoverride "button_size" {
@@ -3767,44 +3767,86 @@ container = {
 			margin_top = 2
 
 			item = {
-				button_icon_round = {
+				widget = {
 					size = { 40 40 }
-					onclick = "[InformationPanelBar.OpenSeaRegionPanelTab(NavalMissionMarker.GetProvince.Self, 'navy')]"
-					onrightclick = "[RightClickMenuManager.ToggleFleetsOnMissionInSeaRegion(NavalMissionMarker.Self, NavalMissionType.Self, PdxGuiWidget.AccessSelf, 'fleets_on_mission_in_sea_region')]"
-					tooltip = "NAVAL_MISSION_MARKER_TOOLTIP"
 
-					state = {
-	                    name = "big"
-	                    trigger_when = "[IsZoomLevelNear]"
-	                    size = { 40 40 }
-	                    duration = 0.2
-	                }
+					button_icon_round = {
+						parentanchor = center
+						size = { 40 40 }
+						onclick = "[InformationPanelBar.OpenSeaRegionPanelTab(NavalMissionMarker.GetProvince.Self, 'navy')]"
+						onrightclick = "[RightClickMenuManager.ToggleFleetsOnMissionInSeaRegion(NavalMissionMarker.Self, NavalMissionType.Self, PdxGuiWidget.AccessSelf, 'fleets_on_mission_in_sea_region')]"
+						tooltip = "NAVAL_MISSION_MARKER_TOOLTIP"
+						alpha = "[Select_float(NavalMissionMarker.AreAllFleetsOnMissionTypeRecalledForRepairs(NavalMissionType.Self),'(float)0.5','(float)1.0')]"
 
-	                state = {
-	                    name = "mid"
-	                    trigger_when = "[IsZoomLevelMid]"
-	                    size = { 36 36 }
-	                    duration = 0.2
-	                }
+						state = {
+							name = "big"
+							trigger_when = "[IsZoomLevelNear]"
+							size = { 40 40 }
+							duration = 0.2
+						}
 
-	                state = {
-	                    name = "small"
-	                    trigger_when = "[IsZoomLevelFar]"
-	                    size = { 34 34 }
-	                    duration = 0.2
-	                }
+						state = {
+							name = "mid"
+							trigger_when = "[IsZoomLevelMid]"
+							size = { 36 36 }
+							duration = 0.2
+						}
 
-					blockoverride "icon" {
-						texture = "[NavalMissionType.GetIcon]"
+						state = {
+							name = "small"
+							trigger_when = "[IsZoomLevelFar]"
+							size = { 34 34 }
+							duration = 0.2
+						}
+
+						blockoverride "icon" {
+							texture = "[NavalMissionType.GetIcon]"
+						}
+
+						blockoverride "icon_size" {
+							size = { 75% 75% }
+						}
+
+						action_selection_number = {
+							blockoverride "text" {
+								text = "[NavalMissionMarker.GetNumFleetsOnMissionType(NavalMissionType.Self)]"
+							}
+						}
 					}
 
-					blockoverride "icon_size" {
-						size = { 75% 75% }
-					}
+					icon = {
+						name = "repair_indicator"
+						parentanchor = bottom|right
+						widgetanchor = center
+						position = { -6 -6 }
+						size = { 22 22 }
+						texture = "gfx/interface/icons/alert_icons/repairing.dds"
+						visible = "[NavalMissionMarker.IsAnyFleetOnMissionTypeRecalledForRepairs(NavalMissionType.Self)]"
+						alpha = 0.9
+						alwaystransparent = yes
 
-					action_selection_number = {
-						blockoverride "text" {
-							text = "[NavalMissionMarker.GetNumFleetsOnMissionType(NavalMissionType.Self)]"
+						state = {
+							name = "big"
+							trigger_when = "[IsZoomLevelNear]"
+							position = { -6 -6 }
+							size = { 22 22 }
+							duration = 0.2
+						}
+
+						state = {
+							name = "mid"
+							trigger_when = "[IsZoomLevelMid]"
+							position = { -7 -7 }
+							size = { 20 20 }
+							duration = 0.2
+						}
+
+						state = {
+							name = "small"
+							trigger_when = "[IsZoomLevelFar]"
+							position = { -8 -8 }
+							size = { 19 19 }
+							duration = 0.2
 						}
 					}
 				}
@@ -5569,8 +5611,8 @@ container = {
 			FancyTooltip_Strait = {}
 		}
 
-		### Zoom levels Mid & Near
 		widget = {
+			visible = "[Not(And(IsMapModeSelected( 'mm_default' ), IsZoomLevelFar))]"
 			parentanchor = bottom|hcenter
 			size = { 30 30 }
 

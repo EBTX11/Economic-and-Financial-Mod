@@ -1,10 +1,10 @@
 import os
 
 # Chemin complet vers le fichier source
-chemin_source = 'C:/Users/Compte principal/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/history/global/00_ef_economic_global_variable.txt'
+chemin_source = 'C:/Users/Compt/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/history/global/00_ef_economic_global_variable.txt'
 
 # Chemin complet vers le fichier de destination
-chemin_destination = 'C:/Users/Compte principal/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/scripted_effects/10_new_country_var.txt'
+chemin_destination = 'C:/Users/Compt/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/scripted_effects/10_new_country_var.txt'
 
 # Balises dans le fichier source
 balise_debut_source = "#begin_copy"

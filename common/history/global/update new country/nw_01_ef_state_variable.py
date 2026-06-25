@@ -1,7 +1,7 @@
 import os
 
 # Chemin complet vers le fichier source
-chemin_source = 'C:/Users/Compt/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/history/global/00_ef_financial_global_variable.txt'
+chemin_source = 'C:/Users/Compt/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/history/global/01_ef_state_global_variable.txt'
 
 # Chemin complet vers le fichier de destination
 chemin_destination = 'C:/Users/Compt/Documents/Paradox Interactive/Victoria 3/mod/Economic-and-Financial-Mod/common/scripted_effects/10_new_country_var.txt'
@@ -11,8 +11,8 @@ balise_debut_source = "#begin_copy"
 balise_fin_source = "#end_copy"
 
 # Balises dans le fichier de destination
-balise_debut_destination = "#begin_past_financial_event"
-balise_fin_destination = "#end_past_financial_event"
+balise_debut_destination = "#begin_past_state_event"
+balise_fin_destination = "#end_past_state_event"
 
 # Ouvrir le fichier source en mode lecture en utilisant le codec 'utf-8'
 with open(chemin_source, 'r', encoding='utf-8') as source_file:

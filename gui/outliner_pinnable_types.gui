@@ -74,9 +74,10 @@ types pinnable_outliner_items {
 				parentanchor = vcenter
 
 				icon = {
+					datacontext = "[Character.GetMilitaryFormation]"
+					visible = "[MilitaryFormation.IsValid]"
 					parentanchor = vcenter
 					size = { 28 28 }
-					datacontext = "[Character.GetMilitaryFormation]"
 					texture = "[MilitaryFormation.GetFlag]"
 					color = "[MilitaryFormation.GetFlagColor]"
 
@@ -86,8 +87,8 @@ types pinnable_outliner_items {
 				}
 
 				icon = {
+					visible = "[And(Character.IsGeneral, Character.GetOrderType.IsValid)]"
 					size = { 26 26 }
-					visible = "[Character.IsGeneral]"
 					texture = "[Character.GetOrderType.GetTexture]"
 					tooltip = "COMMANDER_ORDER_TOOLTIP"
 					parentanchor = vcenter
@@ -753,16 +754,6 @@ types pinnable_outliner_items {
 			using = highlighted_square_selection
 		}
 
-		blockoverride "text" {
-			text = "MILITARY_FORMATION_NAME_OUTLINER"
-		}
-
-		blockoverride "outliner_item_tooltip" {
-			tooltipwidget = {
-				FancyTooltip_MilitaryFormation = {}
-			}
-		}
-
 		blockoverride "onclick" {
 			onclick = "[InformationPanelBar.OpenMilitaryFormationPanelTab( MilitaryFormation.Self, 'default' )]"
 			onrightclick = "[RightClickMenuManager.ShowForMilitaryFormation(MilitaryFormation.AccessSelf)]"
@@ -780,129 +771,151 @@ types pinnable_outliner_items {
 			onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 		}
 
-		blockoverride "icon" {
-			flowcontainer = {
-				icon = {
-					parentanchor = vcenter
-					size = { 24 24 }
-					texture = "[MilitaryFormation.GetFlag]"
-					color = "[MilitaryFormation.GetFlagColor]"
-				}
-			}
-		}
-
-		blockoverride "additional_info" {
-			flowcontainer = {
-				spacing = 5
+		blockoverride "widget" {
+			widget = {
+				size = { 315 24 }
 				parentanchor = vcenter
+				position = { 5 0 }
 
-				textbox = {
-					visible = "[MilitaryFormation.IsArmy]"
-					raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
-					tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
-					autoresize = yes
-					minimumsize = { 90 -1 }
-					maximumsize = { 90 -1 }
-					align = right|nobaseline
-					parentanchor = vcenter
-					using = transparent_if_unmobilized_in_conflict
-					margin_right = 3
-				}
-
-				widget = {
-					visible = "[MilitaryFormation.IsFleet]"
-					size = { 24 -1 }
-					parentanchor = vcenter
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					layoutpolicy_vertical = expanding
+					spacing = 5
 
 					icon = {
-						visible = "[MilitaryFormation.HasNavalMission]"
-						parentanchor = vcenter
 						size = { 24 24 }
-						texture = "[MilitaryFormation.GetNavalMission.GetType.GetIcon]"
+						texture = "[MilitaryFormation.GetFlag]"
+						color = "[MilitaryFormation.GetFlagColor]"
 					}
 
-					icon = {
-						visible = "[And(Not(MilitaryFormation.HasNavalMission), MilitaryFormation.HasInvasion)]"
-						parentanchor = vcenter
+					textbox = {
+						layoutpolicy_horizontal = expanding
+						size = { 0 24 }
+						align = nobaseline
+						using = elide_fontsize_min
+						text = "MILITARY_FORMATION_NAME_OUTLINER"
+					}
+
+					hbox = {
+						visible = "[MilitaryFormation.IsArmy]"
+						spacing = 5
+
+						textbox = {
+							autoresize = yes
+							align = right|nobaseline
+							elide = right
+							max_width = 130
+							fontsize = 14
+							using = transparent_if_unmobilized_in_conflict
+							tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+							text = "MILITARY_FORMATION_REGULARS_COUNT"
+						}
+
+						textbox = {
+							visible = "[GreaterThanZero(MilitaryFormation.GetMaxConscripts)]"
+							autoresize = yes
+							align = right|nobaseline
+							alpha = "[TransparentIfTrue(Not(MilitaryFormation.HasRaisedConscripts))]"
+							elide = right
+							max_width = 130
+							fontsize = 14
+							tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+							text = "MILITARY_FORMATION_CONSCRIPTS_COUNT"
+						}
+					}
+
+					widget = {
+						visible = "[MilitaryFormation.IsFleet]"
 						size = { 24 24 }
-						texture = "gfx/interface/icons/formation_order_icons/naval_invasion.dds"
+
+						icon = {
+							visible = "[MilitaryFormation.HasNavalMission]"
+							parentanchor = center
+							size = { 24 24 }
+							texture = "[MilitaryFormation.GetNavalMission.GetType.GetIcon]"
+						}
+
+						icon = {
+							visible = "[And(Not(MilitaryFormation.HasNavalMission), MilitaryFormation.HasInvasion)]"
+							parentanchor = center
+							size = { 24 24 }
+							texture = "gfx/interface/icons/formation_order_icons/naval_invasion.dds"
+						}
+
+						icon = {
+							visible = "[And(Not(MilitaryFormation.HasNavalMission), And(Not(MilitaryFormation.HasInvasion), MilitaryFormation.IsAboutToTransportArmies))]"
+							parentanchor = center
+							size = { 24 24 }
+							texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+						}
 					}
 
-					icon = {
-						visible = "[And(Not(MilitaryFormation.HasNavalMission), And(Not(MilitaryFormation.HasInvasion), MilitaryFormation.IsAboutToTransportArmies))]"
-						parentanchor = vcenter
-						size = { 24 24 }
-						texture = "gfx/interface/icons/formation_order_icons/embark_onto_fleet.dds"
+					textbox = {
+						visible = "[MilitaryFormation.IsFleet]"
+						autoresize = yes
+						align = right|nobaseline
+						fontsize = 14
+						max_width = 200
+						elide = right
+						raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
+						tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
 					}
-				}
 
-				textbox = {
-					visible = "[MilitaryFormation.IsFleet]"
-					raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
-					tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
-					autoresize = yes
-					minimumsize = { 60 -1 }
-					maximumsize = { 60 -1 }
-					align = right|nobaseline
-					parentanchor = vcenter
-				}
-
-				manpower_bar = {
-					visible = "[MilitaryFormation.IsArmy]"
-					size = { 6 18 }
-					parentanchor = vcenter
-					alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
-				}
-
-				crew_bar = {
-					visible = "[MilitaryFormation.IsFleet]"
-					size = { 6 18 }
-					parentanchor = vcenter
-					alpha = "[TransparentIfTrue(EqualTo_int32(MilitaryFormation.GetShipList.GetCrewMax, MilitaryFormation.GetShipList.GetCrew))]"
-				}
-
-				organization_bar = {
-					tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
-					parentanchor = vcenter
-					size = { 6 18 }
-
-					blockoverride "organization_value" {
-						value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+					manpower_bar = {
+						visible = "[MilitaryFormation.IsArmy]"
+						size = { 6 18 }
+						alpha = "[TransparentIfTrue(EqualTo_int64(MilitaryFormation.GetMaxManpower, MilitaryFormation.GetCurrentManpower))]"
 					}
-					blockoverride "organization_color" {
-						color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
-					}
-					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
-				}
 
-				morale_bar = {
-					visible = "[MilitaryFormation.IsArmy]"
-					size = { 6 18 }
-					parentanchor = vcenter
-					tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+					crew_bar = {
+						visible = "[MilitaryFormation.IsFleet]"
+						size = { 6 18 }
+						alpha = "[TransparentIfTrue(EqualTo_int32(MilitaryFormation.GetShipList.GetCrewMax, MilitaryFormation.GetShipList.GetCrew))]"
+					}
 
-					blockoverride "morale_value" {
-						value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
-					}
-					blockoverride "morale_color" {
-						color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
-					}
-					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetMorale, '(CFixedPoint)1'))]"
-				}
+					organization_bar = {
+						tooltip = "MILITARY_FORMATION_ORGANIZATION_TOOLTIP"
+						size = { 6 18 }
+						alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetOrganizationPercentage, '(CFixedPoint)1'))]"
 
-				hit_points_bar = {
-					visible = "[MilitaryFormation.IsFleet]"
-					size = { 6 18 }
-					parentanchor = vcenter
-					tooltip = "MILITARY_FORMATION_HIT_POINTS_TOOLTIP"
+						blockoverride "organization_value" {
+							value = "[FixedPointToFloat( MilitaryFormation.GetOrganizationPercentage )]"
+						}
 
-					blockoverride "hit_points_value" {
-						value = "[FixedPointToFloat(MilitaryFormation.GetHitPointsPercentage)]"
+						blockoverride "organization_color" {
+							color = "[GetOrganizationColorVec( MilitaryFormation.GetOrganizationPercentage )]"
+						}
 					}
-					blockoverride "hit_points_color" {
-						color = "[GetMoraleColorVec(MilitaryFormation.GetHitPointsPercentage)]"
+
+					morale_bar = {
+						visible = "[MilitaryFormation.IsArmy]"
+						size = { 6 18 }
+						tooltip = "MILITARY_FORMATION_MORALE_TOOLTIP"
+						alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetMorale, '(CFixedPoint)1'))]"
+
+						blockoverride "morale_value" {
+							value = "[FixedPointToFloat( MilitaryFormation.GetMorale )]"
+						}
+
+						blockoverride "morale_color" {
+							color = "[GetMoraleColorVec( MilitaryFormation.GetMorale )]"
+						}
 					}
-					alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetHitPointsPercentage, '(CFixedPoint)1'))]"
+
+					hit_points_bar = {
+						visible = "[MilitaryFormation.IsFleet]"
+						size = { 6 18 }
+						tooltip = "MILITARY_FORMATION_HIT_POINTS_TOOLTIP"
+						alpha = "[TransparentIfTrue(EqualTo_CFixedPoint(MilitaryFormation.GetHitPointsPercentage, '(CFixedPoint)1'))]"
+
+						blockoverride "hit_points_value" {
+							value = "[FixedPointToFloat(MilitaryFormation.GetHitPointsPercentage)]"
+						}
+
+						blockoverride "hit_points_color" {
+							color = "[GetMoraleColorVec(MilitaryFormation.GetHitPointsPercentage)]"
+						}
+					}
 				}
 			}
 		}
@@ -1007,12 +1020,7 @@ types pinnable_outliner_items {
 				}
 
 				blockoverride "title" {
-					formation_item = {
-						blockoverride "text_size" {
-							minimumsize = { 165 -1 }
-							maximumsize = { 165 -1 }
-						}
-					}
+					formation_item = {}
 				}
 			}
 		}
@@ -1159,6 +1167,23 @@ types pinnable_outliner_items {
 
 	type outliner_magnates = pinnable_outliner_group {
 		datacontext = "[Outliner.AccessCategory('magnates')]"
+
+		blockoverride "item" {
+			character_item = {
+				blockoverride "entry_size" {
+					size = { @entry_width @entry_height }
+				}
+
+				blockoverride "text_size" {
+					minimumsize = { 132 -1 }
+					maximumsize = { 132 -1 }
+				}
+			}
+		}
+	}
+
+	type outliner_other = pinnable_outliner_group {
+		datacontext = "[Outliner.AccessCategory('other')]"
 
 		blockoverride "item" {
 			character_item = {

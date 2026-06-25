@@ -761,7 +761,7 @@ types military_formation_panel_types
 
 								### TOTAL VISIBILITY
 								small_header_grid_item = {
-									tooltip = "[concept_visibility]"
+									tooltip = "MILITARY_FORMATION_VISIBILITY_TOOLTIP"
 
 									blockoverride "small_header_size" {
 										size = { 85 30 }
@@ -778,7 +778,7 @@ types military_formation_panel_types
 
 								### CARRYING CAPACITY
 								small_header_grid_item = {
-									tooltip = "[concept_carrying_capacity]"
+									tooltip = "MILITARY_FORMATION_CARRYING_CAPACITY_TOOLTIP"
 
 									blockoverride "small_header_size" {
 										size = { 85 30 }
@@ -799,7 +799,7 @@ types military_formation_panel_types
 
 								### MARINE CAPACITY
 								small_header_grid_item = {
-									tooltip = "[concept_marine_capacity]"
+									tooltip = "MILITARY_FORMATION_MARINE_CAPACITY_TOOLTIP"
 
 									blockoverride "small_header_size" {
 										size = { 85 30 }
@@ -963,7 +963,9 @@ types military_formation_panel_types
 					}
 				}
 
+				### Tabs for Armies
 				tab_buttons = {
+					visible = "[MilitaryFormation.IsArmy]"
 					datacontext = "[MilitaryFormation.GetShipList]"
 
 					# Information
@@ -997,10 +999,10 @@ types military_formation_panel_types
 						onclick = "[InformationPanel.SelectTab('mobilization')]"
 					}
 					blockoverride "second_button_visibility" {
-						visible = "[And(Not(IsDataModelEmpty(MilitaryFormation.GetMobilizationOptions)),InformationPanel.IsTabSelected('mobilization'))]"
+						visible = "[And(Not(IsDataModelEmpty(MilitaryFormation.GetMobilizationOptions)), InformationPanel.IsTabSelected('mobilization'))]"
 					}
 					blockoverride "second_button_visibility_checked" {
-						visible = "[And(Not(IsDataModelEmpty(MilitaryFormation.GetMobilizationOptions)),Not(InformationPanel.IsTabSelected('mobilization')))]"
+						visible = "[And(Not(IsDataModelEmpty(MilitaryFormation.GetMobilizationOptions)), Not(InformationPanel.IsTabSelected('mobilization')))]"
 					}
 					blockoverride "second_button_selected" {
 						text = "MILITARY_FORMATION_PANEL_MOBILIZATION_TAB_SELECTED"
@@ -1045,24 +1047,90 @@ types military_formation_panel_types
 					blockoverride "fourth_button_selected" {
 						text = "MILITARY_FORMATION_PANEL_MODIFIERS_TAB_SELECTED"
 					}
+				}
+
+				### Tabs for Fleets
+				tab_buttons = {
+					visible = "[MilitaryFormation.IsFleet]"
+					datacontext = "[MilitaryFormation.GetShipList]"
+
+					# Information
+					blockoverride "first_button" {
+						text = "MILITARY_FORMATION_PANEL_INFORMATION_TAB"
+					}
+					blockoverride "first_button_tooltip" {
+						tooltip = "MILITARY_FORMATION_PANEL_INFORMATION_TAB"
+					}
+					blockoverride "first_button_click" {
+						onclick = "[InformationPanel.SelectTab('default')]"
+					}
+					blockoverride "first_button_visibility" {
+						visible = "[InformationPanel.IsTabSelected('default')]"
+					}
+					blockoverride "first_button_visibility_checked" {
+						visible = "[Not( InformationPanel.IsTabSelected('default') )]"
+					}
+					blockoverride "first_button_selected" {
+						text = "MILITARY_FORMATION_PANEL_INFORMATION_TAB_SELECTED"
+					}
+
+					# Buildings
+					blockoverride "second_button" {
+						text = "MILITARY_FORMATION_PANEL_BUILDINGS_TAB"
+					}
+					blockoverride "second_button_tooltip" {
+						tooltip = "MILITARY_FORMATION_PANEL_BUILDINGS_TAB"
+					}
+					blockoverride "second_button_click" {
+						onclick = "[InformationPanel.SelectTab('buildings')]"
+					}
+					blockoverride "second_button_visibility" {
+						visible = "[InformationPanel.IsTabSelected('buildings')]"
+					}
+					blockoverride "second_button_visibility_checked" {
+						visible = "[Not( InformationPanel.IsTabSelected('buildings') )]"
+					}
+					blockoverride "second_button_selected" {
+						text = "MILITARY_FORMATION_PANEL_BUILDINGS_TAB_SELECTED"
+					}
+
+					# Modifiers
+					blockoverride "third_button" {
+						text = "MILITARY_FORMATION_PANEL_MODIFIERS_TAB"
+					}
+					blockoverride "third_button_tooltip" {
+						tooltip = "MILITARY_FORMATION_PANEL_MODIFIERS_TAB"
+					}
+					blockoverride "third_button_click" {
+						onclick = "[InformationPanel.SelectTab('modifiers')]"
+					}
+					blockoverride "third_button_visibility" {
+						visible = "[InformationPanel.IsTabSelected('modifiers')]"
+					}
+					blockoverride "third_button_visibility_checked" {
+						visible = "[Not( InformationPanel.IsTabSelected('modifiers') )]"
+					}
+					blockoverride "third_button_selected" {
+						text = "MILITARY_FORMATION_PANEL_MODIFIERS_TAB_SELECTED"
+					}
 
 					# Ship Construction Queue
-					blockoverride "fifth_button" {
+					blockoverride "fourth_button" {
 						raw_text = "MILITARY_FORMATION_CONSTRUCTION_QUEUE_TAB"
 					}
-					blockoverride "fifth_button_tooltip" {
+					blockoverride "fourth_button_tooltip" {
 						tooltip = "MILITARY_FORMATION_CONSTRUCTION_QUEUE_TAB_TOOLTIP"
 					}
-					blockoverride "fifth_button_click" {
+					blockoverride "fourth_button_click" {
 						onclick = "[InformationPanel.SelectTab('ships')]"
 					}
-					blockoverride "fifth_button_visibility" {
-						visible = "[And(MilitaryFormation.IsFleet, InformationPanel.IsTabSelected('ships'))]"
+					blockoverride "fourth_button_visibility" {
+						visible = "[InformationPanel.IsTabSelected('ships')]"
 					}
-					blockoverride "fifth_button_visibility_checked" {
-						visible = "[And(MilitaryFormation.IsFleet, Not(InformationPanel.IsTabSelected('ships')))]"
+					blockoverride "fourth_button_visibility_checked" {
+						visible = "[Not(InformationPanel.IsTabSelected('ships'))]"
 					}
-					blockoverride "fifth_button_selected" {
+					blockoverride "fourth_button_selected" {
 						raw_text = "MILITARY_FORMATION_CONSTRUCTION_QUEUE_TAB_SELECTED"
 					}
 				}
@@ -1516,13 +1584,23 @@ types military_formation_panel_types
 			spacing = 3
 
 			textbox = {
-				raw_text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_WITH_ICON"
-				tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
 				autoresize = yes
 				minimumsize = { 60 -1 }
 				maximumsize = { 60 -1 }
-				align = right|nobaseline
 				parentanchor = vcenter
+				align = right|nobaseline
+				tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+				text = "MILITARY_FORMATION_REGULARS_COUNT"
+			}
+
+			textbox = {
+				visible = "[And(MilitaryFormation.IsArmy, GreaterThanZero(MilitaryFormation.GetMaxConscripts))]"
+				autoresize = yes
+				parentanchor = vcenter
+				align = right|nobaseline
+				alpha = "[TransparentIfTrue(Not(MilitaryFormation.HasRaisedConscripts))]"
+				tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
+				text = "MILITARY_FORMATION_CONSCRIPTS_COUNT"
 			}
 
 			manpower_bar = {
@@ -1674,6 +1752,172 @@ types military_formation_panel_types
 				align = hcenter|nobaseline
 				alpha = 0.5
 				text = "FLEET_NO_PILFERED_GOODS"
+			}
+		}
+
+		### SUPPLY RAID
+		default_header = {
+			visible = "[MilitaryFormation.IsOnRaidSupplyMission]"
+			using = default_fade_in_out
+
+			blockoverride "text" {
+				text = "FLEET_SUPPLY_RAID_HEADER"
+			}
+		}
+
+		textbox = {
+			visible = "[And( MilitaryFormation.IsOnRaidSupplyMission, MilitaryFormation.HasSupplyRaidTargets )]"
+			parentanchor = hcenter
+			align = hcenter|nobaseline
+			autoresize = yes
+			multiline = yes
+			max_width = @panel_width_minus_10
+			using = elide_fontsize_min
+			margin = { 0 5 }
+			text = "FLEET_SUPPLY_RAID_SUMMARY"
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				visible = "[And( MilitaryFormation.IsOnRaidSupplyMission, Not( MilitaryFormation.HasSupplyRaidTargets ) )]"
+			}
+			blockoverride "text" {
+				text = "FLEET_NO_SUPPLY_RAID_TARGETS"
+			}
+		}
+
+		### PROTECT SUPPLY
+		default_header = {
+			visible = "[MilitaryFormation.IsOnProtectSupplyMission]"
+			using = default_fade_in_out
+
+			blockoverride "text" {
+				text = "FLEET_SUPPLY_PROTECT_HEADER"
+			}
+		}
+
+		textbox = {
+			visible = "[And( MilitaryFormation.IsOnProtectSupplyMission, MilitaryFormation.HasOwnSupplyShipsPassingThrough )]"
+			parentanchor = hcenter
+			align = hcenter|nobaseline
+			autoresize = yes
+			multiline = yes
+			max_width = @panel_width_minus_10
+			using = elide_fontsize_min
+			margin = { 0 5 }
+			text = "FLEET_SUPPLY_PROTECT_SUMMARY"
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				visible = "[And( MilitaryFormation.IsOnProtectSupplyMission, Not( MilitaryFormation.HasOwnSupplyShipsPassingThrough ) )]"
+			}
+			blockoverride "text" {
+				text = "FLEET_NO_OWN_SUPPLY_SHIPS"
+			}
+		}
+
+		### PORT BOMBARDMENT
+		default_header_2texts = {
+			visible = "[MilitaryFormation.IsOnPortBombardmentMission]"
+			using = default_fade_in_out
+
+			blockoverride "text1" {
+				text = "FLEET_PORT_BOMBARDMENT_HEADER"
+			}
+
+			blockoverride "right" {
+				flowcontainer = {
+					parentanchor = right|vcenter
+					spacing = 2
+					position = { -12 0 }
+
+					icon = {
+						size = { 30 30 }
+						texture = "gfx/interface/icons/state_status_icons/has_devastation.dds"
+					}
+
+					textbox = {
+						visible = "[MilitaryFormation.IsOnPortBombardmentMission]"
+						parentanchor = vcenter
+						align = nobaseline
+						autoresize = yes
+						max_width = @panel_width_minus_10
+						using = elide_fontsize_min
+						text = "FLEET_PORT_BOMBARDMENT_DEVASTATION"
+					}
+				}
+			}
+		}
+
+		flowcontainer = {
+			visible = "[And( MilitaryFormation.IsOnPortBombardmentMission, Not( IsDataModelEmpty( MilitaryFormation.GetBombardedStates ) ) )]"
+			parentanchor = hcenter
+			direction = vertical
+			spacing = 2
+			datamodel = "[MilitaryFormation.GetBombardedStates]"
+
+			item = {
+				button = {
+					size = { 540 40 }
+					using = default_button
+					onclick = "[InformationPanelBar.OpenStatePanel(State.AccessSelf)]"
+					onrightclick = "[RightClickMenuManager.ShowForState(State.AccessSelf)]"
+					tooltip = "TOOLTIP_STATE_DEVASTATION"
+
+					background = {
+						using = entry_bg_simple
+					}
+
+					hbox = {
+						margin = { 10 0 }
+						spacing = 5
+						layoutpolicy_horizontal = expanding
+						layoutpolicy_vertical = expanding
+
+						tiny_flag = {
+							datacontext = "[State.GetController]"
+						}
+
+						textbox = {
+							layoutpolicy_horizontal = expanding
+							size = { 0 20 }
+							align = nobaseline
+							using = elide_fontsize_min
+							text = "[State.GetNameNoFormatting]"
+						}
+
+						expand = {}
+
+						icon = {
+							size = { 24 24 }
+							texture = "gfx/interface/icons/state_status_icons/has_devastation.dds"
+						}
+
+						textbox = {
+							autoresize = yes
+							align = right|nobaseline
+							using = elide_fontsize_min
+							text = "BOMBARDMENT_STATE_DEVASTATION_WITH_DAILY_CHANGE"
+						}
+
+						textbox = {
+							autoresize = yes
+							align = nobaseline
+							using = elide_fontsize_min
+							raw_text = "(#bold [MilitaryFormation.GetDailyDevastationForBombardedState(State.Self)|=-2]#!)"
+						}
+					}
+				}
+			}
+		}
+
+		empty_state = {
+			blockoverride "visible" {
+				visible = "[And( MilitaryFormation.IsOnPortBombardmentMission, IsDataModelEmpty( MilitaryFormation.GetBombardedStates ) )]"
+			}
+			blockoverride "text" {
+				text = "FLEET_NO_PORT_BOMBARDMENT_TARGETS"
 			}
 		}
 
@@ -2788,6 +3032,8 @@ types military_formation_panel_types
 		direction = vertical
 		spacing = 2
 		margin_bottom = 10
+		alpha = "[TransparentIfFalse(MilitaryFormation.GetSelectedUnitTypeForGroup(CombatUnitGroup.Self).IsValid)]"
+		enabled = "[MilitaryFormation.GetSelectedUnitTypeForGroup(CombatUnitGroup.Self).IsValid]"
 
 		block "minimumsize" {
 			minimumsize = { @panel_width -1 }
@@ -2807,50 +3053,39 @@ types military_formation_panel_types
 			spacing = 5
 
 			block "content_margins" {
-				margin_top = 10
+				margin_top = 5
 				margin_left = 10
 			}
 
 			widget = {
 				size = { @panel_width_minus_20 34 }
 
-				button = {
-					using = expand_button_bg
+				section_header_button = {
 					size = { 100% 100% }
-					onclick = "[FormationPanel.ToggleUnitGroupExpanded( CombatUnitGroup.Self )]"
-				}
+					using = tooltip_ne
+					tooltip = "COMBAT_UNIT_GROUP_TOOLTIP"
 
-				### Expand/Collapse arrow
-				button = {
-					using = expand_arrow
-					parentanchor = left|vcenter
-					position = { 2 0 }
-					size = { 20 20 }
-					visible = "[Not( FormationPanel.IsUnitGroupExpanded( CombatUnitGroup.Self ) )]"
-					alwaystransparent = yes
-				}
+					blockoverride "left_text" {
+						text = "[CombatUnitGroup.GetName]"
+					}
 
-				button = {
-					using = expand_arrow_expanded
-					parentanchor = left|vcenter
-					position = { 2 0 }
-					size = { 20 20 }
-					visible = "[FormationPanel.IsUnitGroupExpanded( CombatUnitGroup.Self )]"
-					alwaystransparent = yes
-				}
+					blockoverride "right_text" {
+						margin_right = 10
 
-				textbox = {
-					position = { 24 0 }
-					parentanchor = left|vcenter
-					autoresize = yes
-					align = nobaseline
-					using = fontsize_large
-					text = "[CombatUnitGroup.GetName]"
-				}
+						combat_unit_type_group_summary = {}
+					}
 
-				combat_unit_type_group_summary = {
-					parentanchor = right|vcenter
-					position = { -10 0 }
+					blockoverride "onclick" {
+						onclick = "[FormationPanel.ToggleUnitGroupExpanded( CombatUnitGroup.Self )]"
+					}
+
+					blockoverride "onclick_showmore" {
+						visible = "[Not( FormationPanel.IsUnitGroupExpanded( CombatUnitGroup.Self ) )]"
+					}
+
+					blockoverride "onclick_showless" {
+						visible = "[FormationPanel.IsUnitGroupExpanded( CombatUnitGroup.Self )]"
+					}
 				}
 			}
 		}
@@ -2992,7 +3227,7 @@ types military_formation_panel_types
 			}
 
 			flowcontainer = {
-				visible = "[MilitaryFormation.GetCountry.IsLocalPlayer]"
+				visible = "[And(MilitaryFormation.GetCountry.IsLocalPlayer, MilitaryFormation.GetSelectedUnitTypeForGroup(CombatUnitGroup.Self).IsValid)]"
 				parentanchor = right
 				margin_right = 10
 				margin_top = 4
@@ -3561,6 +3796,50 @@ types military_formation_panel_types
 
 			blockoverride "text" {
 				text = "BUILDINGS"
+			}
+		}
+
+		# Naval administration summary widget.
+		container = {
+			datacontext = "[MilitaryFormation.GetNavalAdminBuildingTypeItem]"
+
+			buildings_production_method_item = {
+				blockoverride "section_header_interactable" {
+					alwaystransparent = yes
+				}
+
+				blockoverride "section_header_background" {
+					using = entry_bg_simple
+				}
+
+				blockoverride "arrow_visible" {
+					visible = no
+				}
+
+				blockoverride "left_textbox_margin_left" {
+					margin_left = 10
+				}
+
+				# The fleet panel does not live inside a BuildingBrowserPanel, so neutralize
+				# the expand-related references inherited from the base widget.
+				blockoverride "expand_onclick" {}
+
+				blockoverride "expand_showmore_visible" {
+					visible = no
+				}
+
+				blockoverride "expand_showless_visible" {
+					visible = no
+				}
+
+				blockoverride "expanded_list_visible" {
+					visible = no
+				}
+
+				# Hide the expand-construction button on other countries' fleets.
+				blockoverride "expand_button_visible" {
+					visible = "[MilitaryFormation.GetCountry.IsLocalPlayer]"
+				}
 			}
 		}
 
@@ -4941,12 +5220,18 @@ types military_formation_panel_types
 				parentanchor = hcenter
 				spacing = @military_formation_grid_spacing
 
-				### NUMBER OF UNITS
+				### NUMBER OF REGULAR BATTALIONS
 				header_grid_item = {
 					tooltip = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS_TOOLTIP"
 
 					blockoverride "text" {
-						text = "MILITARY_FORMATION_TOTAL_NUMBER_OF_UNITS"
+						text = "MILITARY_FORMATION_REGULARS_COUNT_NO_ICON"
+					}
+
+					blockoverride "text_default_format" {}
+
+					blockoverride "text_maximumsize" {
+						max_width = 110
 					}
 
 					blockoverride "icon" {
@@ -4954,24 +5239,23 @@ types military_formation_panel_types
 					}
 				}
 
-				### MANPOWER
+				### NUMBER OF CONSCRIPT BATTALIONS
 				header_grid_item = {
-					visible = "[MilitaryFormation.IsArmy]"
-					tooltip = "MILITARY_FORMATION_MANPOWER_TOOLTIP"
+					tooltip = "MILITARY_FORMATION_CONSCRIPTS_TOOLTIP"
 
 					blockoverride "text" {
-						raw_text = "[MilitaryFormation.GetCurrentManpower|Dv]"
+						text = "MILITARY_FORMATION_CONSCRIPTS_COUNT_NO_ICON"
+					}
+
+					blockoverride "text_default_format" {}
+
+					blockoverride "text_maximumsize" {
+						max_width = 110
+						alpha = "[TransparentIfTrue(Not(MilitaryFormation.HasRaisedConscripts))]"
 					}
 
 					blockoverride "icon" {
-						raw_text = "@manpower!"
-					}
-
-					blockoverride "progressbar" {
-						manpower_bar = {
-							using = formation_item_progressbar_size
-							parentanchor = vcenter
-						}
+						raw_text = "@conscripts!"
 					}
 				}
 
@@ -4982,6 +5266,10 @@ types military_formation_panel_types
 
 					blockoverride "text" {
 						raw_text = "MILITARY_FORMATION_MORALE_NO_ICON"
+					}
+
+					blockoverride "text_maximumsize" {
+						max_width = 95
 					}
 
 					blockoverride "icon" {
@@ -5012,6 +5300,7 @@ types military_formation_panel_types
 				header_grid_item = {
 					visible = "[MilitaryFormation.IsArmy]"
 					tooltip = "MILITARY_FORMATION_OFFENSE_TOOLTIP"
+					size = { 100 30 }
 
 					blockoverride "text" {
 						text = "[MilitaryFormation.GetAverageOffenseExcludeUnavailableManpower|1v]"
@@ -5026,6 +5315,7 @@ types military_formation_panel_types
 				header_grid_item = {
 					visible = "[MilitaryFormation.IsArmy]"
 					tooltip = "MILITARY_FORMATION_DEFENSE_TOOLTIP"
+					size = { 100 30 }
 
 					blockoverride "text" {
 						text = "[MilitaryFormation.GetAverageDefenseExcludeUnavailableManpower|1v]"
@@ -5036,10 +5326,37 @@ types military_formation_panel_types
 					}
 				}
 
+				### MANPOWER
+				header_grid_item = {
+					visible = "[MilitaryFormation.IsArmy]"
+					tooltip = "MILITARY_FORMATION_MANPOWER_TOOLTIP"
+					size = { 100 30 }
+
+					blockoverride "text" {
+						raw_text = "[MilitaryFormation.GetCurrentManpower|Dv]"
+					}
+
+					blockoverride "text_maximumsize" {
+						max_width = 45
+					}
+
+					blockoverride "icon" {
+						raw_text = "@manpower!"
+					}
+
+					blockoverride "progressbar" {
+						manpower_bar = {
+							using = formation_item_progressbar_size
+							parentanchor = vcenter
+						}
+					}
+				}
+
 				### ATTRITION
 				header_grid_item = {
 					tooltip = "[MilitaryFormation.GetAttritionRiskDesc]"
 					visible = "[MilitaryFormation.IsArmy]"
+					size = { 100 30 }
 
 					blockoverride "text" {
 						text = "[MilitaryFormation.GetAverageAttritionPerWeek|%1^-]"
@@ -5105,8 +5422,18 @@ types military_formation_panel_types
 					onmousehierarchyleave = "[AccessHighlightManager.RemoveHighlight]"
 					tooltip = "MILITARY_FORMATION_SUPPLY_TOOLTIP"
 
+					blockoverride "text_maximumsize" {
+						maximumsize = { 80 -1 }
+					}
+
 					blockoverride "text" {
-						text = "[MilitaryFormation.GetSupplyRatio|0v%]"
+						text = "[SelectLocalization(LessThan_CFixedPoint(MilitaryFormation.GetCurrentSupplyAmount, MilitaryFormation.GetSupplyCapacity), 'SUPPLY_CURRENT_AMOUNT_LOW', 'SUPPLY_CURRENT_AMOUNT_NORMAL')]/[MilitaryFormation.GetSupplyCapacity|D]"
+					}
+
+					blockoverride "text_default_format" {}
+
+					blockoverride "text_maximumsize" {
+						max_width = 95
 					}
 
 					blockoverride "icon" {
@@ -5122,6 +5449,14 @@ types military_formation_panel_types
 								value = "[MilitaryFormation.GetSupplyRatio]"
 							}
 						}
+					}
+
+					icon = {
+						visible = "[MilitaryFormation.HasLogisticsCenterGoodsShortage]"
+						size = { 22 22 }
+						position = { 5 7 }
+						tooltip = "SUPPLY_GOODS_SHORTAGE_DESC"
+						texture = "gfx/interface/icons/generic_icons/goods_shortage.dds"
 					}
 				}
 			}
@@ -5258,7 +5593,7 @@ types military_formation_panel_types
 					}
 
 					blockoverride "text" {
-						text = "[MilitaryFormation.GetBlockadeStrengthMax|vK]"
+						text = "[MilitaryFormation.GetBlockadeStrengthMax|D]"
 					}
 
 					blockoverride "icon" {
@@ -6904,12 +7239,16 @@ types formation_header {
 				maximumsize = { 65 -1 }
 			}
 			align = hcenter|nobaseline
-			default_format = "#v"
 			using = elide_fontsize_min
 			autoresize = yes
+			
+			block "text_default_format" {
+				default_format = "#v"
+			}
 
 			block "text_parentanchor" {
-				parentanchor = center
+				parentanchor = vcenter
+				position = { 25 0 }
 			}
 
 			block "text" {

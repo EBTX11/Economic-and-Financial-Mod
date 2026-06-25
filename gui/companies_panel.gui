@@ -348,40 +348,61 @@ types companies_panel
 
 				company_filter = {}
 
+				search_bar = {
+					parentanchor = hcenter
+					datacontext = "[CompaniesPanel.GetSearchBar]"
+				}
+
 				### sort buttons
 				widget = {
 					size = { @panel_width_plus_14 30 }
-					
+
 					hbox = {
 
 						sort_button = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
-							onclick = "[AccessPlayer.SortCompanies('name')]"
+							onclick = "[CompaniesPanel.SortCompanyTypes('name')]"
 							tooltip = "NAME"
 							text = "NAME"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsCompanyTypesSorted('name')]"
+							}
 						}
 
 						sort_button = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
-							onclick = "[AccessPlayer.SortCompanies('building_database_order')]"
+							onclick = "[CompaniesPanel.SortCompanyTypes('building_database_order')]"
 							tooltip = "BUILDING_DATABASE_ORDER"
 							text = "BUILDING_DATABASE_ORDER"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsCompanyTypesSorted('building_database_order')]"
+							}
 						}
 
 						sort_button = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
-							onclick = "[AccessPlayer.SortCompanies('productivity')]"
+							onclick = "[CompaniesPanel.SortCompanyTypes('productivity')]"
 							text = "[concept_productivity]"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsCompanyTypesSorted('productivity')]"
+							}
 						}
 
 						sort_button = {
 							layoutpolicy_horizontal = expanding
 							size = { 0 30 }
-							onclick = "[AccessPlayer.SortCompanies('levels')]"
+							onclick = "[CompaniesPanel.SortCompanyTypes('levels')]"
 							text = "[concept_building_level]"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsCompanyTypesSorted('levels')]"
+							}
 						}
 					}
 				}
@@ -443,6 +464,10 @@ types companies_panel
 							text = "COUNTRY"
 							onclick = "[CompaniesPanel.Sort('owner')]"
 							tooltip = "SORT_BY_COUNTRY"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsSorted('owner')]"
+							}
 						}
 
 						sort_button = {
@@ -451,6 +476,10 @@ types companies_panel
 							text = "NAME"
 							onclick = "[CompaniesPanel.Sort('name')]"
 							tooltip = "SORT_BY_NAME"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsSorted('name')]"
+							}
 						}
 
 						sort_button = {
@@ -467,6 +496,10 @@ types companies_panel
 							text = "concept_building_balance_profit"
 							onclick = "[CompaniesPanel.Sort('profit')]"
 							tooltip = "concept_building_balance_profit"
+
+							blockoverride "selected_visibility" {
+								visible = "[CompaniesPanel.IsSorted('profit')]"
+							}
 						}
 					}
 				}
@@ -887,6 +920,12 @@ types companies_panel
 														texture = "gfx/interface/icons/company_charter_icons/industry_charter.dds"
 													}
 
+													icon = {
+														visible = "[CompaniesPanel.IsBuildingFilterSelected(BuildingType.Self)]"
+														size = { 100% 100% }
+														using = highlighted_selected_square_selection
+													}
+
 													tooltipwidget = {
 														FancyTooltip_BuildingType = {
 															blockoverride "tooltip_content_before" {
@@ -917,7 +956,6 @@ types companies_panel
 						position = { -10 10 }
 						size = { 130 130 }
 						datacontext = "[Company.GetCompanyType]"
-						tooltip = "GO_TO_BUTTON_COMPANY"
 						onclick = "[InformationPanelBar.OpenCompanyPanel(Company.Self)]"
 						texture = "[CompanyType.GetIcon]"
 
@@ -1016,14 +1054,52 @@ types companies_panel
 
 					flowcontainer = {
 						direction = horizontal
-						spacing = 5							
+						spacing = 5
 						datamodel = "[CompanyType.AccessBuildingTypes(GetPlayer.Self)]"
-						
+
 						item = {
-							company_type_building_item = {}
+							widget = {
+								size = { 50 50 }
+								company_type_building_item = {}
+
+								icon = {
+									visible = "[CompaniesPanel.IsBuildingFilterSelected(BuildingType.Self)]"
+									size = { 100% 100% }
+									using = highlighted_selected_square_selection
+								}
+							}
 						}
 					}
-					
+
+					textbox = {
+						visible = "[HasDlcFeature('mp1_charter_companies')]"
+						autoresize = yes
+						align = nobaseline
+						using = elide_fontsize_min
+						max_width = 360
+						text = "DATA_COMPANY_TYPE_POTENTIAL_ADDITIONAL_INDUSTRIES_HEADER"
+					}
+
+					flowcontainer = {
+						visible = "[HasDlcFeature('mp1_charter_companies')]"
+						direction = horizontal
+						spacing = 5
+						datamodel = "[CompanyType.GetPotentialBuildingTypes(GetPlayer.Self)]"
+
+						item = {
+							widget = {
+								size = { 50 50 }
+								company_type_building_item = {}
+
+								icon = {
+									visible = "[CompaniesPanel.IsBuildingFilterSelected(BuildingType.Self)]"
+									size = { 100% 100% }
+									using = highlighted_selected_square_selection
+								}
+							}
+						}
+					}
+
 					flowcontainer = {
 						visible = "[Not(IsDataModelEmpty(CompanyType.GetPrestigeGoods))]"
 
@@ -1208,7 +1284,7 @@ types companies_panel
 		alpha = "[TransparentIfZero_int32(BuildingType.GetNumLevelsInCountryRaw(GetPlayer.Self))]"
 
 		block "icon_size" {
-			size = { 50 50 }	
+			size = { 50 50 }
 		}
 
 		textbox = {
@@ -1325,7 +1401,7 @@ types companies_panel
 						blockoverride "filter_line_buttons"
 						{
 							building_browser_filter_line_button = {
-								text = "COMPANY_AVAILABLE_FILTER_NAME"
+								text = "COMPANY_AVAILABLE_FILTER_TITLE"
 								align = hcenter
 
 								blockoverride "line_button_tooltip"{
@@ -1346,28 +1422,7 @@ types companies_panel
 							}
 
 							building_browser_filter_line_button = {
-								text = "COMPANY_POTENTIAL_FILTER_NAME"
-								align = hcenter
-
-								blockoverride "line_button_tooltip"{
-									tooltip = "COMPANY_POTENTIAL_FILTER_NAME"
-								}
-
-								blockoverride "line_button_onclick" {
-									onclick = "[CompaniesPanel.SetVisibilityFilter('potential')]"
-								}
-
-								blockoverride "line_button_icon_texture" {
-									visible = no
-								}
-
-								blockoverride "line_button_selected" {
-									visible = "[CompaniesPanel.IsVisibilityFilterSelected('potential')]"
-								}
-							}
-
-							building_browser_filter_line_button = {
-								text = "COMPANY_ATTAINABLE_FILTER_NAME"
+								text = "COMPANY_ATTAINABLE_FILTER_TITLE"
 								align = hcenter
 
 								blockoverride "line_button_tooltip"{
@@ -1384,6 +1439,27 @@ types companies_panel
 
 								blockoverride "line_button_selected" {
 									visible = "[CompaniesPanel.IsVisibilityFilterSelected('attainable')]"
+								}
+							}
+
+							building_browser_filter_line_button = {
+								text = "COMPANY_POTENTIAL_FILTER_TITLE"
+								align = hcenter
+
+								blockoverride "line_button_tooltip"{
+									tooltip = "COMPANY_POTENTIAL_FILTER_NAME"
+								}
+
+								blockoverride "line_button_onclick" {
+									onclick = "[CompaniesPanel.SetVisibilityFilter('potential')]"
+								}
+
+								blockoverride "line_button_icon_texture" {
+									visible = no
+								}
+
+								blockoverride "line_button_selected" {
+									visible = "[CompaniesPanel.IsVisibilityFilterSelected('potential')]"
 								}
 							}
 						}
@@ -1410,7 +1486,7 @@ types companies_panel
 							align = hcenter
 
 							blockoverride "line_button_tooltip"{
-								tooltip = "HISTORICAL_FILTER_NAME"
+								#tooltip = "HISTORICAL_FILTER_NAME"
 							}
 
 							blockoverride "line_button_onclick" {
@@ -1431,7 +1507,7 @@ types companies_panel
 							align = hcenter
 
 							blockoverride "line_button_tooltip"{
-								tooltip = "NON_HISTORICAL_FILTER_NAME"
+								#tooltip = "NON_HISTORICAL_FILTER_NAME"
 							}
 
 							blockoverride "line_button_onclick" {
@@ -1469,7 +1545,7 @@ types companies_panel
 							align = hcenter
 
 							blockoverride "line_button_tooltip"{
-								tooltip = "YES"
+								#tooltip = "YES"
 							}
 
 							blockoverride "line_button_onclick" {
@@ -1490,7 +1566,7 @@ types companies_panel
 							align = hcenter
 
 							blockoverride "line_button_tooltip"{
-								tooltip = "NO"
+								#tooltip = "NO"
 							}
 
 							blockoverride "line_button_onclick" {

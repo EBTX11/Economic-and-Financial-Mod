@@ -2159,7 +2159,7 @@ right_click_menu = {
 					texture = "gfx/interface/icons/formation_order_icons/station_armies.dds"
 				}
 
-				blockoverride = "text" {
+				blockoverride "text" {
 					text = "STATION_MILITARY_FORMATION_LABEL"
 				}
 
@@ -4515,7 +4515,7 @@ right_click_menu = {
 							tooltipwidget = {
 								FancyTooltip_MilitaryFormation = {
 									blockoverride "text_before" {
-										visible = "[Not(InvasionPlannerPopup.CanMilitaryFormationBeSelected(MilitaryFormation.Self))]"
+										visible = "[Not(StringIsEmpty(InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)))]"
 										text = "[InvasionPlannerPopup.GetCanMilitaryFormationBeSelectedTooltip(MilitaryFormation.Self)]"
 										margin_bottom = 15
 									}
@@ -5073,17 +5073,63 @@ right_click_menu = {
 					using = entry_bg_simple
 				}
 
+				fixedgridbox = {
+					parentanchor = hcenter
+					datamodel_reuse_widgets = yes
+					addcolumn = 160
+					addrow = 34
+					maxhorizontalslots = 2
+					datamodel = "[DataModelFirst(GetSelectedFleetsMissionSeaRegions, '(int32)6')]"
+
+					item = {
+						widget = {
+							size = { 155 30 }
+
+							background = {
+								using = entry_bg_simple
+							}
+
+							textbox = {
+								parentanchor = hcenter|vcenter
+								autoresize = yes
+								max_width = 145
+								align = hcenter|nobaseline
+								using = elide_fontsize_min
+								text = "STATE_REGION_LIST_ENTRY"
+							}
+						}
+					}
+				}
+
 				textbox = {
+					visible = "[GreaterThan_int32(GetDataModelSize(GetSelectedFleetsMissionSeaRegions), '(int32)6')]"
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					margin = { 0 2 }
+					raw_text = "#b [GetDataModelSize(DataModelSkipFirst(GetSelectedFleetsMissionSeaRegions, '(int32)6'))|=]#!"
+
+					tooltipwidget = {
+						RegularTooltip_AdditionalSeaRegions = {
+							blockoverride "datamodel" {
+								datamodel = "[DataModelSkipFirst(GetSelectedFleetsMissionSeaRegions, '(int32)6')]"
+							}
+						}
+					}
+				}
+
+				textbox = {
+					visible = "[And(GreaterThan_int32(GetNumberOfSelectedFleetsDifferentNavalMissionTypes, '(int32)0'), IsDataModelEmpty(GetSelectedFleetsMissionSeaRegions))]"
 					parentanchor = hcenter
 					autoresize = yes
 					align = hcenter|nobaseline
 					multiline = yes
 					max_width = 320
-					text = "NAVAL_MISSION_REGIONS"
+					text = "SELECTED_FLEETS_NO_NAVAL_MISSION_SEA_REGIONS"
 				}
 
 				textbox = {
-					visible = "[StringIsEmpty(GetSelectedFleetsMissionRegionsDesc)]"
+					visible = "[Not(GreaterThan_int32(GetNumberOfSelectedFleetsDifferentNavalMissionTypes, '(int32)0'))]"
 					parentanchor = hcenter
 					autoresize = yes
 					align = hcenter|nobaseline
@@ -5276,7 +5322,7 @@ right_click_menu = {
 
 			flowcontainer = {
 				spacing = 10
-				margin = { 20 10 }
+				margin = { 10 10 }
 				minimumsize = { 360 -1 }
 				direction = vertical
 
@@ -5284,17 +5330,71 @@ right_click_menu = {
 					using = entry_bg_simple
 				}
 
+				dynamicgridbox = {
+					parentanchor = hcenter
+					flipdirection = yes
+					datamodel_wrap = 2
+					datamodel = "[DataModelFirst(MilitaryFormation.GetNavalMissionSeaRegions, '(int32)6')]"
+
+					item = {
+						widget = {
+							size = { 165 40 }
+
+							widget = {
+								parentanchor = center
+								size = { 155 30 }
+								using = tooltip_ne
+
+								background = {
+									using = entry_bg_simple
+								}
+
+								tooltipwidget = {
+									FancyTooltip_StateRegion = {}
+								}
+
+								textbox = {
+									parentanchor = hcenter|vcenter
+									autoresize = yes
+									max_width = 145
+									align = hcenter|nobaseline
+									using = elide_fontsize_min
+									text = "[StateRegion.GetNameNoFormatting]"
+								}
+							}
+						}
+					}
+				}
+
 				textbox = {
+					visible = "[GreaterThan_int32(GetDataModelSize(MilitaryFormation.GetNavalMissionSeaRegions), '(int32)6')]"
+					parentanchor = hcenter
+					autoresize = yes
+					align = hcenter|nobaseline
+					margin = { 0 2 }
+					raw_text = "#b [GetDataModelSize(DataModelSkipFirst(MilitaryFormation.GetNavalMissionSeaRegions, '(int32)6'))|=]#!"
+
+					tooltipwidget = {
+						RegularTooltip_AdditionalSeaRegions = {
+							blockoverride "datamodel" {
+								datamodel = "[DataModelSkipFirst(MilitaryFormation.GetNavalMissionSeaRegions, '(int32)6')]"
+							}
+						}
+					}
+				}
+
+				textbox = {
+					visible = "[And(MilitaryFormation.HasNavalMission, IsDataModelEmpty(MilitaryFormation.GetNavalMissionSeaRegions))]"
 					parentanchor = hcenter
 					autoresize = yes
 					align = hcenter|nobaseline
 					multiline = yes
 					max_width = 320
-					text = "FLEET_NAVAL_MISSION_REGIONS"
+					text = "FLEET_NAVAL_MISSION_NO_SEA_REGIONS"
 				}
 
 				textbox = {
-					visible = "[StringIsEmpty(MilitaryFormation.GetNavalMissionRegionsDesc)]"
+					visible = "[Not(MilitaryFormation.HasNavalMission)]"
 					parentanchor = hcenter
 					autoresize = yes
 					align = hcenter|nobaseline
@@ -13244,7 +13344,7 @@ right_click_menu = {
 
 			### Transport
 			right_click_menu_item = {
-				visible = "[And( MilitaryFormation.IsFleet, And( Not( MilitaryFormation.IsTransportingArmies ), Not( MilitaryFormation.HasInvasion ) ) )]"
+				visible = "[And( MilitaryFormation.IsFleet, And( Not( MilitaryFormation.HasTransportedArmyOnboard ), Not( MilitaryFormation.HasInvasion ) ) )]"
 				size = { 260 44 }
 				tooltip = "MILITARY_FORMATION_TRANSPORT_TOOLTIP"
 
@@ -13293,6 +13393,30 @@ right_click_menu = {
 
 				blockoverride "text" {
 					text = "REHOME_MILITARY_FORMATION_LABEL"
+				}
+			}
+
+			### Recall for repairs
+			right_click_menu_item = {
+				visible = "[MilitaryFormation.IsFleet]"
+				size = { 260 44 }
+				tooltip = "RECALL_FLEET_FOR_REPAIRS_TOOLTIP"
+
+				blockoverride "button" {
+					using = default_button_map_interaction
+				}
+
+				blockoverride "properties" {
+					enabled = "[IsValid( MilitaryFormation.RecallForRepairs )]"
+					onclick = "[Execute( MilitaryFormation.RecallForRepairs )]"
+				}
+
+				blockoverride "texture" {
+					texture = "gfx/interface/icons/commander_order_icons/admiral_repairing.dds"
+				}
+
+				blockoverride "text" {
+					text = "RECALL_FLEET_FOR_REPAIRS_LABEL"
 				}
 			}
 		}
@@ -13512,6 +13636,12 @@ right_click_menu = {
 							datacontext = "[Country.GetDefaultConstructionFleet]"
 							datacontext = "[ShipTemplateList.GetDefaultTemplateForFleetOfType(MilitaryFormation.Self, ShipType.Self)]"
 
+							blockoverride "ship_type_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_ShipTemplate = {}
+								}
+							}
+
 							blockoverride "cancel_queue_enabled_and_onclick" {
 								tooltip = "FLEET_CANCEL_SHIP_TEMPLATE_CONSTRUCTION_TOOLTIP"
 								enabled = "[IsValid(ShipTemplate.CancelConstructionForFleet(MilitaryFormation.Self))]"
@@ -13560,6 +13690,12 @@ right_click_menu = {
 						build_ship_type_flowcontainer = {
 							visible = "[Not(Country.HasDefaultConstructionFleet)]"
 							datacontext = "[ShipTemplateList.GetDefaultTemplateOfType(ShipType.Self)]"
+
+							blockoverride "ship_type_tooltip" {
+								tooltipwidget = {
+									FancyTooltip_ShipTemplate = {}
+								}
+							}
 						}
 					}
 				}
@@ -15212,6 +15348,10 @@ types right_click_menu {
 				size = { 410 38 }
 			}
 
+			tooltipwidget = {
+				FancyTooltip_ShipType = {}
+			}
+
 			blockoverride "left_text" {
 				block "selected_ship_template_name" {
 					text = "[ShipType.GetNameNoFormatting]"
@@ -15889,13 +16029,28 @@ right_click_menu = {
 				}
 
 				### UNASSIGNED HEADER
-				textbox = {
+				widget = {
 					margin_top = 5
 					margin_left = 5
-					autoresize = yes
-					align = nobaseline
-					default_format = "#header"
-					text = "ASSIGN_COMMANDER_UNASSIGNED_HEADER"
+					size = { 370 24 }
+
+					textbox = {
+						parentanchor = vcenter
+						margin_left = 5
+						autoresize = yes
+						align = nobaseline
+						default_format = "#header"
+						text = "ASSIGN_COMMANDER_UNASSIGNED_HEADER"
+					}
+
+					textbox = {
+						parentanchor = right|vcenter
+						margin_right = 5
+						autoresize = yes
+						align = nobaseline
+						default_format = "#header"
+						text = "[SelectLocalization(MilitaryFormation.IsFleet, 'NUM_IDLE_ADMIRALS', 'NUM_IDLE_GENERALS')]/[SelectLocalization(MilitaryFormation.IsFleet, 'MAX_IDLE_ADMIRALS', 'MAX_IDLE_GENERALS')]"
+					}
 				}
 
 				### UNASSIGNED GENERALS
